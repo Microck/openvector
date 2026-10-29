@@ -1,5 +1,8 @@
 <div align="center">
-  <img src=".github/assets/openvector-logo.png" width="160" alt="openvector logo">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset=".github/assets/openvector-logo-reversed.png">
+    <img src=".github/assets/openvector-logo.png" width="160" height="160" alt="openvector logo">
+  </picture>
   <h1>openvector</h1>
   <p>raster-to-vector conversion for the desktop, terminal, and node.js.</p>
   <p>
