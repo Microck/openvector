@@ -1,6 +1,6 @@
 # Development
 
-The repository includes the independent Rust implementation, JavaScript differential reference, browser preview, tests and component contracts. Large fixtures are distributed separately as described in [test fixtures](test-fixtures.md). Historical `evidence/` links in component contracts refer to the local investigation archive, which is not part of this repository. Original application probes are development-only and are not included in this source distribution.
+The repository includes the independent Rust implementation, JavaScript differential reference, browser preview, tests and component contracts. Large fixtures stay local as described in [test fixtures](test-fixtures.md). Historical `evidence/` links in component contracts refer to the local investigation archive, which is not part of this repository. Original application probes are development-only and are not included in this source distribution.
 
 ## JavaScript differential reference
 

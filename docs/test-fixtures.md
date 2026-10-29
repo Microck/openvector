@@ -6,10 +6,10 @@ GUI artwork fixture. Ninety-one large capture files are excluded from Git; some
 exceed GitHub's per-file limit. Their exact paths, sizes and SHA-256 digests are in
 [the fixture manifest](fixtures-manifest.json).
 
-The complete corpus currently remains in the owner's local investigation workspace.
-A private distribution location is being selected. Until it is attached here,
-full differential suites require that local corpus. Missing fixtures are errors,
-not skipped tests or substituted expectations. `npm run test:smoke` does not need
+The complete corpus stays in the owner's local investigation workspace. It is not
+uploaded to Git, Git LFS, or GitHub Releases. Full differential suites require that
+local corpus. Missing fixtures are errors, not skipped tests or substituted
+expectations. `npm run test:smoke` does not need
 those omitted files.
 
 Copy the exact large captures into `test/fixtures/` before running the complete

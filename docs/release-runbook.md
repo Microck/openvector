@@ -100,8 +100,9 @@ Do not blindly retry, move a tag, delete a failed release, or overwrite an asset
 Complete only missing uploads whose reviewed bytes still match. A defective
 published build needs a new version with a clear correction note.
 
-## Reference corpus releases
+## Reference corpus
 
-A private fixture archive is test data, not an application release. Keep its tag,
-asset names, byte manifest and checksum pinned in `docs/test-fixtures.md`. It does
-not establish a product version or waive the application release gates above.
+Large reference captures stay local. Do not include them in source commits,
+application assets, or Git LFS. Use `docs/fixtures-manifest.json` to identify and
+verify the local files needed for a full differential run. Small checked-in
+fixtures keep the source smoke checks self-contained.

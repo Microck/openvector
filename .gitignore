@@ -39,7 +39,7 @@ __pycache__/
 !/tools/bitmap-jpeg-libc/
 !/tools/bitmap-raster-libc/
 
-# Large reference captures are stored in the private fixture archive.
+# Large reference captures stay local; see docs/fixtures-manifest.json.
 /test/fixtures/ai-reference.json.gz
 /test/fixtures/anti-alias-segmentation-reference.json
 /test/fixtures/blend-sample-reference.json
