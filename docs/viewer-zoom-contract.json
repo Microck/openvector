@@ -1,0 +1,147 @@
+{
+  "project": "openvector",
+  "status": "Native numeric zoom, source-fit geometry and bounded wheel-anchor arithmetic are verified. Wide/tall source fits match recorded geometry; 8127 wheel arithmetic cases match isolated original numeric instructions. Full viewer input/lifecycle and application parity remain unfinished.",
+  "targetSha256": "c491656b962debc215a8b6e757a9b2949ffe50a36b5f2db692706bcd4ebface1",
+  "nativeGetter": {
+    "address": "0x445a60",
+    "slider": {
+      "minimum": 0,
+      "maximum": 300,
+      "singleStep": 1,
+      "pageStep": 10
+    },
+    "curve": "Exponentiate a linear interpolation between log(0.2) and log(24), with slider value multiplied by binary64 1/300. The native x87 instruction sequence and its intermediate rounding define the result, not an approximate JavaScript expression.",
+    "controlWord": "0x027f",
+    "readOnlyCases": "../test/fixtures/bitmap-scale-reference.ndjson.gz"
+  },
+  "scalarProbeIntent": "Replay only the getter's arithmetic on all 301 owned integers. Copy its original instruction bytes into an owned executable allocation, relocate its three numeric constants, remove the receiver's slider-pointer read, and replace the imported slider-value call with a read of the owned integer argument. All arithmetic instructions remain byte-identical. No original code or data is patched. No Qt object, window, widget setter, application entry point, input event or dialog is used. Verify the instruction substitutions, repeat process output and agreement with all three independently captured getter doubles before accepting the corpus.",
+  "metricsProbeIntent": "A separate helper reads QGraphicsView::matrix, QMatrix coefficient getters, QWidget::rect, the original available/image-size getters, retained center, mode and scrollbar extent. Observe cold and two existing automatic source workflows twice each. Earlier 37 Qt/application helpers and the accepted scalar helper remain frozen. No widget setter, native input, scale/fit widget slot or dialog acknowledgement is permitted.",
+  "centerProbeIntent": "A separate helper reads existing viewport rectangles, horizontal/vertical scrollbar values and ranges, scene bounds, Qt retained center and indents. It copies the current transform into owned value objects and evaluates inversion and point mapping on those copies. Compare cold/wide/tall repeats. All earlier 40 helpers remain frozen. No viewport/widget/scrollbar setter, native input, fit/scale/center widget slot or dialog acknowledgement is permitted.",
+  "geometryContract": "One viewport state owns source dimensions, available viewport dimensions, scene rectangle, integer scrollbars, native retained center and Qt requested center. Scene margins use the slider getter while the transform uses the displayed scale. Scroll ranges use Qt's bounded integer rounding. Centering truncates mapped center minus half the viewport to integer scrollbar values; native center changes only on admitted scroll value changes outside scale/wheel suppression. Point mapping uses the original transform adjoint/determinant operation order. Source fit explicitly recenters after applying scale. Toolbar steps use the native scrollbar action and its singleStep; direct scroll and drag clamp to the current ranges. Browser scroll controls reserve the measured 17-pixel extent. Empty-placeholder geometry, RTL, batch transitions, scrollbar track paging and control autorepeat and full resize lifecycle remain unverified.",
+  "spansProbeIntent": "A separate scalar helper compares source-written x87 getter, slider-producer and inverse formulas with private copies of the original numeric spans. Remove only receiver/state bookkeeping and adapt owned arguments and returns; audit every arithmetic instruction and constant relocation. Compare all 301 slider values, all 300 inverse transition thresholds and 4099 numeric samples across two processes. A separate generator invocation uses only owned formulas and must reproduce the generated values without reading the original executable. Runtime lookup values must come from that independent generator, never from expected fixtures.",
+  "runtimeScaleContract": "The canonical viewport state retains the displayed transform scale and its integer slider position separately. Fit uses the available viewport-to-image ratio clamped to 0.2 through 24 and synchronizes the slider through the native inverse thresholds. The 100 percent action displays exactly scale one while synchronizing that same slider. Slider actions apply their separate producer values. Bitmap Use view scale reads the getter value for the retained slider. Generated lookup arrays come only from the independent source-written formulas. Source fits use the shared integer geometry controller. Full resize/batch lifetimes remain unfinished parity work.",
+  "browserWheelContract": "The Chromium producer uses its native wheelDeltaY integer as the vertical Qt-style angle input, without converting pixel deltaY into an assumed notch count. Missing angle input is an explicit diagnostic. The scale owner advances the slider by trunc(delta/12). The pointer-relative center formula uses the old and new getter values. The existing arithmetic and center clipping match 8127 isolated native numeric cases. Complete native event routing, horizontal hardware wheel behavior, modifier/delegation guards, scrollbar quantization through input transitions and non-Chromium input remain unverified.",
+  "independentGpuiScrollbarContract": {
+    "scope": "Independent GUI behavior only. This does not establish original Qt thumb event parity, track paging, autorepeat or focus lifecycle parity.",
+    "contentBounds": "Image painting and pointer/wheel admission are confined to the content rectangle, excluding the 17-pixel horizontal and vertical scrollbar strips. Their bottom-right intersection shows the container background and cannot seed an image pan. Scrollbar drag capture remains window-wide.",
+    "contentBoundsVerification": "../evidence/gpui-viewport-corner-20261021/verification.json retains frozen paint/pan failures and seven passing actual checks after containment, including all three layers and corner wheel rejection. The same binary passes 13 actual scrollbar checks and 71 GUI/controller/worker regressions. Windows and original event parity are not established by these Linux checks.",
+    "windowsViewportVerification": "../evidence/gpui-windows-viewport-parent-20261021.json verifies the same frozen source on a never-activated Windows desktop: bitmap/vector/segmentation corner rejection, image pan, both scrollbar axes and no movement after release. Eight screenshot comparisons pass. Messages target owned HWNDs; this is not physical capture proof. Wheel is not covered by that evidence.",
+    "windowsWheelVerification": "../evidence/windows-workflows-parent-20261021.json verifies owned-HWND WM_MOUSEWHEEL handling on the same Windows binary: signed positive/negative deltas change displayed zoom, inverse roundtrips restore exact viewport pixels, and both directions in the scrollbar corner leave pixels and the zoom label unchanged. Coordinates come from ClientToScreen. Physical input, focus routing, horizontal/high-resolution scrolling and original event parity remain unverified.",
+    "press": "Left press inside either thumb retains its current value and the pointer's grabbed offset. Left press on the track outside the thumb must page toward the pointer rather than jump to an absolute value. Holding the track press must repeat paging; it must not become a thumb drag.",
+    "move": "A held left-button move maps displacement from the press position through the thumb travel to the scrollbar range. Both axes use ViewerView.scroll for existing integer quantization, range clamping and retained-center updates. Scrollbar-owned movement must not pan or edit the image.",
+    "release": "Left release anywhere delivered to the window ends dragging or track paging. A move without the left button also ends it. Source admission/replacement/clear, reset, batch/dialog transitions and viewport geometry changes discard the interaction without changing B/V/Shift keyboard state. Keyboard deactivation and actual capture transfer while left remains held must not cancel track repeat. Paging continues until the thumb reaches the pointer.",
+    "windowsCaptureOwnership": "A client-area pointer press owns capture until release or actual capture transfer. WM_CANCELMODE during keyboard task switching must not release that client capture; leave native non-client/menu cancellation to the default window procedure when no client interaction owns capture. WM_CAPTURECHANGED clears platform capture ownership without synthesizing pointer input. Capture transfer does not establish a physical button release.",
+    "verification": "Frozen XTest defects remain in ../evidence/gpui-scrollbar-20261021/before/results.json. The integrated implementation passes three focused regressions within 70 GUI/controller/worker checks, 13 actual X11 checks for both-axis grabs/movement/clamps/return/outside release, and six keyboard/modal checks. Tab focus, Home/End, arrows, page keys and held-drag cancellation across About/Escape are live-verified. See ../evidence/gpui-scrollbar-20261021/verification.json, including the retained wrong-width modal detector failure. Other lifecycle transitions are regression-tested; native Qt event parity remains separate.",
+    "nativeConfiguredTimers": {
+      "initialDelayMs": 500,
+      "repeatIntervalMs": 50,
+      "basis": "Pinned QtGui4.dll QScrollBar mousePressEvent at 0x652e7340, track-action helper 0x652e6290, repeat setter 0x652712b0 and timer event 0x65271a50. The original QGraphicsView constructor is statically bound to this stock scrollbar path.",
+      "evidence": "../evidence/full-parity-program-20261023/native-viewer-reference-preparation/report.md",
+      "limit": "Configured constants only, not exact delivered callback or painting times. Original r8 held-left capture transfer before reaching the pointer preserves visible repeat until the pointer is reached. Release was observed only after that stop, so early release after transfer remains unverified."
+    },
+    "trackPagingStatus": "A fresh same-desktop Win11 comparison on 2026-10-22 confirms release af1b408a jumps once while original Qt repeats paging. Native timing bounds in ../evidence/full-parity-program-20261022/windows-input/native-timing-analysis.json show first repeat at 470.3-551.7 ms vertically and 481.3-564.5 ms horizontally, with later observed transitions roughly 48-64 ms apart. Both tracks stop at the pointer and remain stable after release. Native release at160.68ms suppresses all17 later frames; Alt+Tab retains capture and repeat. The corrected Windows GUI7ec46dfd passes14 distinct real-input acceptance checks across two retained scenarios: both-axis paging/repeat/pointer stop/release/early release, keyboard deactivation retaining capture, proven capture transfer cancelling repeat, and unchanged source. See ../evidence/full-parity-program-20261022/windows-capture-cancelmode/verification.json. The first corrected-binary run retains two false capture assertions from independent input queues; a separate attached-owned-queue scenario proves actual capture loss. Configured native timers are statically bound as recorded above. Original r8 in ../evidence/completion-native-reconciliation-20261028-r1/viewport-r8-partial-approval-r2.json proves held-left capture transfer before reaching the pointer, continued visible repeat to the pointer, and stable frames after subsequent release. This disproves the retained Rust capture-loss cancellation expectation. The Windows platform handler now preserves the interaction on capture transfer. Corrected Windows GUI355aaf16 passes the actual vertical held-left transfer workflow in ../evidence/completion-native-reconciliation-20261028-r1/capture-loss-runtime-r6/parent-verification.json: target foreground remains unchanged, retained PNGs show continued repeat reaching the pointer, held frames then remain stable, owned input releases, both processes exit naturally0, and the exact test stage/task are removed. This is qualitative behavior agreement, not an exact callback-timing claim. The original release observation does not establish early-release behavior after transfer."
+  },
+  "scalarReference": {
+    "fixture": "../test/fixtures/viewer-zoom-reference.ndjson.gz",
+    "audit": "../evidence/viewer-zoom-native-audit.json",
+    "fixtureSha256": "96fd89e6e6a05563f3322526e2e2a97371028d732bd8900b9dc4763e6811bc8d",
+    "helperSha256": "175f7de007bde0e924b53f91a00c354eae20fc84f7ef916c8ebfa6820d379a38",
+    "positions": 301,
+    "scalarProcesses": 2,
+    "independentGetterPositions": [
+      100,
+      233,
+      192
+    ],
+    "applicationOrQtInitialized": false,
+    "productViewerChanged": false
+  },
+  "wheel": {
+    "address": "0x4474a0",
+    "sliderDelta": "Native signed integer wheel delta divided by 12, truncated toward zero.",
+    "anchor": "The pointer offset is integer event position minus half the available viewport dimensions. Compute shift=(1/oldGetter)-(1/newGetter), then requestedCenter=retainedCenter+offset*shift. The original spills the old reciprocal and vertical product to binary64; x87 precision control 0x027f makes the observed operations agree with the source-written binary64 formula over the recorded domain. Centering then clamps to the image bounds under updateCenter suppression.",
+    "guards": "Mode 10 suppresses custom wheel handling. The flag at +0x148 is the batch flag: meta-method 38 dispatches setIsBatchMode(bool) to 0x44b6a0, which writes it. Batch wheel handling delegates to QGraphicsView; the replacement mounts its separate batch workspace without the custom single-image wheel handler. Full input/lifecycle conformance remains unverified."
+  },
+  "staticControlFindings": {
+    "setScale": "0x446ae0 clamps the supplied transform scale to 0.2 through 24, resets and scales the QGraphicsView matrix, refreshes scene bounds and recenters. When its update-slider flag is true, it separately converts the supplied scale to an integer slider position while blocking slider signals.",
+    "inverseQuantization": "The instructions at 0x446b41 through 0x446b84 compute (ln(scale)-ln(0.2))*300/(ln(24)-ln(0.2)), switch the x87 rounding control to toward zero for signed int64 conversion, use the low int32 result, and restore the control word. Do not interpret the decompiler's ROUND token as nearest rounding. All 300 inverse transitions and 4099 scalar samples now match the independent runtime values.",
+    "matrixAndSlider": "The actual transform scale and the scale getter are distinct native state. Direct fit and 100 percent actions apply their supplied scale to the matrix, while the bitmap From View handler reconstructs scale from the quantized integer slider. A replacement must preserve this distinction rather than assuming actual zoom equals export view scale.",
+    "one": "0x4472b0 applies scale 1 with slider update enabled and centers on half the image size.",
+    "fit": "0x447310 divides the available view dimensions from 0x4453d0 by the image dimensions from 0x445450, applies the smaller ratio through setScale with slider update enabled, then centers on half the image size. There is no browser-style 64-pixel fit margin in this handler.",
+    "availableSize": "0x4453d0 subtracts field +0x144 from the QWidget rectangle width and height. The constructor initializes this field from the horizontal scrollbar's size hint. The read-only reference captures measure a 17-pixel scrollbar extent, always-on bars and no frame.",
+    "sliderProducer": "0x4473b0 sets/clamps the requested slider integer, reads the admitted integer, computes its own logarithmic expression, and calls setScale with slider update disabled. Its arithmetic keeps a logarithm intermediate in x87 instead of storing it as binary64 as the getter does. Do not assume both numeric spans produce identical bits before comparison.",
+    "imageLifecycle": "The constructor connects imageChanged(bool) to setHaveImage(bool). 0x44b590 fits and recenters when an image becomes available outside batch mode. 0x44b6a0 has separate batch-entry and exit behavior. These transitions remain unimplemented in the replacement zoom controller.",
+    "painting": "0x445f60 compares cached center and getter scale before refreshing its raster region, then delegates to QGraphicsView::paintEvent. The raster-region refresh at 0x445ac0 does not call the setScale handler."
+  },
+  "remaining": [
+    "Cold placeholder, RTL, scrollbar track paging/autorepeat, native drag input and broader center/scroll state comparisons.",
+    "Independent differential resize and sequential source-load lifetimes; current browser wiring follows the pinned Qt model but lacks those original transition captures.",
+    "Native wheel event/delegation guards, hardware horizontal wheel and non-Chromium input; broader numeric and sequential input domains.",
+    "Full image preprocessing, viewport resize and batch-to-single lifetimes.",
+    "Native slider focus/input behavior beyond the recorded scalar operations.",
+    "Full viewer and application differential verification."
+  ],
+  "evidence": [
+    "../evidence/bitmap-scale-view-getter-assembly.txt",
+    "../evidence/bitmap-scale-445a60.c",
+    "../evidence/bitmap-scale-view-literals.json",
+    "../evidence/bitmap-scale-447527.c"
+  ],
+  "nativeWidgetSettersPermitted": false,
+  "nativeInputOrDialogsPermitted": false,
+  "fullApplicationParity": false,
+  "metricsReference": {
+    "fixture": "../test/fixtures/viewer-metrics-reference.ndjson.gz",
+    "audit": "../evidence/viewer-metrics-native-audit.json",
+    "nativeProcesses": 6,
+    "nativeHelperSha256": "b5e1a214114776481df312c793ed26ba4075b746363284d579a10172fe49930b",
+    "matrixAndGetterDifferenceObserved": true,
+    "widgetSettersInvoked": false
+  },
+  "spansReference": {
+    "fixture": "../test/fixtures/viewer-zoom-spans-reference.ndjson.gz",
+    "audit": "../evidence/viewer-zoom-spans-native-audit.json",
+    "scalePositions": 301,
+    "inverseTransitions": 300,
+    "inverseSamples": 4099,
+    "getterProducerBitDifferences": 34,
+    "nativeHelperSha256": "bf026911c0628f9ab101fd2f874ca574a36a8f757e7083bcb54c44ab05160f96",
+    "generatedRuntime": "../gui/viewer-zoom-values.mjs",
+    "independentGeneratorReadsOriginalExecutable": false
+  },
+  "centerReference": {
+    "fixture": "../test/fixtures/viewer-center-reference.ndjson.gz",
+    "audit": "../evidence/viewer-center-native-audit.json",
+    "nativeHelperSha256": "9ac187a3b1c0d726b46380062a2e18d65c2a4bc68c4f159257167f87b4bd48b3",
+    "nativeProcesses": 6,
+    "matchedSourceFits": [
+      "wide",
+      "tall"
+    ],
+    "coldPlaceholderMatched": false,
+    "nativeWidgetSettersInvoked": false
+  },
+  "wheelProbeIntent": "Copy only the original old reciprocal, new reciprocal and anchor arithmetic spans into an owned executable allocation. Supply owned numeric stack arguments, relocate the binary64 one constant and replace only center-field displacements with offsets into an owned pair. Audit every numeric instruction against the original executable. Reuse the accepted source-written scalar getter formulas, check their 301 getter bits against the earlier native corpus, compare separate source-written C anchor arithmetic and the product controller, and repeat the capture in two processes. No Qt initialization, widget, native input, dialog, application entry point or runtime dependency on the original is permitted.",
+  "wheelNumericReference": {
+    "fixture": "../test/fixtures/viewer-wheel-reference.ndjson.gz",
+    "audit": "../evidence/viewer-wheel-native-audit.json",
+    "cases": 8127,
+    "nativeProcesses": 2,
+    "sliderPositions": 301,
+    "deltas": [
+      -2147483648,
+      -121,
+      -120,
+      -11,
+      0,
+      11,
+      120,
+      121,
+      2147483647
+    ],
+    "pointerAndCenterSamples": 3,
+    "helperSha256": "a9ff55bead8b6255aba2dd6bb6f1894cc2ea660072d22941f52fdd26e312eea3",
+    "fixtureSha256": "720602a384cc5e5c42e94fee663567c2b37c1a37a31876853f31b0f03d3e4f1e",
+    "fullInputParity": false
+  }
+}

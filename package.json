@@ -1,0 +1,76 @@
+{
+  "name": "openvector",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Independent raster-to-vector Rust engine with Node-API bindings and a native CLI.",
+  "type": "module",
+  "license": "MIT",
+  "engines": {
+    "node": ">=22.19.0"
+  },
+  "exports": {
+    ".": {
+      "types": "./npm/index.d.mts",
+      "default": "./npm/index.mjs"
+    }
+  },
+  "bin": {
+    "openvector": "./bin/openvector.mjs"
+  },
+  "files": [
+    "npm/index.mjs",
+    "npm/index.d.mts",
+    "npm/native.mjs",
+    "bin/openvector.mjs",
+    "native/*/openvector-node.node",
+    "native/*/openvector",
+    "native/*/openvector.exe",
+    "native/*/rust-licenses.txt",
+    "native/*/toolchain-licenses.txt",
+    "native/*/rust-std-COPYRIGHT-library.html",
+    "native/licenses/*",
+    "rust/Cargo.toml",
+    "rust/Cargo.lock",
+    "rust/crates/openvector/Cargo.toml",
+    "rust/crates/openvector/build.rs",
+    "rust/crates/openvector/src",
+    "rust/crates/openvector/csrc",
+    "rust/crates/openvector/vendor",
+    "rust/crates/openvector-cli/Cargo.toml",
+    "rust/crates/openvector-cli/src",
+    "rust/crates/openvector-node/Cargo.toml",
+    "rust/crates/openvector-node/build.rs",
+    "rust/crates/openvector-node/src",
+    "rust/crates/openvector-gui/Cargo.toml",
+    "rust/crates/openvector-gui/src",
+    "rust/crates/openvector-gui/assets",
+    "rust/vendor",
+    "!rust/**/target/**",
+    "src/parameter-data.json",
+    "src/segmentation-progress-data.json",
+    "src/jpeg-licenses.txt",
+    "src/tiff-licenses.txt",
+    "tools/build-native.mjs",
+    "tools/native-notices.mjs",
+    "tools/rust-std-licenses.json",
+    "tools/rust-upstream-licenses.json",
+    "LICENSE",
+    "README.md",
+    "tools/package-gui.mjs",
+    "docs/"
+  ],
+  "scripts": {
+    "build": "node tools/build-native.mjs",
+    "prepack": "npm run build",
+    "test": "node --test test/*.test.mjs",
+    "test:smoke": "node --test test/pixel-map.test.mjs test/decimal-format.test.mjs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Microck/openvector.git"
+  },
+  "homepage": "https://github.com/Microck/openvector#readme",
+  "bugs": {
+    "url": "https://github.com/Microck/openvector/issues"
+  }
+}

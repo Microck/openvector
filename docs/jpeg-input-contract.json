@@ -1,0 +1,42 @@
+{
+  "component": "Independent JPEG input",
+  "status": "Production decoder matches 196 native import/source/preparation cases and five complete original GUI conversions. CLI binary-stdin exports cover all five output formats. Broader JPEG coding/error coverage and full application parity remain unfinished.",
+  "targetSha256": "c491656b962debc215a8b6e757a9b2949ffe50a36b5f2db692706bcd4ebface1",
+  "decoder": {
+    "boundary": "decodeImage accepts JPEG bytes by SOI signature and returns owned straight RGB BGRA, hasAlpha=false and format=jpeg. This is the same RGB raster contract used by PNG/BMP; JPEG CMYK conversion completes before the shared source preparation stage.",
+    "privateImport": "decodeJpegPixels exposes the original JPEG PixelPacket import for differential verification: owned BGRA, colorspace 1 or 12, and a black plane for four-channel input. Four-channel ink import reverses all component values, including files without an Adobe marker. The final RGB normalization changes this owned raster in place.",
+    "transform": "Eight-bit IJG slow integer IDCT: column-first, 13 constant bits, two pass-one bits, integer dequantization, native descale and range-table wrapping. Do not substitute floating-point inverse transforms or add captured expected pixels.",
+    "sampling": "Use IJG h2v1/h2v2 triangle interpolation and its alternating rounding bias when the downsampled width exceeds two. Preserve replicated image edges and box expansion for other integer sampling ratios.",
+    "color": "Use IJG fixed-point YCbCr conversion. JFIF takes precedence, then Adobe transform code, then RGB component identifiers. Support grayscale, RGB/YCbCr, CMYK and Adobe YCCK. Native source conversion uses rounded multiplicative CMYK-to-RGB values.",
+    "entropy": "Baseline, extended sequential eight-bit and progressive Huffman scans, quantization tables, byte stuffing and restart intervals. Bound every restart group by the remaining MCU count, including noninterleaved scans.",
+    "metadata": "Captured EXIF orientations 1 through 8 do not rotate decoded/source pixels. Captured sRGB ICC profiles do not alter source bytes. Other profile transforms and full metadata behavior remain unverified.",
+    "limits": "Require positive dimensions with an int32 pixel count and int32 component-storage byte count. Twelve-bit, arithmetic/lossless JPEG, malformed-input recovery, unusual sampling combinations and memory/error completion remain required reference work."
+  },
+  "reuse": {
+    "entropySource": "https://github.com/jpeg-js/jpeg-js/tree/1031ccd7a63c641c16afb2430279d1598530a85c",
+    "numericalSource": "https://github.com/libjpeg-turbo/ijg/tree/5ead57a34a398aa798f35bd7a6abad19b2e453e2",
+    "legacyImportSource": "https://svn.dslinux.org/svn/tags/imagemagick/imagemagick-6.4.2/coders/jpeg.c",
+    "notices": "Retain jpeg-js BSD notice, original decoder Apache notice/license and IJG README. Document extraction, restart-loop correction, numerical replacement and removal of unused browser/output helpers.",
+    "runtime": "Plain JavaScript, using no installed Vector Magic files, native child processes, network, browser decoder or external runtime package."
+  },
+  "fixtures": [
+    "../test/fixtures/jpeg-input-reference.ndjson.gz",
+    "../test/fixtures/jpeg-expanded-verified-input-reference.ndjson.gz",
+    "../test/fixtures/jpeg-markers-input-reference.ndjson.gz",
+    "../test/fixtures/jpeg-conversion-reference.ndjson.gz"
+  ],
+  "verification": "Compare raw native imports separately from RGB source normalization, then compare every source/preparation/working pixel and dimension. Inputs contain own encoded bytes and writer declarations; native outputs are assertions only. Verify CLI and real GUI file loading/export after integration.",
+  "completeParity": false,
+  "published": false,
+  "implementation": {
+    "entropy": "../src/jpeg-coefficients.mjs",
+    "pixels": "../src/jpeg-input.mjs",
+    "notices": "../src/jpeg-licenses.txt",
+    "tests": [
+      "../test/jpeg-input.test.mjs",
+      "../gui/test/jpeg-input.test.mjs"
+    ],
+    "containerReuse": "Private readJpegSamples reconstructs owned component planes without interpreting markers. convertJpegYCbCr mutates owned planes with the same integer rounding. TIFF uses these functions while preserving its photometric and ink rules. Standalone JPEG behavior remains governed by its original196-case corpus and five complete conversions.",
+    "componentBoundary": "Raw sample reconstruction is independent of file color count. TIFF uses two planes as grayscale/alpha and checks its own SamplesPerPixel. The standalone file decoder retains its explicit1/3/4 color-count boundary; original standalone two-component JPEGs have unequal fresh output and no stable reference expectation. Own two-component file fixture tests this retained limitation."
+  }
+}

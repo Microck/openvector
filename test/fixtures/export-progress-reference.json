@@ -1,0 +1,315 @@
+{
+  "scope": "All native export phases through the original fraction kernel and document integer observer.",
+  "nativeResponseSha256": [
+    "438c829f0fc2d7e8dc28a96ac0c95a7f60ad37f77255eb510cb55d486c37196e",
+    "438c829f0fc2d7e8dc28a96ac0c95a7f60ad37f77255eb510cb55d486c37196e"
+  ],
+  "phases": [
+    {
+      "phase": 0,
+      "fractionBits": "000000204df5ac3f",
+      "percent": 6,
+      "cancelled": false
+    },
+    {
+      "phase": 1,
+      "fractionBits": "ae47e182071fb33f",
+      "percent": 7,
+      "cancelled": false
+    },
+    {
+      "phase": 2,
+      "fractionBits": "5c8fc27568c3b73f",
+      "percent": 9,
+      "cancelled": false
+    },
+    {
+      "phase": 3,
+      "fractionBits": "0ad7a368c967bc3f",
+      "percent": 11,
+      "cancelled": false
+    },
+    {
+      "phase": 4,
+      "fractionBits": "5c8fc22d1586c03f",
+      "percent": 13,
+      "cancelled": false
+    },
+    {
+      "phase": 5,
+      "fractionBits": "343333a745d8c23f",
+      "percent": 15,
+      "cancelled": false
+    },
+    {
+      "phase": 6,
+      "fractionBits": "0ad7a320762ac53f",
+      "percent": 17,
+      "cancelled": false
+    },
+    {
+      "phase": 7,
+      "fractionBits": "e27a149aa67cc73f",
+      "percent": 18,
+      "cancelled": false
+    },
+    {
+      "phase": 8,
+      "fractionBits": "b81e8513d7cec93f",
+      "percent": 20,
+      "cancelled": false
+    },
+    {
+      "phase": 9,
+      "fractionBits": "8fc2f58c0721cc3f",
+      "percent": 22,
+      "cancelled": false
+    },
+    {
+      "phase": 10,
+      "fractionBits": "676666063873ce3f",
+      "percent": 24,
+      "cancelled": false
+    },
+    {
+      "phase": 11,
+      "fractionBits": "1e85eb3fb462d03f",
+      "percent": 26,
+      "cancelled": false
+    },
+    {
+      "phase": 12,
+      "fractionBits": "0ad7a37ccc8bd13f",
+      "percent": 27,
+      "cancelled": false
+    },
+    {
+      "phase": 13,
+      "fractionBits": "f6285cb9e4b4d23f",
+      "percent": 29,
+      "cancelled": false
+    },
+    {
+      "phase": 14,
+      "fractionBits": "e27a14f6fcddd33f",
+      "percent": 31,
+      "cancelled": false
+    },
+    {
+      "phase": 15,
+      "fractionBits": "cdcccc321507d53f",
+      "percent": 33,
+      "cancelled": false
+    },
+    {
+      "phase": 16,
+      "fractionBits": "b81e856f2d30d63f",
+      "percent": 35,
+      "cancelled": false
+    },
+    {
+      "phase": 17,
+      "fractionBits": "a4703dac4559d73f",
+      "percent": 36,
+      "cancelled": false
+    },
+    {
+      "phase": 18,
+      "fractionBits": "8fc2f5e85d82d83f",
+      "percent": 38,
+      "cancelled": false
+    },
+    {
+      "phase": 19,
+      "fractionBits": "7b14ae2576abd93f",
+      "percent": 40,
+      "cancelled": false
+    },
+    {
+      "phase": 20,
+      "fractionBits": "676666628ed4da3f",
+      "percent": 42,
+      "cancelled": false
+    },
+    {
+      "phase": 21,
+      "fractionBits": "52b81e9fa6fddb3f",
+      "percent": 44,
+      "cancelled": false
+    },
+    {
+      "phase": 22,
+      "fractionBits": "3d0ad7dbbe26dd3f",
+      "percent": 46,
+      "cancelled": false
+    },
+    {
+      "phase": 23,
+      "fractionBits": "295c8f18d74fde3f",
+      "percent": 47,
+      "cancelled": false
+    },
+    {
+      "phase": 24,
+      "fractionBits": "14ae4755ef78df3f",
+      "percent": 49,
+      "cancelled": false
+    },
+    {
+      "phase": 25,
+      "fractionBits": "000000c90351e03f",
+      "percent": 51,
+      "cancelled": false
+    },
+    {
+      "phase": 26,
+      "fractionBits": "f6285ce78fe5e03f",
+      "percent": 53,
+      "cancelled": false
+    },
+    {
+      "phase": 27,
+      "fractionBits": "ec51b8051c7ae13f",
+      "percent": 55,
+      "cancelled": false
+    },
+    {
+      "phase": 28,
+      "fractionBits": "e27a1424a80ee23f",
+      "percent": 56,
+      "cancelled": false
+    },
+    {
+      "phase": 29,
+      "fractionBits": "d7a3704234a3e23f",
+      "percent": 58,
+      "cancelled": false
+    },
+    {
+      "phase": 30,
+      "fractionBits": "cdcccc60c037e33f",
+      "percent": 60,
+      "cancelled": false
+    },
+    {
+      "phase": 31,
+      "fractionBits": "c3f5287f4ccce33f",
+      "percent": 62,
+      "cancelled": false
+    },
+    {
+      "phase": 32,
+      "fractionBits": "b81e859dd860e43f",
+      "percent": 64,
+      "cancelled": false
+    },
+    {
+      "phase": 33,
+      "fractionBits": "ae47e1bb64f5e43f",
+      "percent": 65,
+      "cancelled": false
+    },
+    {
+      "phase": 34,
+      "fractionBits": "a4703ddaf089e53f",
+      "percent": 67,
+      "cancelled": false
+    },
+    {
+      "phase": 35,
+      "fractionBits": "999999f87c1ee63f",
+      "percent": 69,
+      "cancelled": false
+    },
+    {
+      "phase": 36,
+      "fractionBits": "8fc2f51609b3e63f",
+      "percent": 71,
+      "cancelled": false
+    },
+    {
+      "phase": 37,
+      "fractionBits": "85eb51359547e73f",
+      "percent": 73,
+      "cancelled": false
+    },
+    {
+      "phase": 38,
+      "fractionBits": "7b14ae5321dce73f",
+      "percent": 75,
+      "cancelled": false
+    },
+    {
+      "phase": 39,
+      "fractionBits": "713d0a72ad70e83f",
+      "percent": 76,
+      "cancelled": false
+    },
+    {
+      "phase": 40,
+      "fractionBits": "676666903905e93f",
+      "percent": 78,
+      "cancelled": false
+    },
+    {
+      "phase": 41,
+      "fractionBits": "5c8fc2aec599e93f",
+      "percent": 80,
+      "cancelled": false
+    },
+    {
+      "phase": 42,
+      "fractionBits": "52b81ecd512eea3f",
+      "percent": 82,
+      "cancelled": false
+    },
+    {
+      "phase": 43,
+      "fractionBits": "48e17aebddc2ea3f",
+      "percent": 84,
+      "cancelled": false
+    },
+    {
+      "phase": 44,
+      "fractionBits": "3d0ad7096a57eb3f",
+      "percent": 85,
+      "cancelled": false
+    },
+    {
+      "phase": 45,
+      "fractionBits": "33333328f6ebeb3f",
+      "percent": 87,
+      "cancelled": false
+    },
+    {
+      "phase": 46,
+      "fractionBits": "295c8f468280ec3f",
+      "percent": 89,
+      "cancelled": false
+    },
+    {
+      "phase": 47,
+      "fractionBits": "1e85eb640e15ed3f",
+      "percent": 91,
+      "cancelled": false
+    },
+    {
+      "phase": 48,
+      "fractionBits": "14ae47839aa9ed3f",
+      "percent": 93,
+      "cancelled": false
+    },
+    {
+      "phase": 49,
+      "fractionBits": "0ad7a3a1263eee3f",
+      "percent": 95,
+      "cancelled": false
+    },
+    {
+      "phase": 50,
+      "fractionBits": "000000c0b2d2ee3f",
+      "percent": 96,
+      "cancelled": false
+    }
+  ]
+}

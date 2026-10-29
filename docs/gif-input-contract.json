@@ -1,0 +1,26 @@
+{
+  "component": "Independent GIF input",
+  "status": "Independent decoder matches all 82 repeat-identical native import/source/preparation cases and three complete native GUI conversions. Three additional tiny-interlaced files retain the native loader failure.",
+  "authority": "GIF89a defines structural parsing. Untouched original blob decoding and source/preparation bytes govern legacy behavior.",
+  "sources": [
+    "https://www.w3.org/Graphics/GIF/spec-gif89a.txt",
+    "https://svn.dslinux.org/svn/tags/imagemagick/imagemagick-6.4.2/coders/gif.c"
+  ],
+  "api": "Private decodeGif(encoded) returns owned width, height, bgra, hasAlpha and format=gif. No runtime dependencies, native binary, network or browser decoder.",
+  "frame": "Decode the first image descriptor using its width/height and local palette when present. Logical-screen dimensions and offsets do not expand or composite this raster. Native captures verify fourteen offset/local-palette cases and a separate comment/application-extension case; an animated conversion ignores its distinct blue second frame.",
+  "compression": "GIF LZW, least-significant bit packing, clear/end codes, dictionary growth to 12 bits, deferred clear, and four-pass interlace. Captures cover minimum sizes2 through8, special next-code expansion, midstream/repeated clears and dictionary saturation with deferred clear.",
+  "palette": "The image's local table takes precedence over the global table. Graphic-control transparency selects intrinsic hasAlpha only when its index lies inside the active table.",
+  "nativeOpacity": "Legacy opacity=-1 is cast to Q8 before pixel import, so opaque index255 gets alpha0 even with hasAlpha=false. Transparent palette colors retain RGB. Common source preparation already distinguishes intrinsic metadata from raw alpha; no GIF-only preparation branch.",
+  "references": [
+    "../evidence/gif-input-native-verification.json",
+    "../evidence/gif-opaque-gray-input-native-verification.json",
+    "../evidence/gif-opaque-gray-prediction.json",
+    "../evidence/gif-structure-verified-input-native-verification.json",
+    "../evidence/gif-interlace-errors-native-verification.json",
+    "../evidence/gif-conversion-fixture-verification.json"
+  ],
+  "remaining": "Exact native diagnostics, malformed/error routing, nonstandard coding modes, metadata and failure in later animation frames remain unfinished.",
+  "fullApplicationParity": false,
+  "published": false,
+  "interlace": "Advance one pass after each completed row, as the original does. For interlaced heights2/3/4 the next pass selects an out-of-image row and the loader throws. Six fresh native calls confirm stage921 C++ exceptions; error context addresses vary and are not pixel expectations."
+}

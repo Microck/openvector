@@ -1,0 +1,41 @@
+{
+  "project": "openvector",
+  "status": "Implemented and verified against seven native cancellation cases, independent overwrite/pre-abort invariants, existing core cancellation tests and the isolated GUI suite.",
+  "reference": "../test/fixtures/quick-save-cancellation-reference.ndjson.gz",
+  "audit": "../evidence/quick-save-cancellation-native-audit.json",
+  "nativeCases": 7,
+  "nativeProcesses": 14,
+  "quickSaveSnapshots": 40,
+  "boundaries": {
+    "load": "Cancel after native task 8 completes, with or without a prior image. The finished worker image is discarded. MainModel filename becomes empty; both Quick Save folders become the parent of the process working directory. Existing widget filenames, formats and disclosures remain.",
+    "paletteAndSegmentation": "Cancel after first-image task 2 or 3. The current model source is the first input and remains loaded. Quick Save fields retain their pre-batch values.",
+    "smoothingAndFitting": "Cancel after second-image task 4 or 5. The current model source is the second input and remains loaded. Quick Save fields retain their pre-batch values.",
+    "export": "Cancel after first-image task 6. The completed SVG remains on disk. The model source remains the first input and Quick Save fields retain their pre-batch values."
+  },
+  "implementation": {
+    "owner": "GuiEngine uses one source-file metadata reset for both ordinary reset and completed-load cancellation. It clears the loaded file metadata/current source path and sends the existing empty-source event to QuickSave.",
+    "document": "ImageDocument.cancelLoad already performs the native numeric/source reset. The metadata operation must not reset that document again or replace its session.",
+    "otherCancellation": "Later completed-task cancellation retains the current source path and existing Quick Save fields. No new cancellation flag, alternate vectorizer or processing adapter is introduced."
+  },
+  "evidenceLimits": [
+    "Cancellation uses the existing native model hook after joining the selected task, before event-loop completion delivery. No native controls or dialogs are driven.",
+    "Raw clocks/durations are retained and validated with the existing timing comparator. Other state and native output bytes repeat identically.",
+    "Arbitrary in-task timing, overwrite-skip completion and active-job shutdown remain outside these captures.",
+    "Independent overwrite-skip and pre-aborted invariants are useful checks but do not establish unobserved native Quick Save skip-window behavior.",
+    "The seven cancellation cases use valid loads at the cancellation boundary; cancellation of an already failed load has not been captured."
+  ],
+  "fullApplicationParity": false,
+  "verification": {
+    "focusedTests": 73,
+    "quickSaveGuiTests": 61,
+    "existingCoreCancellationTests": 12,
+    "guiTests": {
+      "passed": 484,
+      "failed": 1,
+      "skipped": 0
+    },
+    "knownFailure": "Existing processing-batch-controls setter-only backgroundMode 2 case; unchanged.",
+    "beforeFix": "Two load-cancellation comparisons fail with the original native expectations; evidence/quick-save-cancellation-before-fix-tests.txt.",
+    "checkpoint": "../evidence/quick-save-cancellation-verification-checkpoint.json"
+  }
+}

@@ -1,0 +1,39 @@
+{
+  "project": "openvector",
+  "status": "Implemented and verified against nine native batch cases, actual filesystem/HTTP source guards and the isolated GUI suite.",
+  "reference": "../test/fixtures/quick-save-batch-reference.ndjson.gz",
+  "audit": "../evidence/quick-save-batch-native-audit.json",
+  "nativeCases": 9,
+  "nativeProcesses": 18,
+  "quickSaveSnapshots": 49,
+  "observed": {
+    "widgets": "The nine ordinary batch workflows retain both Quick Save filenames, directories, formats and disclosures. Completed-load cancellation resets source metadata and folders as specified in quick-save-cancellation-contract.json; later captured task cancellations retain the widgets.",
+    "source": "Ordinary batch attempts advance the current model filename, including failed loads. Completed-load cancellation clears it; captured later-task cancellations retain the current attempted file. Queue-only changes retain the preceding source path.",
+    "protection": "The statically traced Quick Save source-overwrite guard reads the current MainModel filename, independently of retained widget text. An old widget filename is not an authority for source protection."
+  },
+  "implementation": {
+    "owner": "GuiEngine owns the current resolved source filename. Single-image commit, source reset and each completed batch-load attempt update this owner. QuickSave owns window fields only.",
+    "save": "GuiEngine.quickSaveTarget combines the chosen widget target with the current source path. QuickSaveFile continues using its existing source comparison and pending-save ownership.",
+    "widgets": "No batch-load notification is sent to QuickSave.sourceChanged; that method remains the single-image/reset widget event."
+  },
+  "evidenceLimits": [
+    "The frozen helper aborts on native modals; no native controls or dialogs were driven.",
+    "Raw clocks/durations are retained. Only those established timing fields are normalized for repeat comparison; all other state and exported SVG bytes match.",
+    "Seven cancellation cases are verified separately in quick-save-cancellation-contract.json. Overwrite-preflight skip and active-job shutdown remain outside the native Quick Save captures.",
+    "Native Quick Save write/error handlers were not executed. This scope combines observed source state with the prior static source-protection branch."
+  ],
+  "knownUnrelatedFailure": "processing-batch-controls injects backgroundMode 2 through an internal setter; the verified public menu admits 0, 1 and 3. Its existing failing test and contract remain unchanged.",
+  "fullApplicationParity": false,
+  "verification": {
+    "focusedTests": 50,
+    "guiTests": {
+      "passed": 473,
+      "failed": 1,
+      "skipped": 0
+    },
+    "knownFailure": "processing-batch-controls internal setter 2 against public menu 0/1/3; unchanged.",
+    "frontendSourcesAndBundleUnchanged": true,
+    "checkpoint": "../evidence/quick-save-batch-verification-checkpoint.json"
+  },
+  "cancellationContract": "quick-save-cancellation-contract.json"
+}

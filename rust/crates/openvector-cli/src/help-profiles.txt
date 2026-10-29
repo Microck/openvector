@@ -1,0 +1,31 @@
+Usage: openvector profiles <list|show|save|select|rename|delete> [options]
+
+Manage saved advanced settings through the shared profile library. Never prompt.
+
+  --file <path>   Profile storage file (required; parent must exist).
+  --name <name>   Exact source profile name (all commands except list).
+  --new-name <name>  Exact replacement label for rename.
+  --input <path>  Full profile JSON for save; - reads standard input.
+  -f, --force    Replace an existing exact name when saving or renaming.
+  -h, --help     Show this help without reading files.
+
+Examples:
+  openvector profiles list --file profiles.json
+  openvector profiles show --file profiles.json --name "Default Advanced Settings"
+  openvector profiles save --file profiles.json --name Logo --input profile.json
+  openvector profiles select --file profiles.json --name Logo
+  openvector profiles rename --file profiles.json --name Logo --new-name Artwork
+  openvector profiles delete --file profiles.json --name Artwork
+
+All successful commands write JSON on stdout. list/show never write storage.
+show prints one reusable profile; save prints its name/profile entry; select
+prints the previous index and selected profile, then persists its new order.
+Missing names and invalid input exit 1 with diagnostics on stderr.
+rename preserves source settings and position; --force removes a colliding
+destination. Empty or unchanged new labels do nothing and do not write storage.
+delete removes the named entry without a prompt. Both print previous indices.
+
+Each invocation starts a new session, placing Default Advanced Settings first.
+Names preserve case, whitespace and Unicode. Startup keeps color counts but
+discards palette colors and restores transparency colors as opaque RGB, matching
+the original preferences. No conversion is triggered by these commands.

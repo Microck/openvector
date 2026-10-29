@@ -1,0 +1,41 @@
+Usage: openvector batch <image...> [options]
+
+Convert multiple images with shared basic or advanced settings and one export folder.
+
+      --output-dir <directory>  Existing export folder (default: last source folder).
+      --format <format>         SVG, EPS, PDF, AI or DXF (default: AI).
+      --settings <path>         JSON basic controls or advanced: true and
+                                document processing controls (see below).
+      --profile <name>          Apply saved advanced settings after --settings.
+      --profiles-file <path>    Explicit profile storage (required with --profile).
+      --layout <mode>           stacked, cutouts or grouped-cutouts (default).
+      --thin-stroke             Add the original thin shape outlines.
+      --compact                Use compact EPS operators.
+      --dxf-mode <mode>         splines, sparse-lines or dense-lines (default).
+      --overwrite <decision>    skip (default), replace or cancel existing outputs.
+  -h, --help                    Show this help.
+
+Examples:
+  openvector batch logo.png photo.jpg --format svg --output-dir vectors
+  openvector batch first.png second.png --settings batch.json --overwrite replace
+  openvector batch first.png second.png --profile Logo --profiles-file profiles.json
+
+Print a JSON summary and detailed processing log on stdout. Never prompt.
+Continue after load/save failures, report them on stderr and exit 1.
+Exit 0 when no file fails, or 130 when cancelled at preflight or by Ctrl-C.
+Ctrl-C requests cancellation at a numerical-stage checkpoint or completed task
+boundary. Press it again to
+force termination without a JSON summary. Completed output files remain.
+Missing output folders are not created.
+
+Settings: category 0=photo, 1=blended artwork, 2=flat artwork, 3=auto;
+quality 0=high, 1=medium, 2=low, 3=auto; paletteMode 1=fixed,
+2=flexible, 3=auto; colorCount 0=auto or 2..12;
+backgroundMode 0=preserve, 1=white, 3=auto. Defaults: 3,3,3,0,1.
+Two colors: paletteMode 1 and colorCount 2.
+Advanced: advanced true; colorCount 2..24 (default 2); sensitivity,
+antiAlias, complexity, minimumPixels, artifactRejection, clusterColors,
+smoothness, detectCorners, curveComplexity and smoothingAntiAlias.
+Advanced mode skips classification. Only fixed mode finds a palette.
+Saved profiles replace advanced controls/count, retaining the batch transparency
+and basic choices from --settings. Selection persists the profile's MRU order.

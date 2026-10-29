@@ -1,0 +1,97 @@
+{
+  "sourceSha256": "c491656b962debc215a8b6e757a9b2949ffe50a36b5f2db692706bcd4ebface1",
+  "precisionSixteenRecordingSha256": "d3083b3973f77955f08e341c4276af860b7ff61bd16cc9e53747cd0700a7fb5a",
+  "scope": "Original CRT special-value labels and decimal-label rounding, including x87 negative indefinite NaN. Precision two/three retained from earlier native capture; precision sixteen recaptured through mode 56.",
+  "cases": [
+    {
+      "precision": 2,
+      "bits": "7ff0000000000000",
+      "expected": "1.#J"
+    },
+    {
+      "precision": 2,
+      "bits": "fff0000000000000",
+      "expected": "-1.#J"
+    },
+    {
+      "precision": 2,
+      "bits": "7ff8000000000000",
+      "expected": "1.#R"
+    },
+    {
+      "precision": 2,
+      "bits": "fff8000000000000",
+      "expected": "-1.#J"
+    },
+    {
+      "precision": 2,
+      "bits": "7ff0000000000001",
+      "expected": "1.#T"
+    },
+    {
+      "precision": 2,
+      "bits": "fff0000000000001",
+      "expected": "-1.#T"
+    },
+    {
+      "precision": 3,
+      "bits": "7ff0000000000000",
+      "expected": "1.#IO"
+    },
+    {
+      "precision": 3,
+      "bits": "fff0000000000000",
+      "expected": "-1.#IO"
+    },
+    {
+      "precision": 3,
+      "bits": "7ff8000000000000",
+      "expected": "1.#QO"
+    },
+    {
+      "precision": 3,
+      "bits": "fff8000000000000",
+      "expected": "-1.#IO"
+    },
+    {
+      "precision": 3,
+      "bits": "7ff0000000000001",
+      "expected": "1.#SO"
+    },
+    {
+      "precision": 3,
+      "bits": "fff0000000000001",
+      "expected": "-1.#SO"
+    },
+    {
+      "precision": 16,
+      "bits": "7ff0000000000000",
+      "expected": "1.#INF000000000000"
+    },
+    {
+      "precision": 16,
+      "bits": "fff0000000000000",
+      "expected": "-1.#INF000000000000"
+    },
+    {
+      "precision": 16,
+      "bits": "7ff8000000000000",
+      "expected": "1.#QNAN00000000000"
+    },
+    {
+      "precision": 16,
+      "bits": "fff8000000000000",
+      "expected": "-1.#IND000000000000"
+    },
+    {
+      "precision": 16,
+      "bits": "7ff0000000000001",
+      "expected": "1.#SNAN00000000000"
+    },
+    {
+      "precision": 16,
+      "bits": "fff0000000000001",
+      "expected": "-1.#SNAN00000000000"
+    }
+  ]
+}

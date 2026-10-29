@@ -1,0 +1,342 @@
+{
+  "project": "openvector",
+  "status": "Native reset-target identities, labels, cold state and model-stage state captured. Full-window No/Yes captures match Rust semantic owners from Review page 19 with empty and one-entry queues; see application-reset-contract.json.",
+  "reference": "../test/fixtures/window-reset-state-reference.ndjson.gz",
+  "identityReference": "../test/fixtures/window-reset-reference.ndjson.gz",
+  "nativeAudits": [
+    "../evidence/window-reset-native-audit.json",
+    "../evidence/window-reset-state-native-audit.json"
+  ],
+  "nativeProcesses": 20,
+  "widgetSnapshots": 26,
+  "widgetsPerSnapshot": 16,
+  "targets": [
+    {
+      "parentOffset": "0x0",
+      "fieldOffset": "0x174",
+      "className": "CustomTimerCheckBox",
+      "label": "Auto-Update Palette",
+      "observedColdState": {
+        "checked": true,
+        "expanded": null,
+        "label": "Auto-Update Palette"
+      },
+      "staticReset": {
+        "checked": true
+      }
+    },
+    {
+      "parentOffset": "0x0",
+      "fieldOffset": "0x190",
+      "className": "CustomTimerCheckBox",
+      "label": "Auto-Update Segmentation",
+      "observedColdState": {
+        "checked": true,
+        "expanded": null,
+        "label": "Auto-Update Segmentation"
+      },
+      "staticReset": {
+        "checked": true
+      }
+    },
+    {
+      "parentOffset": "0x0",
+      "fieldOffset": "0x1b0",
+      "className": "CustomTimerCheckBox",
+      "label": "Auto-Update Vectorization",
+      "observedColdState": {
+        "checked": true,
+        "expanded": null,
+        "label": "Auto-Update Vectorization"
+      },
+      "staticReset": {
+        "checked": true
+      }
+    },
+    {
+      "parentOffset": "0x0",
+      "fieldOffset": "0x14c",
+      "className": "QCheckBox",
+      "label": "Skip this page next time",
+      "observedColdState": {
+        "checked": false,
+        "expanded": null,
+        "label": "Skip this page next time"
+      },
+      "staticReset": {
+        "checked": false
+      }
+    },
+    {
+      "parentOffset": "0x0",
+      "fieldOffset": "0x1b4",
+      "className": "QuickSaveWidget",
+      "label": null,
+      "observedColdState": {
+        "checked": null,
+        "expanded": false,
+        "formatIndex": 0,
+        "formats": [
+          "ai",
+          "dxf",
+          "emf",
+          "eps",
+          "pdf",
+          "svg"
+        ],
+        "directory": "D:\\migracion\\vector-magic-re"
+      },
+      "staticReset": {
+        "expanded": false,
+        "formatIndex": 0,
+        "directoryArgument": ""
+      }
+    },
+    {
+      "parentOffset": "0x0",
+      "fieldOffset": "0x1c4",
+      "className": "QuickSaveWidget",
+      "label": null,
+      "observedColdState": {
+        "checked": null,
+        "expanded": false,
+        "formatIndex": 0,
+        "formats": [
+          "ai",
+          "dxf",
+          "emf",
+          "eps",
+          "pdf",
+          "svg"
+        ],
+        "directory": "D:\\migracion\\vector-magic-re"
+      },
+      "staticReset": {
+        "expanded": false,
+        "formatIndex": 0,
+        "directoryArgument": ""
+      }
+    },
+    {
+      "parentOffset": "0x0",
+      "fieldOffset": "0x1dc",
+      "className": "CustomBitmapExportWidget",
+      "label": null,
+      "observedColdState": {
+        "checked": null,
+        "expanded": false,
+        "formatIndex": 2,
+        "formats": [
+          "bmp",
+          "jpg",
+          "png",
+          "tif"
+        ],
+        "directory": "D:\\migracion\\vector-magic-re",
+        "scale": 1.0
+      },
+      "staticReset": {
+        "expanded": false,
+        "format": "png",
+        "scale": 1,
+        "directoryArgument": ""
+      }
+    },
+    {
+      "parentOffset": "0x0",
+      "fieldOffset": "0x1e0",
+      "className": "CustomBitmapExportWidget",
+      "label": null,
+      "observedColdState": {
+        "checked": null,
+        "expanded": false,
+        "formatIndex": 2,
+        "formats": [
+          "bmp",
+          "jpg",
+          "png",
+          "tif"
+        ],
+        "directory": "D:\\migracion\\vector-magic-re",
+        "scale": 1.0
+      },
+      "staticReset": {
+        "expanded": false,
+        "format": "png",
+        "scale": 1,
+        "directoryArgument": ""
+      }
+    },
+    {
+      "parentOffset": "0x0",
+      "fieldOffset": "0xb0",
+      "className": "MostRecentDirectoriesWidget",
+      "label": "Recent Folders",
+      "observedColdState": {
+        "checked": null,
+        "expanded": false
+      },
+      "staticReset": {
+        "expanded": false
+      }
+    },
+    {
+      "parentOffset": "0x0",
+      "fieldOffset": "0xb4",
+      "className": "MostRecentFilesWidget",
+      "label": "Recent Images",
+      "observedColdState": {
+        "checked": null,
+        "expanded": false
+      },
+      "staticReset": {
+        "expanded": false
+      }
+    },
+    {
+      "parentOffset": "0x0",
+      "fieldOffset": "0x130",
+      "className": "LinkListWidget",
+      "label": "Recent B&asic Settings",
+      "observedColdState": {
+        "checked": null,
+        "expanded": false
+      },
+      "staticReset": {
+        "expanded": false
+      }
+    },
+    {
+      "parentOffset": "0x0",
+      "fieldOffset": "0x134",
+      "className": "ToggleGroupBox",
+      "label": "&Saved Advanced Settings",
+      "observedColdState": {
+        "checked": null,
+        "expanded": false
+      },
+      "staticReset": {
+        "expanded": false
+      }
+    },
+    {
+      "parentOffset": "0x0",
+      "fieldOffset": "0x1d0",
+      "className": "ToggleGroupBox",
+      "label": "Save Se&ttings",
+      "observedColdState": {
+        "checked": null,
+        "expanded": false
+      },
+      "staticReset": {
+        "expanded": false
+      }
+    },
+    {
+      "parentOffset": "0x0",
+      "fieldOffset": "0x1b8",
+      "className": "DragResultWidget",
+      "label": "Minimize on drag",
+      "observedColdState": {
+        "checked": true,
+        "expanded": null,
+        "label": "Minimize on drag",
+        "formatIndex": 0,
+        "formats": [
+          "ai",
+          "dxf",
+          "emf",
+          "eps",
+          "pdf",
+          "svg"
+        ]
+      },
+      "staticReset": {
+        "formatIndex": 0,
+        "minimizeOnDrag": true
+      }
+    },
+    {
+      "parentOffset": "0x0",
+      "fieldOffset": "0x1c8",
+      "className": "DragResultWidget",
+      "label": "Minimize on drag",
+      "observedColdState": {
+        "checked": true,
+        "expanded": null,
+        "label": "Minimize on drag",
+        "formatIndex": 0,
+        "formats": [
+          "ai",
+          "dxf",
+          "emf",
+          "eps",
+          "pdf",
+          "svg"
+        ]
+      },
+      "staticReset": {
+        "formatIndex": 0,
+        "minimizeOnDrag": true
+      }
+    },
+    {
+      "parentOffset": "0x30",
+      "fieldOffset": "0xb4",
+      "className": "QCheckBox",
+      "label": "Paths",
+      "observedColdState": {
+        "checked": false,
+        "expanded": null,
+        "label": "Paths"
+      },
+      "staticReset": {
+        "checked": false
+      }
+    }
+  ],
+  "staticEvidence": {
+    "handler": "../evidence/reset-everything-006-reset-handler.c",
+    "handlerAssembly": "../evidence/reset-everything-handler-tail-llvm.txt",
+    "toggle": "../evidence/window-reset-002-business.c",
+    "formatSelection": "../evidence/window-reset-003-business.c",
+    "directory": "../evidence/window-reset-005-business.c",
+    "bitmapScale": "../evidence/window-reset-006-business.c",
+    "bitmapFormat": "../evidence/window-reset-007-business.c",
+    "constructor": "../evidence/window-reset-008-business.c",
+    "fullResetHandler": "../evidence/native-window-reset-static-20261021/window-lifecycle-004-full-reset-handler.c",
+    "fullResetHandlerRecord": "../evidence/native-window-reset-static-20261021/window-lifecycle-004-full-reset-handler.json",
+    "resolvedOwnersAndRefresh": "../evidence/native-window-reset-static-20261021/analysis.json"
+  },
+  "evidenceBoundary": "Observed cold/model/pending-warning state is distinct from static reset predictions. No widget setter or native input is invoked by the observer; pending warnings terminate the process with code 19.",
+  "independentPresentation": {
+    "recentFiles": "Native window+0xb4 starts collapsed. GPUI has an independent session disclosure, initially collapsed and collapsed by confirmed Reset application. Actual desktop checks pass in the binary-bound 50/50 baseline at ../evidence/gpui-back-reset-20261021/verification.json.",
+    "recentDirectories": "Native window+0xb0 starts collapsed. GPUI has an independent session disclosure with the same lifecycle. Toggling does not clear history or affect the other disclosure. The same desktop baseline verifies independent expansion and Cancel preservation."
+  },
+  "gpuiReset": {
+    "path": "The GPUI Reset application confirmation, with Cancel focused by default, runs reset_application in rust/crates/openvector-gui/src/app_workflows.rs. Existing admission, list and model stages run first, as in the native handler. The window stage below follows them, before the existing single attempt at each store.",
+    "basis": "staticReset values and the 0x451750 call order establish general predictions. Full-window captures start on Review Result (native page 19), with empty and one-entry queues. The former Basic Export label was incorrect; corrected Rust semantic comparison is tracked in application-reset-contract.json. These captures do not prove transitions from every altered widget value.",
+    "implemented": {
+      "autoUpdate": "window+0x174/0x190/0x1b0: wizard and stored autoPalette, autoSegmentation and autoVectorization become true.",
+      "skipReview": "window+0x14c: wizard and stored skipReview become false.",
+      "quickSave": "window+0x1b4/0x1c4 via 0x41dfc0: basic and advanced panes collapse and select AI. The empty folder argument selects the canonical working directory. The closed source filename is cleared.",
+      "bitmapExport": "window+0x1dc/0x1e0 via 0x41e3d0: basic and advanced panes collapse and select PNG with the same folder rule. Scale 1 commits through both live size panes against the retained original size; stored bitmapScale takes the settled scale.",
+      "dragResult": "window+0x1b8/0x1c8 via 0x41ec00: basic and advanced choices select AI with Minimize on drag checked.",
+      "recentDisclosures": "window+0xb0 and +0xb4 collapse independently stored session disclosures. Cancel preserves them; neither expansion state is persisted.",
+      "paths": "window+0x30 child +0xb4: viewer Paths turns off. This session state is not stored."
+    },
+    "desktopVerification": {
+      "currentReset": "Current Linux binary 7978244f, Windows binary 7a0782df and macOS binary a5494984 paint cancellation preservation, confirmed source closure with Basic Export retained, and successful new Open/conversion. Linux and Windows also export the recovered vector. See application-reset-contract.json paintedCurrentVerification for exact source, binary, input and comparison limits.",
+      "disclosures": "All five mapped disclosures, reset Cancel preservation and confirmed collapse are exercised on reviewed binary 30185c4f...045f. Profile workflows pass 35 checks; ../evidence/gpui-profile-controls-live-20261021/verification.json.",
+      "recentBasicSettings": "Shared Rust, CLI and installed npm checks pass. The 23-check actual Recent Basic run verifies five stored/four visible entries, duplicates, replay, real cancellation, restart, reset clearing and independent disclosures; ../evidence/gpui-recent-basic-live-20261021/analysis.json."
+    },
+    "finalRefresh": "Read-only disassembly of 0x450de0 resolves page-dependent widget updates, QLabel text, and QStackedWidget selection from model+0x1b8. It is not evidence of a preference-save call. GPUI derives controls from reset state on render; all transitive native callee effects remain unverified.",
+    "retained": "Current source directory, vector export format/layout/curve/thin/compact, batch advanced requests and export folder, bitmap original size and files on disk. Retained evidence assigns none of them to the window stage.",
+    "failure": "Quick Save, bitmap export and size updates are prepared on copies before the model stage, so a rejected update leaves the session unchanged. Store failures keep the in-memory reset and report each failed store."
+  },
+  "remaining": [
+    "Extend native full-window observations beyond Review Result and mostly-default widgets captured in application-reset-contract.json. Current Linux, Windows and macOS painted Export checks are separate observations, not matching native starting states.",
+    "Complete preference persistence and resolve the setter-only processing-reset comparison."
+  ],
+  "fullApplicationParity": false
+}

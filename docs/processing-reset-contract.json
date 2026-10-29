@@ -1,0 +1,46 @@
+{
+  "project": "openvector",
+  "status": "Independent engine and batch-owner reset implemented. Six native workflows match; one setter-only transparency state remains a visible differential failure.",
+  "reference": "../test/fixtures/processing-reset-reference.ndjson.gz",
+  "nativeAudit": "../evidence/processing-reset-native-audit.json",
+  "cases": 7,
+  "nativeProcesses": 28,
+  "documentCaptures": 10,
+  "profileFrames": 49,
+  "operation": {
+    "native": "List reset 0x42f380 followed by source/model reset 0x430ed0 with three true arguments. These captures do not execute the post-confirmation window handler.",
+    "single": "Reset selected processing controls and counters. Commit the default settings record with zero RGBA background to the blank document before resetting selected palette metadata and transparent-white background. Clear source, geometry, editing state and continuing flag without replacing the application session.",
+    "palette": "Clear selected colors and customization, set paletteColorCount to two, retain the runtime revert copy.",
+    "batch": "Clear queue and processing indices. Set category, quality and paletteMode to three, basic color count to zero and background mode/color to opaque white. Preserve advanced mode, advanced controls/count, palette colors, paletteColorCount and background recommendation.",
+    "export": "Preserve batch export folder, format and output options at this model stage.",
+    "random": "Preserve the existing session random stream through reset, including a later conversion. Never replace CoreSession to implement reset.",
+    "persistence": "Native restart captures preserve batch advanced controls and palette count but discard saved palette colors. OpenVector's processing-preference owner now matches eight ordinary/reset-related restart workflows; see processing-preferences-contract.json. Window persistence and exact native quit behavior remain unfinished."
+  },
+  "independentOwners": {
+    "engine": "GuiEngine.resetProcessing() establishes the scalar defaults, then uses the existing canonical source reset path for document and selected source metadata.",
+    "batch": "BatchController.resetSource clears its queue and resets only the observed basic/background fields. Its local reset-source command rejects active/running batch operations before mutation. ApplicationController admits the shared model operation in either idle workspace before calling the same owner operation.",
+    "lists": "Saved profiles and source histories use their existing reset operations from factory-reset-contract.json."
+  },
+  "remaining": [
+    "Extend full-window widget and confirmation coverage beyond the captured basic Export state. Current full-window and historical model comparisons are distinguished in application-reset-contract.json.",
+    "Complete window preference persistence and exact native quit ordering; selected/batch processing persistence is verified separately."
+  ],
+  "fullApplicationParity": false,
+  "knownComparisonGap": {
+    "case": "processing-batch-controls",
+    "nativeSetterValue": 2,
+    "acceptedProcessingValues": [
+      0,
+      1,
+      3
+    ],
+    "nativeMenuEvidence": "../evidence/native-batch-processing-gui-menu-choices-verified-verification.json",
+    "nativeMenuValues": [
+      0,
+      1,
+      3
+    ],
+    "testPolicy": "Keep the native capture and failing comparison intact. No setter adapter, extra model channel, widened processing admission, skipped case or rewritten native expectation.",
+    "remaining": "Resolve the appropriate conformance boundary for a setter-only state before claiming all captured model states match."
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "status": "The shared direct-save transaction supports vector and bitmap output. Existing vector behavior and the bitmap decision/byte paths have scoped verification; see bitmap-gui-contract.json for the current checkpoint.",
+  "name": "OpenVector",
+  "reference": {
+    "executableSha256": "c491656b962debc215a8b6e757a9b2949ffe50a36b5f2db692706bcd4ebface1",
+    "dynamic": "quick-save-fields-reference.ndjson.gz: 11 cases, 22 processes, 31 reference snapshots",
+    "static": {
+      "savePressed": "0x4212d0",
+      "filenameNormalization": "0x41d7f0",
+      "editingFinished": "0x420e40",
+      "vectorSignalConnection": "0x44f790",
+      "notificationTimer": "0x420e60, 5000 ms single shot",
+      "bitmapReceiver": "0x451430 -> 0x429bb0 -> 0x44c470"
+    },
+    "limits": "No native controls were driven and no native save dialogs were answered. Native disk writes and receiver failure behavior have not been executed."
+  },
+  "ownership": {
+    "persistent": "Independent vector and bitmap basic/advanced format, directory and expanded choices. The current seven-owner preference file also stores one shared bitmap scale.",
+    "transient": "Each Quick Save owner additionally exposes filename. Filenames start empty, use the first dot as the basename boundary, update on nonempty source events and survive source reset. They are never persisted.",
+    "source": "GuiEngine owns the resolved current source filename. Ordinary batch attempts advance it while retaining Quick Save widget fields; completed-load cancellation uses the shared source-metadata reset. See quick-save-batch-contract.json and quick-save-cancellation-contract.json. Clipboard source handling remains unfinished.",
+    "pending": "One pending direct save freezes its target and bytes. Document/settings/queue mutations wait until its directory or overwrite decision resolves. Reads remain available."
+  },
+  "commands": {
+    "save": "POST quickSaveFile with command save, kind vector/bitmap and mode basic/advanced. Vector output options come from the application owner; EMF uses host-measured device metrics. Bitmap uses its selected pane format and the shared size owner.",
+    "decide": "POST quickSaveFile with command decide and Boolean accepted. Cancel clears the pending save without writing its target.",
+    "pickDirectory": "POST quickSaveDirectory with kind vector/bitmap and mode; the host uses its existing native folder picker. Cancellation preserves that kind\u2019s choices.",
+    "acknowledge": "POST quickSaveFile with command acknowledge, only when its transparency warning is pending. The native warning has one OK button; decide cannot accept or cancel that warning."
+  },
+  "flow": [
+    "Reject an empty filename.",
+    "Resolve the chosen directory and filename, then append the chosen extension.",
+    "Ask before recursively creating a missing parent directory.",
+    "Reject overwriting the source file.",
+    "Ask before overwriting an existing target.",
+    "For bitmap output that needs a transparency warning, show the native OK-only warning after the directory/overwrite checks; acknowledge it before writing.",
+    "Write independent exporter bytes to the target. Report Saved for five seconds only after a successful write. Surface file-system errors and clear the pending save."
+  ],
+  "unverified": [
+    "Typed filename completion and unusual path normalization are statically derived, not dynamically compared.",
+    "Native overwrite-skip source events and arbitrary in-task cancellation are not covered by the ordinary and cancellation source-lifetime cases.",
+    "Success-only notification deliberately avoids claiming native error-notification parity until the save receiver is traced."
+  ]
+}

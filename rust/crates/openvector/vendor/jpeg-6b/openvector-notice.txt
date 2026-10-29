@@ -1,0 +1,19 @@
+OpenVector uses the Independent JPEG Group's jpeg-6b compressor.
+This software is based in part on the work of the Independent JPEG Group.
+
+The selected C sources and headers are unmodified copies of the IJG component
+distributed with Qt 4.4.3. Their copyright and license terms are retained in
+README. No ansi2knr source is included.
+
+The Rust engine calls the native wrapper in
+rust/crates/openvector/csrc/bitmap_jpeg.c. The crate's build.rs compiles that
+wrapper and these IJG sources into the engine. The wrapper provides a growing
+memory destination, host allocation, setjmp/longjmp error recovery and
+top-down BGRA-to-RGB scanlines. It replaces the JavaScript reference wrapper's
+per-call WebAssembly arena and trap-based error reporting. The build uses
+NO_GETENV to avoid host environment access. Upstream codec files are unchanged.
+Default compression is quality 75, baseline JPEG, RGB input and 96-DPI density.
+
+The Rust caller, native wrapper and build script are OpenVector application
+code. This component is compiled into the native CLI, Node-API library and
+GPUI application. It requires no Vector Magic or Qt installation.

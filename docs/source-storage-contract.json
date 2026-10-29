@@ -1,0 +1,76 @@
+{
+  "project": "openvector",
+  "status": "Rust/GPUI recent-cache and malformed-store startup behavior are verified through actual Linux workflows. The two retained numeric export-preference failures now have a separate passing post-fix startup run.",
+  "reference": "../test/fixtures/source-storage-reference.ndjson.gz",
+  "nativeAudit": "../evidence/source-storage-native-audit.json",
+  "nativeCases": 6,
+  "nativeProcesses": 32,
+  "observations": 41,
+  "behavior": {
+    "restore": "Restore the ordered cached filenames, descriptions and thumbnails. Do not rescan, prune missing files, or refresh changed files at startup.",
+    "refresh": "Successfully reopening a changed file refreshes its own metadata and thumbnail and promotes its exact filename to the front.",
+    "clear": "Clear all recent-file metadata and thumbnails. The cleared list remains empty after restart.",
+    "directory": "Retain the last successful source directory independently of the current image. A process restart starts without a loaded image.",
+    "identity": "Keep exact path spelling and Unicode through storage. File loading may resolve a relative caller path against the host working directory; browser basenames do not identify disk files.",
+    "format": "Current GPUI storage is the preferences document described in gpuiStorage below. The historical browser source document used directory, directories and up to three coupled file records containing cached RGBA bytes or null. Neither implementation migrates historical local formats.",
+    "failure": "Malformed or inaccessible storage is an explicit error; a missing storage file is a fresh application. Atomic writes preserve the previous file on failure. A successful image load and in-memory history mutation remain visible if saving history fails. Such errors return sourceResult with the current history and an explicit loaded flag, alongside the actual document state. A failed read/decode has no successful sourceResult and preserves the current wizard. Native file-error dialog outcomes remain unverified."
+  },
+  "gpuiStorage": {
+    "owner": "Rust GUI Preferences owns recent cached pixels; shared core SourceHistory continues to own metadata. Batch previews have separate session ownership.",
+    "field": "sources.files[].previewPng",
+    "representation": "Required JSON byte array containing a lossless PNG, or explicit null. Missing previewPng is rejected, not recovered by reading a source path.",
+    "projection": "The modernized GUI uses Bitmap::preview, bounded to 360 pixels per side without upscaling. This does not claim byte-identical native thumbnail sampling.",
+    "restore": "Restore stored pixels without reopening changed, missing or invalid original files. Successful single-source reopen refreshes only its own entry.",
+    "lifetime": "Eviction, Clear recent images and Reset release retired textures through the existing window atlas cleanup.",
+    "startupFailure": "Malformed preferences or profile stores stop startup before Worker::start, print the rejected path and recovery instructions, and leave both stores unchanged. Present format and layout fields must contain supported text values; wrong types must not silently become defaults. Missing files use first-run defaults.",
+    "verification": "../evidence/storage-locale-integration-20261021/verification.json",
+    "desktopStatus": "23 assertions pass in ../evidence/gpui-storage-after-20261021/report.json: source-change/restart cache retention, independent batch previews, clear/reset, malformed-store preservation and missing-store startup. Its numeric format/layout failures remain recorded. Their exact malformed bytes pass all four rejection/preservation checks on the fixed binary in ../evidence/gpui-storage-types-20261021/run/results.json."
+  },
+  "historicalReferenceSections": "host, gui and verification below describe the browser reference, not the current GPUI runtime.",
+  "host": {
+    "module": "../gui/source-controller.mjs",
+    "ownership": "The worker owns one source controller, the existing GuiEngine document and one SourceHistory metadata owner. Disk opens use the canonical engine.open path.",
+    "api": "GET /api/sources lists cached history. POST commands pick, reopen and clear use the same host and worker serialization. Picker paths are real OS paths. Uploaded byte-only sources do not become fictional disk-history entries.",
+    "storageLocation": "An absolute sourceFilename supplied by the local host, defaulting to sources.json next to its profile file.",
+    "thumbnailReference": "../test/fixtures/source-thumbnails-reference.ndjson.gz",
+    "thumbnailAudit": "../evidence/source-thumbnails-native-audit.json",
+    "thumbnailArithmetic": "Fixed-point sampling must preserve solid colors. Native cached PNGs cover patterned opaque and alpha sources at 13x9, 9x13, 32x32, 47x35, 35x47 and 64x64, including upscaling, downscaling and no resize. Compare every cached pixel before and after restart.",
+    "pickerVerification": "Windows single-image picker mode compiles. Open, Browse, Ctrl-O and the empty viewer action use that host boundary. No native picker interaction was driven or verified."
+  },
+  "limits": [
+    "Native clipboard acquisition and after-answer behavior remain unverified.",
+    "Browser file drops do not expose real disk paths; complete desktop drop parity remains unfinished.",
+    "The source host does not establish full selected-settings restart parity. Native startup controls are retained explicitly in the corpus.",
+    "Original recent-file widget default/retained disclosure state is unverified; browser canvas pixel readback is unavailable. Cached pixels are compared at the source-host boundary.",
+    "Native picker interaction and source replacement during pending work on other wizard pages remain unverified."
+  ],
+  "verification": {
+    "checkpoint": "../evidence/source-gui-verification-checkpoint.json",
+    "sourceTests": "../evidence/source-storage-owner-tests.txt",
+    "installedTests": "../evidence/source-storage-installed-tests.txt",
+    "fullGuiTests": "../evidence/source-gui-final-tests.txt",
+    "isolatedBuild": "../evidence/source-gui-final-build.txt",
+    "decoderAudit": "../evidence/source-storage-decoder-audit.json",
+    "review": "source-gui-code-review.md",
+    "sourceAndInstalledTestsEach": 6,
+    "guiTests": 321,
+    "sourceHostTests": 15,
+    "nativePickerInteractionVerified": false,
+    "nativeGuiRecentFileWidgetsCompared": false,
+    "storageCheckpoint": "../evidence/source-storage-verification-checkpoint.json",
+    "browserStates": "../evidence/source-gui-final-browser-states.json",
+    "browserScreenshot": "../evidence/source-gui-final-browser.jpg",
+    "browserRecentFileProjectionVerified": true
+  },
+  "fullApplicationParity": false,
+  "gui": {
+    "page": "Load Image",
+    "presentation": "Three recent-file links with cached thumbnails, basenames, native size labels and full-path tooltips/accessibility names. A native HTML disclosure starts expanded in this modernized layout.",
+    "reopen": "A successful reopen adopts the new image, settings and palette projection and starts Wizard mode. Its exact file entry moves to the front.",
+    "failure": "Read/decode failure preserves the current wizard and image. A loaded image whose history cannot be saved still starts its wizard and updates visible in-memory history; the error stays visible.",
+    "uploads": "The OS picker serves file-open controls. Byte-only browser drops retain the shared upload handler and do not create disk-history entries.",
+    "keyboard": "Enter toggles a focused disclosure and activates a focused recent-file link. Global wizard shortcuts yield to summary elements.",
+    "reset": "POST reset-history clears file rows, cached thumbnails and recent directories while preserving the current source directory and loaded document. POST clear still clears file rows only. See factory-reset-contract.json for this historical model scope and application-reset-contract.json for the separate full-window Reset evidence."
+  },
+  "directoryContract": "source-directories-contract.json"
+}

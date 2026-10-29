@@ -1,0 +1,25 @@
+Usage: openvector recent-settings <list|show|clear> [options]
+
+Inspect or clear recent basic settings recorded by vectorize --recent-file.
+Never prompt.
+
+  --file <path>   Recent settings storage file (required; a missing file is empty).
+  --index <n>     Zero-based entry for show.
+  -h, --help      Show this help without reading files.
+
+Examples:
+  openvector recent-settings list --file recent.json
+  openvector recent-settings show --file recent.json --index 0
+  openvector recent-settings clear --file recent.json
+
+All successful commands write JSON on stdout. list/show never write storage.
+list prints entries newest first with their summary label and visibility. show
+prints one reusable profile. clear prints the removed entry count and writes
+storage only when it removed entries. Missing entries and invalid input exit 1
+with diagnostics on stderr.
+
+Storage keeps five entries; the first four are visible and replayable with
+vectorize --recent-index. Labels such as "Artwork, High, Two colors" identify
+entries: recording an existing label moves that entry first and keeps its older
+settings. Storage discards palette colors and restores transparency colors as
+opaque RGB, matching saved advanced profiles.

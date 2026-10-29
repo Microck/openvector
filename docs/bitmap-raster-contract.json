@@ -1,0 +1,48 @@
+{
+  "project": "openvector",
+  "status": "Independent fills and cosmetic strokes match 67 native pixel cases. Canonical document export and CLI match 34 native bitmap files. GUI bitmap integration and broader parity remain unfinished.",
+  "parentContract": "bitmap-export-contract.json",
+  "verificationCheckpoint": "../evidence/bitmap-cli-verification-checkpoint.json",
+  "codeReview": "bitmap-raster-code-review.md",
+  "goal": "Render fitted vector geometry into pixels matching the original bitmap export, then use the independent file encoders.",
+  "primitiveReference": {
+    "helper": "New raster-pixels helper 30; the preceding 29 reference executables remain frozen.",
+    "operation": "Construct owned offscreen QImage, QPainter and QPainterPath objects through Qt 4.4.3's exported methods. Read their raw premultiplied BGRA pixels. These are reference objects, not native application widgets.",
+    "inputs": "Dimensions, RGB32 or ARGB32_Premultiplied format, packed initial fill, translation/scale and colored paths containing move, line, cubic and close commands. Paths specify odd-even or winding fill.",
+    "nativeUiInputSynthesized": false,
+    "nativeDialogsAnswered": false,
+    "nativeWidgetSettersInvoked": false
+  },
+  "applicationReference": "REA and assembly must establish native scene construction, color/path order and overlap handling separately from the primitive scan converter.",
+  "strokeWork": {
+    "status": "Forty-one exact native stroke pixel cases pass, including repeated controls, tiny turns, collinear loops, clipping and reflections.",
+    "nativeContract": "The opaque prepass draws separate single-edge paths with zero-width solid pens, SquareCap and BevelJoin. Zero width means one device pixel after mapping geometry. Lines retain region traversal multiplicity; cubic slots retain the last region write.",
+    "referencePlan": "Separate raster-strokes helper 31 adds owned QPen objects to the offscreen QPainter reference. The existing 30 executable hashes remain frozen. No application widgets or dialogs are driven.",
+    "license": "The separately imported editable square-stroke.mjs module derives from LGPL-2.1 Qt 4.5.3 curve-offset/stroker routines. The complete license, upstream exception and modification notice are packaged alongside it. No installed proprietary implementation is a runtime dependency.",
+    "verificationOwner": "Exact primitive pixels belong to test/bitmap-raster.test.mjs. Complete fitted-scene ordering and encoded outputs require integration comparisons."
+  },
+  "fittedSceneImplementation": {
+    "module": "../src/bitmap-raster.mjs",
+    "api": "renderBitmap({geometry,width,height,scale=1,hasAlpha=false,hiddenRegions=[]}) returns owned premultiplied BGRA pixels, consistently with rasterizePaths. Application file export uses exportBitmap(document,{format,scale,flatten}) from openvector/bitmap, which chooses storage from actual source alpha, applied background mode and active background history and owns per-codec conversion.",
+    "ordering": "Cubic seam slots retain the last region write, then every line seam is appended in region traversal order. Opaque output draws seams with averaged alpha at least 250, followed by region fills with cutout holes. Transparent output omits the seam prepass. Hidden regions affect fill traversal; seam collection follows the native scene builder.",
+    "channels": "Both raster boundaries return premultiplied BGRA. exportBitmap converts to straight channels with truncating channel*255/alpha only for PNG/TIFF, clearing RGB at alpha zero. Native BMP/JPEG consume stored channels directly.",
+    "status": "Original seventeen scene files and seventeen additional visibility/history files match through exportBitmap; CLI native byte comparisons also cover these files. GUI bitmap integration remains unfinished."
+  },
+  "primitiveImplementation": {
+    "status": "Primitive fills and single-edge cosmetic strokes are verified within 67 native pixel cases.",
+    "module": "../src/bitmap-raster.mjs",
+    "input": "rasterizePaths receives dimensions, hasAlpha, a straight BGRA background, [scaleX,scaleY,translateX,translateY], and colored paths. Fills use M/L/C/Z commands and even-odd or nonzero rules. stroke:true accepts one M followed by one L or C and paints a one-device-pixel square-capped edge. Native Qt enum values are confined to reference-fixture translation.",
+    "output": "Owned premultiplied BGRA pixels with dimensions and hasAlpha. The canonical bitmap-export operation owns per-format conversion: PNG/TIFF unpremultiply; BMP/JPEG write stored channels.",
+    "kernel": "The FreeType gray scan converter distributed with Qt 4.4.3, compiled as a freestanding WebAssembly module. Its FreeType license and copyright headers remain with the source. Pool overflow uses an explicit worker error in place of nonlocal jumps; original band splitting remains. The allocator keeps the observed x86 3200-byte control quota, independent of the modified worker layout.",
+    "pool": "Start with 8192 bytes per rasterization and double on -6 up to one MiB. Preserve and compose spans already emitted before a retry. The quota is grounded in QtGui4.dll's raster_reset at 0x65133810, not inferred from the WebAssembly compiler's sizeof worker.",
+    "tests": "Sixty-seven exact native pixel cases plus admission checks. Canonical codec/document export tests bring the core total to 115 passed; CLI suites add 146 passing tests. No failures or skips. Caller pixels, document state and background history remain unchanged.",
+    "scope": "Fills, source-over composition and one-edge cosmetic strokes. General polyline stroke styles, extreme-coordinate clipping and complete application conformance are not established."
+  },
+  "remaining": [
+    "Broader color/geometry conformance and extreme-coordinate clipping beyond the 67 verified primitive cases",
+    "Native comparisons for hidden-region scenes, flatten choices and more complex fitted geometry",
+    "Broader complete native bitmap file comparisons, including larger fitted-scene JPEGs",
+    "GUI bitmap integration"
+  ],
+  "fullApplicationParity": false
+}

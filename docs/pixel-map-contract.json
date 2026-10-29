@@ -1,0 +1,29 @@
+{
+  "component": "Independent segmentation pixel map",
+  "storage": "Positive integer width and height with exactly width * height signed int32 segment identifiers in row-major order. Construction copies the caller's array.",
+  "api": {
+    "constructor": "new PixelMap({ width, height, segments })",
+    "floodFill": "map.floodFill(seed, replacement) mutates the connected region containing the row-major seed index. It returns undefined, matching the original core operation.",
+    "toJSON": "Returns { width, height, segments } with an independent array suitable for CLI input or persistence."
+  },
+  "fill_behavior": [
+    "Use the segment identifier at the seed as the source identifier.",
+    "Replace only pixels with that identifier connected through horizontal or vertical edges.",
+    "Do not cross a row boundary or connect through a diagonal contact.",
+    "Reject an out-of-range seed or a replacement equal to the source identifier before changing the map.",
+    "Accept the full signed int32 segment range. Segment identifiers are not palette colors."
+  ],
+  "cli": {
+    "syntax": "openvector fill <map.json|-> <seed> <replacement>",
+    "input": "A JSON pixel map with width, height, segments.",
+    "output": "The complete edited map as JSON on stdout. Errors go to stderr with exit status 1 and no partial JSON.",
+    "side_effects": "No file writes. A caller can redirect stdout to save the edited map."
+  },
+  "reference": {
+    "routine": "vmde.exe 0x484100",
+    "diagnostic": "PixelMap::floodFill at 0x8de0d0",
+    "directions": "0x472cf4..0x472cff initialize right=1, down=width, left=-1; the following initialization supplies up=-width.",
+    "probe": "Original integer scanline instructions run on the Windows x86 host. Only calls to the deque container are redirected to a bounded in-memory deque; seven absolute direction operands are relocated. No GUI or original DLL is loaded.",
+    "limits": "Covers the core map mutation. Palette lookup, document history, GUI gestures, recomputation, and zap/pencil tools remain separate unresolved behavior."
+  }
+}

@@ -1,0 +1,33 @@
+{
+  "project": "openvector",
+  "status": "Shared output owner, both GUI workspaces, CLI compact EPS and persistence verified. Native quit remains unfinished. The later full-window Reset capture retains exporter values for one starting state; see application-reset-contract.json.",
+  "reference": "../test/fixtures/export-preferences-reference.ndjson.gz",
+  "nativeAudit": "../evidence/export-preferences-native-audit.json",
+  "cases": 8,
+  "nativeProcesses": 36,
+  "restartPhases": 10,
+  "verification": {
+    "newGuiTestsPassed": 11,
+    "cliTestsPassed": 43,
+    "isolatedGuiSuite": {"passed": 376, "failed": 1, "skipped": 0},
+    "coreSuite": {"passed": 720, "failed": 2, "skipped": 0},
+    "coreScope": "The full core run predates the new compact CLI test. The subsequent entire CLI-batch file passes all 43 tests. Numerical source files did not change during the run.",
+    "browser": "Visible defaults, keyboard layout selection, single/batch/single sharing, format-specific enabled state, compact thin-stroke EPS download and actual host restart without reseeding.",
+    "checkpoint": "../evidence/export-preferences-verification-checkpoint.json"
+  },
+  "nativeFields": {
+    "layout": {"offset": "0x1d8", "values": ["stacked", "cutouts", "grouped-cutouts"], "default": 2},
+    "compact": {"offset": "0x1dc", "values": [true, false], "default": 1},
+    "thinStroke": {"offset": "0x1e0", "values": [true, false], "default": 1},
+    "curveMode": {"offset": "0x1e4", "values": ["splines", "sparse-lines", "dense-lines"], "default": 2}
+  },
+  "behavior": {
+    "ownership": "One GuiEngine output-options owner supplies the single-image GUI and batch processing flow. Both pass selected snapshots explicitly to the existing per-call writer methods. Browser and batch snapshots are owned projections, not separate settings owners.",
+    "defaults": {"layout": "grouped-cutouts", "thinStroke": false, "compact": false, "curveMode": "dense-lines"},
+    "rustCli": "vectorize and batch overlay explicit export flags on these application defaults. Standalone export-* commands retain their per-call serializer defaults. Geometry-corpus comparisons explicitly select their reference writer's layout and, for DXF, curve mode; the default-conversion checks compare the application defaults independently.",
+    "lifetime": "Preserve options through workspace changes and application model reset. Save/restore them once at the processing-preference root; remove the earlier batch-local preference field. Invalid old local files fail with explicit recovery instructions; no migration or compatibility path.",
+    "api": "POST /api/outputOptions applies validated partial changes in either idle workspace and publishes batch state before replying. The single-image GUI sends its complete selected options in the export query. The export endpoint and writer methods keep their existing per-call defaults and never read hidden application settings.",
+    "limits": "Native quit ordering, active-job shutdown and broader full-window Reset starting states remain unverified. This historical corpus changes business-model settings only and never answers a native dialog; later full-window evidence is recorded in application-reset-contract.json."
+  },
+  "fullApplicationParity": false
+}

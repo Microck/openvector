@@ -1,0 +1,92 @@
+{
+  "project": "openvector",
+  "status": "Canonical document bitmap export and CLI vectorize support BMP/JPEG/PNG/TIFF with native storage policy. GUI integration and broader export behavior remain unfinished.",
+  "groundTruth": "../evidence/bitmap-export-call-chain-verification.json",
+  "runtimeReference": "../test/fixtures/bitmap-export-reference.ndjson.gz",
+  "runtimeAudit": "../evidence/bitmap-export-native-audit.json",
+  "supplementalCodecAudit": "../evidence/bitmap-export-codec-supplemental-audit.json",
+  "codecObservations": "../evidence/bitmap-export-codec-observations.json",
+  "qtSourceReference": "../evidence/bitmap-export-qt-source-identity.json",
+  "codecCheckpoint": "../evidence/bitmap-cli-verification-checkpoint.json",
+  "codecCodeReview": "bitmap-codecs-code-review.md",
+  "rasterContract": "bitmap-raster-contract.json",
+  "cliWork": {
+    "status": "Implemented and verified: 115 core tests and 146 CLI tests pass, zero failures/skips.",
+    "command": "Extend vectorize --format and output-extension inference with BMP/JPEG/PNG/TIFF. Reuse binary stdout, exclusive file creation, --force, edit plans and saved profiles. Scale applies only to bitmap files.",
+    "storageFinding": "Native 0x469ed0 classifies actual original-source alpha. Renderer 0x42df00 also tests the visibility owner's active history count through 0x4694c0 before selecting RGB32 or premultiplied ARGB32. Container alpha capability and current hidden bits alone are insufficient.",
+    "referencePlan": "New helper 33 invokes MainModel's existing world-point background business action and undo/redo/revert slots. It then calls the ordinary bitmap-save model method on fresh targets. Earlier 32 executables remain frozen. No pointer/key input or native dialogs may be driven.",
+    "architecture": "openvector/bitmap exports exportBitmap(document,{format,scale=1,flatten=false}). It reads the canonical ImageDocument once, selects native storage from sourceAlphaType, applied background mode and active undo history, renders fitted vectors, converts storage for the selected codec, and returns owned file bytes. renderBitmap now returns premultiplied pixels consistently with rasterizePaths. PNG/TIFF unpremultiply at the file boundary; BMP/JPEG receive the native stored channels. No straight-to-premultiplied reconstruction exists.",
+    "cliContract": "vectorize accepts bmp/jpg/jpeg/png/tif/tiff in --format or output-extension inference. --scale is positive and finite and only applies to bitmap output. --flatten is only valid for non-PNG bitmap formats and acknowledges the native warning when sourceAlphaType is nonzero and applied backgroundMode is zero. The CLI never prompts. Failures produce no output bytes or output-file replacement. Existing --force and source/profile file protection remain.",
+    "verification": "Canonical codec integration owns complete native bitmap files, including visibility/history storage. The existing CLI vectorize suite owns option parsing, binary stdout/stdin, exit codes, warnings and filesystem behavior.",
+    "nativeAudit": "../evidence/bitmap-visibility-native-audit.json",
+    "storageVerification": "Five cases, ten native processes and seventeen files establish hiding, double-toggle, undo, redo and opaque RGBA-container behavior. BMP/JPEG preserve native stored channels; PNG/TIFF convert to straight channels.",
+    "codeReview": "bitmap-cli-code-review.md"
+  },
+  "jpegWork": {
+    "status": "Nine native pixel-to-JPEG files and two complete fitted-scene JPEG files match every encoded byte.",
+    "reference": "Qt 4.4.3 qjpeghandler.cpp writes RGB32 channels through IJG jpeg-6b with jpeg_set_defaults, quality 75, baseline quantization and no progressive/optimized coding request. It selects 96 DPI JFIF density for the default 3780 pixels per meter.",
+    "implementationPlan": "src/bitmap-jpeg.wasm is a freestanding 60493-byte IJG jpeg-6b compressor with zero host imports, a per-call arena and an owned growing memory destination. Its unmodified upstream files, complete README license and wrapper notice are packaged under src/vendor/jpeg-6b. No installed Vector Magic or Qt code is called by the product.",
+    "api": "encodeJpeg({width,height,bgra}) accepts straight top-down BGRA bytes, ignores alpha as the native RGB32 writer does, and returns an owned Buffer without modifying its input. Scene flattening remains the renderer/caller's responsibility. IJG's maximum dimension is 65500; a host-independent module resets its arena between calls and retains peak memory.",
+    "verificationOwner": "The existing bitmap codec suite owns supplied-pixel JPEG bytes, ownership across arena reuse, ignored alpha and admission. Its complete fitted-scene integration also compares two native JPEG files. The combined codec/raster run passes 115 core tests with zero failures/skips.",
+    "supplementalReference": "Helper 32 creates an owned RGB32 QImage from explicitly supplied pixels and saves to a fresh owned JPEG path. Nine cases run in eighteen fresh processes with identical whole raw responses and file bytes. Prior helpers 1-31 remain frozen. No application widgets, native input or dialogs are driven.",
+    "nativeAudit": "../evidence/bitmap-jpeg-native-audit.json",
+    "sceneAudit": "../evidence/bitmap-jpeg-scenes-native-audit.json",
+    "sourceIdentity": "../evidence/bitmap-jpeg-source-identity.json",
+    "buildIdentity": "../evidence/bitmap-jpeg-build-verification.json"
+  },
+  "observedStaticBehavior": {
+    "pipeline": "MainModel bitmap save schedules task 7. VectorRenderThread rasterizes fitted paths using QImage and antialiased QPainter, then calls QImage::save with automatic format selection and quality -1.",
+    "formats": [
+      "bmp",
+      "jpg",
+      "png",
+      "tif"
+    ],
+    "scale": "The model owns one shared bitmap export scale. Basic and advanced bitmap widgets retain separate format, directory and disclosure choices.",
+    "transparency": "A non-PNG target can display the original flatten warning. Reference helpers must abort on any native modal without answering it.",
+    "sourceProtection": "The scheduler skips a target equal to the current source filename. Exact filesystem equivalence semantics are not yet verified."
+  },
+  "observedRuntimeBehavior": {
+    "environment": "Installed QtGui4.dll reports file version 4.4.3.0. The helper explicitly sets QT_PLUGIN_PATH to the installation root so JPEG and TIFF imageformat plugins are discovered. No installed files are copied or changed.",
+    "opaque": "PNG, BMP, JPEG and TIFF outputs repeat byte-for-byte. Lossless BMP, PNG and TIFF outputs decode to the same RGBA pixels.",
+    "dimensions": "The 16 by 12 source renders to 16 by 12 at scale 1, 32 by 24 at 2, 8 by 6 at 0.5 and 20 by 15 at 1.25. These cases do not yet establish half-integer rounding or GUI bounds.",
+    "alpha": "The alpha source exports a PNG containing alpha values from 0 through 255. Its output bytes repeat exactly.",
+    "nonpositiveModelSetter": "Direct model-slot calls with 0 or -0.5 propagate that value to both bitmap widgets and create no file. These are internal-setter diagnostics, not evidence that the GUI size controls admit those values.",
+    "pixelEvidence": "Pillow decodes the saved files to RGBA for comparison. JPEG decoded pixels depend on that decoder and do not establish native internal image pixels.",
+    "counts": {
+      "cases": 8,
+      "processes": 16,
+      "bitmapFiles": 18,
+      "stateSnapshots": 88
+    },
+    "fixtureSha256": "a44bd73cec6406e4fd33bb18f016f810a3f690cd8ccc513dac250e597b52983f"
+  },
+  "supplementalCodecCase": "An additional two fresh processes at scale 0.1875 export all four formats at 3 by 2 pixels. Their eight files repeat exactly. The 24-bit BMP is 78 bytes, covering row padding that the 16-pixel-wide source does not exercise. This supplemental case is separate from the immutable eight-case fixture.",
+  "sourceResearch": "Selected Qt 4.4.3 sources were inspected from the official archive. The explicitly FreeType-licensed gray rasterizer and headers are now vendored with their license and documented changes. Other Qt application/widget sources remain reference material.",
+  "independentCodecContract": {
+    "status": "Independent pixel encoders verified within twenty-two native file cases; these are not completed bitmap export commands.",
+    "module": "../src/bitmap-codecs.mjs",
+    "input": "encodeBmp, encodeJpeg, encodeTiff and encodePng receive {width,height,bgra} as tightly packed top-down channel bytes. They validate once, return owned file bytes, preserve input, and perform no implicit channel premultiplication. encodePng accepts boolean hasAlpha for RGB/RGBA output. Application callers should use openvector/bitmap so native document storage and format-specific conversion are applied together.",
+    "bmp": "24-bit uncompressed bottom-up BGR, four-byte row alignment, 54-byte headers and 3780 pixels per meter. Alpha does not participate in BMP encoding; the renderer supplies colors already composed over the chosen background.",
+    "tiff": "Little-endian classic TIFF, one uncompressed interleaved RGBA strip and the nine observed directory tags. The encoder writes supplied channel bytes without color or alpha transforms.",
+    "png": "Adaptive PNG filters use the first minimum signed-byte residual sum. A bundled WebAssembly build of unmodified zlib 1.2.3 uses level 6, Z_FILTERED, a 32 KiB compression window and memLevel 8. The PNG header advertises the smallest sufficient zlib window, includes 3780 pixels-per-meter resolution and uses 8192-byte IDAT chunks. Modern Node Z_FILTERED matches small cases but differs on the larger captured streams; no modern-compressor fallback exists.",
+    "compressor": "src/bitmap-deflate.wasm is 23662 bytes and imports no host functions. One synchronous arena resets between calls and retains its peak memory allocation. tools/build-bitmap-deflate.py rebuilds it with LLVM. The complete selected upstream sources and license are packaged under src/vendor/zlib-1.2.3. The compressor uses upstream zlib sources only.",
+    "verification": "test/bitmap-codecs.test.mjs owns twenty-two supplied-pixel file references and thirty-four canonical document file exports, including seventeen visibility/history files. The primitive raster and codec suites pass 115 core tests. Three CLI suites pass 146 tests, including all thirty-four native bitmap files.",
+    "rasterization": "renderBitmap in bitmap-raster.mjs renders completed fitted geometry with the native cutouts and opaque seam prepass. Eleven complete source-to-file cases match seventeen native exports across the four formats. Encoders receive rendered pixels, not resized source pixels."
+  },
+  "referenceAdmission": {
+    "helper": "New bitmap-export helper 29 only; the existing 28 accepted executables remain unchanged.",
+    "operations": "Private desktop and settings namespace. Invoke the existing MainModel bitmap save business method with an owned QStringList. Set scale through the existing MainModel Qt slot. Wait for ordinary worker completion and read state through frozen observers.",
+    "outputs": "Only fresh files in an owned evidence directory. Retain raw outputs and decode their pixels for comparison.",
+    "nativeUiInputSynthesized": false,
+    "nativeDialogsAnswered": false,
+    "nativeWidgetSettersInvoked": false
+  },
+  "remaining": [
+    "Scale limits, zero-sized outcomes and GUI widget admission; positive half-integer dimension rounding is now captured",
+    "Broader complex/hidden geometry, colors, transparency and flatten choices",
+    "Broader complete source-to-file conformance, including larger fitted-scene JPEGs and flatten choices",
+    "GUI bitmap controls, save decisions, source protection equivalence and persisted bitmap choices"
+  ],
+  "fullApplicationParity": false
+}

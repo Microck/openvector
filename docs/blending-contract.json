@@ -1,0 +1,24 @@
+{
+  "component": "Independent local color-blend solver",
+  "status": "Independent local solver and weighted palette scoring implemented and matched against native recordings.",
+  "api": "fitColorBlend({ bgra, colors }) returns an owned float32 color, double weights, and double selfWeight. bgra is one byte pixel; colors are one through nine ordered normalized float32 BGRA colors. The first color is the sample's own region or palette entry.",
+  "ownership": "Validate and round once at the public boundary. Do not mutate caller arrays. Internal arithmetic trusts the validated shape.",
+  "one_color": "Return the supplied color and selfWeight=1.",
+  "two_colors": "Subtract colors and normalize the sample with float32 arithmetic. Compute the BGRA squared color norm and sample projection in native float32 order. For a positive norm, adjust the double projection t by (1-2*t)*0.01/(norm+0.02), clamp to [0,1], retain double weights [1-t,t], and form output channels using float32(t), float32 multiplication, and float32 addition. Equal colors use weights [0.5,0.5].",
+  "multi_color": "Multiply sample bytes by the float32 1/255 constant. Preserve the blue and green products in double precision; store red and alpha through float32 before converting to double. Fit the three BGR channels in double precision with diagonal regularization 0.01 and a sum-to-one constraint. Add zero constraints for the most negative unconstrained weight until no unbound weight is below -0.0001. Preserve tiny remaining negative weights rather than clamping or normalizing them. Output BGR is the float32 weighted color; alpha remains the normalized sample alpha.",
+  "solver": "Preserve native Cholesky and triangular-solve arithmetic order, BLAS multiplication order, and first-entry tie decisions. Numerical equivalence alone does not establish 1:1 decisions.",
+  "reference": "Original 0x4a2520 with 0x4a1de0 neighborhood gathering, 0x4a1f20 matrix preparation, 0x4a2040 constrained solve, 0x4a1980 Cholesky steps, and 0x4a1b60 triangular solves. Original palette-mode input supplies ordered colors without using the production implementation.",
+  "recording": "../evidence/engine-blend-sample-native-reference.json",
+  "cases": 1080,
+  "weighted_score": {
+    "api": "scoreWeightedPalette({ width, height, bgra, palette, indices, costPerColor }) returns { total, error, colors } using explicit supplied assignments.",
+    "dimensions": "Nonnegative int32 width/height with an int32 pixel count, exact BGRA and index lengths, and a nonempty normalized palette. Empty and one-dimensional prepared maps follow the original scorer; this does not establish GUI loading behavior.",
+    "boundary_mask": "The constructor radius is 2. Mark all four pixels of every nonuniform 2 by 2 assignment square with 2. Scan the same squares once more; if any corner exceeds 1, replace zero-valued corners with 1. Other pixels use their assigned color directly.",
+    "neighborhood": "For each marked pixel, begin with its assigned color, then gather distinct palette identifiers from right, down, left, up, down-left, up-right, up-left, and down-right neighbors. Ignore out-of-bounds positions. Fit the resulting ordered colors with the solver above; do not deduplicate equal channel values with different identifiers.",
+    "arithmetic": "Compute float32 BGRA squared errors between the fitted color and normalized pixel. Accumulate in row-major order with float32 stores. error=float32(log10(1+sum)); colors=float32(float32(colorCount-2)*float32(costPerColor)); total=float32(error+colors).",
+    "reference": "Original 0x48d180 and 0x48d050 with is_anti_aliased=1, original 0x481f60 boundary construction, and original blend fitting.",
+    "recording": "../evidence/engine-weighted-score-native-reference.json",
+    "cases": 440
+  },
+  "limits": "The shared blend solver, weighted candidate scoring, automatic/supplied-palette segmentation and integrated prepared shadow dispatch are implemented in their respective modules. Full image-file conversion, remaining preprocessing, GUI/document integration and unsupported numerical modes remain unfinished."
+}

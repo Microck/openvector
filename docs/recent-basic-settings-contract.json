@@ -1,0 +1,81 @@
+{
+  "status": "Implemented through the shared Rust engine, CLI, npm and GPUI. The retained 30-event native history matches the independent current GUI and numerical replay, including startup committed controls, Recent ordering and replay, selected and named profiles, rendered geometry, RNG and exact AI export bytes. Other previously identified finite branches remain limited as listed below.",
+  "reference": "../evidence/native-recent-basic-static-20261021/analysis.json",
+  "referenceSha256": "c491656b962debc215a8b6e757a9b2949ffe50a36b5f2db692706bcd4ebface1",
+  "rustVerification": "../evidence/recent-basic-integration-20261021/verification.json",
+  "desktopVerification": "../evidence/gpui-recent-basic-live-20261021/analysis.json",
+  "list": {
+    "storedCapacity": 5,
+    "visibleCapacity": 4,
+    "order": "newest first",
+    "identity": "Exact derived English summary label. On a duplicate, move the existing entry to the front and preserve its old complete profile; discard the incoming profile.",
+    "recording": "Only a successful fitting completion (status 0) that did work and is not a batch operation. Include automatic, basic, advanced, advanced-profile replay, editing completion and recent-basic replay. Cached, failed, cancelled and batch fitting do not record.",
+    "reset": "Reset application clears the list and collapses its disclosure. Start Over and model-only resets preserve it.",
+    "clearControl": "No standalone clear control in the native widget. The native clear slot is available programmatically, but its widget signal is never emitted."
+  },
+  "label": {
+    "category": {
+      "0": "Photograph, ",
+      "1": "Anti-aliased artwork, ",
+      "2": "Artwork, "
+    },
+    "quality": {
+      "0": "High, ",
+      "1": "Medium, ",
+      "2": "Low, "
+    },
+    "paletteMode": {
+      "0": "Two colors",
+      "1": "N colors for positive paletteColorCount; otherwise Fixed colors",
+      "2": "Unlimited colors"
+    },
+    "unknownValues": "Omit only the unrecognized component. Recognized category and quality components retain their trailing comma-space, including when palette mode is unrecognized."
+  },
+  "replay": {
+    "apply": "Copy the full stored SettingsProfile into selected settings, force advanced=false, but do not restore the palette candidate list or runtime palette backup/customized fields.",
+    "pipeline": "Mode 0 requests palette bounds 2..2; mode 1 requests paletteColorCount..paletteColorCount without the advanced replay's 0-to-2..12 fallback; mode 2 skips palette search. Run segmentation, smoothing and fitting. Other modes apply settings but do not process.",
+    "success": "Review, or Export when Skip review is enabled. A fitting completion that did work records through the same list rule.",
+    "failureOrCancel": "Return to mode selection with the replayed settings still selected."
+  },
+  "persistence": {
+    "projection": "Reuse stored_settings_profile/read_settings_profile: palette colors are omitted and background alpha reloads as 1. Rebuild from oldest to newest through the same duplicate/order/capacity rule; derive labels rather than storing them.",
+    "native": "21 keys per VmQt::VectorizationSettings::basic::<i>, name 'not named'; count VmQt::MainModel/num_mcu_settings. Clean window teardown writes the native store.",
+    "rust": "GUI embeds recentBasicSettings as an array of projected SettingsProfile objects in its existing preferences. CLI collection files contain exactly that key and array. Native npm wraps the same Rust collection. Rust uses its existing immediate preference persistence policy; this is not proof of native crash/teardown timing parity."
+  },
+  "sharedRustInterface": {
+    "collection": "saved_profiles::RecentBasicProfiles (Default, Clone, Debug), with RecentBasicProfile { label: String, profile: SettingsProfile }.",
+    "methods": [
+      "entries(&self) -> &[RecentBasicProfile]",
+      "visible_entries(&self) -> &[RecentBasicProfile]",
+      "record_completion(&mut self, profile: &SettingsProfile, status: u32, did_work: bool, batch: bool) -> bool; true means the completion was eligible, even for an already-front duplicate",
+      "clear(&mut self)",
+      "stored_profiles(&self) -> serde_json::Value; array of projected profiles",
+      "from_stored_profiles(&serde_json::Value) -> Result<Self, String>",
+      "read_file(path: impl AsRef<Path>) -> Result<Self, String>; missing means empty",
+      "write_file(&self, path: impl AsRef<Path>) -> Result<(), String>; existing atomic profile-write convention"
+    ],
+    "labelFunction": "settings_profile::basic_profile_label(&SettingsProfile) -> String",
+    "applyFunction": "settings_profile::apply_basic_profile(&SettingsProfile) -> SettingsProfile",
+    "runner": "settings_profile::run_basic_profile with the same document, profile, palette-runtime, progress and stage-observer arguments and result shape as run_advanced_profile. Share the pipeline; preserve advanced replay behavior. The common result type may be named ProfileResult after updating all internal references. Applying selected controls remains explicit, as in the existing advanced API."
+  },
+  "surfaces": {
+    "cli": "recent-settings list/show/clear --file <path>; vectorize --recent-file <path> records eligible completions, with optional --recent-index <zero-based index> to replay. Replay cannot be combined with named advanced profile selection. All collection and replay behavior delegates to Rust, not CLI copies of the algorithm.",
+    "npm": "RecentBasicProfiles wrapping the shared Rust collection and ImageDocument.runBasicProfile wrapping the shared replay runner; explicit label/apply projections follow existing advanced-profile binding conventions. Successful runAutomatic and runBatchImage results expose fitting: {status, didWork}; finishEditing returns its existing snapshot fields plus fittingCompletion: {status, didWork}, because its fitting field already holds geometry. Obtain these from the shared Rust stage observers, without cloning another snapshot or inferring work from progress. Callers can then apply the exact recording rule to automatic and editing work. Update declarations and exports, not a JS implementation.",
+    "gpui": "Recent Basic Settings on Mode, initially collapsed, first four links only and no Clear button. Independent Saved Advanced Settings on the same native page and Save Settings on the advanced export page follow the constructor evidence. Reset collapses all three; Cancel preserves them. Keep named-profile Play/Fast Forward/batch Use/save/rename/delete/overwrite behavior through the same existing model."
+  },
+  "uncertainties": [
+    "The retained history covers five stored entries, duplicate-label preservation, Recent row navigation and its selected runtime state. It does not establish every possible profile, palette mode or disclosure persistence across restart.",
+    "Native palette behavior for a fixed palette count of zero or less has not been traced. Forward exact bounds to the existing Rust palette task and preserve any failure.",
+    "The unrecognized-mode apply-only branch remains supported by static evidence and Rust checks, without a retained original runtime observation."
+  ],
+  "fullApplicationParity": false,
+  "currentNativeHistory": {
+    "capture": "../evidence/completion-native-reconciliation-20261028-r1/observed-history-validation.json",
+    "scope": "The existing R12 response contains all 30 events, eight fitting completions and five Recent Basic profiles. Native exited zero, with no surviving job members and retained protected-state equality receipts. The corrected independent Rust GUI and numerical replay match 60 GUI snapshots, 34,953 values, 1,363 initialized binary blocks, all 29 captured RNG states and the exact 3,259-byte AI export.",
+    "startupDocument": "The GUI worker commits the startup selected profile and its advanced color count before it reports ready. First source admission preserves those committed controls; later selected-only edits, including entering Advanced, do not silently recommit them.",
+    "savedProfileRuntime": "In event 21 the named saved profile has an empty revert backup, while the selected owner retains its four-color backup. Every other captured copy field matches. The finite-history validator explicitly checks the empty saved backup and preservation of the selected backup.",
+    "preservation": "The frozen predecessor decoder and its failing full-copy prediction remain unchanged. No native request, captured response or existing expected fixture was edited.",
+    "limit": "This is a finite observed-history result, not full application parity or goal-wide custody settlement.",
+    "verification": "../evidence/completion-native-reconciliation-20261028-r1/corrected-native-comparison.json"
+  }
+}

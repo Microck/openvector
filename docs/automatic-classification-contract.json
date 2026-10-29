@@ -1,0 +1,365 @@
+{
+  "component": "Automatic classification and color-count reconstruction",
+  "status": "Canonical fresh automatic image analysis now matches 42 completed original controllers and two native empty-peak/random outcomes across three sessions. Type/quality, source-cache reuse, Shared updates, color-count analysis and recommendation writes are integrated. The 273 prepared and 16 large-image analyses remain verified. File decoding, GUI defaults and document edit/cache/cancel lifecycle remain unfinished.",
+  "targetSha256": "c491656b962debc215a8b6e757a9b2949ffe50a36b5f2db692706bcd4ebface1",
+  "controller": {
+    "reference": "0x46db00",
+    "caller": "0x436af0",
+    "candidateRange": [
+      2,
+      12
+    ],
+    "featureExtraction": "0x48de70",
+    "labelSettingsConstructor": "0x48f7b0",
+    "labelSettingsDecoder": "0x490dd0",
+    "scope": "The 0x46db00 document/UI range controller and final document choice remain separate. Fresh complete 0x4933e0 -> 0x48f3e0 automatic analysis is independently implemented through CoreSession.analyzeImage and specified by image-state-contract.json."
+  },
+  "model": {
+    "reference": "0x4abf40",
+    "features": 62,
+    "input": "Original 62-double feature vector plus original settings/profile object. Probe derived IEEE nonfinite states as well as finite thresholds.",
+    "output": "Original short classification-label string, interpreted separately by original registries. Do not guess its category/color-count meaning.",
+    "thresholdEvidence": "../evidence/classification-native-thresholds.json",
+    "assemblyEvidence": "../evidence/classification-tree-assembly.txt",
+    "arithmetic": "Exact original double threshold bits. x87 comparisons take their actual ordered/unordered branch conditions; decompiler mathematical comparisons alone are insufficient.",
+    "nativeOperation": 62,
+    "verification": "Fresh-process complete response repeat, threshold-adjacent values in varied contexts, every observable label, all original profile names and infinity/NaN inputs. Preserve the session PRNG.",
+    "status": "Independent decision tree and label decoder match all 31604 original vectors, ten profiles, threshold neighbors and nonfinite input patterns.",
+    "cases": 31604,
+    "fixture": "../test/fixtures/classification-model-reference.ndjson.gz",
+    "source": "../src/automatic-colors.mjs",
+    "report": "../evidence/classification-model-initial-test-run.txt"
+  },
+  "featureExtraction": {
+    "reference": "0x48de70",
+    "fields": "62 doubles at palette module +0x60 through +0x248. Candidate-score ordering, ranks, distinct pixel colors, total pixel count, normalized errors and prefix minima require native capture before implementation.",
+    "pending": "Final controller selection and document-cache integration remain separate; prepared-image candidate generation, scoring, feature construction and model decoding are implemented.",
+    "nativeOperation": 63,
+    "captureContract": "Prepared BGRA, dimensions, histogram controls, anti-alias flag and explicit float32 color cost. Execute original generation for every count 2..12 in one retained original session, capture each palette/map/membership/score before original feature construction, then capture all 62 raw double feature bits and the original decoded decision. Preserve every PRNG transition.",
+    "status": "Independent feature construction matches 270 completed original cases bit-for-bit; 306 original empty-peak fatal cases retained as explicit diagnostics.",
+    "cases": 576,
+    "candidates": 6336,
+    "completed": 270,
+    "fatal": 306,
+    "normalization": "Slots 38..48 = (error - minimumError)/(maximumError - minimumError); slot 49 minimum, slot 50 maximum. Equal errors retain original signed NaNs.",
+    "ranking": "Comparator 0x48cf40 orders score then candidate count ascending. The only identical pairs are the indistinguishable sentinels (1e6,-1); qsort partition ties do not affect features.",
+    "fixture": "../test/fixtures/classification-features-reference.ndjson.gz",
+    "report": "../evidence/classification-features-native-reference.json",
+    "nativeSetup": "After resizing prepared maps, execute original 0x472cb0 to initialize neighbor offsets. Uninitialized-direction recordings are retained separately as a diagnosed harness limitation, not application parity evidence.",
+    "rawCaptureOperation": 64
+  },
+  "session": "Palette candidates and classifier operations must retain the same application-session PRNG. No per-stage seed override.",
+  "remaining": [
+    "Recover original file decoding, non-matte source context and filename-extension normalization.",
+    "Recover document final color-count choice, cache reuse/invalidation and cancellation.",
+    "Recover GUI profile/default transitions and editing workflows."
+  ],
+  "fullApplicationParity": false,
+  "labelRegistry": {
+    "registration": "0x490ee0",
+    "decoder": "0x490dd0",
+    "categoryMap": "0xa690fc",
+    "countMap": "0xa690f0",
+    "observedLabels": {
+      "2": {
+        "mode": 0,
+        "count": 2
+      },
+      "3..12": {
+        "mode": 1,
+        "count": "same integer as label"
+      },
+      "13": {
+        "mode": 2,
+        "count": 12
+      }
+    },
+    "meaning": "Native executable lookups validate mode 0 for label 2, mode 1 for labels 3..12 and mode 2 for label 13. The controller uses mode 2 for minimum-score fallback. These are palette-count classes; image type/quality has its separate verified model and fresh source/working feature pipeline."
+  },
+  "sessionApi": {
+    "method": "CoreSession.analyzeColorCounts(input)",
+    "input": "Positive int32 width/height, exact prepared BGRA bytes, bins 8/16, boolean connected/antiAlias, finite float32 costPerColor. Anti-alias needs dimensions at least 2 by 2.",
+    "output": "All 11 original-order candidates (colorCount, finalized palette, indices, weights, passes, pre-quantization score, randomState), histogram peakWeights, 62 features, decoded classification. This is palette-count analysis, not full image-type/quality resolution or final document/cache selection.",
+    "ordering": "Build histogram and anti-alias measurement once; refine and score each candidate before byte quantization, retain one shared PRNG across counts and images. The feature-construction empty-peak diagnostic occurs after all candidates consume their original random values.",
+    "verification": "576 prepared inputs, 6336 generated candidates and raw score comparisons, 270 completed bit-exact feature vectors, 306 native empty-peak fatal cases, and every original retained PRNG transition."
+  },
+  "imageTypeQualityRecovery": {
+    "controller": "0x4933e0",
+    "featureExtraction": "0x491d40",
+    "predictor": "0x4ac470",
+    "decoder": "0x490cc0",
+    "featureStorage": "20 float32 values at image-classifier owner +0xd8 through +0x124; native feature producer passes the +0xd8 pointer to the predictor.",
+    "nativeBodies": "Feature extraction has four noncontiguous ranges, 5621 body bytes; predictor is 1688 contiguous bytes.",
+    "labelRegistries": "Registration 0x490ee0 maps logo/logo_aa/photo and quality suffixes 0/1/2 through separate type and quality maps.",
+    "status": "Independent decision kernel matches 57472 native feature/extension cases, including threshold neighbors, nonfinite bits, all five emitted labels and all 22 extension strings. Independent complete feature extraction matches 273 prepared analyses and 16 additional fresh large-image source/working analyses.",
+    "evidence": [
+      "../evidence/pseudocode/597-image-classifier-feature-extraction.c",
+      "../evidence/pseudocode/599-image-type-quality-model.c",
+      "../evidence/pseudocode/600-image-type-quality-decoder.c"
+    ],
+    "coefficientBlock": "Constructor copies 36 native doubles from 0x8de330 into owner +0x128 via 0x48f750. Its precise role remains unresolved; it is not the compiled palette-count tree.",
+    "nativeModelOperation": 65,
+    "modelCaptureContract": "Twenty raw float32 feature values plus an original short extension string passed by value. Execute original predictor and type/quality registry lookups; retain raw input bits, decoded result and PRNG state, compare two fresh-process outputs without masking.",
+    "modelStringInput": "The image type/quality predictor compares the literal extension against .bmp, .jpeg, .png and .tiff on one branch. It does not receive the profile object used by the palette-count model. Preserve exact case and spelling at this kernel boundary; filename/extension normalization is a separate unrecovered producer.",
+    "labelCodes": "Native registry type codes: photo=0, logo_aa=1, logo=2. Quality codes: suffix 0 => 2, suffix 1 => 1, suffix 2 => 0.",
+    "arithmetic": "Float32 input values compare against original double thresholds using x87 ordered/unordered conditions; one threshold uses SSE float32 COMISS. Native threshold bits and actual branches are authoritative.",
+    "modelCases": 57472,
+    "thresholdComparisons": 65,
+    "modelFixture": "../test/fixtures/image-classifier-model-reference.ndjson.gz",
+    "modelSource": "../src/image-classification.mjs",
+    "modelReport": "../evidence/image-classifier-model-native-reference.json",
+    "nativeFeatureOperation": 66,
+    "featureCaptureContract": "Raw BGRA raster, dimensions at least 2 by 2, exact short extension and explicit original preprocessing mode/amount, with fresh-core numeric settings. Construct through 0x472c30, load through 0x473bb0, prepare through 0x4738b0, then execute the original classification-thread setup: clear supplied-palette flag at core+0x208 and 0x488d20(core+0x930,1,0,0), followed by 0x491d40. Capture load/set/working dimensions, connected labels/moments, settings, all 20 features, decoded result and retained PRNG. Preserve empty normalization outcomes before later stages.",
+    "preprocessingEvidence": "Original mode 1 invokes EnhanceImage 0x4d6430 amount times. EnhanceImage returns null for width or height <=4; the fresh constructor default is mode 1/amount 1. An initial 2x2 probe loaded and set 2x2 successfully, then prepared 0x0. Full GUI control resolution remains separate; do not classify this harness condition as universal GUI behavior. Explicit original mode 0 is the no-op branch, not an added compatibility flag.",
+    "featureRecording": {
+      "cases": 96,
+      "completed": 72,
+      "emptyNativeWorkingImages": 24,
+      "wholeNativeResponseRepeatIdentical": true,
+      "fixture": "../test/fixtures/image-features-reference.ndjson.gz",
+      "report": "../evidence/image-features-native-reference.json",
+      "scope": "Modes 0/amount 0 and 1/amount 1, .png/.jpg, six raster patterns at sizes 2/4/8/16, fresh constructor numerical parameters. This is an explicit native stage context, not verified GUI defaults.",
+      "derivativeCapture": "The original feature producer frees gradient buffers. After recording its complete result, the probe separately repeats original blur 0x473b20 and gradient 0x483150, captures their rasters/maps and clears the gradient cache with 0x47e840. Both calls consume no PRNG, and source pixels remain identical."
+    },
+    "gradientKernel": {
+      "source": "../src/image-classification.mjs",
+      "function": "measureClassifierGradients",
+      "input": "Internal validated working dimensions >=2 with prepared byte BGRA, plus an explicit full source-blur raster. Reflect neighbors at working bounds and retain each raster's own row width. No public image-file detector is exposed.",
+      "output": "Owned float32 gradient/blur-gradient maps and two root-mean-square classifier features.",
+      "arithmetic": "SSE float32 byte conversion, subtraction, squared BGRA sums and neighbor-distance accumulation. Right/left/bottom/top neighbors reflect at boundaries. The blur residual subtracts the float32 mean of four blurred neighbors. Feature slots 0/1 are float32 sqrt(float32(sum(float32(map*map))/pixelCount)).",
+      "verification": "Both maps and both gradient feature slots match all 72 completed recordings. The edge, region and color kernels now cover all twenty feature slots; preprocessing/blur and full region dispatch remain separate.",
+      "assembly": "../evidence/image-gradient-arithmetic-assembly.txt"
+    },
+    "edgeFeatureRecovery": {
+      "sampler": "0x48fc60",
+      "aggregator": "0x490020",
+      "nativeOperation": 67,
+      "contract": "Original six-pixel normalized BGRA stencil, five signed luminance differences, middle-sign orientation, contiguous nonnegative side support, middle strict-threshold/max test, then float32 profile normalization. Aggregate accepted horizontal then vertical samples at x/y >=2 and <dimension-3. Feature slots 2/3 average the far/near profile pairs; slot 4 is the middle profile mean.",
+      "luminance": "Original double constants and x87 operation order: (G*0.59 + R*0.3) + B*0.11 on float32-normalized bytes; store each difference as float32.",
+      "verification": {
+        "cases": 71620,
+        "accepted": 55927,
+        "nonfiniteProfileValues": 1550,
+        "report": "../evidence/classifier-edges-native-reference.json",
+        "fixture": "../test/fixtures/classifier-edges-reference.ndjson.gz"
+      }
+    },
+    "remainingFeaturePlan": "All twenty feature arithmetic slots now compose with independent full source Gaussian blur, distinct-stride working gradients, full region dispatch including explicit shadow controls, and region moments already computed by segmentation. Remaining upstream work is file decoding, stateful cache invalidation and actual GUI classify-profile resolution.",
+    "regionFeatureRecovery": {
+      "contract": "Prepared BGRA, original presegmentation labels, allocated region counts and float32 BGRA sums. Radius-two boundary mask separates interior and boundary errors. Reciprocal counts, means, residual squared norms, accumulators and divisions use SSE float32. Slots 5..8 contain boundary/(boundary+interior), overall, boundary and interior mean errors. Slots 9..13 contain pixel count, allocated region count, count/pixels, count/sqrt(pixels) using double x87 square root/division, and unique packed BGRA byte count.",
+      "verification": "Compare complete recovered segment dispatch against captured original labels and moments using observed Shared, subpixel and base-region controls. Constructor AA=1 and clustering=1 were observed, not inferred from a cleared first Shared byte. These captures do not establish GUI defaults."
+    },
+    "nativeConstructorContext": {
+      "nativeOperation": 81,
+      "report": "../evidence/image-classifier-native-context.json",
+      "sharedWords": [
+        0,
+        1,
+        0,
+        1,
+        1,
+        0
+      ],
+      "edgeScale": 50,
+      "edgeFloor": 0.01,
+      "verification": "68 context bytes per completed image: the original 64-byte context plus exact core 0x298 int32 shadow acceptance control. Complete fresh-process responses repeat exactly and stripping context bytes reproduces the operation-66 payload after its helper-layout header. Original 43-file installation hashes remain unchanged.",
+      "pending": "All 72 complete constructor-context maps and ordinary moments now match the canonical independent segment path using the captured shadowing/control fields. This establishes prepared constructor behavior, not GUI defaults or full image-file conversion.",
+      "stageTrace": {
+        "nativeOperation": 69,
+        "report": "../evidence/classifier-regions-native-reference.json",
+        "fixture": "../test/fixtures/classifier-regions-reference.ndjson.gz",
+        "baseAndSubpixelMapsEqual": 72,
+        "shadowPositiveRegions": 6,
+        "shadowChangedImages": 6,
+        "allFinalMapsMatchUninstrumentedDispatch": true,
+        "models": [
+          "0x4ae090 on 42 doubles",
+          "0x4ae1f0 on 42 doubles and an explicit control"
+        ],
+        "scope": "Two repeated complete original responses and nine original stage maps per completed image. Independent base, subpixel and integrated shadow dispatch now match all captured final maps; private shadow features and refinement state have separate broader native comparisons."
+      },
+      "contextBytes": 68,
+      "shadowControl": 0,
+      "shadowControlOffset": 664
+    },
+    "colorFeatureRecovery": {
+      "contract": "Slots 14..19 use weighted 16^4 BGRA histogram peaks. Preserve original connected-peak tie ordering. Pixel weights max(1 - measurementByte*edgeScale*(1/255),edgeFloor) remain double for histogram sums and centroid products; centroid sums/counts store float32. Nearest peak selection subtracts unnormalized peak bytes from normalized float pixels, with float32 differences and double squared-distance sums. Residual moments use the square of the signed BGRA residual sum, not a squared norm. Slots 14..16 are fourth/(mean^2)-3 in double, biased weighted mean and weighted fourth moment; slots 17..19 are original-weight fractions after bin, neighborhood and peak-pair-line deletions.",
+      "arithmetic": "Original pair samples use truncation of negative 16*double Euclidean distance of float32 normalized peak differences; denominator 2-truncated, inclusive samples 3-truncated. Interpolation multiplication/addition round separately to float32, byte quantization uses double*255+0.5 truncation.",
+      "verification": {
+        "cases": 78,
+        "maximumReconstructedPeaks": 256,
+        "casesAboveTwelvePeaks": 48,
+        "differentNativeDeletionStages": 13,
+        "report": "../evidence/classifier-colors-native-reference.json"
+      }
+    },
+    "featureArithmeticVerification": {
+      "completed": 150,
+      "emptyWorkingImages": 24,
+      "allFeatureBitsEqual": true,
+      "decodedDecisionsFromIndependentFeaturesEqual": true,
+      "scope": "Independent prepared-image orchestration now computes its own blur, gradients, contrast, segmentation, ordinary moments, all twenty feature values and final model decision. Original prepared BGRA, exact extension and explicit numerical/control parameters remain the upstream inputs. File decoding, preprocessing/default-profile resolution remain separate.",
+      "report": "../evidence/prepared-image-pipeline-initial-test-run.txt",
+      "constructorCases": 72,
+      "multipeakCases": 78,
+      "multipeakReport": "../evidence/classifier-colors-native-reference.json",
+      "coverage": "../evidence/image-feature-multipeak-coverage.json"
+    },
+    "shadowDecisionRecovery": {
+      "regionModel": "0x4ae090",
+      "acceptanceModel": "0x4ae1f0",
+      "input": "42 raw float64 features; acceptance also takes the exact int32 control. These private kernels consume recovered upstream shadow statistics, not image bytes.",
+      "arithmetic": "Recover original double threshold bytes and actual CFG comparisons. Ordered less-than and equal-or-unordered branches must preserve the native x87 behavior. Do not copy decompiler comparisons without checking branches.",
+      "nativeOperation": 71,
+      "verificationPlan": "Original 42-double shadow vectors from complete region-stage recordings; varied finite contexts at every threshold and both adjacent doubles; signed zero, positive/negative infinity, quiet/signaling NaN bits; all defined control values plus representative other int32 values. Complete responses from two fresh original processes must repeat exactly and all retained PRNG states must remain unchanged.",
+      "status": "Both independent private decision kernels match all 51008 native feature/control cases and all 2006 native-produced region flags.",
+      "cases": 51008,
+      "recordedFeatureCases": 14042,
+      "thresholdComparisons": 24,
+      "report": "../evidence/shadow-models-native-reference.json",
+      "fixture": "../test/fixtures/shadow-models-reference.ndjson.gz",
+      "source": "../src/shadow-classification.mjs"
+    },
+    "shadowFeatureRecovery": {
+      "producer": "0x4a8800",
+      "storage": "42 float64 values per region, 0x150-byte stride",
+      "scope": "Original prepared BGRA, original-equivalent blur and dense rebuilt subpixel state after first palette transfer. Reconstruct every feature, covariance/principal-direction arithmetic and boundary/neighbor statistic before integrating shadow decisions.",
+      "initialMapping": {
+        "0..7": "Gradient/blur-gradient double region sums and square-root variants. Actual assembly widens the map float32 values and accumulates directly in float64, contrary to decompiler casts.",
+        "8..10": "Region pixel count, native interior count and radius-two interior-mask count.",
+        "11..20": "Distinct boundary neighboring regions and counts stratified by size/interior/luminance.",
+        "21..24": "Double source-model luminance, double sum of float32 channel variances, interior/boundary-set ratio and boundary-set aspect ratio. Preserve different source and neighboring luminance addition orders.",
+        "25..32": "Normalized variants of slots 0..7.",
+        "33..38": "Shadow refinement statistics filled later.",
+        "39": "Minimum squared model-color distance to a region with more than ten interior pixels.",
+        "40": "Initially zero; later refinement statistic.",
+        "41": "Region squared residual to its principal color line."
+      },
+      "evidence": "../evidence/pseudocode/635-shadow-feature-producer.c",
+      "principalDirection": {
+        "reference": "0x4a72a0",
+        "matrixProduct": "0x4a6df0",
+        "contract": "Explicit float32 column-major 4x4 matrix, retained float32 eigenvalue, int32 iteration count and float32 epsilon. Start output direction at four ones; multiply, normalize using double squared-norm/square-root followed by float32 length/reciprocal, multiply again and evaluate the double dot product stored as float32. Strict epsilon convergence returns without updating the retained eigenvalue.",
+        "nativeOperations": [
+          72,
+          73
+        ],
+        "callerState": "Original producer reuses a stack float across regions without initializing its first value. Hardware entry/return traces preserve that actual value; do not infer zero as an original initialization rule. The separately implemented kernel accepts explicit retained state. Full traced image-stage response must equal its untraced response.",
+        "traceObservation": "Two complete hardware-traced image responses repeat exactly; every original result byte after the helper layout header equals the untraced recording. Every isolated kernel response repeats exactly, including all actual observed initial stack values.",
+        "cases": 15249,
+        "actualImageCalls": 4012,
+        "nativeImageRuns": 2,
+        "report": "../evidence/principal-colors-native-reference.json",
+        "fixture": "../test/fixtures/principal-colors-reference.ndjson.gz",
+        "source": "../src/shadow-classification.mjs"
+      },
+      "source": "../src/shadow-classification.mjs",
+      "status": "Independent producer matches all 42 feature bits, covariance matrices, principal directions and flags for 2006 original regions across 72 images, using independent blur and gradients. Canonical zero initial PCA state also matches every observable feature and direction byte in those records, while explicit retained-state kernel tests preserve the original actual stack values. This does not claim native stack initialization.",
+      "regionVectors": 2006,
+      "imageCases": 72,
+      "report": "../evidence/shadow-feature-initial-test-run.txt"
+    },
+    "shadowReassignmentRecovery": {
+      "proposal": "0x48a540",
+      "neighborProposal": "0x48a440",
+      "nativeOperation": 74,
+      "contract": "For each shadow pixel, inspect left, right, top and bottom neighbors. Ignore out-of-bounds positions and neighbors whose current region remains shadow flagged. Compare normalized byte BGRA squared distances using the native float32 multiply/add order; strict improvement preserves earlier neighbors on ties. The enclosing fill visits pending pixels in ascending pixel order and takes the strictly cheapest available proposal, preserving the earlier pending pixel on a tie. Assignment changes the region map before the next proposal scan.",
+      "scope": "Pixel reassignment precedes refinement acceptance and region rebuilding. Matching the six current changed maps alone does not establish complete shadow behavior; trace original proposals and acceptance before integration.",
+      "kernelContract": "writeShadowProposal takes an owned prepared raster/map/flag context, pixel index and caller-owned cost/target storage. Reset cost to native float32 1e10; preserve target when no valid proposal exists. reassignShadowPixels copies the region map, fills flagged regions in original order and returns the map plus ordered chosen assignments. Region rebuilding and acceptance remain separate. A missing non-shadow frontier violates the native algorithm precondition and must not silently recover.",
+      "recording": {
+        "cases": 1474,
+        "acceptedProposals": 1274,
+        "rejectedProposals": 200,
+        "images": 6,
+        "report": "../evidence/shadow-proposals-native-reference.json",
+        "fixture": "../test/fixtures/shadow-proposals-reference.ndjson.gz",
+        "wholeTraceRepeatIdentical": true,
+        "originalImageResultPayloadIdentical": true
+      }
+    },
+    "shadowEnergyRecovery": {
+      "contract": "Start with a prepared dense eight-neighbor state and its persistent cached costs, 42-double feature rows and shadow flags. Rebuild twenty-four neighbors retaining cached interior costs. For each flagged original region, old energy starts from interiorError at the shadow ordinal (not its original region ID), then adds sorted boundary cached costs with float32 stores. Fill shadow pixels, rebuild eight then twenty-four neighbors, and evaluate all original shadow pixels in ascending order before outside boundary pixels in ascending order. Each unrounded pixel energy is added to a float32 accumulator. Normalize with a float32 reciprocal multiplied in double; new-minus-old and its division remain double. After measuring every shadow, restore the saved filled map containing original region IDs before acceptance. Apply original acceptance to the updated vector, restore rejected original pixel labels on that map, then rebuild eight neighbors. The dense map used for cost fitting must not be reused for restoration. The detector/blur/prepared-state lifecycle must still be composed before integration.",
+      "verificationPlan": "Hardware entry/return snapshots around the original 0x48b690 shadow calls, repeated complete responses matching untraced results, and acceptance vectors from original 0x4ae1f0. Compare all state and feature bits without tolerances.",
+      "status": "Independent refinement matches 640 explicit cases/7600 flagged regions and all six original image-stage changes. It now runs inside the canonical segmentation dispatcher; 578 complete automatic/supplied results, including 81 accepted and six rejected shadows, match the original.",
+      "source": "../src/subpixel.mjs",
+      "function": "refineShadowState",
+      "explicitStateVerification": "Development-only operation 77 supplies arbitrary connected prepared regions, native subpixel controls, shadow flags, 42-double feature rows and int32 acceptance control. The original routine remains unchanged. Cover multiple/adjacent shadows, mixed decisions and restoration, plus empty shadow sets, before allowing production integration.",
+      "explicitCases": 640,
+      "imageCases": 6,
+      "explicitFlaggedRegions": 7600,
+      "explicitAcceptedRegions": 7576,
+      "explicitRejectedRegions": 24,
+      "explicitMixedDecisionCases": 24,
+      "maximumSimultaneousShadows": 86,
+      "explicitNoShadowCases": 160,
+      "nativeOperations": [
+        75,
+        76,
+        77,
+        78
+      ],
+      "report": "../evidence/shadow-refinement-native-reference.json",
+      "fixture": "../test/fixtures/shadow-refinement-reference.ndjson.gz",
+      "input": "Internal validated raster/control object containing BGRA, feature rows, flags, numerical parameters and exact int32 acceptance control, plus an explicit prepared eight-neighbor state. Copies all caller-owned labels, costs and feature rows. No public CLI integration is claimed."
+    },
+    "blurRecovery": {
+      "reference": "0x473b20 -> 0x4ae670 -> 0x4bc610 -> 0x4bab40 -> 0x4c9670",
+      "nativeBuild": "The selected executable embeds the literal ImageMagick 6.4.2 06/23/08 Q8 and identifies GaussianBlurImageChannel/ConvolveImageChannel in its own source-path strings. Original instructions remain the numerical authority.",
+      "contract": "The fixed classifier blur uses a 5x5 row-major Gaussian kernel, radius 1.5/sigma 0.75/channel mask 0xf7. Each exponent exp(-(x*x+y*y)/1.125) stores float32, then divides in double by 0.5625*2*pi. The convolution accumulates coefficient*Q8-byte plus prior float32 channel sum in double, storing float32 after every tap. Sum coefficients in double and store its reciprocal float32; scale the channel sum in double, store float32 and truncate(value+0.5), clamped to [0,255]. Extend boundary pixels by clamping coordinates. Preserve alpha bytes. Use an owned output over the actual prepared raster, not raw input. Initial preparation separately multiplies each raw byte color by the double alpha*(1/255), truncates and retains alpha before populating its cached Q8 image; no unpremultiplication or reconstructed hidden RGB.",
+      "verificationPlan": "Hardware entry/return kernel captures during complete native classification, with repeated complete responses equal to the untraced payload. Explicit original Gaussian calls over asymmetric, constant, impulse, alternating, gradient, random and alpha-rich rasters, including small/long dimensions. Compare every resulting byte and all upstream feature bits without tolerances.",
+      "status": "Independent fixed Gaussian and initial alpha-premultiplication kernels match all 2224 original rasters, including 290 one-dimensional cases and all 65536 alpha/color-byte pairs. No native blur raster is supplied to the prepared image pipeline.",
+      "scope": "Private prepared-pixel Gaussian blur and the original initial alpha-premultiplication step. All four preprocessing modes are verified separately by image-preparation-contract.json. Working reduction is verified by image-resize-contract.json. Source/working orchestration is governed by image-state-contract.json; file decoding and the full image state lifecycle remain unfinished.",
+      "verification": "All 288 original convolution entries have identical double kernel bits, mask 0xf7, zero bias and x87 control 0x027f. Complete traced/untraced original payloads match and both repeats are identical. Every independent prepared blur byte and initial premultiplied byte matches 2224 explicit recordings.",
+      "source": "../src/image-classification.mjs",
+      "functions": [
+        "premultiplyClassifierPixels",
+        "blurClassifierPixels"
+      ],
+      "cases": 2224,
+      "comparedBytes": 3208328,
+      "kernelCalls": 288,
+      "oneDimensionalCases": 290,
+      "exhaustiveAlphaBytePairs": 65536,
+      "report": "../evidence/classifier-blur-native-reference.json",
+      "fixture": "../test/fixtures/classifier-blur-reference.ndjson.gz"
+    },
+    "preparedPipeline": {
+      "source": "../src/image-pipeline.mjs",
+      "function": "classifyImageState",
+      "input": "Explicit source/working raster pair, working dimensions >=2, exact filename extension string and native numerical/control parameters, including EdgeImage weight controls and the observed shadow switch/control for enabled anti-alias dispatch. Prepared component contexts explicitly supply the same raster in both roles. No file decoding, profile resolution or GUI defaults are inferred.",
+      "contract": "Run one canonical independent segmentation path and reuse the region moments that it already computes. Produce independent fixed Gaussian blur, gradients, edge features, region features, contrast/weighted color features and the twenty-float feature vector; apply the original image type/quality decision model to that vector and exact extension. Return owned intermediates for differential inspection. Native feature bits, blur rasters, labels, counts and sums are comparison outputs only, never pipeline inputs.",
+      "verificationPlan": "All 195 constructor-context and 78 multicolor/control analyses must match every feature bit, model decision, blur byte, gradient map, contrast byte and region moment. Independent decoded-pixel preparation supplies 195 inputs; native intermediates remain comparison outputs only.",
+      "status": "All 273 prepared analyses match exact feature bits, classification, blur, gradients, contrast, labels and moments. Of these, 195 also run independent decoded-pixel preprocessing before classification; the other 78 retain their prepared-input component scope.",
+      "cases": 273,
+      "constructorCases": 72,
+      "multicolorCases": 78,
+      "report": "../evidence/image-filters-full-test-run.txt",
+      "verification": {
+        "sourceSuite": {
+          "tests": 221,
+          "pass": 221,
+          "fail": 0,
+          "durationMs": 612578.9197,
+          "report": "../evidence/image-controller-full-test-run.txt"
+        },
+        "installedPackage": "../evidence/image-controller-package-archive-verification.json",
+        "restrictedRuntime": "../evidence/isolated-image-controller-verification.json",
+        "scopedSuite": {
+          "tests": 7,
+          "pass": 7,
+          "fail": 0,
+          "report": "../evidence/image-filters-scoped-test-run.txt"
+        }
+      },
+      "filteredConstructorCases": 123
+    }
+  },
+  "imagePreparationContract": "image-preparation-contract.json",
+  "workingReductionContract": "image-resize-contract.json",
+  "sourceCacheGradientRecovery": {
+    "proof": "../evidence/image-source-gradients-native-reference.json",
+    "cases": 5,
+    "status": "Independent source/working gradients match all five native states. Canonical classification and shadow segmentation now carry the full source cache; all 16 additional complete large-image analyses match native feature bits and intermediate bytes. The stateful profile controller remains unfinished."
+  },
+  "imageStateContract": "image-state-contract.json"
+}

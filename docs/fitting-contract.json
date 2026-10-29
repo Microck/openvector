@@ -1,0 +1,154 @@
+{
+  "component": "Independent Bezier fitting under reconstruction",
+  "status": "Independent default-flag fitting matches all native corpora, with the public library/CLI and fresh offline package verified. Vector output assembly and serializers remain unfinished.",
+  "boundary": "Completed shared contour geometry from smoothing, resolved fitting parameters and native node-kind markers. Preserve contour order, shared nodes and region boundary/parent records.",
+  "reference_executable_sha256": "c491656b962debc215a8b6e757a9b2949ffe50a36b5f2db692706bcd4ebface1",
+  "full_stage": "Original 0x4a1030 first normalizes node kinds and reserves work, selects keepers, fits selected intervals, emits shared region edge/cubic records and optionally refines curves. All 15 full-pipeline fitted targets are retained in the original known-settings pipeline recording.",
+  "prepared_samples": {
+    "status": "Implemented internal kernel matches all 2784 native states and 7408 interior samples exactly. Outputs own coordinates/parameters; explicit marking mutates only stage-owned node kinds.",
+    "reference": "0x49c7b0",
+    "input": "Finite double shared-node coordinates, an ordered nonempty cyclic contour, nonnegative start/end sample indices and an explicit markInterior boolean. End indices below start repeatedly add contour length until end >= start. Endpoints come from start/end modulo contour length.",
+    "order": "Interior samples are indices start+1 through end-1. Accumulate chord length using sqrt(dy*dy + dx*dx), starting at the first endpoint and ending at the final endpoint. If total length equals zero use one as the divisor. Normalize each accumulated length by multiplication with 1/total in original double order. Do not replace sqrt with hypot or divide each cumulative length separately.",
+    "markers": "When enabled, set each visited interior shared node kind to 2 in sample order; preserve all other kinds and shared-node identity. Empty/adjacent intervals return zero samples without changing markers.",
+    "output": "Owned interior point pairs, normalized double parameters and node-kind markers. The stage does not select intervals or fit control points.",
+    "acceptance": "Compare every sample parameter, coordinate, final kind and retained random state exactly against original calls, including wrapped/full-cycle spans, repeated nodes, collapsed geometry and threshold-scale coordinates.",
+    "cases": 2784,
+    "interior_samples": 7408,
+    "recording": "../evidence/engine-fitting-samples-native-reference.json",
+    "fixture": "../test/fixtures/fitting-samples-reference.json",
+    "driver": "../tools/record-fitting-samples.py",
+    "native_repeatability": "../evidence/fitting-samples-repeatability.json",
+    "review": {
+      "method": "ce-simplify-code inline, one context; no independent reviewer corroboration",
+      "scope": "Settled native operation 44 and sample-reference recorder",
+      "applied": {
+        "reuse": 0,
+        "quality": 0,
+        "efficiency": 0
+      },
+      "findings": "Existing original container references and matching vector deallocation are sufficient. One case factory and recorder own the capture; no abstraction or optimization was needed.",
+      "new_unreachable_code": []
+    },
+    "implementation_boundary": "Internal fitting kernel receives already-owned validated nodes and contour identifiers from the future fitting stage. It mutates only visited node kinds when marking is enabled and returns owned Float64Array parameters plus owned interior point pairs. Package subpath remains blocked; the eventual public fitter will own/validate complete geometry once, rather than repeat full geometry validation/cloning for every fit-cost proposal."
+  },
+  "numerical_fit": {
+    "status": "Independent interval costs and all eight control-point coordinates match all 2784 original cases exactly; keeper selection and full fitting remain pending.",
+    "cubic": "0x49d360 forms a two-channel Bernstein design matrix, adds a fixed diagonal regularizer, builds normal equations with the original BLAS path and solves through dgesv. Preserve arithmetic/order from assembly; do not substitute a generic visually similar tracer.",
+    "quadratic": "0x49dcf0 fits the three-interior-sample branch and converts its result to cubic control points. One/two-interior-sample and empty branches of 0x49e960 differ.",
+    "sample_cost": "0x49e960 dispatches by interior sample count, returns a squared residual cost and writes interval control points. Keeper merging and redistribution use this same operation.",
+    "cost_boundary": "Original 0x49e960 receives the same explicit cyclic contour/start/end/mark input as sample preparation. Capture its double residual cost, eight double cubic coordinates, all final node kinds and unchanged PRNG state. Empty spans, one/two samples, three samples and four-or-more samples dispatch differently; preserve these branches as original algorithm behavior.",
+    "cases": 2784,
+    "recording": "../evidence/engine-fitting-cost-native-reference.json",
+    "fixture": "../test/fixtures/fitting-cost-reference.json",
+    "branches": {
+      "empty": 966,
+      "one_sample": 616,
+      "two_samples": 383,
+      "quadratic_three_samples": 221,
+      "cubic_four_or_more": 598
+    },
+    "maximum_interior_samples": 35,
+    "regularizer": "Double 0x3ee4f8b588e368f1 (0.00001), added after each zero-seeded transposed dot product. Preserve the original normal-equation LU scaling, pivot/update and triangular solve order.",
+    "short_interval": "One/two interior samples use quarter/three-quarter straight control points but score only the first sample against straight interpolation. Three samples use the regularized quadratic solve, score its original arithmetic, then convert its power coefficients to cubic control points. Four-or-more use the regularized cubic solve."
+  },
+  "next_recovery": "After final source/package checks, recover vector document/output assembly and serializer options from the now-compared fitted geometries. The original extra fitter-refinement branch remains explicit pending recovery.",
+  "distribution": "Original binary, DLLs, REA output and native reference probes are development evidence only and are excluded from the independent package.",
+  "completion": "Prepared sample or fit-cost comparisons do not establish complete fitted geometry, serialization, decoding, classification, editing or GUI parity.",
+  "evidence_bundle": "../evidence/rea-fitting-complete-evidence-bundle.json",
+  "evidence_bundle_records": 298,
+  "keeper_partition": {
+    "status": "Implemented and compared exactly with all 3907 native states.",
+    "boundary": "Owned node positions and one explicit cyclic contour interval; positive initial/final cost thresholds, iteration count and the original schedule fraction. Captures the active linked records and current threshold, before stage node marking and cubic-slot allocation.",
+    "initialization": "0x49a560 builds end-start+1 unit-span records, including an endpoint sentinel. Each starts with zero cached cost and a dirty bit. Slot identity is retained as records merge or their boundaries move.",
+    "controller": "0x49f8b0 traverses nodes with two following linked records. 0x49f310 first compares merged fit cost minus both cached costs with the current strict threshold; otherwise it compares neighboring one-sample redistribution costs. Preserve cached dirty state, traversal order and the final endpoint sentinel.",
+    "schedule": "Initial threshold precedes the first traversal. The multiplier is exp(log(final/initial)/(iterations*fraction)) through the original x87 instruction sequence. After each traversal, use multiplier*current while the zero-based iteration is below iterations*fraction, then set final exactly. The default fraction is 0.5.",
+    "acceptance": "Require exact active record slots, starts, spans, links, cached costs, dirty bits and final threshold; retain native failures if any. Do not replace these with only visually similar fitted output.",
+    "cases": 3907,
+    "base_contour_intervals": 2784,
+    "isolated_multiplier_probes": 1039,
+    "schedule_probes": 84,
+    "iteration_probe_values": [
+      0,
+      1,
+      2,
+      3,
+      7,
+      10,
+      20
+    ],
+    "fraction_probe_values": [
+      0.25,
+      0.5,
+      1,
+      2
+    ],
+    "recording": "../evidence/engine-fitting-keepers-native-reference.json",
+    "fixture": "../test/fixtures/fitting-keepers-reference.json"
+  },
+  "full_controller": {
+    "status": "Public fitContours and fit-contours CLI match all 2712 complete native states plus 15 pipeline targets; library ownership/validation and CLI stdout/stderr/help checks pass.",
+    "boundary": "Completed smoothing geometry and resolved numeric fitting parameters. Own the geometry once; retain shared node identity, contour order, nesting and boundary-neighbor order. The original extra refinement flag stays at its constructed zero value in this supported stage.",
+    "order": "Normalize node kinds 1/2/5 to 0 and 4 to 3. In region/sample order, partition intervals around kind-0 nodes between nearest nonzero nodes. Mark keeper starts, selected interiors and endpoints while assigning cubic-storage slots, including endpoint-sentinel slots. Fit each remaining kind-1 run once in region/sample order, mark its interiors kind 2, then emit line/cubic region edges in native cyclic order.",
+    "output": "Fitted nodes contain x/y/cubic index/kind; regions contain colors/counts/parent/contour/edge records; serialize only referenced cubic storage slots. Preserve unused reserved slot count without inventing uninitialized coordinates.",
+    "acceptance": "Compare every cubic coordinate, referenced slot identifier, total reserved slot count, node kind/index, region edge, neighbor and nesting field against complete original fitting stages. Initial target is all 15 pipeline stages, followed by broader complete-stage native recordings.",
+    "cases": 2712,
+    "pipeline_targets": 15,
+    "recording": "../evidence/engine-fitting-full-native-reference.json",
+    "fixture": "../test/fixtures/fitting-full-reference.json",
+    "driver": "../tools/record-full-fitting.py",
+    "api": "fitContours({ geometry, parameters }), exported by openvector/fitting. Validate finite shared nodes, byte kinds, complete region metadata/contours/boundaries, positive finite threshold ratio and a nonnegative int32 iteration count once. Own inputs and return fitted geometry, preserving caller storage on both success and failure. No random stream is consumed. The input is completed smoothing geometry, not an already fitted document.",
+    "cli": {
+      "syntax": "openvector fit-contours <contours.json|->",
+      "input": "JSON geometry and explicit basic/advanced settings object. Resolve fitting parameters; no BGRA image or dimensions are needed at this stage.",
+      "output": "Complete fitted geometry JSON on stdout; exit 0 on success. Invalid input/unsupported settings/processing failure exit 1 with one stderr message and empty stdout. -h/--help retains existing behavior. No prompts.",
+      "limits": "Prepared contour stage only. Does not decode, segment or smooth pixels, assemble vector export shapes or serialize vector files.",
+      "reference_cases": 3
+    }
+  },
+  "native_repeatability": "../evidence/fitting-native-repeatability-current.json",
+  "precision": "Shared extended-arithmetic.mjs retains the original FYL2X/F2XM1 register results at 64 significand bits, native FLDLN2/FLDL2E constants and intervening 53-bit arithmetic/store boundaries. Its binary helpers were moved from the existing arctangent module without changing the angle algorithm. All 1039 isolated original multipliers match exactly, including powers near one and exponent-scaled inputs.",
+  "review": {
+    "method": "ce-simplify-code inline in one context; no independent reviewer corroboration",
+    "applied": {
+      "reuse": 1,
+      "quality": 1,
+      "efficiency": 2
+    },
+    "skipped": 3,
+    "changes": "Use one interval evaluator for merged/cached/redistributed costs; reuse synchronous proposal scratch; retain constant coefficient tables once; compare captured native random-state metadata separately from pure kernel results. Shared rounding helpers and wire codecs already have one canonical implementation.",
+    "skipped_findings": "Keep owned region cloning, the branch-specific original arithmetic, and clear stage/module separation; their behavior/ownership contracts outweigh small simplifications.",
+    "new_unreachable_code": [],
+    "lint": "No lint or typecheck scripts configured; JavaScript source and Node built-in tests."
+  },
+  "source_verification": {
+    "tests": 136,
+    "passed": 136,
+    "failed": 0,
+    "skipped": 0,
+    "duration_ms": 580023.4373,
+    "report": "../evidence/fitting-full-test-run.txt"
+  },
+  "installed_verification": "../evidence/installed-fitting-verification.json",
+  "archive_verification": "../evidence/fitting-package-archive-verification.json",
+  "package_sha256": "8d7dabf41261b4a9fd8f964cf6159233c3c5977fe1afe3e43e91fc09aa9b552a",
+  "package_bytes": 68214,
+  "package_files": 27,
+  "public_entry_points": 10,
+  "prepared_pipeline_integration": {
+    "cases": 15,
+    "public_retained_session": true,
+    "seed_overrides": false,
+    "source_fixture": "../test/fixtures/pipeline-prepared-reference.json",
+    "source_test": "../test/pipeline.test.mjs",
+    "installed_verification": "../evidence/installed-prepared-pipeline-verification.json",
+    "scope": "Prepared BGRA and explicit fixed color counts/settings through all public numeric stage APIs; excludes file decoding, automatic classification/count selection and export serialization."
+  },
+  "retained_state": {
+    "status": "Implemented retained fitting and document cleanup. The 176 captured fitting interruption workflows pass through direct/task document calls; sixteen-region and contour/region reconstruction lifetimes are covered. Batch/CLI/GUI cancellation and retry are verified in document-fitting-verification-checkpoint.json. Broader conformance remains unfinished.",
+    "controls": "new ContourFitter(completedSmoothingGeometry); run(parameters, optionalOnProgress); snapshot().",
+    "ownership": "Clone and validate source geometry once. Each run retains live node/cubic identifiers and old edges until their actual native reset/allocation/rebuild points. Host observer exceptions propagate unchanged and leave the owned state available for inspection and retry.",
+    "snapshot": "Owned cubicStorageSlots, cubicAvailability, initialized cubics, nodes and regions. Availability is independent of retained edge references. Partial snapshots are not completed export geometry.",
+    "evidence": "stage-progress-contract.json",
+    "review": "document-fitting-code-review.md"
+  }
+}

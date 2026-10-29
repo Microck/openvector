@@ -1,0 +1,39 @@
+This directory retains the license and modification notes for the FreeType
+gray rasterizer distributed with Qt 4.4.3. The native implementation is
+rust/crates/openvector/src/bitmap_raster/gray_raster.rs, a Rust translation of
+OpenVector's modified src/vendor/freetype-raster/qgrayraster.c reference.
+The Rust module retains the original copyright and FreeType Project License
+attribution. The accompanying FTL.TXT is the unmodified upstream license.
+
+OpenVector changes to the reference qgrayraster.c:
+- Replace setjmp/longjmp pool exhaustion with an explicit worker overflow flag.
+  The original band subdivision and retry remain the error recovery mechanism.
+- Remove unused allocating raster constructors/destructors and the function
+  table. The freestanding wrapper supplies the raster object and memory pool.
+- The allocator retains the observed x86 reference's 3200-byte control quota
+  independently of the modified worker layout. This preserves pool-growth
+  retries and any pixels already composed before those retries.
+- Remove unused stdio/stdlib includes and nonlocal-jump declarations.
+
+Native Rust translation changes:
+- Replace C cell pointers and pool storage with indexed Rust vectors.
+- Preserve 32-bit wrapping arithmetic and logical pool accounting: 3200 bytes
+  of control storage, 16-byte cells and 4-byte row pointers. These sizes model
+  the reference rather than the native host's pointer sizes.
+- Retain band subdivision, overflow retries and spans flushed before failure.
+- Write one-byte coverage directly into the caller's buffer through the Rust
+  worker instead of the reference's freestanding C wrapper.
+
+The native build does not compile qgrayraster.c or its two private headers.
+The headers remain unmodified in the development reference. No Qt application
+or widget code is included. Source provenance and hashes are recorded in
+evidence/bitmap-raster-source-identity.json in the development checkout;
+that investigation evidence is not part of the npm archive.
+
+Cargo compiles this Rust module into the openvector engine used by the CLI,
+Node-API library and GPUI application. No FreeType or Qt installation is
+required by this component.
+
+This software is based in part on the work of the FreeType Team.
+Portions are copyright 1996-2004 The FreeType Project (www.freetype.org).
+All rights reserved.

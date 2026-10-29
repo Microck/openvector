@@ -1,0 +1,40 @@
+{
+  "project": "openvector",
+  "status": "Pending-warning triggers, defaults, timer dispatch and retained state verified in the bounded native corpus; independent nested-warning queue corrected and browser-checked.",
+  "scope": "Palette and segmentation overwrite warning triggers, displayed text, standard buttons, explicit/effective defaults, escape-button property, focus and state while the model waits for a decision.",
+  "referenceBoundary": "Separate opt-in helpers invoke original business-model methods. Immediate observers record read-only modal/model/document state, close their observation files, then exit with status 19. A separate delayed observer lets the native modal event loop run for 750 ms to observe armed timer dispatch before the same abort; it counts changes of the actual active-modal identity without exporting pointers. No helper clicks, dismisses, answers, changes focus or synthesizes native input. No original instructions or licensing checks are patched.",
+  "observationLimit": "A null explicit default/escape/focus pointer is recorded as absent. Do not infer keyboard dismissal or button behavior from those properties. Native acceptance/cancellation and full widget interaction remain outside this observation scope.",
+  "completion": "Paired fresh responses and modal metadata must repeat exactly, all bytes must reparse, and original files/settings/input desktop must remain unchanged. Compare the native pending state and visible browser confirmation behavior before claiming parity.",
+  "fullApplicationParity": false,
+  "nativeFixture": "test/fixtures/profile-modal-reference.ndjson.gz",
+  "nativeAudit": "evidence/profile-modal-native-audit.json",
+  "nativeCases": 9,
+  "nativeProcesses": 18,
+  "pendingDocuments": 53,
+  "modalObservations": 8,
+  "behavior": {
+    "triggers": "Customized palettes and segmentation with committed undo records prompt before recalculation. A clean palette recalculates without a warning.",
+    "default": "Both warnings show OK and Cancel; Cancel is the explicit/effective default and focused button.",
+    "timer": "A timer-triggered warning has consumed its pending timer. A manual update leaves an already armed timer running. After 750 ms, both palette and segmentation captures observe a second distinct active modal identity and consumed timer, while the first action remains pending.",
+    "state": "Pending warnings preserve the selected profile, palette ownership, document stages, numerical arrays and edit/background history.",
+    "queue": "Pending decisions do not own the engine work queue. Preflight and accepted work remain serialized against current engine state. Each pending warning retains its own decision and Cancel focus target. Only the top warning is actionable.",
+    "browserCancel": "Closing the top independent browser warning returns to the preceding pending warning. Browser acceptance/cancellation is verified as product behavior only; no native after-answer equivalence is claimed."
+  },
+  "baseline": "evidence/profile-modal-browser-baseline.json",
+  "verification": {
+    "checkpoint": "../evidence/profile-modal-verification-checkpoint.json",
+    "nativeAudit": "../evidence/profile-modal-native-audit.json",
+    "guiTests": "../evidence/profile-modal-final-gui-tests.txt",
+    "guiTestCount": 306,
+    "availableUiWorkflows": 36,
+    "completeDocumentComparisons": 274,
+    "typedDocumentParameterComparisons": 27400,
+    "browser": "../evidence/profile-modal-browser-verification.json",
+    "browserUiChecks": 19,
+    "browserPendingStateProjections": 5,
+    "browserCompiledFrontendIdentity": "../evidence/profile-modal-browser-build-identity.json",
+    "screenshot": "../evidence/profile-modal-browser.png",
+    "review": "profile-confirmation-code-review.md",
+    "nativeAfterAnswerParityClaimed": false
+  }
+}

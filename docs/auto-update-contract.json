@@ -1,0 +1,53 @@
+{
+  "component": "Advanced wizard Auto-Update",
+  "status": "Independent scheduling matches eleven repeat-identical native workflows, including pending-work reentry. The browser now uses the same timer and palette owners. Real browser checks cover fresh loading, coalesced changes, manual edits, default-Cancel overwrite dialogs and advanced stage transitions. Mid-task cancellation and failure completion remain unfinished.",
+  "targetSha256": "c491656b962debc215a8b6e757a9b2949ffe50a36b5f2db692706bcd4ebface1",
+  "reference": {
+    "constructor": "0x412b90: QCheckBox subclass owns a single-shot QTimer at +0x14 and a pending byte at +0x18.",
+    "timer": "Single-shot timer, 500 ms interval. Constructor checks the box, disables the widget and clears the byte at +0x18.",
+    "singleShotEvidence": "Constructor sets timer +0x14 bit zero. Original QtCore4.dll exported QTimer::isSingleShot getter at 0x67089d70 reads exactly that bit.",
+    "signals": "advancedSettingsChanged() connects to trigger(); timer timeout connects to internalTimeout(); widget clicked connects to internalClicked().",
+    "pageWidgets": {
+      "palette": "MainWindow +0x174 -> advUpdatePalette()",
+      "segmentation": "MainWindow +0x190 -> advUpdateSegmentation()",
+      "vectorization": "MainWindow +0x1b0 -> advUpdateContours()"
+    },
+    "evidence": [
+      "../evidence/1049-native-auto-update-widget-constructor.json",
+      "../evidence/1048-native-mainwindow-complete-retained-pseudocode.json",
+      "../evidence/native-qtimer-single-shot-getter.asm"
+    ],
+    "methodDispatch": {
+      "timeout()": "0x45efc0, signal",
+      "internalTimeout()": "0x412ca0",
+      "internalClicked()": "0x412cd0",
+      "trigger()": "0x412ce0"
+    },
+    "metadata": "CustomTimerCheckBox strings at 0x70e450 and original qt_metacall jump table at 0x45f98c establish slot order. Initial REA filenames 1053-1055 contain guessed names; this mapping controls.",
+    "trigger": "When enabled, set byte +0x18 to one and start/restart the timer only if checked.",
+    "timeout": "Emit timeout and clear byte +0x18 only when checked and enabled; otherwise leave it unchanged.",
+    "click": "Actual click toggles checked. If now checked, enabled and pending, restart the timer. Unchecking does not cancel an active timer.",
+    "pageEntry": {
+      "palette": "Enable only at page 12. After pending-work resumption, the explicit page callback triggers for modes 0/1 with no selected colors. The view normalizes mode 0 to fixed mode 1 before this callback.",
+      "segmentation": "Enable only at page 13. The explicit page callback triggers when the document segmentation cache key differs from selected controls.",
+      "vectorization": "Enable only at page 16. The explicit page callback triggers when either smoothing or fitting key differs, including the segmentation edit key. Do not replace these native predicates with geometry-presence checks.",
+      "leaving": "Disabling does not cancel a timer. If it expires disabled, retain pending and emit no task.",
+      "reentry": "A checked pending widget restarts its timer when reenabled, independently of the explicit page cache predicate. Proven by palette reentry with existing colors and vector reentry with matching keys. Fixture: ../test/fixtures/auto-update-reentry-reference.ndjson.gz."
+    },
+    "overwriteDialogs": "Palette customization and segmentation undo history gate original QMessageBox warnings. Cancel is the default and preserves edits; OK runs the original stage and replaces the relevant edits. Timer expiry clears pending before the warning. Cancel leaves the timer inactive and does not reschedule itself. Direct-slot invocation is a different producer and can leave an already pending timer active."
+  },
+  "requiredVerification": [
+    "Completed: widget handlers, original Qt metadata and page-entry producers recovered.",
+    "Completed: original nine timer workflows plus two pending-reentry workflows. See auto-update-fixture-verification.json and auto-update-reentry-fixture-verification.json.",
+    "Completed: actual original palette and segmentation overwrite acceptance/cancellation, including true original timer dispatch and unchanged input-desktop guards. Other task cancellation and failure completion remain unfinished.",
+    "Verify defaults/persistence and the exact processing stage triggered by each control."
+  ],
+  "publication": "Keep private until full application parity is achieved.",
+  "implementationSeam": "src/document-controls.mjs is the canonical settings validator and native cache-key serializer for both the document engine and GUI scheduling. Move existing functions unchanged and update current callers; do not add a second browser serializer or legacy re-export. wizardPageSettings centralizes advanced palette-mode normalization before the same page timer observes selected controls.",
+  "implementation": "gui/auto-update.mjs owns the three pending timers. Explicit settings/page/click events change deadlines; completion does not reschedule based on stale controls. React uses one monotonic deadline effect and an ordered processing queue. Palette and segmentation warnings resolve before a stage runs, with Cancel focused by default.",
+  "browserVerification": [
+    "../evidence/palette-timers-browser-verification.json",
+    "../evidence/committed-edits-browser-verification.json"
+  ],
+  "freshLoadFixture": "../test/fixtures/advanced-workflow-reference.ndjson.gz"
+}

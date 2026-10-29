@@ -1,0 +1,50 @@
+{
+  "project": "openvector",
+  "status": "Independent Quick Save choices, transient source naming, direct folder saving, persistence, GUI controls and EMF export verified within the stated reference scope.",
+  "nativeReference": "../test/fixtures/window-export-preferences-reference.ndjson.gz",
+  "nativeContract": "window-export-preferences-contract.json",
+  "verification": {
+    "quickSaveTestsPassed": 61,
+    "focusedTestsIncludingExistingCoreCancellation": 73,
+    "nativeQuickSaveProjections": 32,
+    "nativeOrdinaryBatchCases": 9,
+    "nativeCancellationCases": 7,
+    "nativeBatchQuickSaveSnapshots": 89,
+    "isolatedGuiSuite": {
+      "passed": 484,
+      "failed": 1,
+      "skipped": 0
+    },
+    "knownFailure": "Existing processing-batch-controls setter-only backgroundMode 2 comparison; unchanged.",
+    "browser": "The unchanged GUI bundle was verified at the direct-save checkpoint. Current backend ownership/reset changes use actual controller, filesystem and HTTP tests.",
+    "checkpoint": "../evidence/quick-save-cancellation-verification-checkpoint.json"
+  },
+  "behavior": {
+    "owner": "GuiEngine owns a vector QuickSave instance with separate basic and advanced records. UI snapshots expose format, directory, expanded and transient filename. preferences() projects only the three persistent choices. Defaults are AI, the canonical working directory, collapsed and empty filename.",
+    "source": "A successful single-image open replaces both folders with the containing folder and sets both filenames using QFileInfo-style first-dot basename. A recognized vector suffix also selects that format. Source reset changes both folders to the parent of the working directory and retains filenames. Invalid image decoding preserves prior Quick Save state.",
+    "directory": "Canonicalize existing folders. Keep missing/inaccessible folder text in native separators. Empty input selects the working directory. Configuring one mode does not change the other mode.",
+    "http": "GET /api/quickSave returns both owned records. POST accepts mode basic or advanced and partial format/directory/expanded/filename choices. Invalid input changes nothing. Choices are readable in either workspace; a running batch rejects mutations. The direct-save contract describes save/decision commands.",
+    "storage": "The canonical processing-preferences root requires selected, batch, outputOptions, autoUpdate, skipReview, quickSave and bitmapSave. quickSave requires exactly basic and advanced, each with all three fields. Missing files use cold defaults. Invalid or earlier shapes fail with an explicit recovery path, without migration.",
+    "gui": "The File format selector uses the active mode choice. A persisted Quick Save disclosure contains directory, folder picker, transient filename and Save. Direct saves use existing exporters and explicit directory/overwrite decisions. A separate Download action retains browser downloads.",
+    "emf": "The GUI host supplies the EMF writer with the current Windows reference-device measurements. An empty in-memory GDI metafile supplies pixels, millimeters and micrometers from its header and is deleted. No Vector Magic binary, registry or file is consulted. The core writer retains its explicit per-call referenceDevice contract.",
+    "batch": "Ordinary batch attempts and captured later-task cancellations advance the current source path while retaining Quick Save fields. Completed-load cancellation clears that path and resets both folders to the parent of the working directory, retaining widget filenames/formats/disclosures. Native evidence covers nine ordinary and seven cancellation cases."
+  },
+  "emfApiSources": [
+    "https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-createenhmetafilew",
+    "https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-getenhmetafileheader",
+    "https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-closeenhmetafile",
+    "https://learn.microsoft.com/en-us/windows/win32/api/wingdi/nf-wingdi-deleteenhmetafile"
+  ],
+  "remaining": [
+    "Native filename completion and unusual typed path cases",
+    "Native overwrite-skip source events and failed single-image changes; arbitrary in-task cancellation",
+    "Native save receiver and failure notification behavior; folder picker UI not driven",
+    "Bitmap export, drag-result behavior and their remaining preference owners",
+    "Full window reset, active-job shutdown, full parity, packaging, publication and Rust/GPUI"
+  ],
+  "fullApplicationParity": false,
+  "directSaveContract": "quick-save-direct-contract.json",
+  "filenameReference": "../test/fixtures/quick-save-fields-reference.ndjson.gz",
+  "batchContract": "quick-save-batch-contract.json",
+  "cancellationContract": "quick-save-cancellation-contract.json"
+}

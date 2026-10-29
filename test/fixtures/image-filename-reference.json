@@ -1,0 +1,84 @@
+{
+  "type": "native-filename-reference",
+  "operation": 111,
+  "wholeFreshProcessResponseRepeatIdentical": true,
+  "recordingSha256": "f9ab7e6b0f4a13a09aee765774956f66501a1e8f50315f93e506997d0d3740c0",
+  "sourceNameSetter": "0x484b00",
+  "cases": [
+    {
+      "filename": "D:\\migracion\\vector-magic-re\\evidence\\gui-source-context-inputs\\source.gif",
+      "extension": ".gif",
+      "shadowControl": 0
+    },
+    {
+      "filename": "D:\\migracion\\vector-magic-re\\evidence\\gui-source-context-inputs\\source.jpg",
+      "extension": ".jpeg",
+      "shadowControl": 1
+    },
+    {
+      "filename": "D:\\migracion\\vector-magic-re\\evidence\\gui-source-context-inputs\\source.jpeg",
+      "extension": ".jpeg",
+      "shadowControl": 1
+    },
+    {
+      "filename": "D:\\migracion\\vector-magic-re\\evidence\\gui-source-context-inputs\\source.png",
+      "extension": ".png",
+      "shadowControl": 2
+    },
+    {
+      "filename": "D:\\migracion\\vector-magic-re\\evidence\\gui-source-context-inputs\\source.bmp",
+      "extension": ".bmp",
+      "shadowControl": -1
+    },
+    {
+      "filename": "D:\\migracion\\vector-magic-re\\evidence\\gui-source-context-inputs\\source.tif",
+      "extension": ".tiff",
+      "shadowControl": -1
+    },
+    {
+      "filename": "D:\\migracion\\vector-magic-re\\evidence\\gui-source-context-inputs\\source.tiff",
+      "extension": ".tiff",
+      "shadowControl": -1
+    },
+    {
+      "filename": "D:\\migracion\\vector-magic-re\\evidence\\gui-source-context-inputs\\source.PNG",
+      "extension": ".PNG",
+      "shadowControl": -1
+    },
+    {
+      "filename": "D:\\migracion\\vector-magic-re\\evidence\\gui-source-context-inputs\\source.JPG",
+      "extension": ".JPG",
+      "shadowControl": -1
+    },
+    {
+      "filename": "D:\\migracion\\vector-magic-re\\evidence\\gui-source-context-inputs\\source.unknown",
+      "extension": ".unknown",
+      "shadowControl": -1
+    },
+    {
+      "filename": "D:\\migracion\\vector-magic-re\\evidence\\gui-source-context-inputs\\source",
+      "extension": "",
+      "shadowControl": -1
+    },
+    {
+      "filename": "D:\\migracion\\vector-magic-re\\evidence\\gui-source-context-inputs\\source.abcdefghijklmnopq",
+      "extension": ".abcdefghijklmnopq",
+      "shadowControl": -1
+    },
+    {
+      "filename": "D:\\migracion\\vector-magic-re\\evidence\\gui-source-context-inputs\\.png",
+      "extension": ".png",
+      "shadowControl": 2
+    },
+    {
+      "filename": "D:\\migracion\\vector-magic-re\\evidence\\gui-source-context-inputs\\parent.with-dot\\no-suffix",
+      "extension": "",
+      "shadowControl": -1
+    },
+    {
+      "filename": "D:/migracion\\vector-magic-re\\evidence\\gui-source-context-inputs\\parent.with-dot\\no-suffix",
+      "extension": ".with-dot\\no-suffix",
+      "shadowControl": -1
+    }
+  ]
+}

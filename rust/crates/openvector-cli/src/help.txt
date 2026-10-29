@@ -1,0 +1,43 @@
+Usage: openvector vectorize <image|-> [options]
+       openvector batch <image...> [options]
+       openvector settings <settings.json|->
+       openvector fill <map.json|-> <seed> <replacement>
+       openvector assign-palette <assignment.json|->
+       openvector refine-palette <refinement.json|->
+       openvector generate-palette <generation.json|->
+       openvector analyze-image <image.json|->
+       openvector segment <segmentation.json|->
+       openvector trace-contours <image.json|->
+       openvector smooth-contours <image.json|->
+       openvector fit-contours <contours.json|->
+       openvector export-svg <document.json|->
+       openvector export-eps <document.json|->
+       openvector export-pdf <document.json|->
+       openvector export-ai <document.json|->
+       openvector export-dxf <document.json|->
+       openvector export-emf <document.json|->
+
+vectorize       Automatically convert a PNG, BMP, JPEG, GIF or TIFF. Use vectorize --help.
+batch           Convert multiple files with shared settings. Use batch --help.
+profiles        Manage saved advanced settings. Use profiles --help.
+recent-settings Inspect or clear recent basic settings. Use recent-settings --help.
+settings        Print numeric engine parameters for one processing stage.
+fill            Edit a connected region in a segmentation pixel map.
+assign-palette  Assign BGRA pixels to an explicit palette.
+refine-palette  Refine an explicit palette with antiAlias true or false.
+generate-palette  Generate a fixed-count palette with antiAlias true or false.
+analyze-image   Classify decoded BGRA pixels and evaluate automatic color counts.
+segment         Segment prepared BGRA pixels using explicit processing settings.
+trace-contours  Segment prepared BGRA pixels and trace shared vector boundaries.
+smooth-contours  Smooth prepared shared contours with explicit processing settings.
+fit-contours    Fit shared Bezier curves to completed smoothed contours.
+export-svg      Write a fitted graph as SVG with layout and stroke controls.
+export-eps      Write EPS with layout, stroke and compact PostScript controls.
+export-pdf      Write PDF bytes with layout, stroke and opacity controls.
+export-ai       Write AI with layout, stroke and compound path controls.
+export-dxf      Write DXF with the original palette and explicit curve modes.
+export-emf      Write EMF bytes with explicit reference-device measurements.
+Use - to read JSON from standard input. Export commands write raw vector files;
+other commands write JSON. Errors go to stderr with exit status 1.
+
+Use --version to print the package version. Feature parity is under development.

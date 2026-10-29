@@ -1,0 +1,60 @@
+{
+  "project": "openvector",
+  "status": "Recent-file and directory owners, cached thumbnails, storage and modernized GUI controls verified within bounded native/browser coverage. Clipboard and global reset remain unfinished.",
+  "scope": "Clipboard bitmap admission; independent recent-file and recent-directory ownership, storage and GUI projection.",
+  "reference": {
+    "help": "../evidence/qt-resources/Resources/wp_load_image.html",
+    "clipboardPreview": "../evidence/source-entry-002-clipboard-preview.json",
+    "clipboardModel": "../evidence/source-entry-005-clipboard-source.json",
+    "recentAdd": "../evidence/source-entry-006-recent-file-add.json",
+    "recentRemove": "../evidence/source-entry-007-recent-file-remove.json",
+    "recentClear": "../evidence/source-entry-008-recent-file-clear.json",
+    "nativeAudit": "../evidence/source-history-native-audit.json",
+    "fixture": "../test/fixtures/source-history-reference.ndjson.gz"
+  },
+  "staticObservations": {
+    "clipboard": "The model validates nonempty clipboard dimensions, converts QImage to format 5, imports straight BGRA through 0x46aa40, assigns clipboard.png in the current source directory, marks clipboard ownership and dispatches source completion. The display title becomes [From clipboard]. Acquisition itself is not exercised by this investigation.",
+    "clipboardThumbnail": "The load-page preview uses a thumbnail up to 2,000,000 pixels and a large-image placeholder above that threshold. Empty clipboard images disable the button. Exact scaling ABI still needs instruction verification.",
+    "recentFiles": "0x42dc20 couples filenames, descriptions and QPixmaps in three lists at model+0x17c/+0x180/+0x184, with capacity at +0x178. Existing names are found by QString equality before moving the coupled entry to the front. Removal and clearing update all three lists and emit listChanged. Paired native observations verify the metadata owner; cached pixels and restart storage are covered separately by source-storage-contract.json."
+  },
+  "boundary": "Only original business-model methods and read-only metadata are admitted in an owned private settings namespace and private desktop. Never drive, answer or dismiss native dialogs. Do not read or replace the user's clipboard to manufacture test data.",
+  "pathContract": "The OS-picker host owns real disk paths. Browser drops expose basenames and bytes and never become fictional disk-history entries. Native picker interaction remains unverified.",
+  "fullApplicationParity": false,
+  "recentFileOwner": {
+    "module": "../src/source-history.mjs",
+    "export": "openvector/source-history",
+    "operations": "SourceHistory.add({filename,width,height,bytes}), remove(filename), clear(), snapshot(); SourceHistory.fromSnapshot(snapshot), SourceHistory.thumbnailDimensions(width,height); formatFileSize(bytes). Snapshots and restored owners own their metadata arrays.",
+    "capacity": 3,
+    "identity": "Exact UTF-16 string equality. Preserve caller spelling and Unicode; do not normalize or case-fold names.",
+    "description": "WIDTHxHEIGHT, SIZE. Decimal scaling multiplies by binary64 0.001 while the value is strictly above 1000, at most three times. Units are B, kB, MB, TB. One fractional digit uses native Qt rounding.",
+    "thumbnail": "Fit within 32x32 with integer aspect-ratio truncation, including upscaling. Empty dimensions produce the native null-pixmap size 0x0. Pixel values are outside this metadata owner.",
+    "scope": "Active file rows only. Native startup unused QPixmap entries stay outside visible metadata. The source host owns cached pixels, real disk access and JSON storage; see source-storage-contract.json. The modernized recent-file projection is connected. Clipboard acquisition and other load-page behaviors remain unfinished.",
+    "presentationContract": "window-reset-contract.json"
+  },
+  "verification": {
+    "checkpoint": "../evidence/source-history-verification-checkpoint.json",
+    "nativeAudit": "../evidence/source-history-native-audit.json",
+    "nativeCases": 4,
+    "nativeProcesses": 8,
+    "sourceHistoryObservations": 60,
+    "fileSizeCases": 24,
+    "thumbnailShapeCases": 8,
+    "sourceTests": "../evidence/source-history-tests.txt",
+    "installedTests": "../evidence/source-history-installed-tests.txt",
+    "testsEach": 5,
+    "packageIdentity": "../evidence/source-history-package-identity.json",
+    "publicExports": 19,
+    "mainProcessDenials": "../evidence/source-history-installed-denials.txt",
+    "review": "source-history-code-review.md",
+    "nativeGuiRecentFileWidgetsCompared": false,
+    "clipboardAcquisitionObserved": false,
+    "fullApplicationParity": false
+  },
+  "sourceStorageContract": "source-storage-contract.json",
+  "recentDirectoryOwner": {
+    "contract": "source-directories-contract.json",
+    "class": "SourceDirectories",
+    "capacity": 4,
+    "independentOfFileClear": true
+  }
+}

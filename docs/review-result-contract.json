@@ -1,0 +1,34 @@
+{
+  "project": "openvector",
+  "status": "Independent engine and HTTP review actions match opaque and translucent native corpora. GUI controls, skip preference and observed navigation are verified in review-ui-contract.json. Full application parity remains unfinished.",
+  "reference": "../test/fixtures/review-actions-reference.ndjson.gz",
+  "inputs": "../test/fixtures/review-actions-inputs.json",
+  "nativeAudit": "../evidence/review-actions-native-audit.json",
+  "alphaReference": "../test/fixtures/review-alpha-reference.ndjson.gz",
+  "alphaInputs": "../test/fixtures/review-alpha-inputs.json",
+  "alphaNativeAudit": "../evidence/review-alpha-native-audit.json",
+  "nativeCases": 22,
+  "nativeProcesses": 44,
+  "documents": 30,
+  "verification": {
+    "newTestsPassed": 24,
+    "isolatedGuiSuite": {"passed": 411, "failed": 1, "skipped": 0},
+    "knownFailure": "Existing processing-batch-controls setter-only backgroundMode 2 comparison; unchanged.",
+    "checkpoint": "../evidence/review-result-verification-checkpoint.json"
+  },
+  "behavior": {
+    "pages": "Native 17 is advanced Export Result, 18 is basic Export Result, 19 is Review Result and 15 is Remove Background. Automatic/basic completion enters Review unless the saved skip checkbox is checked. Leaving background removal enters advanced Export or basic Review, even when Skip is checked.",
+    "artwork": "Choice 0 sets category 1 and fixed palette mode, searches palette candidates and enters the basic palette page. Candidate completion may choose a new palette and update its metadata.",
+    "quality": "Choices 1, 2 and 3 select quality 0, 1 and 2, then run the existing segmentation, smoothing and fitting path. Matching keys reuse work. They preserve the selected palette and recommendation state.",
+    "colors": "Choice 4 selects fixed palette mode and opens basic palette selection. Choice 5 selects flexible palette mode and reruns segmentation through fitting. Neither invokes automatic reclassification.",
+    "edit": "Choice 6 enters the existing segmentation editor. Choice 7 returns to image type selection with the current controls. Choice 8 enters the existing background editor.",
+    "api": "GuiEngine.review and POST /api/review accept one named action: artwork, high, medium, low, custom-colors, unlimited-colors, edit, hand-pick or background. They return the resulting document, selected controls and destination page. Validation precedes mutation. Batch ownership blocks the single-image command."
+  },
+  "referenceLimitations": [
+    "Native action captures call MainModel::troubleShoot directly through its Qt method. Assembly proves the sender argument is unused, so the observer passes null instead of driving a widget.",
+    "The existing observation-only show routine sets WA_DontShowOnScreen on a private desktop. No native button input or dialog answer is synthesized.",
+    "Hidden-window Next and Back do nothing; visible-on-private-desktop captures establish actual navigation admission. Both corpora are retained.",
+    "GUI controls and Skip are verified separately in review-ui-contract.json. Customized history cases and complete window parity remain unfinished."
+  ],
+  "fullApplicationParity": false
+}

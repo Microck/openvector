@@ -1,0 +1,29 @@
+{
+  "project": "openvector",
+  "status": "Native model stages and pending confirmation captured. Independent list ownership and host persistence verified. Later full-window No/Yes capture and Rust comparison are scoped separately in application-reset-contract.json.",
+  "reference": "../test/fixtures/factory-reset-reference.ndjson.gz",
+  "nativeAudit": "../evidence/factory-reset-native-audit.json",
+  "referenceScope": {
+    "cases": 5,
+    "processes": 18,
+    "listReset": "Original model routine 0x42f380 clears recent file names, descriptions, cached icons, recent directories and saved configurations, then inserts Default Advanced Settings. Current image, current source directory, selected controls and export options survive this stage.",
+    "modelReset": "A subsequent call to original model routine 0x430ed0 with three true arguments clears the image and batch queue and resets processing controls. This is separate from the existing Start Over reset, which retains processing choices.",
+    "confirmation": "Reset Everything asks Yes/No, with No explicitly default and focused. The observer captures the pending warning and exits with code 19. It never answers the warning or executes its post-confirmation window handler.",
+    "windowReset": "This historical corpus does not answer the warning. Static handler 0x451750 calls both model stages, then resets GUI widgets. Later after-confirmation observations are recorded separately in application-reset-contract.json."
+  },
+  "listOwners": {
+    "profiles": "SavedAdvancedProfiles.reset() replaces the current list with the built-in profile, including after that entry was renamed, removed or evicted. ProfileController reset persists that same owner without applying a profile to the document.",
+    "sources": "SourceController reset-history clears file rows, cached icons and recent directories while retaining the current source directory and loaded document. The existing clear command still clears files only.",
+    "storage": "Use the existing canonical JSON files and atomic writes. Native changes remain in memory before persistence; OpenVector persists each accepted host mutation. A failed write remains explicit and retains the in-memory reset. No registry import, migration or alternate format.",
+    "admission": "Profile reset rejects an active or running batch. Source reset-history uses the existing single-image source-command guard. No global Reset Everything button is exposed by these owner operations."
+  },
+  "remaining": [
+    "Finish processing-reset conformance: engine and batch-owner operations are implemented, with one setter-only transparency comparison still failing. See processing-reset-contract.json.",
+    "Extend the full-window reference beyond the captured basic Export starting state; see application-reset-contract.json for current widget and navigation evidence.",
+    "Verify complete persisted application state and restart after full-window Reset."
+  ],
+  "fullApplicationParity": false,
+  "processingResetContract": "processing-reset-contract.json",
+  "windowResetContract": "window-reset-contract.json",
+  "applicationResetContract": "application-reset-contract.json"
+}

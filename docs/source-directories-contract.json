@@ -1,0 +1,51 @@
+{
+  "project": "openvector",
+  "status": "Independent directory owner, persistence and modernized controls verified within bounded native/browser coverage.",
+  "reference": "../test/fixtures/source-directories-reference.ndjson.gz",
+  "nativeAudit": "../evidence/source-directories-native-audit.json",
+  "nativeCases": 4,
+  "nativeProcesses": 18,
+  "directoryObservations": 31,
+  "behavior": {
+    "capacity": 4,
+    "identity": "Exact string identity, including case and Unicode. Successful source loads promote the containing directory. Loading a different file in the same directory promotes the same entry.",
+    "eviction": "Keep the four most recent distinct directory strings, newest first.",
+    "restore": "Restore the cached order without checking whether directories still exist. Restart starts without a loaded image.",
+    "clearFiles": "clearMruFiles() clears file rows and icons while preserving directory history.",
+    "storage": "The one current source-storage document requires directory, directories and files. Missing directories in an older local document is an explicit format error; no migration or fallback format.",
+    "browse": "The Browse action beside a recent directory opens the image picker starting in that directory. Only a successful image load updates source history.",
+    "reveal": "The Open Folder action asks the OS to open that directory. It does not load an image or mutate source history. Native successful Explorer interaction remains unverified."
+  },
+  "ownership": {
+    "module": "../src/source-history.mjs",
+    "export": "openvector/source-history",
+    "class": "SourceDirectories",
+    "operations": "add(directory), snapshot(), clear(), SourceDirectories.fromSnapshot({capacity:4,directories}). Snapshots own their arrays; this owner does not resolve paths or read disk.",
+    "host": "The existing source controller owns directory history alongside the separate file-history owner and cached icons. Its snapshot exposes directoryHistory. Storage keeps only the directory strings."
+  },
+  "limits": [
+    "Native picker interaction and cancellation remain unverified.",
+    "Successful native Explorer launch remains unverified.",
+    "Global Reset Everything is a separate behavior; its captured scope and remaining gaps are recorded in application-reset-contract.json."
+  ],
+  "fullApplicationParity": false,
+  "presentation": {
+    "rows": "Directory names with full-path tooltips and accessible action names. Separate Browse and Open Folder buttons.",
+    "disclosure": "The HTML disclosure starts collapsed, matching the native MostRecentDirectoriesWidget observations in window-reset-contract.json."
+  },
+  "verification": {
+    "checkpoint": "../evidence/source-directories-verification-checkpoint.json",
+    "guiTests": "../evidence/source-directories-final-gui-tests.txt",
+    "ownerTests": "../evidence/source-directories-owner-tests.txt",
+    "installedTests": "../evidence/source-directories-installed-tests.txt",
+    "browserStates": "../evidence/source-directories-browser-states.json",
+    "browserScreenshot": "../evidence/source-directories-browser.jpg",
+    "packageIdentity": "../evidence/source-directories-package-identity.json",
+    "review": "source-directories-code-review.md",
+    "guiTestsPassed": 327,
+    "ownerAndInstalledTestsEach": 11,
+    "nativeDirectoryRowsCompared": 4,
+    "nativePickerInteractionVerified": false,
+    "nativeExplorerSuccessVerified": false
+  }
+}

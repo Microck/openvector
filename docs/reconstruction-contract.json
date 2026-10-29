@@ -1,0 +1,228 @@
+{
+  "status": "independent-core-components-implemented; full-converter-in-progress",
+  "target": {
+    "application": "Vector Magic Desktop Edition",
+    "version_evidence": "Bundled release_notes.txt begins with version 1.15, August 30, 2010; PE timestamp agrees with that date.",
+    "executable": "D:\\VectorMagic\\Vector Magic\\vmde.exe",
+    "sha256": "c491656b962debc215a8b6e757a9b2949ffe50a36b5f2db692706bcd4ebface1"
+  },
+  "required_outcome": {
+    "engine": "An independently implemented vectorization engine with the same observable behavior as the selected target.",
+    "cli": "Expose processing, editing, batch, configuration, and export operations from a terminal.",
+    "gui": "A custom GUI using the same engine and document model as the CLI.",
+    "distribution": "A publishable npm package exposing the library and CLI.",
+    "runtime_dependency_on_vector_magic": false,
+    "original_executable_or_dlls_in_distribution": false,
+    "original_application_role": "Development reference only.",
+    "gui_constraints": {
+      "background": "#000000",
+      "primary_text": "#ffffff",
+      "density": "high",
+      "decorative_cards": false,
+      "nonessential_motion": false
+    },
+    "license": "MIT for the independently authored implementation",
+    "price": "Free",
+    "session_model": "Retain one shared core PRNG across processing operations in an application session. Native stage-by-stage captures show that anti-alias contour smoothing also consumes this state. Loading a new image does not reset it. A fresh CLI invocation starts a fresh session."
+  },
+  "completion_criteria": [
+    "The package processes images on a machine where Vector Magic is not installed.",
+    "The CLI and custom GUI use one canonical engine and document model.",
+    "Every processing and editing feature below has an executable behavior test against a reference with known settings.",
+    "Segment topology, colors, alpha, curve geometry, corner decisions, and export options agree with the original for the reference corpus.",
+    "Any serialization differences are identified explicitly; visual similarity alone does not establish 1:1 behavior.",
+    "The npm package contains the new implementation and its dependencies, excluding investigation evidence and original application files."
+  ],
+  "feature_surface": [
+    {
+      "feature": "automatic image classification and settings",
+      "evidence": "app_overview.html",
+      "recovery": "Palette-count tree/feature/candidate kernels remain native-verified. Independent prepared image type/quality analysis now matches all 273 complete recordings, computing its own blur, segmentation, moments and 20-float feature vector. Initial alpha/Gaussian kernels cover 2224 original images and exhaustive alpha-byte pairs. File decoding, full source/working cache orchestration, GUI classify-profile/default resolution and final document/color-count selection remain unfinished."
+    },
+    {
+      "feature": "basic and advanced modes",
+      "evidence": "app_overview.html; 007-profile-loader.json",
+      "recovery": "numeric translation implemented; 648 host-CPU arithmetic cases pass"
+    },
+    {
+      "feature": "photograph, artwork with blending, artwork without blending",
+      "evidence": "051-category-enum.json",
+      "recovery": "category enumeration recovered"
+    },
+    {
+      "feature": "quality and detail selection",
+      "evidence": "core-profiles.json; 007-profile-loader.json",
+      "recovery": "quality enumeration and 100-parameter profile storage types recovered; numeric resolver implemented"
+    },
+    {
+      "feature": "automatic, generated fixed, manually edited fixed, and flexible palettes",
+      "evidence": "wp_adv_palette.html; wp_fixed_palette.html; 032-palette-stage.json",
+      "recovery": "fixed-count generation and explicit starting-palette refinement implemented with and without anti-alias weighting; automatic selection, fixed/flexible GUI rules, and palette editing remain pending"
+    },
+    {
+      "feature": "palette color count, sensitivity, and anti-aliasing",
+      "evidence": "wp_adv_palette.html; 007-profile-loader.json",
+      "recovery": "Numeric controls, histogram peaks, measurement, weighted/unweighted generation/refinement and candidate scoring have native differential recordings. The local blend solver matches 1080 calls and weighted scoring matches 440 calls. Automatic count selection and one-dimensional input preprocessing remain pending."
+    },
+    {
+      "feature": "preserve alpha, flatten to white, flatten to a chosen color",
+      "evidence": "wp_transparency.html",
+      "recovery": "documented behavior recovered; runtime edge cases pending"
+    },
+    {
+      "feature": "segmentation complexity, minimum region size, artifact rejection, and color clustering",
+      "evidence": "wp_adv_segment.html; 039-segmentation-algorithm.json",
+      "recovery": "Unweighted segmentation with and without diagonal extraction matches 328 complete original runs. Separate primitives cover 3281 cases. Subpixel statistics, medians, boundary sets, cached costs, and region energies match 540 native rebuilds. Directed merge costs match 10708 original proposals and explicit merges match 838 incremental states. Candidate selection matches 2700 ordered pass states and 18350 accepted merges. Alternating rebuilds match 1080 snapshots and the complete unclustered subpixel schedule matches 432 native final states. Presegmentation matches 632 native states; automatic anti-alias segmentation matches 240 runs. Independent segmentation also matches all 15 known-settings pipeline stages. Advanced color selection matches 548 states and 7832 bounded costs; clustering-enabled segmentation matches another 240 runs. Complete prepared shadow integration now matches 578 automatic/supplied original results; nonzero size penalties and full image-file conversion remain unfinished. Supplied-palette segmentation matches 782 valid native results; fixed-palette projection matches 1644 states. Another 482 plain inputs violate a native statistic-capacity precondition and remain outside parity assertions."
+    },
+    {
+      "feature": "shared vector contours, boundary topology and region nesting",
+      "evidence": "154-contour-input-prepare.c; 312-contour-node-map.c; 313-contour-trace-region.c; 314-contour-pattern-rewrite.c; 315-contour-staircase-match.c",
+      "recovery": "Independent extraction matches 2584 native states, including 1312 exhaustive binary topology cases, 112 reflected staircase cases and four nested-ring cases. Independent segmentation plus extraction also matches all 15 raw contour stages in full original pipelines. CLI trace-contours exposes prepared-pixel processing. Supported-profile smoothing is implemented separately; default-flag fitting is implemented separately."
+    },
+    {
+      "feature": "contour smoothing, corner detection, and anti-aliasing",
+      "evidence": "wp_contour_smoothing.html; 040-contour-algorithm.json",
+      "recovery": "Independent geometric and image-based prepared smoothing is implemented: priors, 5598 geometric objectives, 2799 image objectives, 3312 line searches per measurement branch, 1029 complete controllers per geometric/image branch, and 6981 combined image objective sequence states. Standalone image measurement also matches 2802 initial and 6981 stateful states. Prepared anti-alias repairs also match 14106 states and 1029 complete repaired controllers, including invalid-region selection and restart energy refresh. Independent nearby-edge construction matches 2814 explicit preparations and all 2454 original repair/controller preparations. Blend preadjustment and shared-PRNG initialization match 2604 cases each plus 110 original interleaved palette/initialization runs. Raw geometry/reference/border preparation matches 2700 native cases, including 96 threshold probes, and composes with all 2604 initializations. Complete corner puncturing matches 3680 native geometry states and its classifier matches 3504 decisions. Complete supported-profile smoothing matches all 2713 original outcomes across two explicit process sessions: 2712 completed vectors and one fatal conversion outcome represented by a JavaScript exception. All nine basic profiles, eight phase masks, three corner schedules and both line-search modes are covered. All 15 retained full-pipeline targets also match. Other prior/optimizer modes and nonfinite controller trajectories remain pending."
+    },
+    {
+      "feature": "Bezier fitting and node complexity",
+      "evidence": "041-bezier-algorithm.json; 012-bezier-keepers.json; 036-curve-cost.json",
+      "recovery": "Independent default-flag fitting matches all 2712 complete native smoothing states and all 15 pipeline targets, including reserved/unused cubic slots, every control coordinate, shared node kinds/indexes and region edge direction/order. Separate corpora cover 2784 sample states, 2784 fit costs/control points and 3907 keeper/cache/threshold states. Public fitContours and prepared fit-contours CLI are implemented. Original extra refinement mode remains pending."
+    },
+    {
+      "feature": "manual segmentation pencil, flood fill, zap, and color selection",
+      "evidence": "wp_segedit.html",
+      "recovery": "Independent Pencil/Fill/Zap, color selection and edit histories match 105 captured states; sixteen real-widget gesture workflows match 193 editor states. Ten finite post-edit refits match. The alpha refit remains failing, with a confirmed original palette overread and non-repeatable native geometry. See segmentation-edit-contract.json."
+    },
+    {
+      "feature": "undo, redo, and revert of edits",
+      "evidence": "wp_segedit.html",
+      "recovery": "Independent document-owned undo/redo/revert, replay and committed-history reentry are implemented and covered by captured bitmap/history and real-widget gesture states. See segmentation-edit-contract.json."
+    },
+    {
+      "feature": "remove and restore background shapes",
+      "evidence": "wp_make_background.html; strings-selected.txt",
+      "recovery": "documented behavior recovered; shape identifiers pending"
+    },
+    {
+      "feature": "batch processing with shared settings, destination, format, and export options",
+      "evidence": "wp_batch_settings.html; wp_load_batch.html",
+      "recovery": "Shared queue, basic/advanced filesystem runner, npm API, batch CLI and modernized GUI workspace implemented. Native comparisons cover task progress, failures, retained document/random lifetime and completed-boundary cancellation/retry. Saved profiles, arbitrary in-task interruption and full GUI conformance remain pending. See batch-contract.json."
+    },
+    {
+      "feature": "SVG, EPS, PDF, AI, DXF, and EMF vector export",
+      "evidence": "reference-corpus.json",
+      "recovery": "All six independent serializers/APIs/CLIs pass complete native corpora for documented fitted-graph options. EMF requires explicit source-device measurements. All 15 public prepared pipelines match all six original outputs. See vector-output-contract.json."
+    },
+    {
+      "feature": "stacked shapes, cutouts, and cutouts grouped by color",
+      "evidence": "wp_batch_settings.html; GUI strings 0x701518 through 0x701570",
+      "recovery": "Shared native traversal, order, direction, holes and visibility are verified for all five implemented writers. Document state/UI behavior remains pending. See vector-output-contract.json."
+    },
+    {
+      "feature": "thin shape-boundary stroke option",
+      "evidence": "wp_batch_settings.html; engine strings near 0x8dd050",
+      "recovery": "option and 0.09375 output constant observed; application conditions pending"
+    },
+    {
+      "feature": "DXF lines plus splines, dense lines only, sparse lines only",
+      "evidence": "wp_batch_settings.html; GUI strings 0x70140c through 0x701480",
+      "recovery": "All three independent curve modes and complete DXF records match 65934 native files across 3264 fitted graphs. Required original normalized float32 palette is retained. API/CLI and 15 coupled pipelines pass. See vector-output-contract.json."
+    },
+    {
+      "feature": "bitmap export with coupled width, height, and scale",
+      "evidence": "wp_single_save.html",
+      "recovery": "documented behavior recovered; rasterization parity pending"
+    },
+    {
+      "feature": "saved configurations and partial pipeline recomputation",
+      "evidence": "wp_adv_save.html; wp_contour_smoothing.html; 033-segment-stage.json through 035-bezier-stage.json",
+      "recovery": "documented behavior and separate stage entry points recovered; cache invalidation pending"
+    },
+    {
+      "feature": "source, segmentation, vector, and path inspection in the GUI",
+      "evidence": "wp_segedit.html; main_view_overview.html",
+      "recovery": "documented behavior recovered; rendering implementation pending"
+    }
+  ],
+  "reference_corpus": {
+    "index": "../evidence/reference-corpus.json",
+    "inputs": 4,
+    "exports": 24,
+    "generation_settings_known": false,
+    "additional_required_cases": [
+      "known-settings exports",
+      "tiny images",
+      "fully transparent input",
+      "alpha transitions",
+      "diagonal contacts",
+      "nested holes",
+      "palette ties",
+      "corner thresholds",
+      "manual edits",
+      "batch failures",
+      "cancellation",
+      "large-image working resize above 200000 pixels",
+      "single-row and single-column loading/measurement behavior"
+    ]
+  },
+  "implementation_status": {
+    "standalone_engine": "Independent settings, palette, blending, segmentation/shadowing, shared contours, supported smoothing/fitting, flood fill and six serializers are implemented. ImageDocument direct stages and completed runTask boundary reproduce native shared caches/geometry, requested versus committed settings and stage-skip effects on one session PRNG. Automatic GUI sequencing, full file conversion, manual edit commands, vector/controller cancellation/errors and GUI remain unfinished.",
+    "production_cli": "JSON settings, fill, palette assignment/refinement/generation, analyze-image automatic analysis, prepared segmentation/contours/smoothing/fitting and six fitted-graph export commands are implemented. Advanced prepared segmentation forwards explicit top-level shadowControl when shadowing is enabled. Image-file conversion, document command workflows and GUI remain unfinished.",
+    "custom_gui": "Working development preview in gui/: React with shadcn/ui, Lucide icons and OpenVector branding. Single viewer, automatic and basic/advanced conversion, segmentation/background editing, PNG/BMP/JPEG/GIF/TIFF input, five vector downloads and shared-document batch screens. Native desktop packaging, remaining interactions and full GUI parity remain unfinished. See gui-contract.json.",
+    "npm_package": "Private 123-file archive artifacts/palette-batch-cancellation-verified/openvector-0.0.0.tgz, SHA-256 209a093b4aeb0e629ccc2b7a656c3532c0f8682e9bec2d21c6c445223a88f231. All source/archive/fresh-install files match. Installed batch palette cancellation/retry and CLI conversion pass with consumer-only reads/writes and denied original/workspace reads and child creation. Installed worker CLI passes separately, with no worker permission inheritance claim. Full application parity and publication remain unfinished.",
+    "npm_publication": "not performed; package remains private while incomplete",
+    "one_to_one_parity": "Bounded component comparisons and all 15 prepared public pipelines pass through fitting in one retained session without seed overrides. The fresh installed package repeats those pipelines. Full image-file/output/application parity is not established.",
+    "github_publication": "Authorized after completion and verification; not performed while full parity remains unfinished.",
+    "image_type_quality": "Canonical CoreSession.analyzeImage now joins independently prepared source/working pixels, full type/quality analysis, Shared type/AA updates, repeated working preparation and automatic palette-count analysis. All 42 successful native controllers and two native fatal/random outcomes match across three sessions. Twenty image and 62 palette feature bits, candidate palettes/weights, recommendation writes, final assignments and random effects agree exactly. Earlier 273 prepared and 16 large-image analyses remain verified. File loading and document/UI lifecycle remain unfinished.",
+    "current_verification": "Palette batch cancellation checkpoint: active palette refinement now polls AbortSignal and the shared worker cancellation flag. Partial source/candidates/PRNG state is retained and retry succeeds; onStage remains completed-task-only. GUI current.complete distinguishes active progress, including repeated 100%, from completion. The real compiled browser shows Palette analysis: 18% and trusted Cancel stops at 36% with source retained, zero outputs and no browser errors. New full runs: core 867/869 and GUI 659/660, zero skips, with exactly the three previously recorded failures. Scoped native/document, batch, worker, profile and Quick Save tests pass. Production build and 123-file offline package install/identity pass. All 43 frozen helpers and original files/settings remain unchanged. Other in-task numerical cancellation, completed browser downloads, full native GUI parity, publication and the Rust/GPUI port remain unfinished. See evidence/palette-batch-cancellation-verification-checkpoint.json.",
+    "shadow_reconstruction": "Private shadow decision models match 51008 native feature/control cases. All 42 prepared shadow features, covariance matrices and principal directions match 2006 original regions; principal iteration matches 15249 native states. Pixel proposals match 1474 hardware-traced calls and all 130 selected assignments. Prepared-state refinement matches 640 explicit cases, 7600 flagged regions, 7576 accepted/24 rejected changes, 24 mixed-decision cases and up to 86 simultaneous shadows, plus all six original image-stage changes. Wider state snapshots, feature bytes, acceptance decisions and final rebuilt maps agree exactly. These kernels now run in canonical prepared segmentation with independent blur and gradients; 578 automatic/supplied complete results and all 72 constructor maps/moments pass. Full image-file conversion and GUI workflow remain unfinished.",
+    "runtime_independence": "Current installed archive matches 907 document/controller actions and 90700 typed parameter comparisons across 20 case entries. This includes 384 actual Qt controller requests with 243 computed/141 skipped, plus both direct-stage corpora. It retains 220 palette edits, 21142 keys, 234 cancellation cases / 498 steps and 9616 progress events. Original-file reads and child creation are denied. Full application parity is unfinished.",
+    "enhance_preprocessing": "Private EnhanceImage and explicit mode-one preparation match 4208 kernel cases and 1616 initial-alpha/repeated-pass cases, including 1728 cutoff-adjacent inputs and 1986 native empty outcomes. Source, installed package and restricted runtime comparisons pass. Median and despeckle now have separate verified implementations; full source/working cache orchestration remains unfinished.",
+    "image_preprocessing": "One private dispatcher reproduces all four modes. Native comparisons cover 10186 median/despeckle kernel cases, 3839 whole dispatch cases, 176 size errors and 123 complete filtered image classifications, alongside the retained Enhance corpus. The private size error preserves the native reason; complete application/UI error handling remains unfinished.",
+    "working_resize": "Private source-preserving working reduction reproduces sampling versus triangle filtering, mixed float32/double channel stores, Geometry omission of zero dimensions and asymmetric ratio precision. All 12084 kernels, 20056 geometries and 92 preparations match; installed and restricted-runtime checks pass. Fresh source/working classification is now integrated; file decoding and stateful cache/profile lifecycle remain unfinished.",
+    "image_state": "Canonical ImageDocument owns decoded source/working rasters, palette/segmentation caches, live contours, smoothing metadata and fitted geometry/output chains on one session PRNG. Fitting changes contour node kinds visible in smoothing hits. The two anti-alias fields remain distinct and native vector defaults are six. File-format orchestration, manual edit commands, cancellation/errors and GUI remain under recovery.",
+    "automatic_image_controller": "Implemented and verified in docs/image-state-contract.json: 42 completed native cases, two empty-peak failures and three retained process sessions. Native recommendation writes are reported separately from raw feature scores; final document choice remains unfinished.",
+    "palette_document": "Canonical ImageDocument palette analysis with progress/cancellation/caller-caught retry. Exact native comparisons: 220 edits, 21142 keys, 234 cancellation cases / 498 steps and 9616 progress events. Original GUI handler, cancel-after-segmentation live buffers, late status 2 and general failure completion remain unfinished; see image-state-contract.json.",
+    "verification_checkpoint": "evidence/document-classification-verification-checkpoint.json",
+    "segmentation_document_recovery": "Canonical ImageDocument.segment now matches all 145 actions on four sources: 16 palette requests, 93 segmentation recomputations and 36 cache hits, with 14500 exact typed parameter comparisons. Shared live grid/palette mutations, supplied colors before key checks, rounded-key collisions, settings, hidden switches and session PRNG agree. Source preparation is independent; native intermediates are expectations only. Segmentation cancellation/errors, vector document stages and GUI remain unfinished.",
+    "settings_field_identity": "Native shadow switch +0x214 is distinct from registered diagonal parameter +0x930. Advanced resolver returns shadowing separately; all 648 raw arithmetic records and numeric values remain unchanged. Current complete document comparisons cover 14500 parameter values. CLI segment/trace-contours forward explicit top-level shadowControl rather than inventing context.",
+    "document_vector_stage_recovery": "Implemented bounded successful decoded-source empty-edit-list document smoothing/fitting, including native stage keys, profiles, committed seventeen-setting controls, shared live contour kind mutations, metadata, fitted cubic/edge output and assembled shape chains. 378 new native actions add 77 smoothing recomputations / 85 hits, 113 fitting recomputations / 45 hits and 37800 typed parameter records. Native responses repeat exactly; independent naive composition and actual document API both match. Manual edits, vector failures/cancellation, GUI mapping and exports remain separate requirements.",
+    "controller_workflow_recovery": "Actual native QObject task-controller constructor, original priority-2 workers and real QCoreApplication queued completion repeat for 384 single-stage requests. Original Qt parent metadata startup stubs are required. Independent ImageDocument.runTask matches completed state, cache gates and distinct palette/non-palette skip commits without fake threads or manual native callbacks. Automatic continuation, busy replacement, controller failures/cancellation and GUI mapping remain under recovery.",
+    "gui_preview": {
+      "contract": "gui-contract.json",
+      "checkpoint": "../evidence/gui-preview-verification-checkpoint.json",
+      "runtime": "Separate private npm project under gui/; shared engine source imports; loopback Node host and processing worker",
+      "engineSourceChanged": false,
+      "published": false
+    },
+    "document_classification": "Independent document.classify and runTask classification match all 380 strict native Qt actions on 19 sources: 133 classifications, 247 interleaved stages, 361 computed and 19 skipped requests. Recommendations, 20-float image features, 62-double palette features, peaks, eleven candidate palettes/weights/scores, full live pixels, all cached geometry, 38000 typed parameter records and PRNG agree. Native source context is explicit; complete file context production remains unverified.",
+    "native_gui_workflow": "Ten fresh successful PNG/BMP-byte pilots and three retained sessions match all final controls, caches, pixels, geometry and 3600 typed parameter records across 36 Auto actions. Source alpha types 0/1/2, both background branches and palette modes 0/1/2 are exercised. Operation 111 proves filename-derived source context through fifteen actual MainWindow loads; canonical library/GUI input now use it. The larger texture passes without a manual override; the earlier zero-context failure is retained. Public Auto integration, photograph branch, manual editing, batch, scheduling/errors, remaining codecs and full GUI parity remain unfinished. See evidence/source-context-verification-checkpoint.json.",
+    "native_gui_profile_defaults": "Operation 108 records three actual settings QObjects: constructor and absent default/batch profile reads. Fresh 628-byte responses repeat exactly, missing keys remain absent, two saved numeric profiles stay unchanged. Independent ImageDocument initialization matches all 17 constructor controls. Missing-profile color conversion yields opaque black; batch category/quality/palette use sentinel 3. Operation 109 confirms selected palette-color count normalization to zero and full clean-preferences MainWindow/Auto flow. Final batch behavior remains unverified.",
+    "encoded_file_context": "decodeImage and resolveImageFilename are named development exports from the root library. Filename parsing preserves native case, aliases, dotfiles and mixed separators; fifteen actual MainWindow loads establish metadata. BMP/PNG matches645/652 byte comparisons, including359 BMP cases and six complete BMP conversions; JPEG matches196 import/preparation cases and five complete conversions; GIF matches82 import/preparation cases, three complete conversions and three native loader failures. TIFF matches1663 decode/source/preparation cases and twenty complete GUI conversions, including300 JPEG-in-TIFF cases. 129 decode rejection cases and two original generic-reader access/heap failures remain recorded. See bmp-input-contract.json, image-input-contract.json, jpeg-input-contract.json gif-input-contract.json and tiff-input-contract.json.",
+    "rust_gpui_port": "After current independent parity is verified, port the engine and CLI to Rust and GUI directly to GPUI, retaining npm distribution and the modernized visual requirements. No port is implemented yet. See rust-port-contract.json.",
+    "batch": "Shared BatchQueue, BatchRunner, batch CLI, openvector/batch API and GUI workspace support basic/advanced controls and five native batch formats. The GUI owns a complete requested profile and shares its existing document/worker. Nine new paired saved-profile workflows cover real supplied palettes, retained counts, load failures and cancellation, alongside the prior filesystem, cancellation and document corpora. Profile UI/service wiring, arbitrary in-task interruption and full GUI conformance remain incomplete. See batch-contract.json.",
+    "saved_profiles": "Shared openvector/profiles API, profile CLI and GUI use one saved list. Save, Play, Fast Forward, batch Use, palette page entry/exit, two-stage Start/Reset and reset-driven name suggestions pass their captured scopes. Reset during editing/background work, altered batch/reset interactions, later guided replay, rename/delete and profile conversion flags remain unfinished. See evidence/profile-navigation-verification-checkpoint.json.",
+    "palette_runtime": "One shared transition kernel serves pending browser edits and authoritative GuiEngine selections. Thirteen paired native workflows cover independent palette/requested counts, add/delete/revert, profile loads, source replacement and real batch jobs. Eighteen complete documents and 1,800 typed parameter records agree. Browser controls and a fresh installed-package checkpoint are recorded in evidence/profile-palettes-verification-checkpoint.json. Full application parity remains unfinished.",
+    "profile_replay_verification": "The independent npm runtime is unchanged apart from README. Frozen root: 692/694 pass, with the same Adam7 and edited-alpha failures. Final GUI and installed verification are recorded in evidence/profile-navigation-verification-checkpoint.json; main-process capability denials and HTTP worker checks remain separate.",
+    "profile_navigation": "One pure palette-page entry rule is shared by browser navigation and profile replay. Three new serial paired workflows add four complete native documents and 400 typed parameter records; a real browser flow completes both palette and segmentation timers. See evidence/profile-navigation-verification-checkpoint.json.",
+    "native_profile_reset": "Five serial paired native reset/name workflows add fifteen complete documents and 1,500 typed parameter records. Both palette pages share their native exit commit; full reset preserves processing controls/count, palette revert backup and PRNG while clearing image/palette state and continuing. One persistent browser name draft follows native reset-driven suggestions. Editing/background and altered-batch reset cases remain unfinished. See evidence/profile-navigation-verification-checkpoint.json.",
+    "numeric_stage_progress_recovery": "Native observers retain 48 accepted completed-state comparisons and 868 exact fractions across seven selectors. Defined label storage repeats its 869 cancellation/retry cases; defined cubic storage now supports 176 fitting interruption workflows, including sixteen-region progress, contour/region reconstruction and first fitting. The independent retained owner and document match 352 direct/task workflows through all captured checkpoints and cleanup status 2. Batch, CLI worker and GUI controller forward fitting cancellation with no completed event/output and support retry. A fresh 123-file installed package passes 352 restricted public-API workflows, installed CLI/native geometry and worker cancellation/retry. Trusted browser cancellation stops at 47% after an active 12% screenshot and retry saves one SVG. Full core 885/887 and GUI 660/661 retain the known three failures. Segmentation/smoothing interruption, partial-chain/original GUI conformance, complete downloads, publication and Rust/GPUI remain unfinished. See stage-progress-contract.json and evidence/document-fitting-verification-checkpoint.json."
+  },
+  "known_settings_native_reference": {
+    "contract": "engine-reference-contract.json",
+    "recording": "../evidence/engine-pipeline-native-reference.json",
+    "inputs": 15,
+    "exports": 90,
+    "scope": "Original staged core pipeline and six-format export from BGRA bytes, explicit fixed color counts, and all 100 recorded parameters. Independent full-conversion parity remains untested."
+  },
+  "project": {
+    "name": "openvector",
+    "npm_package": "openvector",
+    "cli": "openvector",
+    "github_publication": "Publish the completed and verified independent implementation in the openvector GitHub repository, as requested by the user. Publication has not occurred."
+  },
+  "verification_limits": {
+    "worker_permissions": "The Node 24.12 permission model does not inherit into workers. The prior batch-worker-installed-isolation.json workerInheritedDenials=true claim is contradicted by actual reads. Current restricted installed tests cover the direct API, with CLI/worker tests reported separately. See batch-document-load-installed-isolation.json and docs/batch-contract.json."
+  }
+}

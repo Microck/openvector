@@ -1,0 +1,18 @@
+{
+  "project": "openvector",
+  "status": "Three paired native workflows pass complete document and exposed history/pixel comparisons after fixing sampler palette ownership and disabled-sampler bounds. Frozen GUI 290/290, installed direct 257/257, HTTP 6/6 and installed CLI 19/19 pass. Full root verification finishes with 709/711 passing and the two known native-memory-dependent failures; full parity remains unproven.",
+  "rootLimit": "The known alpha-premultiplied case now fails at the live-palette bounds check instead of returning finite coordinates different from native NaNs. Native samples outside its two-color palette with color ID 2 in this case. The port does not read undefined memory, clamp the ID or substitute creation colors to conceal that condition. Its existing failing assertion remains visible. The separate uninitialized 16-bit Adam7 decoding failure also remains visible.",
+  "colorOwnership": "Edited regions retain their creation colors for contour geometry. Smoothing coordinate initialization samples the live processing palette loaded from selected controls. Those colors can differ after an edit; passing region creation colors to the live sampler changes the resulting curves.",
+  "samplingBoundary": "Anti-aliasing disabled skips native coordinate color sampling entirely. Edited region IDs may exceed a reloaded live palette in that path. Validate nonnegative integer region color IDs always, and live-palette bounds when sampling is enabled. The finite native editor corpus supplies six witnesses for this distinction. Never clamp an ID or substitute a different palette for an enabled sampler.",
+  "scope": "Advanced guided segmentation edits followed by Back, Start, Reset or Next. Compare live editor pixels, undo/redo records and keys, selected profile, palette runtime and complete document state.",
+  "referenceBoundary": "A separate opt-in helper submits declared ToolActionRecord values to the original takeAction(ToolActionRecord,bool) model slot. It never sends native mouse/key events or answers native dialogs. Replay's active-modal abort guard remains enabled. Accepted reference executables stay unchanged.",
+  "observation": "After Edit Segmentation has initialized the owned QImage, read it and the selected profile's undo/redo histories on later model snapshots while a source exists. Before entry or after full reset, read only the constructed history lists. Do not treat absent editor-image observations as cleared pixels.",
+  "completion": "Repeat native responses byte-for-byte, reparse complete responses, preserve all original installation files/settings/input desktop, then pass differential engine/service tests and real React checks for any necessary implementation changes.",
+  "nativeAudit": "../evidence/profile-history-native-audit.json",
+  "fixture": "../test/fixtures/profile-history-reference.ndjson.gz",
+  "checkpoint": "../evidence/profile-history-verification-checkpoint.json",
+  "browser": "../evidence/profile-history-browser-verification.json",
+  "historyScope": "55 native observations compare undo/redo counts. Available image observations additionally compare dimensions, serialized edit keys and every opaque display pixel. Individual binary history payloads are retained, not exposed by the GUI owner for direct comparison.",
+  "browserScope": "Real green color selection, Fill at pixel 2,2, Next, smoothing timer and Back. Exact native SVG, controls and region/history counts match. Prepared native commands use zero unused Fill coordinates; browser gestures use -1 sentinels. Do not claim serialized stage-key equality across those forms.",
+  "fullApplicationParity": false
+}

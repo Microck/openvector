@@ -1,0 +1,461 @@
+{
+  "schema": 1,
+  "files": [
+    {
+      "path": "test/fixtures/ai-reference.json.gz",
+      "bytes": 11646346,
+      "sha256": "96f05e041141656b744b6ee2920fdbd9befed412e95e3d9628203053d9dc9816"
+    },
+    {
+      "path": "test/fixtures/anti-alias-segmentation-reference.json",
+      "bytes": 1752289,
+      "sha256": "fc6bf0aab562b91250377b911177852a25aae7b6f468cd4d372f239edfe13be1"
+    },
+    {
+      "path": "test/fixtures/blend-sample-reference.json",
+      "bytes": 2302319,
+      "sha256": "4b338d715cf2e74ed365ac173abe60838dd0e27ba6744494d37d386c8704f807"
+    },
+    {
+      "path": "test/fixtures/bmp-short-matrix-input-reference.ndjson.gz",
+      "bytes": 2515946,
+      "sha256": "40c8d52ca62776a0f8f2e2813b33978143009f6b0fb3b6c95254c5af38615459"
+    },
+    {
+      "path": "test/fixtures/classification-model-reference.ndjson.gz",
+      "bytes": 8585741,
+      "sha256": "181ac5d621f472d4325df716a50ab79ade9dd707564c236a5a76a203f3af40ac"
+    },
+    {
+      "path": "test/fixtures/classifier-blur-reference.ndjson.gz",
+      "bytes": 1900006,
+      "sha256": "82bd36ad32c97432323d00768ca65e4c5f8b4d6701117168ce5ac77a08a57f09"
+    },
+    {
+      "path": "test/fixtures/classifier-edges-reference.ndjson.gz",
+      "bytes": 1707933,
+      "sha256": "237cde14b17163ba81b5f5063c9fd002349fe89b10d2c48c87347a1ba9ddf988"
+    },
+    {
+      "path": "test/fixtures/clustered-anti-alias-segmentation-reference.json",
+      "bytes": 1754333,
+      "sha256": "19f2ac7431a07df6b5031333b311ff0b34918b5e2a36605e831cf228243524fe"
+    },
+    {
+      "path": "test/fixtures/contour-extraction-reference.json",
+      "bytes": 21336530,
+      "sha256": "c1afa2c5a67c05959b055b4dc61144f10b847cc568cb90856dd2f3a276d7fedf"
+    },
+    {
+      "path": "test/fixtures/contour-neighborhoods-reference.json",
+      "bytes": 45920533,
+      "sha256": "30c8c72b1e6274ad94f84af022088e5b6a328f45f02ff17402a4c811df5425bb"
+    },
+    {
+      "path": "test/fixtures/contour-preparation-reference.json",
+      "bytes": 72220294,
+      "sha256": "e4b1911b6db75fe941b780d62ead06afa2159ac74a8d47c37fd33997134f957d"
+    },
+    {
+      "path": "test/fixtures/contour-puncturing-reference.json",
+      "bytes": 66740200,
+      "sha256": "c77c75f0b5bf547b5bfd47659efa91d3b8bd15d6d70778654e6bfc1ccea8bbeb"
+    },
+    {
+      "path": "test/fixtures/curvature-prior-reference.json",
+      "bytes": 1824538,
+      "sha256": "54812eeb1264e53c4ffc6aba033a465c8c508ea17792586be2c5e7ae6965b426"
+    },
+    {
+      "path": "test/fixtures/diagonal-contacts-reference.json",
+      "bytes": 1337837,
+      "sha256": "6d0bdb10efe2c3cd1412599a98d70710665d21db4a7d5a62120f5dea02142c12"
+    },
+    {
+      "path": "test/fixtures/document-automatic-reference.ndjson.gz",
+      "bytes": 1240796,
+      "sha256": "dcc5a0d828984505d6d482356e9894835db44eda6d12edd8c639ef9290154003"
+    },
+    {
+      "path": "test/fixtures/document-cancellation-reference.ndjson.gz",
+      "bytes": 2259597,
+      "sha256": "d684e7287866e9a82978c87756c804476195c1ef3c8443acd442a56e8c7154a0"
+    },
+    {
+      "path": "test/fixtures/dxf-cli-reference.json",
+      "bytes": 1328815,
+      "sha256": "3d79a77e9dbc0cbe93b453b84bf4529e8d0a7575bbae88e3be7e48d3d56258a6"
+    },
+    {
+      "path": "test/fixtures/dxf-coordinates-reference.ndjson.gz",
+      "bytes": 7930418,
+      "sha256": "269fa13510f0ea4c5ad8770f7d65e12e650c745df2a98905594fa94e0fef7f7c"
+    },
+    {
+      "path": "test/fixtures/dxf-reference/part-000.ndjson.gz",
+      "bytes": 33613129,
+      "sha256": "e0eff81ea994129ab4674adcea2c75c63c06397833df71e8a05ec5bf9dd13fc0"
+    },
+    {
+      "path": "test/fixtures/dxf-reference/part-001.ndjson.gz",
+      "bytes": 33622924,
+      "sha256": "5a31386c596f5d52efafe4b0dc86b11460046e65103af0260ac9e1f14ffd4622"
+    },
+    {
+      "path": "test/fixtures/dxf-reference/part-002.ndjson.gz",
+      "bytes": 33592401,
+      "sha256": "5751355a0ad7d800bd9df8ce68425e46ba54cf85cdb0a59cd92fd98bdee4eecd"
+    },
+    {
+      "path": "test/fixtures/dxf-reference/part-003.ndjson.gz",
+      "bytes": 33595981,
+      "sha256": "4a5a54a087ee7d34ed9b3b917b7fbf5d05a45eeeb9f590eb21f01eba93186f98"
+    },
+    {
+      "path": "test/fixtures/dxf-reference/part-004.ndjson.gz",
+      "bytes": 33582174,
+      "sha256": "54da2666deadbbaff4839f80e53269f7d1a356a210d7ed9e15a260187f444069"
+    },
+    {
+      "path": "test/fixtures/dxf-reference/part-005.ndjson.gz",
+      "bytes": 2254098,
+      "sha256": "38e080a1c391d76acdc37d0b5e5e25d316bd7f54eaa0782223d8ab20e0d54944"
+    },
+    {
+      "path": "test/fixtures/emf-coordinates-reference.ndjson.gz",
+      "bytes": 3437451,
+      "sha256": "5b78f12df9b41114e3cac42cf3f2d70ca20ecb54db71e4532461cdfa197780c2"
+    },
+    {
+      "path": "test/fixtures/emf-reference.ndjson.gz",
+      "bytes": 23476873,
+      "sha256": "b296f299ef6ee8a9957d0560c17123d968cae8ec18df78fbde08635a24cbd532"
+    },
+    {
+      "path": "test/fixtures/eps-reference.json.gz",
+      "bytes": 18226795,
+      "sha256": "859d7489ee37e3e5f244a312e6594db5fee5f541815e0416427ae91cc5d5f857"
+    },
+    {
+      "path": "test/fixtures/export-interruption-reference.ndjson.gz",
+      "bytes": 3664858,
+      "sha256": "72af339a443558c64839ecbc12171a78d6de8c30345de92b401e9ccfcd8c83e4"
+    },
+    {
+      "path": "test/fixtures/fitting-cost-reference.json",
+      "bytes": 2113065,
+      "sha256": "dc241d0c8a5a07dd3256e2c75077a91f25e96ecef702507cd18d516ce787a97d"
+    },
+    {
+      "path": "test/fixtures/fitting-full-reference.json",
+      "bytes": 47307767,
+      "sha256": "f43d94482c48ef4b4b701052d9095f902471e4617c51428dcee05af3eff2e2b9"
+    },
+    {
+      "path": "test/fixtures/fitting-keepers-reference.json",
+      "bytes": 3129768,
+      "sha256": "2424160853aab4626c7e7e5c89c17f84512de4941514eff9b0067f612a9b4f9f"
+    },
+    {
+      "path": "test/fixtures/fitting-region-progress-reference.ndjson.gz",
+      "bytes": 2582244,
+      "sha256": "a7ae6a482b9755ba4d425522f01823e2541317a0a2c0aae1cf97a7b8d82cd02a"
+    },
+    {
+      "path": "test/fixtures/fitting-samples-reference.json",
+      "bytes": 2109862,
+      "sha256": "3a9e4cc705ee37cbbcd351f098c8a1cc902d739aa0ffe8d84fd15225892b241d"
+    },
+    {
+      "path": "test/fixtures/fresh-captures-20261022.ndjson.gz",
+      "bytes": 5799041,
+      "sha256": "1d9dc669264da8e1b74e4e8298f24db08c9976c94406be297f645d6e574bc67b"
+    },
+    {
+      "path": "test/fixtures/gif-input-reference.ndjson.gz",
+      "bytes": 4326248,
+      "sha256": "f233ecfab01f36cbe481f61103426d59e1f00cec053ec9430d04187affd3e66b"
+    },
+    {
+      "path": "test/fixtures/image-background-reference.ndjson.br",
+      "bytes": 21192488,
+      "sha256": "57594c6fac6feccd355cf4471ba74092d626b8b0a2347fe16dc2fcde53b95300"
+    },
+    {
+      "path": "test/fixtures/image-classifier-model-reference.ndjson.gz",
+      "bytes": 2856435,
+      "sha256": "8269d9c9eacc932fda7e6a27ebdfffd9ec04cb38401869caaebe1c9e6e82ce4f"
+    },
+    {
+      "path": "test/fixtures/image-enhance-kernel-reference.ndjson.gz",
+      "bytes": 1347220,
+      "sha256": "a84d43e9684af58a931927a2e54ed3a8f45de7a3bd565465481f1ae9944cd325"
+    },
+    {
+      "path": "test/fixtures/image-enhance-preparation-reference.ndjson.gz",
+      "bytes": 1309501,
+      "sha256": "baa0c704cd3965a1b37918686e7c2aede9c5018ec65358e2e0730453c55909fd"
+    },
+    {
+      "path": "test/fixtures/image-filters-kernel-reference.ndjson.gz",
+      "bytes": 5373701,
+      "sha256": "bfbfd44d20f94c81de25e6ef167f9dffb2a36bc297e35ee191c379f229d70bfc"
+    },
+    {
+      "path": "test/fixtures/image-filters-preparation-reference.ndjson.gz",
+      "bytes": 4020465,
+      "sha256": "1960e939c45f6db2742f1fd17c6eeefbf3eae37f520bd873d436cc359582c7ab"
+    },
+    {
+      "path": "test/fixtures/image-input-reference.ndjson.gz",
+      "bytes": 2486026,
+      "sha256": "0559b95a44e14cc700b8f94f9487c43cb5c196d4b964dfdfb6c209de0166b34e"
+    },
+    {
+      "path": "test/fixtures/image-resize-kernel-reference.ndjson.gz",
+      "bytes": 2425323,
+      "sha256": "e978e5f0c1867fdafa1bde3a53dc6771fadb84e95bb14ba9691f95351ea1593e"
+    },
+    {
+      "path": "test/fixtures/image-resize-working-reference.ndjson.gz",
+      "bytes": 90259973,
+      "sha256": "2528d1eb7d7ad472eadf4d5c452fabff1c675f5f23468928e41c38a907cc0c39"
+    },
+    {
+      "path": "test/fixtures/image-source-gradients-reference.ndjson.gz",
+      "bytes": 3528923,
+      "sha256": "0050ec5fe69f7634a83edf5ef43d278bd88e8c82f6f292a7f4df35b35ee39fb4"
+    },
+    {
+      "path": "test/fixtures/initial-regions-reference.json",
+      "bytes": 2125216,
+      "sha256": "9a395b2f0f52dd58a4839f5114c7deb007bd5395efe7a3e762d92b336a34187f"
+    },
+    {
+      "path": "test/fixtures/jpeg-expanded-verified-input-reference.ndjson.gz",
+      "bytes": 9465712,
+      "sha256": "449de0f3c42071837dd92cbe9a4a940f6dbee92aaea673b37e63ea78c5fb9f27"
+    },
+    {
+      "path": "test/fixtures/output-shapes-reference.json",
+      "bytes": 38144671,
+      "sha256": "fb284dd6ecb7ee64e07e6a7637f7b66a5414a790c93bbdbe9f0dfb62875bffd1"
+    },
+    {
+      "path": "test/fixtures/palette-resize-cancellation-reference.ndjson.gz",
+      "bytes": 1159721,
+      "sha256": "0079ab64b7bb6b4291d798bab0d95fbc33c68af33cf6c93f26a9be05fa5e4513"
+    },
+    {
+      "path": "test/fixtures/pdf-reference.json.gz",
+      "bytes": 11598536,
+      "sha256": "7ca4d12450ba2ffc85e2f59f1473f8ecdddecc2926d8452a7e0b15f7b84ea67b"
+    },
+    {
+      "path": "test/fixtures/peaks-reference.json",
+      "bytes": 3955496,
+      "sha256": "5b4841885da4b9df5063de1968ab783b1b703b094c6420637305622fdb6b559c"
+    },
+    {
+      "path": "test/fixtures/presegmentation-reference.json",
+      "bytes": 4956476,
+      "sha256": "e68bd1328bd9dc3bcf0eed5db13d163f56ee89775dddf4e6f56535e677e21348"
+    },
+    {
+      "path": "test/fixtures/region-pass-reference.json",
+      "bytes": 1400558,
+      "sha256": "48f131a712e263cb51c4c9bc6d911c1160282d9c1b5ad5fa2f248c252d5712d9"
+    },
+    {
+      "path": "test/fixtures/score-reference.json",
+      "bytes": 1566384,
+      "sha256": "49e84770aebe110c00a9a8be3493103118242295e5719d4f0fb39743b9502a3a"
+    },
+    {
+      "path": "test/fixtures/segmentation-after-palette-cancellation-reference.ndjson.gz",
+      "bytes": 4179938,
+      "sha256": "e2de22f28c1b7fdbf84f4f591e8bf6176bed7fe3adb06686b8f4fd188eeda663"
+    },
+    {
+      "path": "test/fixtures/shadow-models-reference.ndjson.gz",
+      "bytes": 8938225,
+      "sha256": "f4b861e286698c6ec9f1c079873b9de28bc760585c2e3e41def12c024ffaa9f4"
+    },
+    {
+      "path": "test/fixtures/shadow-refinement-reference.ndjson.gz",
+      "bytes": 10597699,
+      "sha256": "3284460678320d4235bd9590d0a7cccf57d56f0afa29e9b72c37a64dc3816cb8"
+    },
+    {
+      "path": "test/fixtures/smoothing-cached-optimizer-reference.json",
+      "bytes": 7082756,
+      "sha256": "7180917de7d507e24a04698a8db682da6c1ff0eb60439cd8fa9fccdba54f9b32"
+    },
+    {
+      "path": "test/fixtures/smoothing-cancellation-reference.ndjson.gz",
+      "bytes": 1380131,
+      "sha256": "feba21a0fe9161a32d2da3d85a22f1a1a0bc2493fee6580cdd53dd0c12da5fbc"
+    },
+    {
+      "path": "test/fixtures/smoothing-full-prefix-reference.json",
+      "bytes": 18523396,
+      "sha256": "48a646c4e78514e3ddab834105ef679c601bac9044aae3b2ac72c4ecc40108cf"
+    },
+    {
+      "path": "test/fixtures/smoothing-full-sessions-reference.json",
+      "bytes": 52382856,
+      "sha256": "f290f4646b49d689d1ce15aefddf6e93d477938e9f471f2eaef8b2c484b97dc4"
+    },
+    {
+      "path": "test/fixtures/smoothing-image-line-search-reference.json",
+      "bytes": 50341825,
+      "sha256": "24b1a5c31d220b8ffe73582561e4dd390ec0d8e0f2bb36d2abffb17845d3110a"
+    },
+    {
+      "path": "test/fixtures/smoothing-image-measurement-reference.json",
+      "bytes": 102109184,
+      "sha256": "efdd0908f72a3a53f329cb6895c2853e461fca9eab01c473c61ddcca948bc722"
+    },
+    {
+      "path": "test/fixtures/smoothing-image-objective-reference.json",
+      "bytes": 39728657,
+      "sha256": "f757268276b5510ed9278bd1256364a51b4dd7c3fa86f18b2830d2009c98a6bf"
+    },
+    {
+      "path": "test/fixtures/smoothing-image-objective-sequence-reference.json",
+      "bytes": 25480110,
+      "sha256": "467bed988c70689f90af8d103b97535d5a961b3930dff44fd22820fc4c946733"
+    },
+    {
+      "path": "test/fixtures/smoothing-image-optimizer-reference.json",
+      "bytes": 16528797,
+      "sha256": "0504c9fb0641a530032742d37db82f53bd29542b1e127878f34d539f3dfc153a"
+    },
+    {
+      "path": "test/fixtures/smoothing-image-sequence-reference.json",
+      "bytes": 180426538,
+      "sha256": "dd2e20ab6b256e7c94ca019df9270dfac0b01e9588c42f29f48de3ee2766287d"
+    },
+    {
+      "path": "test/fixtures/smoothing-initialization-mixed-reference.json",
+      "bytes": 1367913,
+      "sha256": "cd8b8da4cfaa8a5ba79d9979cc13a86e95ec13fef485ce348aa87e121cb94158"
+    },
+    {
+      "path": "test/fixtures/smoothing-initialization-reference.json",
+      "bytes": 38568975,
+      "sha256": "f347cfb077120694f66501569d4eb628bd9017fd3a79159c4eb505d9dd628c6c"
+    },
+    {
+      "path": "test/fixtures/smoothing-line-search-reference.json",
+      "bytes": 50145968,
+      "sha256": "4b3eea8ee5ac6c1723fe326329817bd605d4be0413f2761220dcc36df03d7dd8"
+    },
+    {
+      "path": "test/fixtures/smoothing-objective-reference.json",
+      "bytes": 79118416,
+      "sha256": "de13a4142261530d21cf04f987761a21a32afc4d9070515ea60f932a4ed9efb4"
+    },
+    {
+      "path": "test/fixtures/smoothing-optimizer-reference.json",
+      "bytes": 9410809,
+      "sha256": "8a3ba0a82691d55eb8f8ca2aa579069e5c76ac99b7aba52d855a0c930bc933f6"
+    },
+    {
+      "path": "test/fixtures/smoothing-preadjustment-reference.json",
+      "bytes": 37874393,
+      "sha256": "1d3a02d140a2d9358cc14bd9fc3f5a15aa3254eb7f56e9f57de16099cdf3348a"
+    },
+    {
+      "path": "test/fixtures/smoothing-repair-optimizer-reference.json",
+      "bytes": 20020386,
+      "sha256": "dd6315a8d9558f0808b2dbbeff42f4fd3c9971b0a742d572404d4acd226fcab4"
+    },
+    {
+      "path": "test/fixtures/smoothing-repair-reference.json",
+      "bytes": 31833357,
+      "sha256": "78cc16236f6308e0b79a92249bdba0265162ab24d776ae1c8b7f69ef6adc4e4c"
+    },
+    {
+      "path": "test/fixtures/source-shrink-fresh-20261021.ndjson.gz",
+      "bytes": 42889562,
+      "sha256": "b102e0549efe21f9830ecdf3a7de724698c8078cbddb2463b972e97e6c51ae51"
+    },
+    {
+      "path": "test/fixtures/source-shrink-partial-three-20261021.ndjson.gz",
+      "bytes": 16880303,
+      "sha256": "4b6b6170bd465464016e43b57e32789ddb9d76fe2fe59328f6631acc0c2fd55a"
+    },
+    {
+      "path": "test/fixtures/subpixel-color-selection-reference.json",
+      "bytes": 24764657,
+      "sha256": "f7be0b9ee1b4199e92d438be4e3b3bb917a2c2031914055956eaf36243fc4cae"
+    },
+    {
+      "path": "test/fixtures/subpixel-merge-cost-reference.json",
+      "bytes": 3479907,
+      "sha256": "b38b77c881aa77bf2ebe05924b791e1279fedde43b0cac654c58564344552e19"
+    },
+    {
+      "path": "test/fixtures/subpixel-merge-reference.json",
+      "bytes": 12523765,
+      "sha256": "965b0f695f213aa03c865afade603cf2f7c271691c738f0a17503d68cb0343f5"
+    },
+    {
+      "path": "test/fixtures/subpixel-optimization-reference.json",
+      "bytes": 1385159,
+      "sha256": "18eb5a0f6e24735e8aff587d7c014c9bf5994a3055ea1e03754766dc17be52fe"
+    },
+    {
+      "path": "test/fixtures/subpixel-palette-projection-reference.json",
+      "bytes": 68670721,
+      "sha256": "dc4b96faf8134095fd03f8be1bdbc1ef6d4e94a3952116354dbb18ff35651cbb"
+    },
+    {
+      "path": "test/fixtures/subpixel-pass-reference.json",
+      "bytes": 43516984,
+      "sha256": "55f26311dec0ed732bb42291b4c80be8e027918d4c72783e9bc7254a472ff71b"
+    },
+    {
+      "path": "test/fixtures/subpixel-rebuild-reference.json",
+      "bytes": 39869775,
+      "sha256": "3892cbcf917b441dd003eeebda4323f5b75fdd016bcaa4f4eb8fb8ac3c590d4e"
+    },
+    {
+      "path": "test/fixtures/subpixel-statistics-reference.json",
+      "bytes": 11256786,
+      "sha256": "6cba015277607d2aeca5d06114bb43ea13d57f51a814a26034f20ebd05cbe343"
+    },
+    {
+      "path": "test/fixtures/supplied-palette-segmentation-reference.json",
+      "bytes": 15150330,
+      "sha256": "7a37a2f4247e485cfdab8556efa5870493b7537246e5f45c997af0040a88c10c"
+    },
+    {
+      "path": "test/fixtures/svg-reference.json",
+      "bytes": 113491046,
+      "sha256": "9b0fa067a5e0200b9fda023fd28678db802b9707dc1a05347dddc3fc37052d76"
+    },
+    {
+      "path": "test/fixtures/tiff-quantum-matrix-input-reference.ndjson.gz",
+      "bytes": 1746402,
+      "sha256": "a4b5b54484b57f340d4d9be44a281312e3a8e0f2f5a4fe63a67bf2c088801d1a"
+    },
+    {
+      "path": "test/fixtures/unweighted-diagonal-segmentation-reference.json",
+      "bytes": 1276369,
+      "sha256": "90e1227b13c94c7c0696faedda332a1c4943c91706ea1f07ffae121e30209505"
+    },
+    {
+      "path": "test/fixtures/unweighted-segmentation-reference.json",
+      "bytes": 1287462,
+      "sha256": "9523526079a8ae323ed8567089f888af45a05accc52bb3a9947bda0bf46271a9"
+    },
+    {
+      "path": "test/fixtures/weighted-score-reference.json",
+      "bytes": 2299499,
+      "sha256": "c2d0fd80b68d61ca8fa85b8505b76149348ef684a6b172715cefe01d0fc4222e"
+    }
+  ],
+  "totalBytes": 1936441031
+}

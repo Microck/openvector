@@ -1,0 +1,66 @@
+{
+  "component": "Independent BMP input",
+  "status": "359 repeat-identical original BMP import/source/preparation cases and six complete native GUI conversions match. Full format/application parity remains unfinished.",
+  "targetSha256": "c491656b962debc215a8b6e757a9b2949ffe50a36b5f2db692706bcd4ebface1",
+  "reference": [
+    "../test/fixtures/image-input-reference.ndjson.gz",
+    "../test/fixtures/bmp-layout-input-reference.ndjson.gz",
+    "../test/fixtures/bmp-bitfields-input-reference.ndjson.gz",
+    "../test/fixtures/bmp-header-variants-input-reference.ndjson.gz",
+    "../test/fixtures/bmp-short-matrix-input-reference.ndjson.gz",
+    "../test/fixtures/bmp-rle-input-reference.ndjson.gz",
+    "../test/fixtures/bmp-rle-controls-input-reference.ndjson.gz",
+    "../test/fixtures/bmp-palettes-input-reference.ndjson.gz",
+    "../test/fixtures/bmp-wrappers-input-reference.ndjson.gz",
+    "../test/fixtures/bmp-ignored-masks-input-reference.ndjson.gz",
+    "../test/fixtures/bmp-expanded-conversion-reference.ndjson.gz"
+  ],
+  "contract": "Own decoded BGRA bytes, intrinsic matte and dimensions must match original raw/source/working/preparation bytes. Support packed palettes and truecolor storage through native row ordering and Q8 bitfield expansion. Do not use reference pixels as runtime input. Preserve the existing failing BMP/PNG suite.",
+  "sources": [
+    "https://learn.microsoft.com/en-us/windows/win32/api/wingdi/ns-wingdi-bitmapinfoheader",
+    "https://learn.microsoft.com/en-us/windows/win32/gdi/bitmap-header-types",
+    "https://svn.dslinux.org/svn/tags/imagemagick/imagemagick-6.4.2/coders/bmp.c"
+  ],
+  "authority": "Microsoft defines layout; original captures and REA define legacy pixel behavior. Source mirror is causal context, not asserted identical linked source.",
+  "remaining": "Multi-image arrays beyond the first raster, metadata/color profiles, malformed and truncated files, exact errors and full-word mask undefined/hanging native behavior require further investigation. Full application and Rust/GPUI parity remain unproven.",
+  "fullApplicationParity": false,
+  "published": false,
+  "supported": {
+    "headers": [
+      12,
+      40,
+      52,
+      56,
+      64,
+      108,
+      124
+    ],
+    "bits": [
+      1,
+      4,
+      8,
+      16,
+      24,
+      32
+    ],
+    "storage": "Indexed palettes, RGB555 defaults, BI_BITFIELDS, RGB24, RGB32, RLE4 and RLE8, both row directions, reduced declared palettes and native palette strides. BM and CI identifiers and nested BA prefixes decode their first raster.",
+    "nativeQuirks": "Preserve cached matte before BI_RGB resets masks, native opacity inversion, 52-byte alpha read from following storage, 64-byte three-byte palette entries, BA root-relative palette/pixel offsets, ignored 24-bit masks and Q8 bitfield rounding.",
+    "exhaustive": "Three 256-by-256 matrices cover all 65,536 packed 16-bit values under RGB555, RGB565 and RGBA4444.",
+    "rle": "Encoded/absolute commands, nibble ordering, word padding, EOL, delta, early EOB and zero-filled tight raster."
+  },
+  "coverage": {
+    "retainedCases": 44,
+    "newCases": 315,
+    "totalSuccessfulCases": 359,
+    "completeConversions": 6,
+    "freshCompleteConversionResponses": 12,
+    "canonicalSuite": "../test/bmp-input.test.mjs",
+    "guiSuite": "../gui/test/bmp-input.test.mjs",
+    "cliSuite": "../test/cli-vectorize.test.mjs"
+  },
+  "rea": {
+    "analysis": "../evidence/1115-native-bmp-reader-analysis.json",
+    "entry": "0x6533a0",
+    "scope": "REA projected function covers noncontiguous native ranges and does not establish the entire pixel import path. Exact native byte captures establish observed behavior."
+  }
+}

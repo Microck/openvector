@@ -1,0 +1,12 @@
+{
+  "scope": "Native palette creation colors before a selected fixed-palette reload. Assertions only; heap bytes never supply independent processing inputs.",
+  "inputSha256": "42f54f02e8e2df8c9bfee3827ad08807a5fed243f4f1aa4a86f05d33eab6dec7",
+  "nativeResponseSha256": "0277da07eb27b5ad17d9c1b6a47bd169ab8b4e36a71c4d542729351c6e125571",
+  "nativeRequestSha256": "45d2f72f82d6e3189d3e5537cc8df592d3063d297e94f453183d62818d956247",
+  "creationPaletteBgraBits": "000000000000000000000000000000008180803d8180803e8180003e8180803e00000000000000008180003f8180003f",
+  "reloadedPaletteCount": 2,
+  "invalidNativeColorIndex": 2,
+  "nativeReadInstruction": "0x4a268d",
+  "nativeReadOperand": "[edi]",
+  "originalInstructionWindowUnchanged": true
+}

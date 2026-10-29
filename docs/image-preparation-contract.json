@@ -1,0 +1,143 @@
+{
+  "component": "Decoded Q8 image preparation",
+  "targetSha256": "c491656b962debc215a8b6e757a9b2949ffe50a36b5f2db692706bcd4ebface1",
+  "scope": "Private kernels and one preprocessing dispatcher over validated decoded BGRA bytes, explicit mode 0..3 and amount 0..3. Large-image working reduction is separately verified by image-resize-contract.json. File decoding, full cache lifecycle and GUI profile selection remain unfinished.",
+  "initialAlpha": "Use the existing premultiplyClassifierPixels kernel exactly once before preprocessing. Preserve alpha.",
+  "enhance": {
+    "reference": "0x4d6430, wrapper 0x4ae620, dispatcher 0x472a00",
+    "dimensions": "Positive integer width and height, exact BGRA byte length. Return an empty image with dimensions zero when either dimension is below 5.",
+    "weights": [
+      5,
+      8,
+      10,
+      8,
+      5,
+      8,
+      20,
+      40,
+      20,
+      8,
+      10,
+      40,
+      80,
+      40,
+      10,
+      8,
+      20,
+      40,
+      20,
+      8,
+      5,
+      8,
+      10,
+      8,
+      5
+    ],
+    "border": "Clamp each of the 25 row-major tap coordinates to the image bounds.",
+    "distance": "In double arithmetic, compute red term (((Rc+Rn)*0.5+512)*dR)*dR*(1/255), then add 4*dG*dG, then ((767-(Bc+Bn)*0.5)*dB)*dB*(1/255), then ((767-(Oc+On)*0.5)*dO)*dO*(1/255). O=255-alpha. Accept only distance <2601.",
+    "accumulation": "Accumulate each accepted BGRO channel times its integer weight into a float32 sum. Count is the sum of accepted weights. The center is always accepted.",
+    "normalization": "halfCount=float32(count*0.5); reciprocal=1/count; byte=trunc((sum+halfCount-1)*reciprocal). Convert opacity back to alpha. Preserve this evaluation order.",
+    "ownership": "Return owned output bytes and preserve the caller's input.",
+    "modeOne": "Premultiply the initial decoded bytes once, then run EnhanceImage amount times for explicit integer amount 0..3. Amount zero performs no filter. An empty result remains empty.",
+    "verification": {
+      "cases": 4208,
+      "emptyKernelCases": 1269,
+      "kernelBytes": 3431072,
+      "cutoffAdjacentCases": 1728,
+      "wholePreparationCases": 1616,
+      "emptyPreparationCases": 717,
+      "preparationBytes": 2139216,
+      "freshNativeResponsesRepeatIdentically": true,
+      "originalInstructionsPatched": false,
+      "test": "../test/image-preparation.test.mjs",
+      "source": "../src/image-preparation.mjs",
+      "fixtures": [
+        "../test/fixtures/image-enhance-kernel-reference.ndjson.gz",
+        "../test/fixtures/image-enhance-preparation-reference.ndjson.gz"
+      ],
+      "proof": "../evidence/image-enhance-native-reference.json",
+      "installedPackage": "../evidence/image-enhance-package-archive-verification.json",
+      "restrictedRuntime": "../evidence/isolated-image-enhance-verification.json"
+    }
+  },
+  "fullApplicationParity": false,
+  "published": false,
+  "reduceNoise": {
+    "reference": "0x4bb750, wrapper 0x4ae7f0, nonpeak median 0x4bb5e0",
+    "kernelWidth": "3 for amounts 0 and 1, 5 for amount 2, 7 for amount 3. Radius-zero sigma-0.5 kernel selection yields 3.",
+    "border": "Clamp each row-major neighborhood coordinate to image bounds.",
+    "selection": "For each independent channel, choose sorted sample index floor(kernelWidth squared/2). If the chosen value is the smallest unique value and another value exists, use the next unique value. If it is the greatest unique value and a previous value exists, use the previous unique value. A constant field remains constant.",
+    "alpha": "Native channels are BGRO. For odd neighborhoods, nonpeak median is invariant under the reversal O=255-alpha, so direct alpha processing produces the same byte.",
+    "smallImage": "If width or height is below kernelWidth, the native wrapper throws Magick::ErrorOption with reason ImageSmallerThanKernelRadius. The private kernel raises RangeError with that reason. Full application/UI exception translation is still unfinished.",
+    "evidence": "../evidence/mode-two-boundary-investigation.json; REA 683, 685 and 687..688; captured first-chance native message in noise-error-message-native.bin.",
+    "verification": {
+      "kernelCases": 7194,
+      "wholePreparationCases": 551,
+      "sizeErrorCases": 176,
+      "nativeErrorTypeMessageStageRepeatIdentical": true,
+      "proof": "../evidence/image-filters-native-reference.json",
+      "source": "../src/image-preparation.mjs",
+      "test": "../test/image-preparation.test.mjs"
+    }
+  },
+  "despeckle": {
+    "reference": "0x4ba420, hull 0x4ba200",
+    "padding": "Zero-padded (width+2)*(height+2) BGRO channel planes, initialized independently. Output ownership is separate from input.",
+    "channelOrder": [
+      "R",
+      "G",
+      "B",
+      "opacity"
+    ],
+    "directions": [
+      [
+        0,
+        1
+      ],
+      [
+        1,
+        0
+      ],
+      [
+        1,
+        1
+      ],
+      [
+        -1,
+        1
+      ]
+    ],
+    "sequence": "For each direction, run hull(forward,+1), hull(backward,+1), hull(backward,-1), hull(forward,-1).",
+    "hullFirstPass": "Read source center and source forward neighbor. Positive: increment if neighbor >= center+2. Negative: decrement if neighbor <= center-2. Otherwise copy center into scratch.",
+    "hullSecondPass": "Read scratch center and scratch backward/forward neighbors. Positive: increment if backward >= center+2 and forward > center. Negative: decrement if backward <= center-2 and forward < center. Otherwise copy scratch center to source.",
+    "alpha": "Convert alpha to opacity before filling each plane and back to alpha at output. Alpha padding must therefore correspond to opacity zero.",
+    "amount": "Mode 3 runs one DespeckleImage call for every amount 0..3; amount is ignored by the native dispatcher.",
+    "verification": {
+      "kernelCases": 2992,
+      "wholePreparationCases": 1096,
+      "wholeNativeResponsesRepeatIdentically": true,
+      "proof": "../evidence/image-filters-native-reference.json",
+      "source": "../src/image-preparation.mjs",
+      "test": "../test/image-preparation.test.mjs"
+    }
+  },
+  "dispatcher": {
+    "function": "prepareImagePixels",
+    "source": "../src/image-preparation.mjs",
+    "contract": "Receive validated decoded BGRA dimensions, bytes and explicit mode/amount. Premultiply alpha once. Mode 0 returns owned premultiplied pixels; mode 1 repeats EnhanceImage amount times; mode 2 performs one nonpeak median with amount as radius; mode 3 performs one despeckle regardless of amount. Never substitute another filter or suppress an original empty-image/precondition outcome. No resize or file loading is inferred.",
+    "verification": {
+      "wholePreparationCases": 3839,
+      "nativeEmptyCases": 495,
+      "comparedOutputBytes": 5677384,
+      "allFourModesAndAmounts": true,
+      "oldDecodedClassifications": 72,
+      "newFilteredClassifications": 123,
+      "emptyClassificationInputs": 24,
+      "nativeConstructorContextCases": 123,
+      "classificationProof": "../evidence/image-filters-classification-native-reference.json",
+      "installedPackage": "../evidence/image-filters-package-archive-verification.json",
+      "restrictedRuntime": "../evidence/isolated-image-filters-verification.json"
+    }
+  },
+  "workingReductionContract": "image-resize-contract.json"
+}

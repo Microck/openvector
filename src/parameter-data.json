@@ -1,0 +1,1840 @@
+{
+  "profiles": [
+    {
+      "Shared::is_anti_aliased": 0,
+      "Shared::image_type_code": 9,
+      "Preprocessor::filter_type": 1,
+      "Preprocessor::reduce_noise_order": 0,
+      "PaletteFinder::cost_per_color": 0.15000000596046448,
+      "PaletteFinder::use_16_hist_bins": 1,
+      "PaletteFinder::use_26_connected_peaks": 1,
+      "EdgeImage::edge_weight_scale": 42.0,
+      "EdgeImage::edge_weight_floor": 0.0032,
+      "Segmenter::max_iterations": 5,
+      "Segmenter::lambda_pre": 9.999999747378752e-06,
+      "Segmenter::lambda_initial": 9.999999747378752e-05,
+      "Segmenter::lambda_final": 0.10000000149011612,
+      "Segmenter::min_num_pixels": 0,
+      "Segmenter::num_iter_btwn_renum": 1,
+      "Segmenter::rise_fraction": 0.4000000059604645,
+      "Segmenter::size_penalty_weight": 0.0,
+      "Segmenter::size_penalty_power": 1.0,
+      "Segmenter::use_over_seg_diag_extr": 0,
+      "SubPixelSegmenter::lambda_f": 0.10000000149011612,
+      "SubPixelSegmenter::beach_lambda_f": 9.999999747378752e-06,
+      "SubPixelSegmenter::color_cluster_margin": 0.10000000149011612,
+      "SubPixelSegmenter::use_connected_24_iteration": 0,
+      "SuperPixelSegmenter::lambda_f": 0.009999999776482582,
+      "SuperPixelSegmenter::use_connected_24_iteration": 0,
+      "SubPixelSegmentation::self_weight_eps": 0.10000000149011612,
+      "SubPixelSegmentation::self_weight_penalty_low": 0.009999999776482582,
+      "SubPixelSegmentation::self_weight_penalty_high": 1.0,
+      "SuperPixels::self_weight_eps": 0.10000000149011612,
+      "SuperPixels::self_weight_penalty_low": 0.009999999776482582,
+      "SuperPixels::self_weight_penalty_high": 1.0,
+      "FlowField::affinity_cost_scale": 9.999999747378752e-05,
+      "ContourSmoother::measurement_types": [
+        0,
+        0,
+        0
+      ],
+      "ContourSmoother::optimizer_type": [
+        0,
+        0,
+        0
+      ],
+      "ContourSmoother::prior_types": [
+        3,
+        3,
+        3
+      ],
+      "ContourSmoother::prior_strengths": [
+        10.0,
+        10.0,
+        10.0
+      ],
+      "ContourSmoother::length_penalty_weights": [
+        5.0,
+        0.5,
+        0.5
+      ],
+      "ContourSmoother::do_puncture_corners": [
+        0,
+        1,
+        0
+      ],
+      "ContourSmoother::is_enabled": [
+        1,
+        1,
+        1
+      ],
+      "ContourSmoother::length_barrier_weight": 0.1,
+      "ContourSmoother::air_pressure_weight": 5.0,
+      "ContourSmoother::perturbation_range": 0.01,
+      "ContourSmoother::puncture_flatness_thresh": 0.2,
+      "ContourSmoother::puncture_corner_thresh": 1.2,
+      "ContourSmoother::anti_inv_pot_meas_scale": 1.5,
+      "ContourSmoother::anti_inv_pot_prior_scale": 1.5,
+      "ContourSmoother::phase_0.cg_line_search_type": 0,
+      "ContourSmoother::phase_0.cg_iter_for_restart": 5,
+      "ContourSmoother::phase_0.cg_min_iter": 10,
+      "ContourSmoother::phase_0.cg_max_iter": 30,
+      "ContourSmoother::phase_0.cg_knock_out_count_down": 10,
+      "ContourSmoother::phase_0.cg_use_eps_from_step": 1,
+      "ContourSmoother::phase_0.cg_quad_line_srch_max_iter": 1,
+      "ContourSmoother::phase_0.cg_min_eps": 1e-06,
+      "ContourSmoother::phase_0.cg_max_eps": 0.01,
+      "ContourSmoother::phase_0.cg_step_fraction": 0.1,
+      "ContourSmoother::phase_0.cg_rel_tol": 1e-05,
+      "ContourSmoother::phase_0.cg_abs_tol": 1e-05,
+      "ContourSmoother::phase_0.cg_quad_line_srch_rel_tol": 0.001,
+      "ContourSmoother::phase_0.cg_max_step_size": 0.3,
+      "ContourSmoother::phase_0.cg_num_blind_steps": 50,
+      "ContourSmoother::phase_0.cg_num_seeing_steps": 2,
+      "ContourSmoother::phase_0.cg_blind_blend_latest": 0.5,
+      "ContourSmoother::phase_1.cg_line_search_type": 0,
+      "ContourSmoother::phase_1.cg_iter_for_restart": 5,
+      "ContourSmoother::phase_1.cg_min_iter": 50,
+      "ContourSmoother::phase_1.cg_max_iter": 200,
+      "ContourSmoother::phase_1.cg_knock_out_count_down": 10,
+      "ContourSmoother::phase_1.cg_use_eps_from_step": 1,
+      "ContourSmoother::phase_1.cg_quad_line_srch_max_iter": 1,
+      "ContourSmoother::phase_1.cg_min_eps": 1e-06,
+      "ContourSmoother::phase_1.cg_max_eps": 0.01,
+      "ContourSmoother::phase_1.cg_step_fraction": 0.1,
+      "ContourSmoother::phase_1.cg_rel_tol": 1e-05,
+      "ContourSmoother::phase_1.cg_abs_tol": 1e-05,
+      "ContourSmoother::phase_1.cg_quad_line_srch_rel_tol": 0.001,
+      "ContourSmoother::phase_1.cg_max_step_size": 0.3,
+      "ContourSmoother::phase_1.cg_num_blind_steps": 50,
+      "ContourSmoother::phase_1.cg_num_seeing_steps": 2,
+      "ContourSmoother::phase_1.cg_blind_blend_latest": 0.5,
+      "ContourSmoother::phase_2.cg_line_search_type": 0,
+      "ContourSmoother::phase_2.cg_iter_for_restart": 5,
+      "ContourSmoother::phase_2.cg_min_iter": 20,
+      "ContourSmoother::phase_2.cg_max_iter": 200,
+      "ContourSmoother::phase_2.cg_knock_out_count_down": 10,
+      "ContourSmoother::phase_2.cg_use_eps_from_step": 1,
+      "ContourSmoother::phase_2.cg_quad_line_srch_max_iter": 1,
+      "ContourSmoother::phase_2.cg_min_eps": 1e-06,
+      "ContourSmoother::phase_2.cg_max_eps": 0.01,
+      "ContourSmoother::phase_2.cg_step_fraction": 0.1,
+      "ContourSmoother::phase_2.cg_rel_tol": 1e-05,
+      "ContourSmoother::phase_2.cg_abs_tol": 1e-05,
+      "ContourSmoother::phase_2.cg_quad_line_srch_rel_tol": 0.001,
+      "ContourSmoother::phase_2.cg_max_step_size": 0.3,
+      "ContourSmoother::phase_2.cg_num_blind_steps": 50,
+      "ContourSmoother::phase_2.cg_num_seeing_steps": 2,
+      "ContourSmoother::phase_2.cg_blind_blend_latest": 0.5,
+      "BezierFitter::max_iterations": 20,
+      "BezierFitter::stat_thresh_initial": 1e-08,
+      "BezierFitter::stat_thresh_final": 0.2
+    },
+    {
+      "Shared::is_anti_aliased": 0,
+      "Shared::image_type_code": 0,
+      "Preprocessor::filter_type": 1,
+      "Preprocessor::reduce_noise_order": 0,
+      "PaletteFinder::cost_per_color": 0.15000000596046448,
+      "PaletteFinder::use_16_hist_bins": 1,
+      "PaletteFinder::use_26_connected_peaks": 1,
+      "EdgeImage::edge_weight_scale": 42.0,
+      "EdgeImage::edge_weight_floor": 0.0032,
+      "Segmenter::max_iterations": 50,
+      "Segmenter::lambda_pre": 9.999999747378752e-05,
+      "Segmenter::lambda_initial": 9.999999747378752e-05,
+      "Segmenter::lambda_final": 1.0,
+      "Segmenter::min_num_pixels": 4,
+      "Segmenter::num_iter_btwn_renum": 1,
+      "Segmenter::rise_fraction": 0.4000000059604645,
+      "Segmenter::size_penalty_weight": 0.0,
+      "Segmenter::size_penalty_power": 1.0,
+      "Segmenter::use_over_seg_diag_extr": 1,
+      "SubPixelSegmenter::lambda_f": 0.10000000149011612,
+      "SubPixelSegmenter::beach_lambda_f": 9.999999747378752e-06,
+      "SubPixelSegmenter::color_cluster_margin": 0.10000000149011612,
+      "SubPixelSegmenter::use_connected_24_iteration": 0,
+      "SuperPixelSegmenter::lambda_f": 0.009999999776482582,
+      "SuperPixelSegmenter::use_connected_24_iteration": 0,
+      "SubPixelSegmentation::self_weight_eps": 0.10000000149011612,
+      "SubPixelSegmentation::self_weight_penalty_low": 0.009999999776482582,
+      "SubPixelSegmentation::self_weight_penalty_high": 1.0,
+      "SuperPixels::self_weight_eps": 0.10000000149011612,
+      "SuperPixels::self_weight_penalty_low": 0.009999999776482582,
+      "SuperPixels::self_weight_penalty_high": 1.0,
+      "FlowField::affinity_cost_scale": 9.999999747378752e-05,
+      "ContourSmoother::measurement_types": [
+        0,
+        0,
+        0
+      ],
+      "ContourSmoother::optimizer_type": [
+        0,
+        0,
+        0
+      ],
+      "ContourSmoother::prior_types": [
+        3,
+        3,
+        3
+      ],
+      "ContourSmoother::prior_strengths": [
+        20.0,
+        20.0,
+        20.0
+      ],
+      "ContourSmoother::length_penalty_weights": [
+        5.0,
+        0.5,
+        0.1
+      ],
+      "ContourSmoother::do_puncture_corners": [
+        0,
+        1,
+        0
+      ],
+      "ContourSmoother::is_enabled": [
+        1,
+        1,
+        1
+      ],
+      "ContourSmoother::length_barrier_weight": 0.1,
+      "ContourSmoother::air_pressure_weight": 5.0,
+      "ContourSmoother::perturbation_range": 0.01,
+      "ContourSmoother::puncture_flatness_thresh": 0.2,
+      "ContourSmoother::puncture_corner_thresh": 1.2,
+      "ContourSmoother::anti_inv_pot_meas_scale": 1.5,
+      "ContourSmoother::anti_inv_pot_prior_scale": 1.5,
+      "ContourSmoother::phase_0.cg_line_search_type": 0,
+      "ContourSmoother::phase_0.cg_iter_for_restart": 10,
+      "ContourSmoother::phase_0.cg_min_iter": 10,
+      "ContourSmoother::phase_0.cg_max_iter": 30,
+      "ContourSmoother::phase_0.cg_knock_out_count_down": 10,
+      "ContourSmoother::phase_0.cg_use_eps_from_step": 1,
+      "ContourSmoother::phase_0.cg_quad_line_srch_max_iter": 1,
+      "ContourSmoother::phase_0.cg_min_eps": 1e-06,
+      "ContourSmoother::phase_0.cg_max_eps": 0.01,
+      "ContourSmoother::phase_0.cg_step_fraction": 0.1,
+      "ContourSmoother::phase_0.cg_rel_tol": 1e-05,
+      "ContourSmoother::phase_0.cg_abs_tol": 1e-05,
+      "ContourSmoother::phase_0.cg_quad_line_srch_rel_tol": 0.001,
+      "ContourSmoother::phase_0.cg_max_step_size": 0.3,
+      "ContourSmoother::phase_0.cg_num_blind_steps": 50,
+      "ContourSmoother::phase_0.cg_num_seeing_steps": 2,
+      "ContourSmoother::phase_0.cg_blind_blend_latest": 0.5,
+      "ContourSmoother::phase_1.cg_line_search_type": 0,
+      "ContourSmoother::phase_1.cg_iter_for_restart": 100,
+      "ContourSmoother::phase_1.cg_min_iter": 50,
+      "ContourSmoother::phase_1.cg_max_iter": 200,
+      "ContourSmoother::phase_1.cg_knock_out_count_down": 10,
+      "ContourSmoother::phase_1.cg_use_eps_from_step": 1,
+      "ContourSmoother::phase_1.cg_quad_line_srch_max_iter": 1,
+      "ContourSmoother::phase_1.cg_min_eps": 1e-06,
+      "ContourSmoother::phase_1.cg_max_eps": 0.01,
+      "ContourSmoother::phase_1.cg_step_fraction": 0.1,
+      "ContourSmoother::phase_1.cg_rel_tol": 1e-05,
+      "ContourSmoother::phase_1.cg_abs_tol": 1e-05,
+      "ContourSmoother::phase_1.cg_quad_line_srch_rel_tol": 0.001,
+      "ContourSmoother::phase_1.cg_max_step_size": 0.3,
+      "ContourSmoother::phase_1.cg_num_blind_steps": 50,
+      "ContourSmoother::phase_1.cg_num_seeing_steps": 2,
+      "ContourSmoother::phase_1.cg_blind_blend_latest": 0.5,
+      "ContourSmoother::phase_2.cg_line_search_type": 0,
+      "ContourSmoother::phase_2.cg_iter_for_restart": 100,
+      "ContourSmoother::phase_2.cg_min_iter": 20,
+      "ContourSmoother::phase_2.cg_max_iter": 500,
+      "ContourSmoother::phase_2.cg_knock_out_count_down": 10,
+      "ContourSmoother::phase_2.cg_use_eps_from_step": 1,
+      "ContourSmoother::phase_2.cg_quad_line_srch_max_iter": 1,
+      "ContourSmoother::phase_2.cg_min_eps": 1e-06,
+      "ContourSmoother::phase_2.cg_max_eps": 0.01,
+      "ContourSmoother::phase_2.cg_step_fraction": 0.1,
+      "ContourSmoother::phase_2.cg_rel_tol": 1e-05,
+      "ContourSmoother::phase_2.cg_abs_tol": 1e-05,
+      "ContourSmoother::phase_2.cg_quad_line_srch_rel_tol": 0.001,
+      "ContourSmoother::phase_2.cg_max_step_size": 0.3,
+      "ContourSmoother::phase_2.cg_num_blind_steps": 50,
+      "ContourSmoother::phase_2.cg_num_seeing_steps": 2,
+      "ContourSmoother::phase_2.cg_blind_blend_latest": 0.5,
+      "BezierFitter::max_iterations": 20,
+      "BezierFitter::stat_thresh_initial": 1e-08,
+      "BezierFitter::stat_thresh_final": 0.7
+    },
+    {
+      "Shared::is_anti_aliased": 0,
+      "Shared::image_type_code": 1,
+      "Preprocessor::filter_type": 1,
+      "Preprocessor::reduce_noise_order": 0,
+      "PaletteFinder::cost_per_color": 0.15000000596046448,
+      "PaletteFinder::use_16_hist_bins": 1,
+      "PaletteFinder::use_26_connected_peaks": 1,
+      "EdgeImage::edge_weight_scale": 42.0,
+      "EdgeImage::edge_weight_floor": 0.0032,
+      "Segmenter::max_iterations": 50,
+      "Segmenter::lambda_pre": 9.999999747378752e-05,
+      "Segmenter::lambda_initial": 9.999999747378752e-05,
+      "Segmenter::lambda_final": 0.5,
+      "Segmenter::min_num_pixels": 4,
+      "Segmenter::num_iter_btwn_renum": 1,
+      "Segmenter::rise_fraction": 0.4000000059604645,
+      "Segmenter::size_penalty_weight": 0.0,
+      "Segmenter::size_penalty_power": 1.0,
+      "Segmenter::use_over_seg_diag_extr": 1,
+      "SubPixelSegmenter::lambda_f": 0.10000000149011612,
+      "SubPixelSegmenter::beach_lambda_f": 9.999999747378752e-06,
+      "SubPixelSegmenter::color_cluster_margin": 0.10000000149011612,
+      "SubPixelSegmenter::use_connected_24_iteration": 0,
+      "SuperPixelSegmenter::lambda_f": 0.009999999776482582,
+      "SuperPixelSegmenter::use_connected_24_iteration": 0,
+      "SubPixelSegmentation::self_weight_eps": 0.10000000149011612,
+      "SubPixelSegmentation::self_weight_penalty_low": 0.009999999776482582,
+      "SubPixelSegmentation::self_weight_penalty_high": 1.0,
+      "SuperPixels::self_weight_eps": 0.10000000149011612,
+      "SuperPixels::self_weight_penalty_low": 0.009999999776482582,
+      "SuperPixels::self_weight_penalty_high": 1.0,
+      "FlowField::affinity_cost_scale": 9.999999747378752e-05,
+      "ContourSmoother::measurement_types": [
+        0,
+        0,
+        0
+      ],
+      "ContourSmoother::optimizer_type": [
+        0,
+        0,
+        0
+      ],
+      "ContourSmoother::prior_types": [
+        3,
+        3,
+        3
+      ],
+      "ContourSmoother::prior_strengths": [
+        10.0,
+        10.0,
+        20.0
+      ],
+      "ContourSmoother::length_penalty_weights": [
+        5.0,
+        0.5,
+        0.1
+      ],
+      "ContourSmoother::do_puncture_corners": [
+        0,
+        1,
+        0
+      ],
+      "ContourSmoother::is_enabled": [
+        1,
+        1,
+        1
+      ],
+      "ContourSmoother::length_barrier_weight": 0.1,
+      "ContourSmoother::air_pressure_weight": 5.0,
+      "ContourSmoother::perturbation_range": 0.01,
+      "ContourSmoother::puncture_flatness_thresh": 0.2,
+      "ContourSmoother::puncture_corner_thresh": 1.2,
+      "ContourSmoother::anti_inv_pot_meas_scale": 1.5,
+      "ContourSmoother::anti_inv_pot_prior_scale": 1.5,
+      "ContourSmoother::phase_0.cg_line_search_type": 0,
+      "ContourSmoother::phase_0.cg_iter_for_restart": 10,
+      "ContourSmoother::phase_0.cg_min_iter": 10,
+      "ContourSmoother::phase_0.cg_max_iter": 30,
+      "ContourSmoother::phase_0.cg_knock_out_count_down": 10,
+      "ContourSmoother::phase_0.cg_use_eps_from_step": 1,
+      "ContourSmoother::phase_0.cg_quad_line_srch_max_iter": 1,
+      "ContourSmoother::phase_0.cg_min_eps": 1e-06,
+      "ContourSmoother::phase_0.cg_max_eps": 0.01,
+      "ContourSmoother::phase_0.cg_step_fraction": 0.1,
+      "ContourSmoother::phase_0.cg_rel_tol": 1e-05,
+      "ContourSmoother::phase_0.cg_abs_tol": 1e-05,
+      "ContourSmoother::phase_0.cg_quad_line_srch_rel_tol": 0.001,
+      "ContourSmoother::phase_0.cg_max_step_size": 0.3,
+      "ContourSmoother::phase_0.cg_num_blind_steps": 50,
+      "ContourSmoother::phase_0.cg_num_seeing_steps": 2,
+      "ContourSmoother::phase_0.cg_blind_blend_latest": 0.5,
+      "ContourSmoother::phase_1.cg_line_search_type": 0,
+      "ContourSmoother::phase_1.cg_iter_for_restart": 100,
+      "ContourSmoother::phase_1.cg_min_iter": 50,
+      "ContourSmoother::phase_1.cg_max_iter": 200,
+      "ContourSmoother::phase_1.cg_knock_out_count_down": 10,
+      "ContourSmoother::phase_1.cg_use_eps_from_step": 1,
+      "ContourSmoother::phase_1.cg_quad_line_srch_max_iter": 1,
+      "ContourSmoother::phase_1.cg_min_eps": 1e-06,
+      "ContourSmoother::phase_1.cg_max_eps": 0.01,
+      "ContourSmoother::phase_1.cg_step_fraction": 0.1,
+      "ContourSmoother::phase_1.cg_rel_tol": 1e-05,
+      "ContourSmoother::phase_1.cg_abs_tol": 1e-05,
+      "ContourSmoother::phase_1.cg_quad_line_srch_rel_tol": 0.001,
+      "ContourSmoother::phase_1.cg_max_step_size": 0.3,
+      "ContourSmoother::phase_1.cg_num_blind_steps": 50,
+      "ContourSmoother::phase_1.cg_num_seeing_steps": 2,
+      "ContourSmoother::phase_1.cg_blind_blend_latest": 0.5,
+      "ContourSmoother::phase_2.cg_line_search_type": 0,
+      "ContourSmoother::phase_2.cg_iter_for_restart": 100,
+      "ContourSmoother::phase_2.cg_min_iter": 20,
+      "ContourSmoother::phase_2.cg_max_iter": 500,
+      "ContourSmoother::phase_2.cg_knock_out_count_down": 10,
+      "ContourSmoother::phase_2.cg_use_eps_from_step": 1,
+      "ContourSmoother::phase_2.cg_quad_line_srch_max_iter": 1,
+      "ContourSmoother::phase_2.cg_min_eps": 1e-06,
+      "ContourSmoother::phase_2.cg_max_eps": 0.01,
+      "ContourSmoother::phase_2.cg_step_fraction": 0.1,
+      "ContourSmoother::phase_2.cg_rel_tol": 1e-05,
+      "ContourSmoother::phase_2.cg_abs_tol": 1e-05,
+      "ContourSmoother::phase_2.cg_quad_line_srch_rel_tol": 0.001,
+      "ContourSmoother::phase_2.cg_max_step_size": 0.3,
+      "ContourSmoother::phase_2.cg_num_blind_steps": 50,
+      "ContourSmoother::phase_2.cg_num_seeing_steps": 2,
+      "ContourSmoother::phase_2.cg_blind_blend_latest": 0.5,
+      "BezierFitter::max_iterations": 20,
+      "BezierFitter::stat_thresh_initial": 1e-08,
+      "BezierFitter::stat_thresh_final": 0.6
+    },
+    {
+      "Shared::is_anti_aliased": 0,
+      "Shared::image_type_code": 2,
+      "Preprocessor::filter_type": 1,
+      "Preprocessor::reduce_noise_order": 0,
+      "PaletteFinder::cost_per_color": 0.15000000596046448,
+      "PaletteFinder::use_16_hist_bins": 1,
+      "PaletteFinder::use_26_connected_peaks": 1,
+      "EdgeImage::edge_weight_scale": 42.0,
+      "EdgeImage::edge_weight_floor": 0.0032,
+      "Segmenter::max_iterations": 50,
+      "Segmenter::lambda_pre": 9.999999747378752e-05,
+      "Segmenter::lambda_initial": 9.999999747378752e-05,
+      "Segmenter::lambda_final": 0.10000000149011612,
+      "Segmenter::min_num_pixels": 3,
+      "Segmenter::num_iter_btwn_renum": 1,
+      "Segmenter::rise_fraction": 0.4000000059604645,
+      "Segmenter::size_penalty_weight": 0.0,
+      "Segmenter::size_penalty_power": 1.0,
+      "Segmenter::use_over_seg_diag_extr": 1,
+      "SubPixelSegmenter::lambda_f": 0.10000000149011612,
+      "SubPixelSegmenter::beach_lambda_f": 9.999999747378752e-06,
+      "SubPixelSegmenter::color_cluster_margin": 0.10000000149011612,
+      "SubPixelSegmenter::use_connected_24_iteration": 0,
+      "SuperPixelSegmenter::lambda_f": 0.009999999776482582,
+      "SuperPixelSegmenter::use_connected_24_iteration": 0,
+      "SubPixelSegmentation::self_weight_eps": 0.10000000149011612,
+      "SubPixelSegmentation::self_weight_penalty_low": 0.009999999776482582,
+      "SubPixelSegmentation::self_weight_penalty_high": 1.0,
+      "SuperPixels::self_weight_eps": 0.10000000149011612,
+      "SuperPixels::self_weight_penalty_low": 0.009999999776482582,
+      "SuperPixels::self_weight_penalty_high": 1.0,
+      "FlowField::affinity_cost_scale": 9.999999747378752e-05,
+      "ContourSmoother::measurement_types": [
+        0,
+        0,
+        0
+      ],
+      "ContourSmoother::optimizer_type": [
+        0,
+        0,
+        0
+      ],
+      "ContourSmoother::prior_types": [
+        3,
+        3,
+        3
+      ],
+      "ContourSmoother::prior_strengths": [
+        10.0,
+        10.0,
+        20.0
+      ],
+      "ContourSmoother::length_penalty_weights": [
+        5.0,
+        0.5,
+        0.1
+      ],
+      "ContourSmoother::do_puncture_corners": [
+        0,
+        1,
+        0
+      ],
+      "ContourSmoother::is_enabled": [
+        1,
+        1,
+        1
+      ],
+      "ContourSmoother::length_barrier_weight": 0.1,
+      "ContourSmoother::air_pressure_weight": 5.0,
+      "ContourSmoother::perturbation_range": 0.01,
+      "ContourSmoother::puncture_flatness_thresh": 0.2,
+      "ContourSmoother::puncture_corner_thresh": 1.2,
+      "ContourSmoother::anti_inv_pot_meas_scale": 1.5,
+      "ContourSmoother::anti_inv_pot_prior_scale": 1.5,
+      "ContourSmoother::phase_0.cg_line_search_type": 0,
+      "ContourSmoother::phase_0.cg_iter_for_restart": 10,
+      "ContourSmoother::phase_0.cg_min_iter": 10,
+      "ContourSmoother::phase_0.cg_max_iter": 30,
+      "ContourSmoother::phase_0.cg_knock_out_count_down": 10,
+      "ContourSmoother::phase_0.cg_use_eps_from_step": 1,
+      "ContourSmoother::phase_0.cg_quad_line_srch_max_iter": 1,
+      "ContourSmoother::phase_0.cg_min_eps": 1e-06,
+      "ContourSmoother::phase_0.cg_max_eps": 0.01,
+      "ContourSmoother::phase_0.cg_step_fraction": 0.1,
+      "ContourSmoother::phase_0.cg_rel_tol": 1e-05,
+      "ContourSmoother::phase_0.cg_abs_tol": 1e-05,
+      "ContourSmoother::phase_0.cg_quad_line_srch_rel_tol": 0.001,
+      "ContourSmoother::phase_0.cg_max_step_size": 0.3,
+      "ContourSmoother::phase_0.cg_num_blind_steps": 50,
+      "ContourSmoother::phase_0.cg_num_seeing_steps": 2,
+      "ContourSmoother::phase_0.cg_blind_blend_latest": 0.5,
+      "ContourSmoother::phase_1.cg_line_search_type": 0,
+      "ContourSmoother::phase_1.cg_iter_for_restart": 100,
+      "ContourSmoother::phase_1.cg_min_iter": 50,
+      "ContourSmoother::phase_1.cg_max_iter": 200,
+      "ContourSmoother::phase_1.cg_knock_out_count_down": 10,
+      "ContourSmoother::phase_1.cg_use_eps_from_step": 1,
+      "ContourSmoother::phase_1.cg_quad_line_srch_max_iter": 1,
+      "ContourSmoother::phase_1.cg_min_eps": 1e-06,
+      "ContourSmoother::phase_1.cg_max_eps": 0.01,
+      "ContourSmoother::phase_1.cg_step_fraction": 0.1,
+      "ContourSmoother::phase_1.cg_rel_tol": 1e-05,
+      "ContourSmoother::phase_1.cg_abs_tol": 1e-05,
+      "ContourSmoother::phase_1.cg_quad_line_srch_rel_tol": 0.001,
+      "ContourSmoother::phase_1.cg_max_step_size": 0.3,
+      "ContourSmoother::phase_1.cg_num_blind_steps": 50,
+      "ContourSmoother::phase_1.cg_num_seeing_steps": 2,
+      "ContourSmoother::phase_1.cg_blind_blend_latest": 0.5,
+      "ContourSmoother::phase_2.cg_line_search_type": 0,
+      "ContourSmoother::phase_2.cg_iter_for_restart": 100,
+      "ContourSmoother::phase_2.cg_min_iter": 20,
+      "ContourSmoother::phase_2.cg_max_iter": 500,
+      "ContourSmoother::phase_2.cg_knock_out_count_down": 10,
+      "ContourSmoother::phase_2.cg_use_eps_from_step": 1,
+      "ContourSmoother::phase_2.cg_quad_line_srch_max_iter": 1,
+      "ContourSmoother::phase_2.cg_min_eps": 1e-06,
+      "ContourSmoother::phase_2.cg_max_eps": 0.01,
+      "ContourSmoother::phase_2.cg_step_fraction": 0.1,
+      "ContourSmoother::phase_2.cg_rel_tol": 1e-05,
+      "ContourSmoother::phase_2.cg_abs_tol": 1e-05,
+      "ContourSmoother::phase_2.cg_quad_line_srch_rel_tol": 0.001,
+      "ContourSmoother::phase_2.cg_max_step_size": 0.3,
+      "ContourSmoother::phase_2.cg_num_blind_steps": 50,
+      "ContourSmoother::phase_2.cg_num_seeing_steps": 2,
+      "ContourSmoother::phase_2.cg_blind_blend_latest": 0.5,
+      "BezierFitter::max_iterations": 20,
+      "BezierFitter::stat_thresh_initial": 1e-08,
+      "BezierFitter::stat_thresh_final": 0.5
+    },
+    {
+      "Shared::is_anti_aliased": 1,
+      "Shared::image_type_code": 3,
+      "Preprocessor::filter_type": 1,
+      "Preprocessor::reduce_noise_order": 2,
+      "PaletteFinder::cost_per_color": 0.15000000596046448,
+      "PaletteFinder::use_16_hist_bins": 1,
+      "PaletteFinder::use_26_connected_peaks": 1,
+      "EdgeImage::edge_weight_scale": 42.0,
+      "EdgeImage::edge_weight_floor": 0.0032,
+      "Segmenter::max_iterations": 50,
+      "Segmenter::lambda_pre": 9.999999747378752e-05,
+      "Segmenter::lambda_initial": 9.999999747378752e-05,
+      "Segmenter::lambda_final": 1.0,
+      "Segmenter::min_num_pixels": 0,
+      "Segmenter::num_iter_btwn_renum": 5,
+      "Segmenter::rise_fraction": 0.4000000059604645,
+      "Segmenter::size_penalty_weight": 0.0,
+      "Segmenter::size_penalty_power": 1.0,
+      "Segmenter::use_over_seg_diag_extr": 0,
+      "SubPixelSegmenter::lambda_f": 0.10000000149011612,
+      "SubPixelSegmenter::beach_lambda_f": 9.999999747378752e-06,
+      "SubPixelSegmenter::color_cluster_margin": 0.10000000149011612,
+      "SubPixelSegmenter::use_connected_24_iteration": 0,
+      "SuperPixelSegmenter::lambda_f": 0.009999999776482582,
+      "SuperPixelSegmenter::use_connected_24_iteration": 0,
+      "SubPixelSegmentation::self_weight_eps": 0.10000000149011612,
+      "SubPixelSegmentation::self_weight_penalty_low": 0.009999999776482582,
+      "SubPixelSegmentation::self_weight_penalty_high": 1.0,
+      "SuperPixels::self_weight_eps": 0.10000000149011612,
+      "SuperPixels::self_weight_penalty_low": 0.009999999776482582,
+      "SuperPixels::self_weight_penalty_high": 1.0,
+      "FlowField::affinity_cost_scale": 9.999999747378752e-05,
+      "ContourSmoother::measurement_types": [
+        1,
+        1,
+        1
+      ],
+      "ContourSmoother::optimizer_type": [
+        0,
+        0,
+        0
+      ],
+      "ContourSmoother::prior_types": [
+        3,
+        3,
+        3
+      ],
+      "ContourSmoother::prior_strengths": [
+        5.0,
+        5.0,
+        5.0
+      ],
+      "ContourSmoother::length_penalty_weights": [
+        5.0,
+        0.5,
+        0.5
+      ],
+      "ContourSmoother::do_puncture_corners": [
+        0,
+        1,
+        0
+      ],
+      "ContourSmoother::is_enabled": [
+        1,
+        1,
+        1
+      ],
+      "ContourSmoother::length_barrier_weight": 0.1,
+      "ContourSmoother::air_pressure_weight": 5.0,
+      "ContourSmoother::perturbation_range": 0.01,
+      "ContourSmoother::puncture_flatness_thresh": 0.4,
+      "ContourSmoother::puncture_corner_thresh": 1.0,
+      "ContourSmoother::anti_inv_pot_meas_scale": 1.5,
+      "ContourSmoother::anti_inv_pot_prior_scale": 1.5,
+      "ContourSmoother::phase_0.cg_line_search_type": 5,
+      "ContourSmoother::phase_0.cg_iter_for_restart": 5,
+      "ContourSmoother::phase_0.cg_min_iter": 10,
+      "ContourSmoother::phase_0.cg_max_iter": 30,
+      "ContourSmoother::phase_0.cg_knock_out_count_down": 10,
+      "ContourSmoother::phase_0.cg_use_eps_from_step": 1,
+      "ContourSmoother::phase_0.cg_quad_line_srch_max_iter": 1,
+      "ContourSmoother::phase_0.cg_min_eps": 1e-06,
+      "ContourSmoother::phase_0.cg_max_eps": 0.01,
+      "ContourSmoother::phase_0.cg_step_fraction": 0.1,
+      "ContourSmoother::phase_0.cg_rel_tol": 1e-05,
+      "ContourSmoother::phase_0.cg_abs_tol": 1e-05,
+      "ContourSmoother::phase_0.cg_quad_line_srch_rel_tol": 0.001,
+      "ContourSmoother::phase_0.cg_max_step_size": 0.3,
+      "ContourSmoother::phase_0.cg_num_blind_steps": 50,
+      "ContourSmoother::phase_0.cg_num_seeing_steps": 2,
+      "ContourSmoother::phase_0.cg_blind_blend_latest": 0.5,
+      "ContourSmoother::phase_1.cg_line_search_type": 5,
+      "ContourSmoother::phase_1.cg_iter_for_restart": 25,
+      "ContourSmoother::phase_1.cg_min_iter": 50,
+      "ContourSmoother::phase_1.cg_max_iter": 225,
+      "ContourSmoother::phase_1.cg_knock_out_count_down": 10,
+      "ContourSmoother::phase_1.cg_use_eps_from_step": 1,
+      "ContourSmoother::phase_1.cg_quad_line_srch_max_iter": 1,
+      "ContourSmoother::phase_1.cg_min_eps": 1e-06,
+      "ContourSmoother::phase_1.cg_max_eps": 0.01,
+      "ContourSmoother::phase_1.cg_step_fraction": 0.1,
+      "ContourSmoother::phase_1.cg_rel_tol": 1e-05,
+      "ContourSmoother::phase_1.cg_abs_tol": 1e-05,
+      "ContourSmoother::phase_1.cg_quad_line_srch_rel_tol": 0.001,
+      "ContourSmoother::phase_1.cg_max_step_size": 0.3,
+      "ContourSmoother::phase_1.cg_num_blind_steps": 50,
+      "ContourSmoother::phase_1.cg_num_seeing_steps": 2,
+      "ContourSmoother::phase_1.cg_blind_blend_latest": 0.5,
+      "ContourSmoother::phase_2.cg_line_search_type": 5,
+      "ContourSmoother::phase_2.cg_iter_for_restart": 25,
+      "ContourSmoother::phase_2.cg_min_iter": 20,
+      "ContourSmoother::phase_2.cg_max_iter": 300,
+      "ContourSmoother::phase_2.cg_knock_out_count_down": 10,
+      "ContourSmoother::phase_2.cg_use_eps_from_step": 1,
+      "ContourSmoother::phase_2.cg_quad_line_srch_max_iter": 1,
+      "ContourSmoother::phase_2.cg_min_eps": 1e-06,
+      "ContourSmoother::phase_2.cg_max_eps": 0.01,
+      "ContourSmoother::phase_2.cg_step_fraction": 0.1,
+      "ContourSmoother::phase_2.cg_rel_tol": 2e-05,
+      "ContourSmoother::phase_2.cg_abs_tol": 0.01,
+      "ContourSmoother::phase_2.cg_quad_line_srch_rel_tol": 0.001,
+      "ContourSmoother::phase_2.cg_max_step_size": 0.3,
+      "ContourSmoother::phase_2.cg_num_blind_steps": 50,
+      "ContourSmoother::phase_2.cg_num_seeing_steps": 2,
+      "ContourSmoother::phase_2.cg_blind_blend_latest": 0.5,
+      "BezierFitter::max_iterations": 20,
+      "BezierFitter::stat_thresh_initial": 1e-08,
+      "BezierFitter::stat_thresh_final": 0.2
+    },
+    {
+      "Shared::is_anti_aliased": 1,
+      "Shared::image_type_code": 4,
+      "Preprocessor::filter_type": 1,
+      "Preprocessor::reduce_noise_order": 1,
+      "PaletteFinder::cost_per_color": 0.15000000596046448,
+      "PaletteFinder::use_16_hist_bins": 1,
+      "PaletteFinder::use_26_connected_peaks": 1,
+      "EdgeImage::edge_weight_scale": 42.0,
+      "EdgeImage::edge_weight_floor": 0.0032,
+      "Segmenter::max_iterations": 50,
+      "Segmenter::lambda_pre": 9.999999747378752e-05,
+      "Segmenter::lambda_initial": 9.999999747378752e-05,
+      "Segmenter::lambda_final": 0.5,
+      "Segmenter::min_num_pixels": 0,
+      "Segmenter::num_iter_btwn_renum": 5,
+      "Segmenter::rise_fraction": 0.4000000059604645,
+      "Segmenter::size_penalty_weight": 0.0,
+      "Segmenter::size_penalty_power": 1.0,
+      "Segmenter::use_over_seg_diag_extr": 0,
+      "SubPixelSegmenter::lambda_f": 0.10000000149011612,
+      "SubPixelSegmenter::beach_lambda_f": 9.999999747378752e-06,
+      "SubPixelSegmenter::color_cluster_margin": 0.10000000149011612,
+      "SubPixelSegmenter::use_connected_24_iteration": 0,
+      "SuperPixelSegmenter::lambda_f": 0.009999999776482582,
+      "SuperPixelSegmenter::use_connected_24_iteration": 0,
+      "SubPixelSegmentation::self_weight_eps": 0.10000000149011612,
+      "SubPixelSegmentation::self_weight_penalty_low": 0.009999999776482582,
+      "SubPixelSegmentation::self_weight_penalty_high": 1.0,
+      "SuperPixels::self_weight_eps": 0.10000000149011612,
+      "SuperPixels::self_weight_penalty_low": 0.009999999776482582,
+      "SuperPixels::self_weight_penalty_high": 1.0,
+      "FlowField::affinity_cost_scale": 9.999999747378752e-05,
+      "ContourSmoother::measurement_types": [
+        1,
+        1,
+        1
+      ],
+      "ContourSmoother::optimizer_type": [
+        0,
+        0,
+        0
+      ],
+      "ContourSmoother::prior_types": [
+        3,
+        3,
+        3
+      ],
+      "ContourSmoother::prior_strengths": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "ContourSmoother::length_penalty_weights": [
+        5.0,
+        0.5,
+        0.5
+      ],
+      "ContourSmoother::do_puncture_corners": [
+        0,
+        1,
+        0
+      ],
+      "ContourSmoother::is_enabled": [
+        1,
+        1,
+        1
+      ],
+      "ContourSmoother::length_barrier_weight": 0.1,
+      "ContourSmoother::air_pressure_weight": 5.0,
+      "ContourSmoother::perturbation_range": 0.01,
+      "ContourSmoother::puncture_flatness_thresh": 0.4,
+      "ContourSmoother::puncture_corner_thresh": 1.0,
+      "ContourSmoother::anti_inv_pot_meas_scale": 1.5,
+      "ContourSmoother::anti_inv_pot_prior_scale": 1.5,
+      "ContourSmoother::phase_0.cg_line_search_type": 5,
+      "ContourSmoother::phase_0.cg_iter_for_restart": 5,
+      "ContourSmoother::phase_0.cg_min_iter": 10,
+      "ContourSmoother::phase_0.cg_max_iter": 30,
+      "ContourSmoother::phase_0.cg_knock_out_count_down": 10,
+      "ContourSmoother::phase_0.cg_use_eps_from_step": 1,
+      "ContourSmoother::phase_0.cg_quad_line_srch_max_iter": 1,
+      "ContourSmoother::phase_0.cg_min_eps": 1e-06,
+      "ContourSmoother::phase_0.cg_max_eps": 0.01,
+      "ContourSmoother::phase_0.cg_step_fraction": 0.1,
+      "ContourSmoother::phase_0.cg_rel_tol": 1e-05,
+      "ContourSmoother::phase_0.cg_abs_tol": 1e-05,
+      "ContourSmoother::phase_0.cg_quad_line_srch_rel_tol": 0.001,
+      "ContourSmoother::phase_0.cg_max_step_size": 0.3,
+      "ContourSmoother::phase_0.cg_num_blind_steps": 50,
+      "ContourSmoother::phase_0.cg_num_seeing_steps": 2,
+      "ContourSmoother::phase_0.cg_blind_blend_latest": 0.5,
+      "ContourSmoother::phase_1.cg_line_search_type": 5,
+      "ContourSmoother::phase_1.cg_iter_for_restart": 25,
+      "ContourSmoother::phase_1.cg_min_iter": 50,
+      "ContourSmoother::phase_1.cg_max_iter": 225,
+      "ContourSmoother::phase_1.cg_knock_out_count_down": 10,
+      "ContourSmoother::phase_1.cg_use_eps_from_step": 1,
+      "ContourSmoother::phase_1.cg_quad_line_srch_max_iter": 1,
+      "ContourSmoother::phase_1.cg_min_eps": 1e-06,
+      "ContourSmoother::phase_1.cg_max_eps": 0.01,
+      "ContourSmoother::phase_1.cg_step_fraction": 0.1,
+      "ContourSmoother::phase_1.cg_rel_tol": 1e-05,
+      "ContourSmoother::phase_1.cg_abs_tol": 1e-05,
+      "ContourSmoother::phase_1.cg_quad_line_srch_rel_tol": 0.001,
+      "ContourSmoother::phase_1.cg_max_step_size": 0.3,
+      "ContourSmoother::phase_1.cg_num_blind_steps": 50,
+      "ContourSmoother::phase_1.cg_num_seeing_steps": 2,
+      "ContourSmoother::phase_1.cg_blind_blend_latest": 0.5,
+      "ContourSmoother::phase_2.cg_line_search_type": 5,
+      "ContourSmoother::phase_2.cg_iter_for_restart": 25,
+      "ContourSmoother::phase_2.cg_min_iter": 20,
+      "ContourSmoother::phase_2.cg_max_iter": 300,
+      "ContourSmoother::phase_2.cg_knock_out_count_down": 10,
+      "ContourSmoother::phase_2.cg_use_eps_from_step": 1,
+      "ContourSmoother::phase_2.cg_quad_line_srch_max_iter": 1,
+      "ContourSmoother::phase_2.cg_min_eps": 1e-06,
+      "ContourSmoother::phase_2.cg_max_eps": 0.01,
+      "ContourSmoother::phase_2.cg_step_fraction": 0.1,
+      "ContourSmoother::phase_2.cg_rel_tol": 2e-05,
+      "ContourSmoother::phase_2.cg_abs_tol": 0.01,
+      "ContourSmoother::phase_2.cg_quad_line_srch_rel_tol": 0.001,
+      "ContourSmoother::phase_2.cg_max_step_size": 0.3,
+      "ContourSmoother::phase_2.cg_num_blind_steps": 50,
+      "ContourSmoother::phase_2.cg_num_seeing_steps": 2,
+      "ContourSmoother::phase_2.cg_blind_blend_latest": 0.5,
+      "BezierFitter::max_iterations": 20,
+      "BezierFitter::stat_thresh_initial": 1e-08,
+      "BezierFitter::stat_thresh_final": 0.2
+    },
+    {
+      "Shared::is_anti_aliased": 1,
+      "Shared::image_type_code": 5,
+      "Preprocessor::filter_type": 1,
+      "Preprocessor::reduce_noise_order": 0,
+      "PaletteFinder::cost_per_color": 0.15000000596046448,
+      "PaletteFinder::use_16_hist_bins": 1,
+      "PaletteFinder::use_26_connected_peaks": 1,
+      "EdgeImage::edge_weight_scale": 42.0,
+      "EdgeImage::edge_weight_floor": 0.0032,
+      "Segmenter::max_iterations": 50,
+      "Segmenter::lambda_pre": 9.999999747378752e-05,
+      "Segmenter::lambda_initial": 9.999999747378752e-05,
+      "Segmenter::lambda_final": 0.10000000149011612,
+      "Segmenter::min_num_pixels": 0,
+      "Segmenter::num_iter_btwn_renum": 5,
+      "Segmenter::rise_fraction": 0.4000000059604645,
+      "Segmenter::size_penalty_weight": 0.0,
+      "Segmenter::size_penalty_power": 1.0,
+      "Segmenter::use_over_seg_diag_extr": 0,
+      "SubPixelSegmenter::lambda_f": 0.10000000149011612,
+      "SubPixelSegmenter::beach_lambda_f": 9.999999747378752e-06,
+      "SubPixelSegmenter::color_cluster_margin": 0.10000000149011612,
+      "SubPixelSegmenter::use_connected_24_iteration": 0,
+      "SuperPixelSegmenter::lambda_f": 0.009999999776482582,
+      "SuperPixelSegmenter::use_connected_24_iteration": 0,
+      "SubPixelSegmentation::self_weight_eps": 0.10000000149011612,
+      "SubPixelSegmentation::self_weight_penalty_low": 0.009999999776482582,
+      "SubPixelSegmentation::self_weight_penalty_high": 1.0,
+      "SuperPixels::self_weight_eps": 0.10000000149011612,
+      "SuperPixels::self_weight_penalty_low": 0.009999999776482582,
+      "SuperPixels::self_weight_penalty_high": 1.0,
+      "FlowField::affinity_cost_scale": 9.999999747378752e-05,
+      "ContourSmoother::measurement_types": [
+        1,
+        1,
+        1
+      ],
+      "ContourSmoother::optimizer_type": [
+        0,
+        0,
+        0
+      ],
+      "ContourSmoother::prior_types": [
+        3,
+        3,
+        3
+      ],
+      "ContourSmoother::prior_strengths": [
+        0.1,
+        0.02,
+        0.9
+      ],
+      "ContourSmoother::length_penalty_weights": [
+        0.5,
+        0.1,
+        0.01
+      ],
+      "ContourSmoother::do_puncture_corners": [
+        0,
+        1,
+        0
+      ],
+      "ContourSmoother::is_enabled": [
+        1,
+        1,
+        1
+      ],
+      "ContourSmoother::length_barrier_weight": 0.1,
+      "ContourSmoother::air_pressure_weight": 5.0,
+      "ContourSmoother::perturbation_range": 0.1,
+      "ContourSmoother::puncture_flatness_thresh": 0.4,
+      "ContourSmoother::puncture_corner_thresh": 0.5,
+      "ContourSmoother::anti_inv_pot_meas_scale": 1.5,
+      "ContourSmoother::anti_inv_pot_prior_scale": 1.5,
+      "ContourSmoother::phase_0.cg_line_search_type": 5,
+      "ContourSmoother::phase_0.cg_iter_for_restart": 5,
+      "ContourSmoother::phase_0.cg_min_iter": 10,
+      "ContourSmoother::phase_0.cg_max_iter": 30,
+      "ContourSmoother::phase_0.cg_knock_out_count_down": 10,
+      "ContourSmoother::phase_0.cg_use_eps_from_step": 1,
+      "ContourSmoother::phase_0.cg_quad_line_srch_max_iter": 1,
+      "ContourSmoother::phase_0.cg_min_eps": 1e-06,
+      "ContourSmoother::phase_0.cg_max_eps": 0.01,
+      "ContourSmoother::phase_0.cg_step_fraction": 0.1,
+      "ContourSmoother::phase_0.cg_rel_tol": 1e-05,
+      "ContourSmoother::phase_0.cg_abs_tol": 1e-05,
+      "ContourSmoother::phase_0.cg_quad_line_srch_rel_tol": 0.001,
+      "ContourSmoother::phase_0.cg_max_step_size": 0.3,
+      "ContourSmoother::phase_0.cg_num_blind_steps": 50,
+      "ContourSmoother::phase_0.cg_num_seeing_steps": 2,
+      "ContourSmoother::phase_0.cg_blind_blend_latest": 0.5,
+      "ContourSmoother::phase_1.cg_line_search_type": 5,
+      "ContourSmoother::phase_1.cg_iter_for_restart": 25,
+      "ContourSmoother::phase_1.cg_min_iter": 50,
+      "ContourSmoother::phase_1.cg_max_iter": 225,
+      "ContourSmoother::phase_1.cg_knock_out_count_down": 10,
+      "ContourSmoother::phase_1.cg_use_eps_from_step": 1,
+      "ContourSmoother::phase_1.cg_quad_line_srch_max_iter": 1,
+      "ContourSmoother::phase_1.cg_min_eps": 1e-06,
+      "ContourSmoother::phase_1.cg_max_eps": 0.01,
+      "ContourSmoother::phase_1.cg_step_fraction": 0.1,
+      "ContourSmoother::phase_1.cg_rel_tol": 1e-05,
+      "ContourSmoother::phase_1.cg_abs_tol": 1e-05,
+      "ContourSmoother::phase_1.cg_quad_line_srch_rel_tol": 0.001,
+      "ContourSmoother::phase_1.cg_max_step_size": 0.3,
+      "ContourSmoother::phase_1.cg_num_blind_steps": 50,
+      "ContourSmoother::phase_1.cg_num_seeing_steps": 2,
+      "ContourSmoother::phase_1.cg_blind_blend_latest": 0.5,
+      "ContourSmoother::phase_2.cg_line_search_type": 5,
+      "ContourSmoother::phase_2.cg_iter_for_restart": 25,
+      "ContourSmoother::phase_2.cg_min_iter": 20,
+      "ContourSmoother::phase_2.cg_max_iter": 300,
+      "ContourSmoother::phase_2.cg_knock_out_count_down": 10,
+      "ContourSmoother::phase_2.cg_use_eps_from_step": 1,
+      "ContourSmoother::phase_2.cg_quad_line_srch_max_iter": 1,
+      "ContourSmoother::phase_2.cg_min_eps": 1e-06,
+      "ContourSmoother::phase_2.cg_max_eps": 0.01,
+      "ContourSmoother::phase_2.cg_step_fraction": 0.1,
+      "ContourSmoother::phase_2.cg_rel_tol": 2e-05,
+      "ContourSmoother::phase_2.cg_abs_tol": 0.01,
+      "ContourSmoother::phase_2.cg_quad_line_srch_rel_tol": 0.001,
+      "ContourSmoother::phase_2.cg_max_step_size": 0.3,
+      "ContourSmoother::phase_2.cg_num_blind_steps": 50,
+      "ContourSmoother::phase_2.cg_num_seeing_steps": 2,
+      "ContourSmoother::phase_2.cg_blind_blend_latest": 0.5,
+      "BezierFitter::max_iterations": 20,
+      "BezierFitter::stat_thresh_initial": 1e-08,
+      "BezierFitter::stat_thresh_final": 0.2
+    },
+    {
+      "Shared::is_anti_aliased": 0,
+      "Shared::image_type_code": 6,
+      "Preprocessor::filter_type": 1,
+      "Preprocessor::reduce_noise_order": 3,
+      "PaletteFinder::cost_per_color": 0.15000000596046448,
+      "PaletteFinder::use_16_hist_bins": 1,
+      "PaletteFinder::use_26_connected_peaks": 1,
+      "EdgeImage::edge_weight_scale": 42.0,
+      "EdgeImage::edge_weight_floor": 0.0032,
+      "Segmenter::max_iterations": 100,
+      "Segmenter::lambda_pre": 0.0010000000474974513,
+      "Segmenter::lambda_initial": 0.0010000000474974513,
+      "Segmenter::lambda_final": 10.0,
+      "Segmenter::min_num_pixels": 2,
+      "Segmenter::num_iter_btwn_renum": 1,
+      "Segmenter::rise_fraction": 0.4000000059604645,
+      "Segmenter::size_penalty_weight": 0.0,
+      "Segmenter::size_penalty_power": 1.0,
+      "Segmenter::use_over_seg_diag_extr": 0,
+      "SubPixelSegmenter::lambda_f": 0.10000000149011612,
+      "SubPixelSegmenter::beach_lambda_f": 9.999999747378752e-06,
+      "SubPixelSegmenter::color_cluster_margin": 0.10000000149011612,
+      "SubPixelSegmenter::use_connected_24_iteration": 0,
+      "SuperPixelSegmenter::lambda_f": 0.009999999776482582,
+      "SuperPixelSegmenter::use_connected_24_iteration": 0,
+      "SubPixelSegmentation::self_weight_eps": 0.10000000149011612,
+      "SubPixelSegmentation::self_weight_penalty_low": 0.009999999776482582,
+      "SubPixelSegmentation::self_weight_penalty_high": 1.0,
+      "SuperPixels::self_weight_eps": 0.10000000149011612,
+      "SuperPixels::self_weight_penalty_low": 0.009999999776482582,
+      "SuperPixels::self_weight_penalty_high": 1.0,
+      "FlowField::affinity_cost_scale": 9.999999747378752e-05,
+      "ContourSmoother::measurement_types": [
+        0,
+        0,
+        0
+      ],
+      "ContourSmoother::optimizer_type": [
+        0,
+        0,
+        0
+      ],
+      "ContourSmoother::prior_types": [
+        3,
+        3,
+        3
+      ],
+      "ContourSmoother::prior_strengths": [
+        5.0,
+        1.0,
+        1.0
+      ],
+      "ContourSmoother::length_penalty_weights": [
+        0.5,
+        0.5,
+        0.5
+      ],
+      "ContourSmoother::do_puncture_corners": [
+        0,
+        0,
+        0
+      ],
+      "ContourSmoother::is_enabled": [
+        1,
+        0,
+        0
+      ],
+      "ContourSmoother::length_barrier_weight": 0.1,
+      "ContourSmoother::air_pressure_weight": 5.0,
+      "ContourSmoother::perturbation_range": 0.01,
+      "ContourSmoother::puncture_flatness_thresh": 0.2,
+      "ContourSmoother::puncture_corner_thresh": 1.2,
+      "ContourSmoother::anti_inv_pot_meas_scale": 1.5,
+      "ContourSmoother::anti_inv_pot_prior_scale": 1.5,
+      "ContourSmoother::phase_0.cg_line_search_type": 0,
+      "ContourSmoother::phase_0.cg_iter_for_restart": 5,
+      "ContourSmoother::phase_0.cg_min_iter": 10,
+      "ContourSmoother::phase_0.cg_max_iter": 200,
+      "ContourSmoother::phase_0.cg_knock_out_count_down": 5,
+      "ContourSmoother::phase_0.cg_use_eps_from_step": 1,
+      "ContourSmoother::phase_0.cg_quad_line_srch_max_iter": 1,
+      "ContourSmoother::phase_0.cg_min_eps": 0.0001,
+      "ContourSmoother::phase_0.cg_max_eps": 0.01,
+      "ContourSmoother::phase_0.cg_step_fraction": 0.1,
+      "ContourSmoother::phase_0.cg_rel_tol": 1e-05,
+      "ContourSmoother::phase_0.cg_abs_tol": 1e-05,
+      "ContourSmoother::phase_0.cg_quad_line_srch_rel_tol": 0.001,
+      "ContourSmoother::phase_0.cg_max_step_size": 0.3,
+      "ContourSmoother::phase_0.cg_num_blind_steps": 50,
+      "ContourSmoother::phase_0.cg_num_seeing_steps": 2,
+      "ContourSmoother::phase_0.cg_blind_blend_latest": 0.5,
+      "ContourSmoother::phase_1.cg_line_search_type": 0,
+      "ContourSmoother::phase_1.cg_iter_for_restart": 5,
+      "ContourSmoother::phase_1.cg_min_iter": 50,
+      "ContourSmoother::phase_1.cg_max_iter": 200,
+      "ContourSmoother::phase_1.cg_knock_out_count_down": 10,
+      "ContourSmoother::phase_1.cg_use_eps_from_step": 1,
+      "ContourSmoother::phase_1.cg_quad_line_srch_max_iter": 1,
+      "ContourSmoother::phase_1.cg_min_eps": 0.0001,
+      "ContourSmoother::phase_1.cg_max_eps": 0.01,
+      "ContourSmoother::phase_1.cg_step_fraction": 0.1,
+      "ContourSmoother::phase_1.cg_rel_tol": 1e-05,
+      "ContourSmoother::phase_1.cg_abs_tol": 1e-05,
+      "ContourSmoother::phase_1.cg_quad_line_srch_rel_tol": 0.001,
+      "ContourSmoother::phase_1.cg_max_step_size": 0.3,
+      "ContourSmoother::phase_1.cg_num_blind_steps": 50,
+      "ContourSmoother::phase_1.cg_num_seeing_steps": 2,
+      "ContourSmoother::phase_1.cg_blind_blend_latest": 0.5,
+      "ContourSmoother::phase_2.cg_line_search_type": 0,
+      "ContourSmoother::phase_2.cg_iter_for_restart": 5,
+      "ContourSmoother::phase_2.cg_min_iter": 20,
+      "ContourSmoother::phase_2.cg_max_iter": 200,
+      "ContourSmoother::phase_2.cg_knock_out_count_down": 10,
+      "ContourSmoother::phase_2.cg_use_eps_from_step": 1,
+      "ContourSmoother::phase_2.cg_quad_line_srch_max_iter": 1,
+      "ContourSmoother::phase_2.cg_min_eps": 0.0001,
+      "ContourSmoother::phase_2.cg_max_eps": 0.01,
+      "ContourSmoother::phase_2.cg_step_fraction": 0.1,
+      "ContourSmoother::phase_2.cg_rel_tol": 1e-05,
+      "ContourSmoother::phase_2.cg_abs_tol": 1e-05,
+      "ContourSmoother::phase_2.cg_quad_line_srch_rel_tol": 0.001,
+      "ContourSmoother::phase_2.cg_max_step_size": 0.3,
+      "ContourSmoother::phase_2.cg_num_blind_steps": 50,
+      "ContourSmoother::phase_2.cg_num_seeing_steps": 2,
+      "ContourSmoother::phase_2.cg_blind_blend_latest": 0.5,
+      "BezierFitter::max_iterations": 10,
+      "BezierFitter::stat_thresh_initial": 0.0001,
+      "BezierFitter::stat_thresh_final": 10.0
+    },
+    {
+      "Shared::is_anti_aliased": 0,
+      "Shared::image_type_code": 7,
+      "Preprocessor::filter_type": 1,
+      "Preprocessor::reduce_noise_order": 2,
+      "PaletteFinder::cost_per_color": 0.15000000596046448,
+      "PaletteFinder::use_16_hist_bins": 1,
+      "PaletteFinder::use_26_connected_peaks": 1,
+      "EdgeImage::edge_weight_scale": 42.0,
+      "EdgeImage::edge_weight_floor": 0.0032,
+      "Segmenter::max_iterations": 75,
+      "Segmenter::lambda_pre": 0.0010000000474974513,
+      "Segmenter::lambda_initial": 0.0010000000474974513,
+      "Segmenter::lambda_final": 1.0,
+      "Segmenter::min_num_pixels": 4,
+      "Segmenter::num_iter_btwn_renum": 1,
+      "Segmenter::rise_fraction": 0.4000000059604645,
+      "Segmenter::size_penalty_weight": 0.0,
+      "Segmenter::size_penalty_power": 1.0,
+      "Segmenter::use_over_seg_diag_extr": 0,
+      "SubPixelSegmenter::lambda_f": 0.10000000149011612,
+      "SubPixelSegmenter::beach_lambda_f": 9.999999747378752e-06,
+      "SubPixelSegmenter::color_cluster_margin": 0.10000000149011612,
+      "SubPixelSegmenter::use_connected_24_iteration": 0,
+      "SuperPixelSegmenter::lambda_f": 0.009999999776482582,
+      "SuperPixelSegmenter::use_connected_24_iteration": 0,
+      "SubPixelSegmentation::self_weight_eps": 0.10000000149011612,
+      "SubPixelSegmentation::self_weight_penalty_low": 0.009999999776482582,
+      "SubPixelSegmentation::self_weight_penalty_high": 1.0,
+      "SuperPixels::self_weight_eps": 0.10000000149011612,
+      "SuperPixels::self_weight_penalty_low": 0.009999999776482582,
+      "SuperPixels::self_weight_penalty_high": 1.0,
+      "FlowField::affinity_cost_scale": 9.999999747378752e-05,
+      "ContourSmoother::measurement_types": [
+        0,
+        0,
+        0
+      ],
+      "ContourSmoother::optimizer_type": [
+        0,
+        0,
+        0
+      ],
+      "ContourSmoother::prior_types": [
+        3,
+        3,
+        3
+      ],
+      "ContourSmoother::prior_strengths": [
+        2.0,
+        1.0,
+        1.0
+      ],
+      "ContourSmoother::length_penalty_weights": [
+        0.5,
+        0.5,
+        0.5
+      ],
+      "ContourSmoother::do_puncture_corners": [
+        0,
+        0,
+        0
+      ],
+      "ContourSmoother::is_enabled": [
+        1,
+        0,
+        0
+      ],
+      "ContourSmoother::length_barrier_weight": 0.1,
+      "ContourSmoother::air_pressure_weight": 5.0,
+      "ContourSmoother::perturbation_range": 0.01,
+      "ContourSmoother::puncture_flatness_thresh": 0.2,
+      "ContourSmoother::puncture_corner_thresh": 1.2,
+      "ContourSmoother::anti_inv_pot_meas_scale": 1.5,
+      "ContourSmoother::anti_inv_pot_prior_scale": 1.5,
+      "ContourSmoother::phase_0.cg_line_search_type": 0,
+      "ContourSmoother::phase_0.cg_iter_for_restart": 5,
+      "ContourSmoother::phase_0.cg_min_iter": 10,
+      "ContourSmoother::phase_0.cg_max_iter": 200,
+      "ContourSmoother::phase_0.cg_knock_out_count_down": 5,
+      "ContourSmoother::phase_0.cg_use_eps_from_step": 1,
+      "ContourSmoother::phase_0.cg_quad_line_srch_max_iter": 1,
+      "ContourSmoother::phase_0.cg_min_eps": 0.0001,
+      "ContourSmoother::phase_0.cg_max_eps": 0.01,
+      "ContourSmoother::phase_0.cg_step_fraction": 0.1,
+      "ContourSmoother::phase_0.cg_rel_tol": 1e-05,
+      "ContourSmoother::phase_0.cg_abs_tol": 1e-05,
+      "ContourSmoother::phase_0.cg_quad_line_srch_rel_tol": 0.001,
+      "ContourSmoother::phase_0.cg_max_step_size": 0.3,
+      "ContourSmoother::phase_0.cg_num_blind_steps": 50,
+      "ContourSmoother::phase_0.cg_num_seeing_steps": 2,
+      "ContourSmoother::phase_0.cg_blind_blend_latest": 0.5,
+      "ContourSmoother::phase_1.cg_line_search_type": 0,
+      "ContourSmoother::phase_1.cg_iter_for_restart": 5,
+      "ContourSmoother::phase_1.cg_min_iter": 50,
+      "ContourSmoother::phase_1.cg_max_iter": 200,
+      "ContourSmoother::phase_1.cg_knock_out_count_down": 10,
+      "ContourSmoother::phase_1.cg_use_eps_from_step": 1,
+      "ContourSmoother::phase_1.cg_quad_line_srch_max_iter": 1,
+      "ContourSmoother::phase_1.cg_min_eps": 0.0001,
+      "ContourSmoother::phase_1.cg_max_eps": 0.01,
+      "ContourSmoother::phase_1.cg_step_fraction": 0.1,
+      "ContourSmoother::phase_1.cg_rel_tol": 1e-05,
+      "ContourSmoother::phase_1.cg_abs_tol": 1e-05,
+      "ContourSmoother::phase_1.cg_quad_line_srch_rel_tol": 0.001,
+      "ContourSmoother::phase_1.cg_max_step_size": 0.3,
+      "ContourSmoother::phase_1.cg_num_blind_steps": 50,
+      "ContourSmoother::phase_1.cg_num_seeing_steps": 2,
+      "ContourSmoother::phase_1.cg_blind_blend_latest": 0.5,
+      "ContourSmoother::phase_2.cg_line_search_type": 0,
+      "ContourSmoother::phase_2.cg_iter_for_restart": 5,
+      "ContourSmoother::phase_2.cg_min_iter": 20,
+      "ContourSmoother::phase_2.cg_max_iter": 200,
+      "ContourSmoother::phase_2.cg_knock_out_count_down": 10,
+      "ContourSmoother::phase_2.cg_use_eps_from_step": 1,
+      "ContourSmoother::phase_2.cg_quad_line_srch_max_iter": 1,
+      "ContourSmoother::phase_2.cg_min_eps": 0.0001,
+      "ContourSmoother::phase_2.cg_max_eps": 0.01,
+      "ContourSmoother::phase_2.cg_step_fraction": 0.1,
+      "ContourSmoother::phase_2.cg_rel_tol": 1e-05,
+      "ContourSmoother::phase_2.cg_abs_tol": 1e-05,
+      "ContourSmoother::phase_2.cg_quad_line_srch_rel_tol": 0.001,
+      "ContourSmoother::phase_2.cg_max_step_size": 0.3,
+      "ContourSmoother::phase_2.cg_num_blind_steps": 50,
+      "ContourSmoother::phase_2.cg_num_seeing_steps": 2,
+      "ContourSmoother::phase_2.cg_blind_blend_latest": 0.5,
+      "BezierFitter::max_iterations": 10,
+      "BezierFitter::stat_thresh_initial": 0.0001,
+      "BezierFitter::stat_thresh_final": 3.0
+    },
+    {
+      "Shared::is_anti_aliased": 0,
+      "Shared::image_type_code": 8,
+      "Preprocessor::filter_type": 1,
+      "Preprocessor::reduce_noise_order": 1,
+      "PaletteFinder::cost_per_color": 0.15000000596046448,
+      "PaletteFinder::use_16_hist_bins": 1,
+      "PaletteFinder::use_26_connected_peaks": 1,
+      "EdgeImage::edge_weight_scale": 42.0,
+      "EdgeImage::edge_weight_floor": 0.0032,
+      "Segmenter::max_iterations": 50,
+      "Segmenter::lambda_pre": 0.0010000000474974513,
+      "Segmenter::lambda_initial": 0.0010000000474974513,
+      "Segmenter::lambda_final": 0.10000000149011612,
+      "Segmenter::min_num_pixels": 7,
+      "Segmenter::num_iter_btwn_renum": 1,
+      "Segmenter::rise_fraction": 0.4000000059604645,
+      "Segmenter::size_penalty_weight": 0.0,
+      "Segmenter::size_penalty_power": 1.0,
+      "Segmenter::use_over_seg_diag_extr": 0,
+      "SubPixelSegmenter::lambda_f": 0.10000000149011612,
+      "SubPixelSegmenter::beach_lambda_f": 9.999999747378752e-06,
+      "SubPixelSegmenter::color_cluster_margin": 0.10000000149011612,
+      "SubPixelSegmenter::use_connected_24_iteration": 0,
+      "SuperPixelSegmenter::lambda_f": 0.009999999776482582,
+      "SuperPixelSegmenter::use_connected_24_iteration": 0,
+      "SubPixelSegmentation::self_weight_eps": 0.10000000149011612,
+      "SubPixelSegmentation::self_weight_penalty_low": 0.009999999776482582,
+      "SubPixelSegmentation::self_weight_penalty_high": 1.0,
+      "SuperPixels::self_weight_eps": 0.10000000149011612,
+      "SuperPixels::self_weight_penalty_low": 0.009999999776482582,
+      "SuperPixels::self_weight_penalty_high": 1.0,
+      "FlowField::affinity_cost_scale": 9.999999747378752e-05,
+      "ContourSmoother::measurement_types": [
+        0,
+        0,
+        0
+      ],
+      "ContourSmoother::optimizer_type": [
+        0,
+        0,
+        0
+      ],
+      "ContourSmoother::prior_types": [
+        3,
+        3,
+        3
+      ],
+      "ContourSmoother::prior_strengths": [
+        1.0,
+        1.0,
+        1.0
+      ],
+      "ContourSmoother::length_penalty_weights": [
+        0.5,
+        0.5,
+        0.5
+      ],
+      "ContourSmoother::do_puncture_corners": [
+        0,
+        1,
+        0
+      ],
+      "ContourSmoother::is_enabled": [
+        1,
+        0,
+        0
+      ],
+      "ContourSmoother::length_barrier_weight": 0.1,
+      "ContourSmoother::air_pressure_weight": 5.0,
+      "ContourSmoother::perturbation_range": 0.01,
+      "ContourSmoother::puncture_flatness_thresh": 0.2,
+      "ContourSmoother::puncture_corner_thresh": 1.2,
+      "ContourSmoother::anti_inv_pot_meas_scale": 1.5,
+      "ContourSmoother::anti_inv_pot_prior_scale": 1.5,
+      "ContourSmoother::phase_0.cg_line_search_type": 0,
+      "ContourSmoother::phase_0.cg_iter_for_restart": 5,
+      "ContourSmoother::phase_0.cg_min_iter": 10,
+      "ContourSmoother::phase_0.cg_max_iter": 200,
+      "ContourSmoother::phase_0.cg_knock_out_count_down": 5,
+      "ContourSmoother::phase_0.cg_use_eps_from_step": 1,
+      "ContourSmoother::phase_0.cg_quad_line_srch_max_iter": 1,
+      "ContourSmoother::phase_0.cg_min_eps": 0.0001,
+      "ContourSmoother::phase_0.cg_max_eps": 0.01,
+      "ContourSmoother::phase_0.cg_step_fraction": 0.1,
+      "ContourSmoother::phase_0.cg_rel_tol": 1e-05,
+      "ContourSmoother::phase_0.cg_abs_tol": 1e-05,
+      "ContourSmoother::phase_0.cg_quad_line_srch_rel_tol": 0.001,
+      "ContourSmoother::phase_0.cg_max_step_size": 0.3,
+      "ContourSmoother::phase_0.cg_num_blind_steps": 50,
+      "ContourSmoother::phase_0.cg_num_seeing_steps": 2,
+      "ContourSmoother::phase_0.cg_blind_blend_latest": 0.5,
+      "ContourSmoother::phase_1.cg_line_search_type": 0,
+      "ContourSmoother::phase_1.cg_iter_for_restart": 5,
+      "ContourSmoother::phase_1.cg_min_iter": 50,
+      "ContourSmoother::phase_1.cg_max_iter": 200,
+      "ContourSmoother::phase_1.cg_knock_out_count_down": 10,
+      "ContourSmoother::phase_1.cg_use_eps_from_step": 1,
+      "ContourSmoother::phase_1.cg_quad_line_srch_max_iter": 1,
+      "ContourSmoother::phase_1.cg_min_eps": 0.0001,
+      "ContourSmoother::phase_1.cg_max_eps": 0.01,
+      "ContourSmoother::phase_1.cg_step_fraction": 0.1,
+      "ContourSmoother::phase_1.cg_rel_tol": 1e-05,
+      "ContourSmoother::phase_1.cg_abs_tol": 1e-05,
+      "ContourSmoother::phase_1.cg_quad_line_srch_rel_tol": 0.001,
+      "ContourSmoother::phase_1.cg_max_step_size": 0.3,
+      "ContourSmoother::phase_1.cg_num_blind_steps": 50,
+      "ContourSmoother::phase_1.cg_num_seeing_steps": 2,
+      "ContourSmoother::phase_1.cg_blind_blend_latest": 0.5,
+      "ContourSmoother::phase_2.cg_line_search_type": 0,
+      "ContourSmoother::phase_2.cg_iter_for_restart": 5,
+      "ContourSmoother::phase_2.cg_min_iter": 20,
+      "ContourSmoother::phase_2.cg_max_iter": 200,
+      "ContourSmoother::phase_2.cg_knock_out_count_down": 10,
+      "ContourSmoother::phase_2.cg_use_eps_from_step": 1,
+      "ContourSmoother::phase_2.cg_quad_line_srch_max_iter": 1,
+      "ContourSmoother::phase_2.cg_min_eps": 0.0001,
+      "ContourSmoother::phase_2.cg_max_eps": 0.01,
+      "ContourSmoother::phase_2.cg_step_fraction": 0.1,
+      "ContourSmoother::phase_2.cg_rel_tol": 1e-05,
+      "ContourSmoother::phase_2.cg_abs_tol": 1e-05,
+      "ContourSmoother::phase_2.cg_quad_line_srch_rel_tol": 0.001,
+      "ContourSmoother::phase_2.cg_max_step_size": 0.3,
+      "ContourSmoother::phase_2.cg_num_blind_steps": 50,
+      "ContourSmoother::phase_2.cg_num_seeing_steps": 2,
+      "ContourSmoother::phase_2.cg_blind_blend_latest": 0.5,
+      "BezierFitter::max_iterations": 10,
+      "BezierFitter::stat_thresh_initial": 0.0001,
+      "BezierFitter::stat_thresh_final": 0.5
+    }
+  ],
+  "segmentation": [
+    [
+      0.0012000000569969416,
+      0.0012000000569969416,
+      20.0
+    ],
+    [
+      0.0010999999940395355,
+      0.0010999999940395355,
+      11.600564002990723
+    ],
+    [
+      0.0010000000474974513,
+      0.0010000000474974513,
+      6.728653907775879
+    ],
+    [
+      0.0008999999845400453,
+      0.0008999999845400453,
+      3.902808666229248
+    ],
+    [
+      0.0007999999797903001,
+      0.0007999999797903001,
+      2.2637391090393066
+    ],
+    [
+      0.000699999975040555,
+      0.000699999975040555,
+      1.3130323886871338
+    ],
+    [
+      0.0006000000284984708,
+      0.0006000000284984708,
+      0.7615957856178284
+    ],
+    [
+      0.0005000000237487257,
+      0.0005000000237487257,
+      0.4417470395565033
+    ],
+    [
+      0.00039999998989515007,
+      0.00039999998989515007,
+      0.25622573494911194
+    ],
+    [
+      0.0003000000142492354,
+      0.0003000000142492354,
+      0.14861814677715302
+    ],
+    [
+      0.00019999999494757503,
+      0.00019999999494757503,
+      0.0862027108669281
+    ],
+    [
+      9.999999747378752e-05,
+      9.999999747378752e-05,
+      0.05000000074505806
+    ]
+  ],
+  "smoothing": [
+    [
+      {
+        "priorStrengths": [
+          0.05,
+          0.01,
+          0.45
+        ],
+        "lengthPenalties": [
+          0.5,
+          0.5,
+          0.5
+        ]
+      },
+      {
+        "priorStrengths": [
+          0.08620270870085897,
+          0.019956925494548066,
+          0.6353515635707694
+        ],
+        "lengthPenalties": [
+          0.7446945662442,
+          0.7446945662442,
+          0.7446945662442
+        ]
+      },
+      {
+        "priorStrengths": [
+          0.14861813974730292,
+          0.03982788751949426,
+          0.897048020737381
+        ],
+        "lengthPenalties": [
+          1.1091399939872746,
+          1.1091399939872746,
+          1.1091399939872746
+        ]
+      },
+      {
+        "priorStrengths": [
+          0.256225724166006,
+          0.07948421838317878,
+          1.2665352501634641
+        ],
+        "lengthPenalties": [
+          1.6519410534528962,
+          1.6519410534528962,
+          1.6519410534528962
+        ]
+      },
+      {
+        "priorStrengths": [
+          0.44174702923897713,
+          0.15862606242654864,
+          1.7882114477974502
+        ],
+        "lengthPenalties": [
+          2.4603830525241834,
+          2.4603830525241834,
+          2.4603830525241834
+        ]
+      },
+      {
+        "priorStrengths": [
+          0.7615958096191475,
+          0.31656885093401615,
+          2.5247620874516876
+        ],
+        "lengthPenalties": [
+          3.6644677801881542,
+          3.6644677801881542,
+          3.6644677801881542
+        ]
+      },
+      {
+        "priorStrengths": [
+          1.3130324344878836,
+          0.6317740971984855,
+          3.5646923109036197
+        ],
+        "lengthPenalties": [
+          5.457818488166129,
+          5.457818488166129,
+          5.457818488166129
+        ]
+      },
+      {
+        "priorStrengths": [
+          2.2637390492987755,
+          1.260826858717554,
+          5.0329618519584765
+        ],
+        "lengthPenalties": [
+          8.128815543368903,
+          8.128815543368903,
+          8.128815543368903
+        ]
+      },
+      {
+        "priorStrengths": [
+          3.9028087568292342,
+          2.516222768095131,
+          7.106000404519674
+        ],
+        "lengthPenalties": [
+          12.106969530296436,
+          12.106969530296436,
+          12.106969530296436
+        ]
+      },
+      {
+        "priorStrengths": [
+          6.728653727602239,
+          5.021607031056001,
+          10.032907706102433
+        ],
+        "lengthPenalties": [
+          18.03198884579169,
+          18.03198884579169,
+          18.03198884579169
+        ]
+      },
+      {
+        "priorStrengths": [
+          11.600563544588898,
+          10.021583738168335,
+          14.165385773852003
+        ],
+        "lengthPenalties": [
+          26.8566482240742,
+          26.8566482240742,
+          26.8566482240742
+        ]
+      },
+      {
+        "priorStrengths": [
+          20.00000000000001,
+          20.0,
+          20.000000000000014
+        ],
+        "lengthPenalties": [
+          40.00000000000001,
+          40.00000000000001,
+          40.00000000000001
+        ]
+      }
+    ],
+    [
+      {
+        "priorStrengths": [
+          0.05,
+          0.01,
+          0.45
+        ],
+        "lengthPenalties": [
+          0.25,
+          0.05,
+          0.005
+        ]
+      },
+      {
+        "priorStrengths": [
+          0.0809383877820033,
+          0.01873817422860384,
+          0.5965512221738415
+        ],
+        "lengthPenalties": [
+          0.34960837362424557,
+          0.06565162172439419,
+          0.00809383877820033
+        ]
+      },
+      {
+        "priorStrengths": [
+          0.13102045233499882,
+          0.035111917342151314,
+          0.7908296903935644
+        ],
+        "lengthPenalties": [
+          0.4889040596327604,
+          0.08620270870085897,
+          0.013102045233499882
+        ]
+      },
+      {
+        "priorStrengths": [
+          0.21209168356927233,
+          0.0657933224657568,
+          1.0483787074125368
+        ],
+        "lengthPenalties": [
+          0.6836998125860022,
+          0.11318695246493873,
+          0.021209168356927235
+        ]
+      },
+      {
+        "priorStrengths": [
+          0.343327178601354,
+          0.12328467394420663,
+          1.3898035537955133
+        ],
+        "lengthPenalties": [
+          0.9561087181015749,
+          0.14861813974730292,
+          0.0343327178601354
+        ]
+      },
+      {
+        "priorStrengths": [
+          0.5557669663547501,
+          0.231012970008316,
+          1.842420019107248
+        ],
+        "lengthPenalties": [
+          1.3370544557738155,
+          0.1951404378414617,
+          0.055576696635475
+        ]
+      },
+      {
+        "priorStrengths": [
+          0.8996576447849667,
+          0.4328761281083057,
+          2.4424398092355144
+        ],
+        "lengthPenalties": [
+          1.8697817349205381,
+          0.256225724166006,
+          0.08996576447849666
+        ]
+      },
+      {
+        "priorStrengths": [
+          1.4563367864929884,
+          0.8111308307896872,
+          3.2378676739677568
+        ],
+        "lengthPenalties": [
+          2.614765405511559,
+          0.336432686380112,
+          0.14563367864929883
+        ]
+      },
+      {
+        "priorStrengths": [
+          2.35747103132732,
+          1.5199110829529343,
+          4.292342040316974
+        ],
+        "lengthPenalties": [
+          3.6565755233193475,
+          0.44174702923897713,
+          0.235747103132732
+        ]
+      },
+      {
+        "priorStrengths": [
+          3.8161980903682,
+          2.848035868435804,
+          5.690226422531671
+        ],
+        "lengthPenalties": [
+          5.113477686967605,
+          0.5800281772294446,
+          0.38161980903682
+        ]
+      },
+      {
+        "priorStrengths": [
+          6.177538417823237,
+          5.336699231206311,
+          7.543358948460338
+        ],
+        "lengthPenalties": [
+          7.150858470818456,
+          0.7615958096191475,
+          0.6177538417823236
+        ]
+      },
+      {
+        "priorStrengths": [
+          10.000000000000005,
+          10.000000000000012,
+          10.000000000000007
+        ],
+        "lengthPenalties": [
+          10.000000000000002,
+          1.0000000000000002,
+          1.0000000000000004
+        ]
+      }
+    ]
+  ],
+  "curves": [
+    [
+      0.0012000000000000001,
+      20.00000000000001
+    ],
+    [
+      0.0011,
+      12.355076835646473
+    ],
+    [
+      0.001,
+      7.6323961807364
+    ],
+    [
+      0.0009000000000000001,
+      4.71494206265464
+    ],
+    [
+      0.0008,
+      2.9126735729859767
+    ],
+    [
+      0.0007,
+      1.7993152895699334
+    ],
+    [
+      0.0006000000000000001,
+      1.1115339327095002
+    ],
+    [
+      0.0005,
+      0.686654357202708
+    ],
+    [
+      0.0004,
+      0.42418336713854465
+    ],
+    [
+      0.00030000000000000003,
+      0.26204090466999763
+    ],
+    [
+      0.0002,
+      0.1618767755640066
+    ],
+    [
+      0.0001,
+      0.1
+    ]
+  ],
+  "constructor": {
+    "Shared::is_anti_aliased": 1,
+    "Shared::image_type_code": 0,
+    "Preprocessor::filter_type": 1,
+    "Preprocessor::reduce_noise_order": 1,
+    "PaletteFinder::cost_per_color": 0.30000001192092896,
+    "PaletteFinder::use_16_hist_bins": 1,
+    "PaletteFinder::use_26_connected_peaks": 1,
+    "EdgeImage::edge_weight_scale": 50.0,
+    "EdgeImage::edge_weight_floor": 0.01,
+    "Segmenter::max_iterations": 50,
+    "Segmenter::lambda_pre": 9.999999747378752e-05,
+    "Segmenter::lambda_initial": 9.999999747378752e-05,
+    "Segmenter::lambda_final": 0.05000000074505806,
+    "Segmenter::min_num_pixels": 0,
+    "Segmenter::num_iter_btwn_renum": 5,
+    "Segmenter::rise_fraction": 0.4000000059604645,
+    "Segmenter::size_penalty_weight": 0.0,
+    "Segmenter::size_penalty_power": 1.0,
+    "Segmenter::use_over_seg_diag_extr": 0,
+    "SubPixelSegmenter::lambda_f": 0.05000000074505806,
+    "SubPixelSegmenter::beach_lambda_f": 9.999999747378752e-06,
+    "SubPixelSegmenter::color_cluster_margin": 0.10000000149011612,
+    "SubPixelSegmenter::use_connected_24_iteration": 0,
+    "SuperPixelSegmenter::lambda_f": 0.009999999776482582,
+    "SuperPixelSegmenter::use_connected_24_iteration": 0,
+    "SubPixelSegmentation::self_weight_eps": 0.10000000149011612,
+    "SubPixelSegmentation::self_weight_penalty_low": 0.009999999776482582,
+    "SubPixelSegmentation::self_weight_penalty_high": 1.0,
+    "SuperPixels::self_weight_eps": 0.10000000149011612,
+    "SuperPixels::self_weight_penalty_low": 0.009999999776482582,
+    "SuperPixels::self_weight_penalty_high": 1.0,
+    "FlowField::affinity_cost_scale": 9.999999747378752e-05,
+    "ContourSmoother::measurement_types": [
+      1,
+      1,
+      1
+    ],
+    "ContourSmoother::optimizer_type": [
+      0,
+      0,
+      0
+    ],
+    "ContourSmoother::prior_types": [
+      1,
+      1,
+      1
+    ],
+    "ContourSmoother::prior_strengths": [
+      1.0,
+      1.0,
+      1.0
+    ],
+    "ContourSmoother::length_penalty_weights": [
+      0.1,
+      0.1,
+      0.1
+    ],
+    "ContourSmoother::do_puncture_corners": [
+      0,
+      0,
+      0
+    ],
+    "ContourSmoother::is_enabled": [
+      1,
+      1,
+      1
+    ],
+    "ContourSmoother::length_barrier_weight": 0.1,
+    "ContourSmoother::air_pressure_weight": 1.0,
+    "ContourSmoother::perturbation_range": 0.01,
+    "ContourSmoother::puncture_flatness_thresh": 0.1,
+    "ContourSmoother::puncture_corner_thresh": 1.5,
+    "ContourSmoother::anti_inv_pot_meas_scale": 0.75,
+    "ContourSmoother::anti_inv_pot_prior_scale": 1.0,
+    "ContourSmoother::phase_0.cg_line_search_type": 0,
+    "ContourSmoother::phase_1.cg_line_search_type": 0,
+    "ContourSmoother::phase_2.cg_line_search_type": 0,
+    "ContourSmoother::phase_0.cg_iter_for_restart": 10,
+    "ContourSmoother::phase_1.cg_iter_for_restart": 10,
+    "ContourSmoother::phase_2.cg_iter_for_restart": 10,
+    "ContourSmoother::phase_0.cg_min_iter": 80,
+    "ContourSmoother::phase_1.cg_min_iter": 80,
+    "ContourSmoother::phase_2.cg_min_iter": 80,
+    "ContourSmoother::phase_0.cg_max_iter": 400,
+    "ContourSmoother::phase_1.cg_max_iter": 400,
+    "ContourSmoother::phase_2.cg_max_iter": 400,
+    "ContourSmoother::phase_0.cg_knock_out_count_down": 10,
+    "ContourSmoother::phase_1.cg_knock_out_count_down": 10,
+    "ContourSmoother::phase_2.cg_knock_out_count_down": 10,
+    "ContourSmoother::phase_0.cg_use_eps_from_step": 1,
+    "ContourSmoother::phase_1.cg_use_eps_from_step": 1,
+    "ContourSmoother::phase_2.cg_use_eps_from_step": 1,
+    "ContourSmoother::phase_0.cg_quad_line_srch_max_iter": 3,
+    "ContourSmoother::phase_1.cg_quad_line_srch_max_iter": 3,
+    "ContourSmoother::phase_2.cg_quad_line_srch_max_iter": 3,
+    "ContourSmoother::phase_0.cg_min_eps": 0.0001,
+    "ContourSmoother::phase_1.cg_min_eps": 0.0001,
+    "ContourSmoother::phase_2.cg_min_eps": 0.0001,
+    "ContourSmoother::phase_0.cg_max_eps": 0.001,
+    "ContourSmoother::phase_1.cg_max_eps": 0.001,
+    "ContourSmoother::phase_2.cg_max_eps": 0.001,
+    "ContourSmoother::phase_0.cg_step_fraction": 0.1,
+    "ContourSmoother::phase_1.cg_step_fraction": 0.1,
+    "ContourSmoother::phase_2.cg_step_fraction": 0.1,
+    "ContourSmoother::phase_0.cg_rel_tol": 1e-05,
+    "ContourSmoother::phase_1.cg_rel_tol": 1e-05,
+    "ContourSmoother::phase_2.cg_rel_tol": 1e-05,
+    "ContourSmoother::phase_0.cg_abs_tol": 1e-05,
+    "ContourSmoother::phase_1.cg_abs_tol": 1e-05,
+    "ContourSmoother::phase_2.cg_abs_tol": 1e-05,
+    "ContourSmoother::phase_0.cg_quad_line_srch_rel_tol": 0.001,
+    "ContourSmoother::phase_1.cg_quad_line_srch_rel_tol": 0.001,
+    "ContourSmoother::phase_2.cg_quad_line_srch_rel_tol": 0.001,
+    "ContourSmoother::phase_0.cg_max_step_size": 0.3,
+    "ContourSmoother::phase_1.cg_max_step_size": 0.3,
+    "ContourSmoother::phase_2.cg_max_step_size": 0.3,
+    "ContourSmoother::phase_0.cg_num_blind_steps": 50,
+    "ContourSmoother::phase_1.cg_num_blind_steps": 50,
+    "ContourSmoother::phase_2.cg_num_blind_steps": 50,
+    "ContourSmoother::phase_0.cg_num_seeing_steps": 2,
+    "ContourSmoother::phase_1.cg_num_seeing_steps": 2,
+    "ContourSmoother::phase_2.cg_num_seeing_steps": 2,
+    "ContourSmoother::phase_0.cg_blind_blend_latest": 0.5,
+    "ContourSmoother::phase_1.cg_blind_blend_latest": 0.5,
+    "ContourSmoother::phase_2.cg_blind_blend_latest": 0.5,
+    "BezierFitter::max_iterations": 10,
+    "BezierFitter::stat_thresh_initial": 9.999999747378752e-05,
+    "BezierFitter::stat_thresh_final": 0.009999999776482582
+  }
+}

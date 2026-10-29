@@ -1,0 +1,115 @@
+{
+  "component": "Independent palette assignment, fixed-count generation, and refinement",
+  "api": "assignPalette({ bgra, palette }) returns an Int32Array with one palette index per pixel.",
+  "cli": "openvector assign-palette <assignment.json|-> reads the same object and prints a JSON array of indices. Errors go to stderr with status 1 and no partial output.",
+  "input": {
+    "bgra": "Flat Uint8Array or ordinary array of byte channels in blue, green, red, alpha order. Four channels per pixel. The caller supplies the engine's premultiplied color representation; this operation does not decode images or change transparency.",
+    "palette": "Nonempty flat Float32Array or ordinary array of normalized BGRA channels in [0, 1]. Convert supplied numbers to float32 once at the boundary. Four channels per palette color."
+  },
+  "behavior": [
+    "Normalize each byte by multiplication with float32(1 / 255), rounding the product to float32.",
+    "Use squared Euclidean distance over all four channels, including alpha.",
+    "Round each subtraction, multiplication, and left-to-right addition to float32 in B, G, R, A order.",
+    "Select the first palette entry when rounded distances tie.",
+    "Do not mutate the caller's pixel or palette arrays. Return independently owned indices.",
+    "An empty pixel buffer returns an empty index buffer; an empty palette is invalid."
+  ],
+  "reference": {
+    "assignment": "0x48d840 with weight collection disabled",
+    "channel_order": "0x476090 formats the bytes at offsets 2, 1, 0 as the SVG RGB hex string, confirming internal BGRA order.",
+    "premultiplication": "0x46c700 adds background * (1 - alpha) to the existing pixel channels during flattening.",
+    "recording": "../evidence/palette-native-reference.json",
+    "cases": 1193,
+    "pixels": 12032,
+    "limits": "This recording covers nearest-color assignment. Separate recordings below cover initialization and weighted/unweighted refinement. Automatic color-count selection, decoding, and final segmentation remain unresolved."
+  },
+  "generation": {
+    "api": "CoreSession.generateUnweighted({ bgra, colorCount, bins, connected }) returns owned normalized Float32Array palette, Int32Array indices, Float64Array weights, and passes.",
+    "cli": "generate-palette <generation.json|-> and refine-palette <refinement.json|-> require an explicit antiAlias boolean. false selects unweighted behavior; true selects weighted behavior and requires width/height. Each invocation starts one fresh session and prints ordinary JSON arrays. Missing antiAlias fails instead of inferring a historical input shape.",
+    "color_count": "An explicit positive int32 count. This is the low-level fixed-count operation, independent of GUI control limits or automatic selection.",
+    "initialization": "Build the unweighted BGRA histogram. Initialize colors from the first ordered peak centers, normalized to float32. If fewer peaks exist than requested colors, consume session PRNG colors in R, G, B order with alpha 1.",
+    "refinement": "Run the same canonical unweighted refinement used by refineUnweighted, retaining session random state.",
+    "quantization": "After refinement, replace each channel with float32(byte * float32(1 / 255)), where byte = trunc(double(channel) * 255 + 0.5) modulo 256. Preserve the assignments and membership weights from refinement; do not add another assignment after quantization.",
+    "empty_input": "An empty pixel buffer follows the original low-level empty-histogram/refinement behavior. Image decoding and GUI image-dimension requirements belong to the loading boundary.",
+    "recording": "../evidence/generation-native-reference.json",
+    "cases": 74,
+    "limits": "Original histogram, peak detection/sort, initialization, refinement, and quantization execute on the host. The harness omits candidate scoring and retained-result projection after verifying they do not modify palette colors or assignments. Weighted behavior has separate recordings. Automatic selection, decoding, and final segmentation remain unfinished."
+  },
+  "histogram_peaks": {
+    "api": "findHistogramPeaks({ histogram, bins, connected }) returns owned Uint8Array bgra bin centers and Float64Array weights in original peak order.",
+    "input": "bins is 8 or 16; histogram has bins^4 finite nonnegative double values, indexed with B fastest, then G, R, A. connected is a required boolean.",
+    "detection": "Keep bins with weight >= 2 unless a strictly heavier neighboring bin exists. When connected is false, use the eight axis neighbors in four dimensions. When true, use all 80 neighboring bins. Equal neighboring weights do not suppress each other.",
+    "centers": "For each coordinate, output coordinate * (256 / bins) + 128 / bins as an unsigned byte.",
+    "order": "Enumerate bins in increasing flat-index order, then reproduce the original bottom-up linked-list merge schedule. Higher weights precede lower weights. On equal weights, take the right run's element when any left color channel is smaller than the corresponding right channel. This is not lexicographic comparison and must not be replaced with Array.sort.",
+    "recording": "../evidence/peaks-native-reference.json",
+    "cases": 44,
+    "limits": "Original peak detector and list sorter from an explicit histogram. Anti-alias measurements have a separate recording; automatic color-count selection remains unfinished."
+  },
+  "anti_alias_measurement": {
+    "api": "measureAntiAlias({ width, height, bgra }) returns an owned Uint8Array with one contrast measurement per pixel.",
+    "dimensions": "This recovered kernel requires width and height >= 2 and exactly width * height BGRA pixels. Single-row/single-column application preprocessing remains unresolved and is not replaced with clamping.",
+    "sampling": "Use top, bottom, left, and right neighbors. At each boundary, reflect the missing neighbor one step inward. Do not wrap rows or duplicate the edge pixel.",
+    "arithmetic": "Normalize channel bytes to float32 using float32(1 / 255); round each neighbor-minus-center difference to float32. Square and sum four BGRA differences per neighbor in double precision. Sum the four neighbor totals in top, bottom, left, right order. Compute sqrt(total) * 255 / sqrt(12), clamp to [0, 255], and truncate to a byte.",
+    "meaning": "A local contrast measurement used by the original weighting branch. This is not the automatic image-type classifier.",
+    "recording": "../evidence/measurement-native-reference.json",
+    "cases": 471,
+    "limits": "Original 0x483b40 arithmetic and float-to-byte conversion run on the host with harness-owned byte-grid storage. Weighted palette consumption has separate recordings. Application loading/resizing and one-dimensional inputs remain unresolved."
+  },
+  "weighted_generation": {
+    "api": "CoreSession.generateWeighted({ width, height, bgra, colorCount, bins, connected }) returns the same owned palette/indices/weights/passes shape as generateUnweighted.",
+    "dimensions": "The recovered measurement kernel requires both dimensions >= 2; one-dimensional application preprocessing remains unresolved.",
+    "constructor_defaults": "Original 0x47fc80 initializes strength=double(50) and minimum=double(0.01). These are not exposed GUI controls or guessed defaults.",
+    "histogram_weight": "Compute max(1 - double(measurementByte) * 50 * double(1 / 255), double(0.01)), retaining the multiplication order. Add these double weights to the histogram.",
+    "refinement_weight": "Round that per-pixel weight to float32. Multiply each normalized float32 channel by it with float32 rounding, accumulate sums/counts in float32, and use the same float32 reciprocal and convergence rules as unweighted refinement.",
+    "membership_weight": "The original assignment collector uses double(measurementByte) * double(1 / 255), not the histogram/refinement weight. Accumulate these values in double precision for the final reported weights.",
+    "session_and_finalization": "Share the same session PRNG, peak ordering, empty-cluster handling, pass limit, and final byte quantization as unweighted generation.",
+    "recording": "../evidence/weighted-generation-native-reference.json",
+    "cases": 80,
+    "limits": "Original measurement, weight constructor, weighted histogram, initialization, weighted means, membership collector, and finalization run on the host. Candidate scoring is implemented separately in the blending module; automatic color count and input preprocessing remain unfinished."
+  },
+  "weighted_refinement": {
+    "api": "CoreSession.refineWeighted({ width, height, bgra, palette }) returns owned palette/indices/weights/passes without final byte quantization, matching the original refinement entry point.",
+    "behavior": "Compute the same native measurement and constructor-default weights as weighted generation, then use the canonical refinement loop from the supplied starting colors. Retain session random state and the distinct raw-contrast membership weights.",
+    "recording": "../evidence/weighted-refinement-native-reference.json",
+    "cases": 80,
+    "limits": "Original measurement, weight constructor, weighted refinement, and membership collection from explicit initial palettes. Input preprocessing and automatic selection remain unfinished."
+  },
+  "refinement": {
+    "api": "new CoreSession().refineUnweighted({ bgra, palette }) returns owned Float32Array palette, Int32Array indices, Float64Array weights, and an integer passes count.",
+    "session": "Each session starts with PRNG state 1. Successive operations share its state. A read-only randomState property exposes the current state for differential verification; operations do not reset it per image.",
+    "random": "state = (state * 2003) % 9973; each requested random component is float32(state * double(1 / 9973)). Empty clusters request R, G, B in that order and set alpha to 1.",
+    "means": "Normalize bytes to float32, accumulate channel sums and membership counts in float32, compute float32(1 / count), and multiply each sum by that reciprocal with float32 rounding.",
+    "termination": "Perform at most 10 assignment passes. After an update, compare the largest float32 channel change with float32(0.01). If smaller, perform one final assignment without another update, unless the tenth pass already ended the loop.",
+    "final_pass": "Collect membership weights on the converged final pass or pass ten. Pass ten can still update colors after assigning indices. Do not insert an extra assignment after this limit.",
+    "empty_colors": "After the loop, set all four channels of colors whose last update count is zero to zero. Do not delete or reorder entries.",
+    "validation": "Validate byte/palette inputs once before entering the loop. Palette must be nonempty. Empty pixel input follows the same empty-cluster rules; it is not assigned a different algorithm.",
+    "recording": "../evidence/refinement-native-reference.json",
+    "recording_scope": "89 ordered calls share one original random state. Original refinement, assignment, means and PRNG instructions run on the host CPU; the harness provides starting colors and preallocated vector operations.",
+    "limits": "Unweighted refinement from an explicit starting palette. Histogram initialization, anti-alias weights, and automatic color-count selection are not covered by this method."
+  },
+  "unweighted_score": {
+    "api": "scoreUnweightedPalette({ bgra, palette, indices, costPerColor }) returns { total, error, colors }.",
+    "inputs": "Explicit per-pixel palette indices and an explicit finite float32 costPerColor. Score the supplied assignments without reassigning pixels; preserve caller arrays.",
+    "arithmetic": "Compute each BGRA squared distance with the assignment float32 operations, then accumulate pixel costs in row-major order with a float32 store after each addition. error=float32(log10(1+double(sum))); colors=float32(float32(colorCount-2)*float32(costPerColor)); total=float32(error+colors).",
+    "ordering": "The generation pipeline scores unquantized refined colors before final byte quantization. Do not infer that score from the returned quantized colors.",
+    "recording": "../evidence/engine-score-native-reference.json",
+    "limits": "This API uses unweighted errors. Anti-alias scoring is implemented in the blending module and specified by blending-contract.json. Automatic color selection remains unfinished.",
+    "cases": 1235
+  },
+  "complete_stage_reference": {
+    "recordings": [
+      "../evidence/engine-generation-native-reference.json",
+      "../evidence/engine-weighted-generation-native-reference.json"
+    ],
+    "unweighted_cases": 69,
+    "weighted_cases": 63,
+    "behavior": "Unmodified original complete fixed-count palette stages, including scoring, blending, allocation, and retained-candidate copying. Colors, indices, membership weights, and random state agree with the bounded captures.",
+    "limits": "Ordered prefixes stop before color counts above the constructor-backed retained-candidate capacity of 24. This is a harness bound, not a GUI limit or full pipeline parity."
+  },
+  "weighted_score": {
+    "contract": "blending-contract.json",
+    "section": "weighted_score",
+    "api": "scoreWeightedPalette from openvector/blending",
+    "cases": 440
+  }
+}

@@ -1,0 +1,180 @@
+{
+  "component": "OpenVector GUI",
+  "status": "Working modernized development preview. Computational and complete GUI parity remain unfinished.",
+  "behavior": {
+    "reference": "Vector Magic desktop at D:/VectorMagic/Vector Magic/vmde.exe",
+    "targetSha256": "c491656b962debc215a8b6e757a9b2949ffe50a36b5f2db692706bcd4ebface1",
+    "requirement": "Preserve Vector Magic's workflow, control grouping and feature set while modernizing its visual presentation.",
+    "engine": "Use the same independent engine as the terminal CLI and Node.js library, without requiring an installed copy of Vector Magic.",
+    "groundTruth": "Establish controls, defaults, enabled states, editing transitions and export behavior from the executable reference. Record unresolved behavior rather than inventing controls or claiming parity from appearance.",
+    "verification": "Compare real GUI actions and exported results with the reference. Verify keyboard operation, focus and accessible control names in the implemented interface."
+  },
+  "presentation": {
+    "components": "Use shadcn/ui for standard interface controls, customized to OpenVector's visual requirements.",
+    "branding": "Create original openvector branding and a new logo; update icons with a consistent modern set.",
+    "layout": "Keep the reference application's recognizable workspace and control grouping; use an information-dense layout and minimal copy.",
+    "background": "#000000",
+    "primaryText": "#ffffff",
+    "decoration": "No decorative cards or pills, and no light-gray subtitle lines above sections.",
+    "motion": "Interactions should normally be instant. Use brief motion only to clarify a change, honor prefers-reduced-motion, and avoid looping pulse, shimmer, blur or spinner animations.",
+    "parityScope": "Visual modernization is explicitly requested. Computational behavior and feature parity remain required; matching legacy pixels, icons or branding is not a GUI acceptance criterion.",
+    "viewerTextSelection": "Panning and painting inside the image viewport must not select its readout text. Restrict this rule to the image viewport, leaving editable fields and text elsewhere with their existing browser behavior. This modernized canvas interaction does not establish native window/focus parity."
+  },
+  "implementation": {
+    "frameworkAndDesktopHost": "React with shadcn/ui and Lucide, served only on loopback by a local Node host. Processing runs in a Node worker using the shared engine. Native desktop packaging remains future work.",
+    "dependenciesInstalled": true,
+    "referenceWorkflowCaptured": false,
+    "guiImplemented": true,
+    "guiParityVerified": false,
+    "previewScope": [
+      "PNG/BMP/JPEG/GIF/TIFF input through the canonical independent decoder, including captured CMYK/progressive JPEG and complete GIF/TIFF conversions, including grayscale/alpha JPEG-compressed TIFF, plus native-verified packed/bitfield/RLE BMP import and six complete BMP conversions, including NeXT/ThunderScan TIFF and retained scanline behavior, floating predictor3, byte-padded grayscale and native planar import",
+      "Single viewer with pan, zoom, bitmap/vector layers and path outlines",
+      "Fully automatic processing through canonical ImageDocument.runAutomatic, with native selected-control/source-reset behavior",
+      "Basic and advanced wizard controls calling verified document stages",
+      "SVG, EPS, PDF, AI and DXF exports through canonical writers",
+      "Streamed freehand Pencil, Fill, Zap, Pick color and undo/redo/revert through ImageDocument; sixteen real-widget gesture workflows match, with broader gesture and layer interactions still incomplete",
+      "Remove Background with document-owned visibility/history, transparent-region dashed outlines, retained completed previews during advanced commits, and visibility-aware downloads; 40 native GUI engine workflows pass.",
+      "Native viewer key-state behavior: B/V event ordering and modifier handling, temporary Shift Pan with retained tool restoration, and independently selected/current layers. Six native sequences cover 99 actions; real browser key/pointer checks pass. Broader shortcut/focus routing remains incomplete.",
+      "Batch file queue, basic/advanced settings, completed-task progress, overwrite decisions, cancellation/retry, summary and log, sharing the single-image document. Clipboard/recent files, full native-dialog interaction verification and EMF device measurement remain incomplete.",
+      "Shared saved settings: Play, Fast Forward, exact-name Save/overwrite and batch Use. Fifteen paired native entry workflows and isolated browser checks pass; full profile lifecycle parity remains unfinished."
+    ],
+    "downloads": "Vector downloads use the existing GET /api/export attachment response and server-owned filename. Bitmap downloads, including their required flatten acknowledgement and attachment fetch, follow bitmap-gui-contract.json. No alternative product download route is introduced for the automation driver.",
+    "verificationCheckpoint": "../evidence/gui-preview-verification-checkpoint.json",
+    "portableRuntime": "A retained curated source-and-built-frontend ZIP runs with Node alone and no node_modules; its fresh extraction passed six GUI integration tests. That historical ZIP predates batch screens and does not verify their native picker helper. Main-thread Node permissions deny original/workspace reads and child creation. Node 24.12 does not inherit its permission model into workers, so no worker filesystem/process isolation is established. Direct installed-engine tests enforce denials without workers; see batch-contract.json verificationLimits.",
+    "browserDownloadLimitation": "The current agent-browser Chrome driver cancels both a vector SVG navigation attachment and a bitmap PNG download. The captured SVG response is 200 with Content-Disposition attachment; direct PNG HTTP export remains valid. A fresh session with the documented download directory on open and all subsequent commands still cancels SVG. No completed browser file exists. The owned Chrome policy page shows no DownloadRestrictions entry; the precise cancellation cause is unresolved. One network observation also times out after the blob attempt. No browser policy, product export transport or existing failure was altered. The other eight formats remain unattempted after the failing completion gate. See ../evidence/browser-exports-download-limitation.json.",
+    "curveStatistic": "Count distinct fitted cubic IDs referenced by non-line region edges. Exclude unused/reserved cubic storage entries.",
+    "currentClassificationCheckpoint": "../evidence/document-classification-verification-checkpoint.json",
+    "filenameContext": "GuiEngine.open uses canonical resolveImageFilename(name) before constructing its document. Actual encoding still comes from the uploaded bytes. Fifteen native MainWindow loads verify source context, case, extension aliases and mixed-separator behavior. Decoded-source witnesses keep their explicit caller inputs; the GUI no longer hardcodes zero.",
+    "sourceContextCheckpoint": "../evidence/native-gui-source-contexts-verification.json",
+    "automaticContract": "automatic-contract.json",
+    "editingContract": "segmentation-edit-contract.json",
+    "editingCheckpoint": "../evidence/segmentation-editor-verification-checkpoint.json",
+    "backgroundContract": "background-edit-contract.json",
+    "backgroundCheckpoint": "../evidence/background-verification-checkpoint.json",
+    "viewerInputContract": "viewer-input-contract.json",
+    "viewerInputCheckpoint": "../evidence/viewer-input-verification-checkpoint.json",
+    "autoUpdateContract": "auto-update-contract.json",
+    "batchContract": "batch-contract.json",
+    "batchCheckpoint": "../evidence/gui-batch-workspace-verification-checkpoint.json",
+    "savedProfilesContract": "saved-profiles-contract.json",
+    "batchProfileCheckpoint": "../evidence/batch-profiles-verification-checkpoint.json",
+    "paletteRuntimeCheckpoint": "../evidence/profile-palettes-verification-checkpoint.json",
+    "profileServiceCheckpoint": "../evidence/profile-service-verification-checkpoint.json",
+    "profileReplayCheckpoint": "../evidence/profile-replay-verification-checkpoint.json",
+    "profileNavigationCheckpoint": "../evidence/profile-navigation-verification-checkpoint.json",
+    "profileResetCheckpoint": "../evidence/profile-navigation-verification-checkpoint.json",
+    "profileManagementCheckpoint": "../evidence/profile-management-verification-checkpoint.json",
+    "profileConversionCheckpoint": "../evidence/profile-conversion-verification-checkpoint.json",
+    "profileGuidedCheckpoint": "../evidence/profile-guided-verification-checkpoint.json",
+    "profileBackwardCheckpoint": "../evidence/profile-backward-verification-checkpoint.json",
+    "profileHistoryCheckpoint": "../evidence/profile-history-verification-checkpoint.json",
+    "profileBackgroundCheckpoint": "../evidence/profile-background-verification-checkpoint.json",
+    "confirmationCheckpoint": "../evidence/profile-modal-verification-checkpoint.json",
+    "sourceEntryContract": "source-entry-contract.json",
+    "viewerSelectionCheckpoint": "../evidence/viewer-selection-verification-checkpoint.json"
+  },
+  "references": [
+    {
+      "url": "https://ui.shadcn.com/",
+      "purpose": "User-selected customizable component system.",
+      "checkedOn": "2026-10-17"
+    },
+    {
+      "url": "https://ui.shadcn.com/docs/components",
+      "purpose": "Official catalog of available controls; select components after observing the corresponding reference workflow.",
+      "checkedOn": "2026-10-17"
+    }
+  ],
+  "referenceTaskEvidence": {
+    "status": "Static REA and bounded native component evidence; no user-visible GUI workflow capture yet.",
+    "controllerConstructor": "0x4400a0; REA 786",
+    "paletteTaskConstructor": "0x43ee40; REA 789",
+    "taskDispatch": "0x43f910; REA 793. Palette request is task kind 2; cache check can avoid creating a worker.",
+    "threadStart": "0x43fd37 pushes priority 2 before original QThread::start.",
+    "taskCompletion": "0x43ff50; REA 795. Dispatches task failure/completion/cancellation signals and schedules pending work. Full original GUI handler behavior remains unverified.",
+    "cancelRequest": "0x43f140; REA 779. Stores active task, marks cancellation and calls original document flag method 0x4690d0.",
+    "componentProof": "../evidence/document-cancellation-native-reference.json",
+    "scope": "Use these observations to preserve task behavior in the eventual shared document model. They do not establish widget layout, enabled controls, dialogs or GUI cancellation completion."
+  },
+  "currentReferenceInspection": {
+    "proof": "../evidence/gui-inspection-current-check.json",
+    "windowOpened": true,
+    "screenshotCapture": "Both initial and one recovered capture timed out.",
+    "accessibility": "Current application exposes unnamed panels, so control identities and visual workflow cannot be verified through this tool.",
+    "scope": "No stale coordinates or unnamed-panel clicks used. GUI is still required; installed reference works according to the user, and this limitation belongs to the inspection tool.",
+    "currentOffscreenCapture": {
+      "method": "Original public Qt QPixmap.grabWidget(MainWindow), with the Qt thread pool settled. No desktop screenshot or native code patch.",
+      "proofs": [
+        "../evidence/native-gui-gesture-background-preview-color-lifetime-reference-verification.json",
+        "../evidence/native-gui-gesture-background-preview-alpha-outline-reference-verification.json"
+      ],
+      "scope": "Real original viewer images establish retained completed scenes, current visibility and outlines for hidden transparent regions. This supersedes the older screenshot-tool limitation only for captured workflows; full GUI coverage remains incomplete."
+    }
+  },
+  "documentedWorkflow": {
+    "groundTruth": "Embedded reference help, not a verified live GUI action trace.",
+    "layout": "One main image viewer with navigation/zoom/layer controls on its left and the wizard on its right. Do not assume a side-by-side source/result layout.",
+    "modes": [
+      "Fully automatic",
+      "Basic wizard",
+      "Advanced wizard"
+    ],
+    "basicPages": [
+      "Load image",
+      "Wizard mode",
+      "Image type",
+      "Transparency",
+      "Input quality/output detail",
+      "Color mode",
+      "Palette selection",
+      "Review",
+      "Edit segmentation",
+      "Export"
+    ],
+    "advancedPages": [
+      "Load image",
+      "Wizard mode",
+      "Transparency",
+      "Palette selection",
+      "Segmentation",
+      "Edit segmentation",
+      "Path smoothing",
+      "Export"
+    ],
+    "viewer": "Pan with arrow buttons or image drag; wheel/slider zoom; 100% and Fit also center. Bitmap/Vector controls select a default layer; holding B/V temporarily shows the respective available layer and releasing returns to default. Paths controls shape outlines.",
+    "navigation": "Start returns to Load Image; Reset on that page closes the image and loses unsaved work. Back/Revert share navigation location; Next/Update share navigation location. Revert/Update appear for unapplied advanced changes. Wizard choice buttons select and advance; recommendations prepopulate selection.",
+    "verificationGap": "Actual GUI defaults, enabled states, event ordering and output behavior still require executable checks. Visual modernization remains explicitly permitted.",
+    "sources": [
+      {
+        "file": "../evidence/qt-resources/Resources/app_overview.html",
+        "sha256": "ba09bad0e0cf8d981c8700ffcf3e6b4921acd5bf8a181a27d0fb9110baebb39d"
+      },
+      {
+        "file": "../evidence/qt-resources/Resources/main_view_overview.html",
+        "sha256": "341739f9a94acf61b87d30b277b87135a78f6456f8f9160f9391760eae74a18a"
+      },
+      {
+        "file": "../evidence/qt-resources/Resources/wizard_overview.html",
+        "sha256": "186f0b4171e8a10c5be1dd110ef1ec447a5c1fb5a379908c490b350a7f326faf"
+      }
+    ]
+  },
+  "advancedControlState": {
+    "selected": "GuiEngine owns the full selected profile and palette runtime. Browser PaletteSelection renders immediate pending edits with the same shared kernel, then sends ordered palette/select commands to the worker. Requested count, palette count, current colors and runtime revert copy have distinct lifetimes. The worker-owned saved-profile service implements list/save/select and persistence; visible Save, Play, Fast Forward and batch Use controls now share that service and existing page timer. Native continuing-flag lifetime, later guided navigation and rename/delete remain unfinished.",
+    "engineSnapshot": "Expose committedSettings, committedCount and segmentationHistory without cloning editor pixels to inspect history. GUI count is explicit request metadata; it does not change palette search bounds or numerical settings.",
+    "commits": "Palette requests commit count/settings on both cache hits and computation. Segmentation/smoothing/fitting commit count only when a core stage does work. Native comparison at 0x468cf0 checks eleven raw advanced fields, including requested count; it does not compare palette availability.",
+    "workflow": "Advanced palette -> segmentation -> segmentation editing -> smoothing -> background -> export. Next performs work when selected advanced controls or stage keys differ; cache hits do not force unavailable geometry to regenerate.",
+    "backwardNavigation": "Back/Revert compares the eleven selected advanced controls with their committed values, not processing-stage freshness. Palette checks these changes only in custom palette mode 1; Segmentation, Editing and Smoothing also check them. Editing separately checks uncommitted edit history. Stale smoothing/fitting keys alone must not prevent Back from returning to Editing. Retained native handlers 0x432a40, 0x468cf0 and 0x431bc0 are preserved in ../evidence/native-back-static-20261021/; this establishes the branch logic without a new reference-process run.",
+    "processing": "One ordered browser queue serializes selection, warning preflight and engine work. Pending decisions release that queue so an armed Auto-Update timer can open another warning. Each pending warning retains its own decision and focus target. See profile-confirmation-contract.json for the authoritative scope and limits.",
+    "verification": "../test/fixtures/advanced-workflow-reference.ndjson.gz covers fresh RGB/alpha palette entry and committed-edit restoration. Real browser reports: ../evidence/palette-timers-browser-verification.json and ../evidence/committed-edits-browser-verification.json. Browser download completion remains unverified.",
+    "selectionTransport": "POST /api/select and /api/palette return only settings, count, paletteColorCount, basicColorCount, recommendedBackgroundMode and paletteRuntime. Merge these into the displayed document without rebuilding SVG, cloning image pixels or replacing the completed scene. The host retains existing serialization, batch-mode and Host/Origin guards.",
+    "sourceReplacement": "Validate before replacing work. A retained source commits selected controls/count and clears committed/selected colors, while retaining the runtime revert palette. First-source loading preserves the existing startup/profile commit.",
+    "paletteRuntimeVerification": "../evidence/profile-palettes-browser-verification.json",
+    "palettePageEntry": "wizardPageSettings is the sole advanced mode-0 normalization rule. Browser navigation and profile Play call it before the existing Auto-Update owner observes settings. Alpha entry retains mode 0 until the user reaches Palette Selection. Three paired navigation workflows and a real browser flow through both timers pass.",
+    "palettePageExit": "Leaving either palette page invokes GuiEngine.leavePalette through the same ordered browser command queue. It commits selected controls/count without processing or changing geometry. The page event also covers Start Over and successful reload from Palette.",
+    "reset": "Full reset clears image/palette state while retaining selected processing controls/count, palette revert backup and the application random stream. Continuing resets on full reset or source load. Reset during editing/background work and with altered batch settings remains unverified.",
+    "profileName": "The browser reference uses one App-level draft across pages and workspaces; successful save clears it. Current GPUI controls, first-unused Settings N suggestions, save/rename rules and evidence limits are defined in saved-profiles-contract.json under gpui.",
+    "confirmationContract": "profile-confirmation-contract.json"
+  },
+  "batchPaletteCancellationContract": "batch-contract.json#cancellationComponent.paletteCheckpoints"
+}

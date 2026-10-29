@@ -1,0 +1,38 @@
+{
+  "parts": [
+    {
+      "file": "part-000.ndjson.gz",
+      "bytes": 33613129,
+      "sha256": "e0eff81ea994129ab4674adcea2c75c63c06397833df71e8a05ec5bf9dd13fc0"
+    },
+    {
+      "file": "part-001.ndjson.gz",
+      "bytes": 33622924,
+      "sha256": "5a31386c596f5d52efafe4b0dc86b11460046e65103af0260ac9e1f14ffd4622"
+    },
+    {
+      "file": "part-002.ndjson.gz",
+      "bytes": 33592401,
+      "sha256": "5751355a0ad7d800bd9df8ce68425e46ba54cf85cdb0a59cd92fd98bdee4eecd"
+    },
+    {
+      "file": "part-003.ndjson.gz",
+      "bytes": 33595981,
+      "sha256": "4a5a54a087ee7d34ed9b3b917b7fbf5d05a45eeeb9f590eb21f01eba93186f98"
+    },
+    {
+      "file": "part-004.ndjson.gz",
+      "bytes": 33582174,
+      "sha256": "54da2666deadbbaff4839f80e53269f7d1a356a210d7ed9e15a260187f444069"
+    },
+    {
+      "file": "part-005.ndjson.gz",
+      "bytes": 2254098,
+      "sha256": "38e080a1c391d76acdc37d0b5e5e25d316bd7f54eaa0782223d8ab20e0d54944"
+    }
+  ],
+  "records": 69200,
+  "ndjsonSha256": "e7b27e53059e3f7b4d5023e10118fd508d2bf0b08ca4238388f0a0186a463615",
+  "cases": 65934,
+  "geometries": 3264
+}

@@ -1,0 +1,75 @@
+{
+  "component": "Encoded image input and decoded source state",
+  "targetSha256": "c491656b962debc215a8b6e757a9b2949ffe50a36b5f2db692706bcd4ebface1",
+  "status": "Independent BMP/PNG decoding matches645 of652 captured cases, including359 BMP cases; seven16-bit Adam7 comparisons remain strict failures. JPEG matches196 import/preparation cases and five complete conversions. GIF matches82 cases and three conversions. TIFF matches1663 cases and twenty conversions. Three GIF, 129 TIFF decode rejections and two TIFF generic-reader process failures are retained.",
+  "reference": {
+    "encodedEntry": "0x473e00",
+    "blobConstructor": "0x4aee70",
+    "blobReader": "0x4ae6d0 -> 0x507060",
+    "sourceSetter": "0x473bb0",
+    "pixelExport": "0x473450",
+    "workingPreparation": "0x4738b0",
+    "rea": "723 through 743; ReadPNGImage 0x5feae0, ReadOnePNGImage 0x5fd120, scratch allocator 0x50e270, interlace row reader 0x69aed0"
+  },
+  "capture": {
+    "nativeOperation": 92,
+    "input": "Exact encoded file bytes plus explicit preprocessing mode/amount and anti-alias control. Decode the blob through the original library, then invoke the same original source setter and working preparation used by the application. Do not populate native decoded pixels from an independent decoder.",
+    "output": "Original decoded matte flag, physical storage class/colorspace/cached type, dimensions and BGRA; post-setter cached matte/dimensions/BGRA; working dimensions/BGRA; post-filter retained source matte/dimensions/BGRA and application PRNG. Do not call GetImageType merely to observe metadata: its allocation changes later legacy PNG scratch contents.",
+    "verification": "Fresh complete native response repeats must agree byte for byte. Generated fixtures retain exact encoded bytes and writer inputs separately. Original installation files and instructions remain unchanged. Native intermediates are expectations only for future independent decoding.",
+    "authoritativeOperation": 93,
+    "wholeLoaderProof": "../evidence/image-loader-whole-repeat-audit.json",
+    "derivativeProof": "../evidence/image-loader-derivative-capture-audit.json"
+  },
+  "decoder": {
+    "api": "Named development exports decodeImage(encoded) and resolveImageFilename(filename) are available from the package root through src/settings.mjs and are shared by CLI, GUI and document controllers. Format-specific modules remain internal.",
+    "input": "Uint8Array containing exact encoded image bytes. Return owned width/height/BGRA, intrinsic hasAlpha boolean (native decoded matte), and detected format. Do not mutate input or invoke original binaries or child processes.",
+    "png": "PNG color types 0/2/3/4/6 at legal depths, five row filters, Adam7 passes, palette/transparency keys and concatenated IDAT. Native Q8 direct-class 16-bit RGB/RGBA reading reduces retained row storage in place after every pass, including unchanged rows. RGB16 emits zero alpha before its legacy tRNS postscan. Transparency keys are cast to Q8 before comparison; the final tRNS scan resets opacity only at the first pixel of each row. Seven Adam7 cases still differ and must remain visible failures.",
+    "bmp": "Independent first-raster BMP import for packed1/4/8-bit palettes,16/24/32-bit pixels, core and extended headers, reduced palettes, native bitfield/Q8/opacity behavior, RLE4/RLE8 and BM/CI/BA wrappers. All359 BMP cases and six complete conversions match. See bmp-input-contract.json for exact scope and remaining work.",
+    "sourceInvariant": "All 337 original source setters rebuild a matte-one source cache, including 138 decoded matte-zero inputs. Preparation requires intrinsic hasAlpha metadata. For matte-zero input, native GetImageType selects opaque palette type 4 only for nongray images with at most 256 colors; source setter promotes that type to truecolor matte type 7 and fills alpha. Other types retain decoder alpha. Setter 0x4aeaf0 selects RGB colorspace, not alpha. Fresh analysis derives resize matte=1; no user matte control or compatibility alias.",
+    "sources": [
+      "https://www.w3.org/TR/png/",
+      "https://learn.microsoft.com/en-us/windows/win32/api/wingdi/ns-wingdi-bitmapinfoheader",
+      "https://svn.dslinux.org/svn/tags/imagemagick/imagemagick-6.4.2/coders/png.c"
+    ],
+    "authority": "Format specifications define structural parsing. Original executable byte observations govern legacy pixel behavior.",
+    "proof": "../evidence/image-input-native-reference.json",
+    "freshQuirkProof": "../evidence/image-input-fresh-quirk-verification.json",
+    "fixture": "../test/fixtures/image-input-reference.ndjson.gz",
+    "cases": 337,
+    "allStageComparison": "../evidence/image-input-all-stage-comparison.json",
+    "historyAudit": "../evidence/image-input-history-audit.json",
+    "publicExportStatus": "Root development exports already exist. package.json remains private=true and unpublished; final Rust/npm binding and stable API verification remain required.",
+    "jpeg": "Native integer transform, chroma sampling, grayscale/RGB/YCbCr/CMYK/YCCK conversion and baseline/progressive restart handling. Normalize JPEG ink colors to the common RGB raster contract before source preparation. See jpeg-input-contract.json for exact scope, source licenses and remaining format/error work.",
+    "gif": "First-descriptor palette/LZW decoding, four-pass native interlace, intrinsic matte versus opacity-byte sentinel, and unchanged common source preparation. See gif-input-contract.json.",
+    "tiff": "Classic TIFF first-IFD import with recovered strip/plane/tile, compression, Q8/alpha and delegate quirks. See tiff-input-contract.json for exact capture scope, retained failures, CCITT table attribution and remaining work.",
+    "expandedBmpContract": "bmp-input-contract.json"
+  },
+  "scope": "Recover encoded input and source preparation for every original format. BMP/PNG, eight-bit Huffman JPEG, GIF and classic TIFF have independent implementations with bounded native conformance. Other original formats, remaining BMP array/metadata/error behavior, JPEG coding modes, malformed/error behavior, metadata/color management and file/dialog workflows remain required work.",
+  "fullApplicationParity": false,
+  "published": false,
+  "nondeterministicReference": {
+    "nativeEntry": "0x473e00",
+    "originalInstructionsPatched": false,
+    "targets": 7,
+    "contexts": 21,
+    "processRuns": 42,
+    "contextsWithRepeatPixelDifferences": 13,
+    "cause": "REA confirms 0x5fd120 allocates retained interlace row storage through 0x50e270, which directly calls malloc without initialization. Reader 0x69aed0 returns without writing the caller row on skipped Adam7 rows and merges only selected pass pixels otherwise. The image reader imports and reduces every row after every pass, including unchanged rows. Previously unwritten scratch bytes can enter pixels and vary with allocation history/process state. Exact source/working/prepared byte differences between repeated untouched whole-loader calls corroborate this.",
+    "decisionNeeded": "Define the intended behavior for native undefined pixels before claiming universal 1:1 parity. Do not hardcode observed heap bytes, inject captured intermediates, weaken comparisons or present deterministic zero-initialized output as an exact match. Other feature parity work remains unfinished independently of this issue."
+  },
+  "verification": {
+    "fullSuite": {
+      "tests": 222,
+      "pass": 221,
+      "fail": 1,
+      "cancelled": 0,
+      "skipped": 0,
+      "todo": 0,
+      "durationMs": 634291.1176,
+      "report": "../evidence/image-input-full-test-run.txt"
+    },
+    "currentFailure": "test/image-input.test.mjs: strict native raw-decoding comparison; first reported case adam7-9x7-10. Independent all-case diagnostic attempts all 337 and retains seven mismatches.",
+    "published": false,
+    "exported": true
+  }
+}

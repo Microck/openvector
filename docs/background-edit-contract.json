@@ -1,0 +1,78 @@
+{
+  "component": "Vector region visibility and Remove Background",
+  "status": "Bounded library, CLI and modern GUI behavior verified against retained native workflows. Full application parity remains incomplete.",
+  "targetSha256": "c491656b962debc215a8b6e757a9b2949ffe50a36b5f2db692706bcd4ebface1",
+  "ownership": "MainModel owns vector visibility and its histories separately from segmentation pixels and ToolActionRecord history. Existing serializers already accept hiddenRegions; that alone does not establish editing behavior.",
+  "api": {
+    "owner": "ImageDocument owns logical visibility, ordered region-ID histories and background mode separately from segmentation editing.",
+    "methods": "beginBackgroundEditing(), backgroundGesture(event), toggleBackground(point), undoBackground(), redoBackground(), revertBackground(), finishBackgroundEditing(), and readonly backgroundState().",
+    "snapshot": "Owned {count,active,tool,hiddenRegions,undo,redo}; tools are pan/background. Only current logical region IDs appear in hiddenRegions. History can retain IDs from an earlier vector result.",
+    "gestures": "Select pan/background or supply the shared press/move/release schema. Only a left-button press in background mode toggles a hit region. A selected active tool toggles back to Pan. Pointer modifiers do not change the captured action behavior.",
+    "history": "Toggle appends and clears redo. Undo toggles the newest active region and prepends it to redo; redo consumes the first redo entry. Revert makes all regions visible and replaces redo with the former active history, discarding any old redo entries.",
+    "lifetime": "A newly completed vector result makes all regions visible and moves active actions to redo, even when the region count changes. Cached processing preserves visibility/history. Source replacement clears both histories. Editor re-entry preserves state; entering segmentation or finishing background mode returns its tool to Pan.",
+    "unavailableGeometry": "Point actions report an explicit diagnostic when no completed boundary graph exists. Native advanced commit/undo can leave empty boundary vectors with cache strings still matching; that undefined hit-test path is not replaced with an older graph.",
+    "scope": "38 library workflows, 1,371 hit queries and 1,588 frames pass. CLI suite: 77/77. GUI suite: 74/74, including 40 native background/viewer workflows and 1,608 frames."
+  },
+  "cli": {
+    "syntax": "Use a {background:command} entry inside --edits. Commands have action begin, gesture, toggle, undo, redo, revert or finish. toggle takes point:[x,y]; gesture takes a nonempty events array using the shared gesture schema.",
+    "processing": "Settings entries select controls without applying them. Explicit finish or process commands apply them. At end of the plan, only uncommitted pixel edits automatically refit using the document's applied settings; unfinished explicit processing produces an error rather than stale vector output.",
+    "sources": "A {source:path} entry opens and automatically processes another image in the same retained session. Relative source paths resolve from the plan's directory. Every source path is protected from output overwrite, including with --force. This writes only the final output, not a batch of exports."
+  },
+  "reference": {
+    "wizardPage": 15,
+    "mode": "0x4318c0 selects the Vector layer and enables background mode on page 15, and disables that mode when leaving it.",
+    "pointAction": "MainModel 0x425710 resolves the world point through document 0x469050 and toggles a valid region through 0x46c110 with history recording and redo clearing enabled.",
+    "pointLookup": "0x488460 tests the pixel's region against live smoothed region boundary points with 0x47eb20, then searches neighboring regions when needed. It is not a direct segmentation-label lookup or a final Bezier intersection test. The independent kernel and replacement lifetimes match the retained native corpus.",
+    "visibilityOwnerOffset": "MainModel + 0x1d8",
+    "visibilityLayout": "Logical bit count +0x10, words pointer +0x18, active history head/count +0x28/+0x2c, redo history head/count +0x34/+0x38. List nodes store a region ID at +8. Allocator pointers and unused bit padding are not semantic values.",
+    "qtSlotDispatch": {
+      "setMakeBackgroundMode(bool)": "0x425570",
+      "revertMakeBackground()": "0x425590 -> 0x46d460",
+      "undoMakeBackground()": "0x4255b0 -> 0x46c1b0",
+      "redoMakeBackground()": "0x4255d0 -> 0x46c270"
+    },
+    "metadata": "Method names/order come from the original MainModel Qt string table at 0x7108c0 and qt_metacall 0x462010. REA request filenames 1019..1021 contain initial guessed history names; the verified mapping above controls.",
+    "reaRequests": [
+      993,
+      1018,
+      1019,
+      1020,
+      1021,
+      1022,
+      1023,
+      1024,
+      1025,
+      1026,
+      1027,
+      1028,
+      1029,
+      1030,
+      1031
+    ]
+  },
+  "capture": {
+    "operation": 114,
+    "entry": "Run the actual automatic controller, show/layout the owned hidden reference window, then enter the real wizard page 15.",
+    "events": "Reuse the real constructed Qt pointer-event path from operation 113; preserve all earlier operation-112/113 wire layouts and recordings.",
+    "state": "Capture logical hidden bits, the original visibility getter for each logical region, ordered active/redo region IDs, actual tool/mode/page/layer and the unchanged segmentation history.",
+    "pointQueries": "Query the unchanged document hit-test directly from declared world coordinates. Expected region IDs and intermediate geometry remain assertions, never independent computation inputs.",
+    "advancedCommit": "Native advanced editor Next applies edited pixels before the separate smoothing page processes vectors. Old cache strings and node storage can remain after regions are rebuilt. Staged action 23 records region/node/boundary extents, and serializes completed geometry only when every current region has a boundary. Normal completed captures retain the strict nonempty-contour contract.",
+    "integrity": "Preserve the original installation and saved profiles. Remove only the isolated reference registry namespace; restore the cursor after every dispatched pointer event."
+  },
+  "verificationRequired": [
+    "Inside, outside, boundary and rounded/truncated point behavior across multiple images and alpha modes.",
+    "Repeated toggles, no-op/outside points, held buttons, press/move/release production and tool selection.",
+    "Undo, redo, revert, redo invalidation and separation from segmentation history.",
+    "Visibility lifetime across re-entry, source changes, smoothing/fitting changes and segmentation edits.",
+    "GUI previews and all writers use document-owned visibility without mutating geometry or source pixels.",
+    "Independent library, CLI and modernized GUI match the executable reference without requiring it at runtime."
+  ],
+  "publication": "Remain private until full application parity is complete.",
+  "gui": {
+    "workflow": "Remove Background keeps the Vector layer, Pan/Erase tools, separate undo/redo/revert, and Next to the export settings. Basic review and advanced smoothing expose this step.",
+    "preview": "Retain the last completed vector scene across an advanced pixel commit. Apply current document visibility to that scene. Removed shapes have red dashed outlines, including transparent regions. Never use the retained scene for hit testing or file export.",
+    "stages": "Advanced Edit segmentation Next commits pixels without running vector stages. The smoothing Update runs only smoothing and fitting. Canonical exports remain unavailable while current fitting is absent.",
+    "wire": "POST background uses the same command grammar as CLI plans. POST vectors applies only smoothing and fitting; process retains the segmentation-through-stage operation.",
+    "verification": "Source and fresh-extraction suites each pass 74 tests. A real browser verifies removal/history and retained completed previews during advanced commit/update. Native offscreen captures establish the scene lifetime and transparent-region outlines."
+  }
+}

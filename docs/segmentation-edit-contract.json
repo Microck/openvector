@@ -1,0 +1,190 @@
+{
+  "component": "Segmentation editor and document edit history",
+  "status": "Independent engine, CLI and GUI editor implemented for the captured tool commands. All 105 bitmap/history states and ten finite refits match. The alpha-heavy comparison remains failing; new native controls vary after a confirmed read beyond the live palette. Complete editing and application parity remain unfinished.",
+  "api": {
+    "owner": "ImageDocument owns one editing session and its base bitmap, active history and redo history.",
+    "beginEditing": "Requires completed segmentation. Returns an owned {width,height,bgra,undo,redo,key,tool,color} snapshot. Re-entering retains the current editing session until segmentation or source replacement.",
+    "edit": "Accepts {tool:'fill'|'zap',x,y,color} or {tool:'pencil',from:[x,y],to:[x,y],color}. Color is four normalized BGRA channels, converted to float32 before native QColor conversion. Zap defaults its unused color to opaque black. commit defaults to true; false changes preview pixels without appending history.",
+    "history": "undoEdit(), redoEdit() and revertEdits() return owned editor snapshots. Unavailable operations leave the session unchanged.",
+    "editingState": "Readonly owned editor snapshot, or null before the editor is initialized. It does not enter an editing mode.",
+    "commitEditing": "Retain an owned undo/redo checkpoint, apply the active edit key and rebuild displayed-color regions without running vector tasks. Changed edits make contours/smoothing/fitting unavailable while retaining their old cache strings. Unchanged edits preserve completed vectors and still commit the current redo checkpoint.",
+    "committedHistory": "editingHistory returns counts without copying pixel buffers. restoreCommittedEditing replays the saved undo/redo checkpoint while preserving the selected tool. leaveEditing ends input state without committing changes or running vector tasks. Source replacement and actual new segmentation clear the checkpoint.",
+    "finishEditing": "Call commitEditing, then run the smoothing and fitting tasks with the selected document controls. This explicit complete-output operation retains commit-before-processing semantics and remains distinct from Advanced Next.",
+    "applyEditing": "Apply the active editor key and rebuild displayed-color regions with the same invalidation as commitEditing, then end editing input, without saving the owned Back checkpoint. Advanced Next uses this operation.",
+    "checkpointBoundary": "Successful classification, palette, segmentation, smoothing and fitting document settings-copy boundaries save both editor histories. Direct cache hits copy histories; scheduler skips for segmentation/smoothing/fitting do not, while palette skips do. Classification, smoothing and fitting check final cancellation before copying; smoothing success remains committed if fitting later cancels. Classification receiver proof: 0x46d936 saves document ECX in ESI, then 0x46daaa selects ESI+0x18 for copy at 0x46daae. Arbitrary native non-cancellation exceptions remain outside the established evidence.",
+    "commitSettings": "The explicit control-preload API changes DocumentSettings only, as used by source loading and profile selection. It does not apply editor pixels or save editor histories. Processing completion and explicit commitEditing own those distinct boundaries.",
+    "editingChanged": "Compare current active history with the document checkpoint using equal lengths and ordered canonical ToolRecord serialized keys. Ignore redo for dirtiness, but restore both histories and replay pixels. Do not compare against the applied segmentation cache key. hasCommittedEdits describes checkpoint active records; hasAppliedEdits describes the applied segmentation key used by discard warnings.",
+    "bounds": "Finite out-of-image tool coordinates are native no-ops. Malformed commands fail before changing pixels or history.",
+    "isolatedZap": "The independent implementation reports an explicit error before mutation when no neighboring color exists. Static Zap handler 0x42cb70 dereferences the neighbor-set begin entry without an empty-set check. This does not establish a stable result for the isolated case; no heap/sentinel emulation or synthetic success is implemented. Native empty-neighbor execution remains unresolved.",
+    "oneSamplePencil": "A distinct-pixel line with one native sample converts both 0/0 coordinates through x87 int64 indefinite and passes its low int32 words, (0,0), to the painter. The real-widget short-samples workflow verifies this behavior and replay.",
+    "gesturePointerLifetime": "ImageDocument retains one previous world point initialized to [-1,-1] across source replacement, reset and a newly computed segmentation. Pencil press updates it before command dispatch; held-left Pencil movement uses it and advances it after dispatch even for a no-op. Background left press updates the same point before hit testing, including outside-image presses. Direct edit/toggle commands, Fill, Zap and picker events do not advance it. Separate documents retain separate points, including documents sharing one CoreSession. This uses static native handler dataflow and bounded independent tests; real native post-stroke lifecycle capture and broader window/batch lifetimes remain unverified."
+  },
+  "cli": {
+    "syntax": "openvector vectorize image.png --edits edits.json [existing output options]",
+    "commands": "A JSON array of tool commands, {gesture:event}, {background:command}, {settings:partialControls}, {source:path}, or an action entry. Each entry selects exactly one kind. Actions are undo, redo, revert, begin, commit, finish, process, restore-committed or leave. restore-committed replays the shared engine checkpoint; leave ends editing input without committing. process takes stage classification/palette/segmentation/smoothing/fitting, with lower/upper for palette. Settings only select controls; process/finish apply them. Source changes run Auto and retain the session random stream. At end, refit only uncommitted pixel edits with applied controls. Require completed vectors before exporting.",
+    "failure": "Invalid JSON, unknown commands or failed edits produce stderr and status 1 before any vector output is written. --edits requires a file path; stdin remains the binary image stream."
+  },
+  "gui": {
+    "entry": "Edit segmentation from Review or the advanced Segmentation page; apply changed segmentation controls before entering.",
+    "controls": "Pan, Pencil, Fill, Zap, Pick color, normalized paint color, undo, redo and revert. Selecting the active tool returns to Pan. Segments is the default editing layer; B/V inspection remains available.",
+    "next": "Advanced Next applies edits without saving the Back checkpoint and enters smoothing, whose separate Auto-Update timer runs the vector tasks. Basic Next explicitly commits and refits immediately. History remains available on re-entry.",
+    "back": "Changed active history makes navigation Back become Revert. Revert restores the owned checkpoint's undo/redo history and pixels, keeps the selected tool and stays on Editing without rewriting the applied segmentation cache. With auto-vectorization off, edit/Next/Back/Back restores baseline and stays Editing; after completed Update it retains edits and leaves for Segmentation. Empty active lists compare equal even with different redo. Native paired evidence: ../evidence/native-back-corrected-20261021/verification.json. Frozen GUI failure: ../evidence/gpui-back-checkpoint-before-20261021/findings.md.",
+    "gestureScope": "The GUI queues press/move/release events in order and streams them through the shared gesture producer. A pending gesture request does not block new pointer samples. The selected editing tool acts independently of the displayed Bitmap, Segments or Vector layer, including temporary B/V inspection. Pencil and picker use the edited segmentation even while another layer is shown; background presses still hit vector regions. Fresh left-button Pencil movement can start a captured drag without synthesizing a press. Picker release is forwarded even without a preceding press. Actual processing and confirmation dialogs still block a new gesture.",
+    "colorPicker": "Pipette selects the native picker mode; a valid release samples the edited segmentation and restores the previous tool. New segmentation initializes paint from palette entry zero through QColor quantization. Paint selection persists across editor re-entry.",
+    "processingCancellation": "The GPUI Cancel control stays fully visible inside its 32px footer. Actual queued-processing checks verify the complete 28px control, cancellation remaining on Editing, zero changed edited pixels and normal Next retry reaching Smoothing. The white-paint case passes all seven checks, including completed vectorization and enabled Export after retry. The black-paint case then fails fitting with 'Contour region colors must identify the completed palette.' The same error occurs without cancellation on byte-identical input and an identical painted frame. Keep that failure visible; the white-paint retry does not waive it. Evidence: ../evidence/gpui-edit-admission-20261021/cancellation-verification.json."
+  },
+  "reference": {
+    "targetSha256": "c491656b962debc215a8b6e757a9b2949ffe50a36b5f2db692706bcd4ebface1",
+    "receiver": "MainModel takeAction(ToolActionRecord,bool), actual Qt slot 99 before QObject's inherited method offset",
+    "dispatch": "0x431500; 64-byte record by value followed by a commit boolean",
+    "record": "Three int32 fields at 0/4/8, four float64 fields at 16/24/32/40, and four float32 ARGB channels at 48/52/56/60. Padding at 12 is not a value.",
+    "key": "0x469b00 serializes the three integers, four doubles and color; 0x46a440 concatenates active-history record keys. Record equality compares these serialized strings.",
+    "evidence": "Private REA requests 959, 965, 969..998 and 1000..1001. Original embedded English editor help at 0x856017.",
+    "editorPage": 14,
+    "nextVisibility": "The native Next handler requires WA_WState_Visible. The recorder uses public Qt show/layout with WA_DontShowOnScreen, rather than writing widget flags or bypassing the handler.",
+    "qtEnumSource": "https://github.com/qt/qt/blob/4.8/src/corelib/global/qnamespace.h"
+  },
+  "gestureReference": {
+    "status": "The independent engine matches all 193 bitmap/history/tool/color states and 15 completed document states from 16 captured real-widget workflows. This establishes bounded gesture behavior, not complete editing parity.",
+    "moveHandler": "0x446020; Pencil submits a committed record for each left-button move and advances the previous world point.",
+    "pressHandler": "0x4463a0; Pencil records an initial point, Fill/Zap act on press, and color picking uses a separate tool kind.",
+    "coordinateProducer": "0x445270 reads QCursor::pos, maps global to the view, then scene to the source graphics item. Event local coordinates alone do not establish the native world point.",
+    "probeOperation": "113 extends only the development reference recorder. Preserve existing operation-112 captures and original installation bytes. Recover real metadata and dispatch through Qt, without replacing original handlers or cursor imports.",
+    "captured": "Repeat-identical real-widget workflows cover pointer sequences, alpha/color sampling, short strokes, cached Next and committed editor re-entry. Initial paint follows palette entry zero, including transparent colors; a dominant-ink witness distinguishes it from pixel (0,0).",
+    "producerRecords": "Pencil includes truncated current-world x/y in each record and the current/previous float64 world points. Fill/Zap retain -1 in their four unused coordinate fields.",
+    "picker": "Tool kind 4 samples the edited segmentation on a valid release and returns to the previous input mode, including release without an earlier press. An out-of-image release keeps the picker active. It does not add segmentation history. Hover and press do not change the committed paint color. Ctrl, Shift, Alt and Meta preserve sampled alpha and color in the captured release cases.",
+    "fixture": "../test/fixtures/segmentation-gesture-reference.ndjson.gz",
+    "fixtureWorkflows": 16,
+    "fixtureActions": 177,
+    "fixtureFrames": 193,
+    "fixtureCompletedStates": 15,
+    "scope": "The two paint-only alpha workflows intentionally have no native Next result. They establish editor pixels, paint and history, without asserting post-edit vector output. The CLI output comparisons cover the other fourteen workflows."
+  },
+  "gestureApi": {
+    "owner": "ImageDocument.gesture(event) uses the same owned segmentation editor and edit history as direct edit commands.",
+    "events": "{phase:'select',tool:'pan'|'pencil'|'fill'|'zap'|'picker'}, {phase:'color',color:[B,G,R,A]}, or {phase:'press'|'move'|'release',point:[x,y],buttons,button?,modifiers?}. World coordinates are processing inputs; native recorded pixels and generated commands are assertions only.",
+    "color": "Initial paint is palette entry zero. A color selection quantizes float32 BGRA through QColor's 16-bit channels before producing float32 action colors.",
+    "history": "Pencil submits a point on left-button press and each changed current-to-previous line on left-button move. Each changed segment is one history entry. Release adds no Pencil segment. Fill/Zap act on left-button press. Selecting the active tool returns to Pan.",
+    "finish": "finishEditing retains histories and paint color but returns the tool to Pan, matching the native Next transition.",
+    "unverified": "The retained point contract follows the original MainView field writes and source/mode handler inspection. Fresh initial state has paired read-only native captures. Full original after-stroke source/reset/batch event lifetimes and wider pointer/layer routing still require independent transition captures.",
+    "initialPencilMove": "The view constructor initializes current and previous world points to (-1,-1). Read-only captures retain those values at cold startup and after first and second automatic source loads. A left-button Pencil move does not require a prior press: it submits current-to-previous coordinates, then advances the previous point even when the out-of-bounds old point makes painting a no-op. Mouse movement without the left button does not advance it. A normal press still starts at its own point.",
+    "pointerLifetime": "One ImageDocument owns the previous viewer point, initialized once to (-1,-1). SegmentationEditor replacement, source replacement and document source reset retain it. Pencil press sets it before applying its point; Pencil move reads it and advances it after dispatch even after a no-op. A left-button background press sets the same point before hit testing, including outside-image clicks. Direct edit/toggle commands leave it unchanged. Independent documents have independent pointer contexts."
+  },
+  "observedBehavior": {
+    "tools": [
+      "Pan moves the viewer; selecting an already selected editing tool returns to Pan.",
+      "Pencil paints the active color. The native line sampler uses four samples per pixel of segment length and suppresses duplicate sampled coordinates.",
+      "Fill changes four-connected displayed pixels with identical packed RGBA color, rather than matching only segmentation region identifiers.",
+      "Zap collects a clicked color component and neighboring colors, then assigns pixels using source-image color distances.",
+      "Color picker samples the image and returns to the previously selected tool."
+    ],
+    "recordKinds": {
+      "3": "pencil",
+      "5": "fill",
+      "6": "zap",
+      "7": "Vector-region visibility/background action with separate history; not the segmentation color picker."
+    },
+    "history": [
+      "A committed action appends when its native tool reports a change, clearing redo. Pencil can report a change and append even when the stored 8-bit pixels remain identical.",
+      "Undo removes the newest active record, prepends it to redo, restores the base segmentation image and replays remaining active records.",
+      "Redo takes the first redo record, appends it to active history and replays it without clearing the remaining redo records.",
+      "Revert restores the base image, moves active commands before existing redo commands in their original order, and clears active history. Redo reapplies the earliest command first.",
+      "Undo, redo and revert enabled states must follow the actual histories."
+    ],
+    "precision": "Tool colors convert float32 ARGB to QColor 16-bit channels. The stored pixel getter takes the high byte (for example 16-bit red 255 becomes byte 0; 256 becomes 1). Pencil compares QColor values, while Fill compares packed RGBA. Native pencil coordinate conversions truncate; native sample arithmetic and store widths must be preserved.",
+    "layers": "Bitmap, Segments and Vector; Segments is the editing default. Vector availability depends on a completed vectorization. B/V temporarily inspect layers.",
+    "fillNeighborOrder": [
+      "left",
+      "right",
+      "up",
+      "down"
+    ],
+    "regionColorLifetime": "The rebuilt regions retain their own painted colors. A later fixed-palette profile load can replace the live palette while preserving those per-region colors. The fill-contact witness has four region colors and only three live palette entries after refitting. A port must model these lifetimes, not bypass palette-index validation.",
+    "zapArithmetic": "Neighbor colors are ordered as unsigned packed RGBA. Native distance uses normalized RGBA channel differences; its minimum is stored as float32 while comparisons use the native expression result. A temporary unused color is chosen through clock-seeded CRT rand; this is separate from the retained engine PRNG.",
+    "paletteLifetimeWitness": "palette-reorder paints white with the existing blue palette color. After Next, live palette order remains red/blue/white while the two region colors are blue/red and their color indices are 0/1. This is not limited to injected off-palette colors.",
+    "colorExpansionObservation": "The flexible edited-state palette contains a byte-50 channel as float32 0.19607844948768616. Direct division by 255 then float32 rounding differs. Verify and reuse the native-equivalent packed-color expansion kernel when implementing the rebuild."
+  },
+  "verificationRequired": [
+    "Real MainModel slots and real QImage state, repeated byte-for-byte in fresh native processes.",
+    "Mutating and no-op fills, diagonal contacts, equal displayed colors across region labels, alpha and channel-rounding boundaries.",
+    "Single-point and line pencil gestures, bounds, duplicate samples and floating-point boundary cases.",
+    "Zap neighbor ordering, source color distances, ties and isolated segments.",
+    "Undo/redo/revert ordering, redo invalidation and replay after source/profile changes.",
+    "Document region rebuilding, smoothing/fitting invalidation and complete exported vector results after edits.",
+    "Independent shared engine, CLI and modernized GUI behavior without original binaries at runtime.",
+    "Trace actual color-picker/tool-selection gestures and region-visibility/background commands separately from segmentation history."
+  ],
+  "existingPixelMapApi": "pixel-map-contract.json remains the narrower segment-identifier flood-fill contract. It does not establish editor parity.",
+  "publication": "Remain private until full application parity is complete.",
+  "capturedReference": {
+    "operation": 112,
+    "scenarios": 11,
+    "actions": 94,
+    "states": 105,
+    "ownEncodedSources": 5,
+    "finiteCompletedRefits": 10,
+    "repeatIdenticalNonfiniteCompletedRefits": 1,
+    "independentEditorImplemented": true,
+    "independentBitmapHistoryStatesMatched": 105,
+    "independentFiniteRefitsMatched": 10,
+    "independentNonfiniteCompletionMatched": false,
+    "verificationCheckpoint": "../evidence/segmentation-editor-verification-checkpoint.json",
+    "fixture": "../test/fixtures/segmentation-edit-reference.ndjson.gz",
+    "nonfiniteEncoding": "A non-finite captured float is represented as {float64Bits: sixteen little-endian hex digits}. This is expected-value data, never an engine input.",
+    "nonRepeatIdenticalStressCase": "../evidence/native-gui-edit-alpha-first-divergence.json",
+    "scope": "Bounded captured behavior, not complete editing or application parity. Native non-finite completion remains distinct from healthy finite geometry.",
+    "nativeAlphaStability": {
+      "status": "Not stable across fresh unmodified original processes. The historical repeat-identical nonfinite count describes its original recording pair only.",
+      "controlRuns": 3,
+      "distinctOutputs": 3,
+      "nonfiniteNodeCoordinateCounts": [
+        0,
+        328,
+        0
+      ],
+      "matchingFields": "All automatic state and editor frames, final source/working pixels, controls, region labels, cache keys, random state and 100 typed parameters match the old capture before comparing final geometry.",
+      "confirmedRead": "After creation of three edited colors and reload of a two-color live palette, sampler 0x4a2520 runs in direct-palette mode with fragment color ID 2. SUBSS at 0x4a268d reads through EDI equal to the palette end. The observed instruction bytes match the original file. The debug run consumes heap guard bytes.",
+      "accessorCorrection": "The previously suspected indirect accessor 0x488f60 was not observed after commit. The confirmed read uses the direct branch.",
+      "independent": "The independent pre-profile three-color palette matches the captured native creation colors. Keep per-region creation-color ownership separate from the selected profile palette.",
+      "limits": "The precise first arithmetic instruction producing NaN in an unmodified control remains untraced. The current independent curve result does not establish parity with the varying native outputs. No heap-byte emulation, NaN injection, test removal or replacement of the old expected result is accepted.",
+      "audit": "../evidence/edited-alpha-reference-stability.json",
+      "fixture": "../test/fixtures/edited-alpha-palette-reference.json"
+    }
+  },
+  "pointerInitialReference": {
+    "fixture": "../test/fixtures/editor-pointer-reference.ndjson.gz",
+    "audit": "../evidence/editor-pointer-native-audit.json",
+    "nativeProcesses": 2,
+    "snapshotsPerProcess": 3,
+    "helperSha256": "b1487e96d8cc7fdb489c7e0b0f9211286a317bfc7a8bf36893e04c23d05800b8",
+    "pointerEventsDispatched": false,
+    "widgetSettersInvoked": false,
+    "staticMoveHandler": "../evidence/viewer-pointer-move-assembly.txt",
+    "staticModeHandler": "../evidence/viewer-input-mode-pointer-assembly.txt",
+    "fullPointerLifecycleParity": false,
+    "browserVerification": "../evidence/editor-pointer-browser-verification.json",
+    "verificationCheckpoint": "../evidence/editor-pointer-verification-checkpoint.json",
+    "codeReview": "editor-pointer-code-review.md"
+  },
+  "pointerLifetimeEvidence": {
+    "memberReferences": "../evidence/viewer-pointer-member-references.json",
+    "dispatchTables": "../evidence/viewer-pointer-dispatch-tables.json",
+    "pencilPress": "../evidence/viewer-press-pencil-assembly.txt",
+    "backgroundPress": "../evidence/viewer-press-background-assembly.txt",
+    "sourceTransition": "../evidence/viewer-source-pointer-lifecycle-assembly.txt",
+    "evidenceKind": "Original instruction and REA constructor dataflow, not a native synthetic-input capture.",
+    "fullPointerLifecycleParity": false,
+    "independentUnitTests": "../test/segmentation-gesture.test.mjs",
+    "browserVerification": "../evidence/editor-pointer-lifetime-browser-verification.json",
+    "verificationCheckpoint": "../evidence/editor-pointer-lifetime-verification-checkpoint.json",
+    "codeReview": "editor-pointer-lifetime-code-review.md"
+  },
+  "layerRoutingEvidence": {
+    "staticFindings": "../evidence/viewer-layer-static-findings.json",
+    "nativeKeyFixture": "../test/fixtures/viewer-input-reference.ndjson.gz",
+    "sampleHelper": "../evidence/viewer-layer-sample-assembly.txt",
+    "modelDispatch": "../evidence/viewer-layer-model-dispatch-assembly.txt",
+    "browserVerification": "../evidence/layer-routing-browser-verification.json",
+    "fullLayerGestureParity": false
+  }
+}

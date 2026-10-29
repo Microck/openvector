@@ -1,0 +1,121 @@
+{
+  "component": "Independent stage-parameter resolver",
+  "scope": "The 100 registered numeric core parameters, basic/advanced stage overrides and the unregistered clustering/shadow switches written by advanced segmentation. Palette-color transfer and image classification are separate components.",
+  "stages": [
+    "palette",
+    "segmentation",
+    "smoothing",
+    "fitting"
+  ],
+  "basic": {
+    "categories": {
+      "photograph": 0,
+      "artwork-with-blending": 1,
+      "artwork-without-blending": 2
+    },
+    "quality": {
+      "high": 0,
+      "medium": 1,
+      "low": 2
+    },
+    "palette_profile": 0,
+    "processing_profile_index": "9 - 3 * category - quality"
+  },
+  "advanced": {
+    "palette": {
+      "profile": 0,
+      "required": [
+        "colorSensitivity",
+        "antiAlias"
+      ],
+      "sensitivity": {
+        "high": 0,
+        "medium": 1,
+        "low": 2
+      }
+    },
+    "segmentation": {
+      "profile": 5,
+      "required": [
+        "complexity",
+        "minimumPixels",
+        "artifactRejection",
+        "clusterColors"
+      ],
+      "artifactRejection": [
+        "none",
+        "moderate",
+        "aggressive"
+      ],
+      "artifactRejectionMapping": "Write Shared anti-alias (core +0x20c) as rejection != 2 and unregistered shadowing (core +0x214) as rejection == 0. Preserve the loaded profile's registered Segmenter::use_over_seg_diag_extr at core +0x930; it is a different field. Return shadowing and clusterColors booleans. Shadow control belongs to the explicit processing context, not this settings override.",
+      "cliShadowContext": "Prepared segment/trace-contours commands forward top-level shadowControl to the canonical segmentation parameters when advanced artifact rejection enables shadowing. Require explicit int32 context; do not invent a value. ImageDocument derives its own captured fresh-core context."
+    },
+    "smoothing": {
+      "profile": 5,
+      "required": [
+        "smoothness",
+        "curveComplexity",
+        "antiAlias",
+        "detectCorners"
+      ]
+    },
+    "fitting": {
+      "profile": 5,
+      "required": [
+        "smoothness",
+        "curveComplexity",
+        "antiAlias",
+        "detectCorners"
+      ]
+    }
+  },
+  "numeric_controls": {
+    "complexity": [
+      1,
+      12
+    ],
+    "smoothness": [
+      1,
+      12
+    ],
+    "curveComplexity": [
+      1,
+      12
+    ],
+    "minimumPixels": [
+      0,
+      2147483647
+    ]
+  },
+  "precision": {
+    "profile_parameters": "Preserve the recovered int32, float32, and float64 registration types.",
+    "advanced_controls": "Use the finite host-CPU arithmetic results for all 12 positions. Do not substitute approximate interpolation or round these values.",
+    "reference": "../evidence/settings-native-reference.json",
+    "reference_cases": 648,
+    "reference_limits": "Original arithmetic spans with relocated absolute constant operands. Covers the selected controls on the current Windows x86 host; it does not establish complete image-vectorization parity."
+  },
+  "result": "A new mutable object containing all 100 numeric parameters. Advanced segmentation also supplies boolean clusterColors and shadowing switches; their absence in other stages means those stages do not write them. Array parameters are copied so documents cannot share mutable state.",
+  "validation": "Validate public options once. Reject missing controls and unknown enum values; do not invent original defaults.",
+  "evidence": [
+    "007-profile-loader.json",
+    "051-category-enum.json",
+    "061-quality-enum.json",
+    "063-slider-constructor.json",
+    "064-engine-parameter-layout.json",
+    "065-optimizer-parameter-layout.json",
+    "settings-disassembly.txt"
+  ],
+  "fieldIdentityCorrection": {
+    "originalEvidence": "REA 749/239 and complete document capture operation 100; parameter-registry.json maps registered diagonal extraction to core +0x930.",
+    "issue": "The earlier arithmetic reader labeled core +0x214 as overSegmentation and resolver incorrectly mapped it to the registered diagonal-extraction parameter. +0x214 controls native shadow dispatch.",
+    "verification": "Keep all 648 captured numeric values unchanged while correcting that field's semantic label. Compare all 100 registered parameter bytes against complete native document profile loading and segmentation, including artifact-rejection modes.",
+    "proof": "../evidence/settings-field-identity-correction-verification.json",
+    "completeProfileTest": "../test/document-segmentation.test.mjs",
+    "installedVerification": "../evidence/installed-document-profiles-verification.json"
+  },
+  "constructor": {
+    "source": "Core reset 0x46e500 constructs 0x472700 before file loading. Three paired failed-load captures independently show identical 100 typed numeric constructor values. These are fresh-context defaults, distinct from all ten loaded profiles.",
+    "reference": "../evidence/native-batch-processing-gui-single-then-invalid-verified-verification.json",
+    "production": "parameter-data.json constructor contains numeric facts only; no paths, instructions, raw outputs, images or native algorithms."
+  }
+}

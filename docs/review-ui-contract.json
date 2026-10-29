@@ -1,0 +1,61 @@
+{
+  "project": "openvector",
+  "status": "Native-backed Review behavior is authoritative. The GPUI port passes 25 desktop checks for Review controls and navigation, 20 follow-up checks for the corrected fixed-palette transition, and 42 product checks on three retained photographs. Automatic GUI SVG saves match both retained native saves for each photograph; broader application parity remains unfinished.",
+  "reference": "../test/fixtures/review-visibility-reference.ndjson.gz",
+  "nativeAudit": "../evidence/review-visibility-native-audit.json",
+  "backReference": "../test/fixtures/review-back-reference.ndjson.gz",
+  "backNativeAudit": "../evidence/review-back-native-audit.json",
+  "nativeCases": 11,
+  "nativeProcesses": 22,
+  "historicalBrowserVerification": {
+    "newTestsPassed": 12,
+    "isolatedGuiSuite": {"passed": 423, "failed": 1, "skipped": 0},
+    "knownFailure": "Existing processing-batch-controls setter-only backgroundMode 2 comparison; unchanged.",
+    "browserStates": 28,
+    "browserConsoleWarningsErrors": 0,
+    "allReviewControlsFit": "1280x720, eleven controls inside the content panel",
+    "checkpoint": "../evidence/review-ui-verification-checkpoint.json"
+  },
+  "gpuiVerification": {
+    "evidence": "../evidence/gpui-review-after-20261021/analysis.json",
+    "binarySha256": "5b2a5f3625e926719cdc7af752b7617abc8c0a465d110baee63541b799bd7074",
+    "passed": 25,
+    "failed": 1,
+    "coverage": "All three category controls, palette modes 0/1/2, read-only strips, Improve result, Skip routing, Editing completion, opaque/RGBA background exceptions, restart and alpha export.",
+    "failure": "Selecting Two colors after processing a fixed four-color palette retains four swatches and four exported RGB fills. Fresh two-color selection works.",
+    "limits": "Linux desktop evidence, not fresh native comparison. Photograph-category controls were exercised with artwork."
+  },
+  "gpuiPaletteTransitionVerification": {
+    "evidence": "../evidence/gpui-palette-transition-after-20261021/verification.json",
+    "binarySha256": "96c9b64f64c0d9a7085aba7a9cb8f9a250f2ac216adf95511c0d2ed5f7601ba0",
+    "passed": 20,
+    "failed": 0,
+    "coverage": "Fresh Two colors to fixed four-color candidate to Two colors restores baseline swatches and byte-identical AI. After a committed Pencil edit, warning Cancel preserves the four-color AI byte-for-byte; Continue restores the original two-color viewport and AI.",
+    "limits": "Basic mode, one retained artwork, Linux X11. Two driver-request errors are retained separately. No fresh native or advanced-mode runtime parity claim. The earlier failing checkpoint remains above."
+  },
+  "gpuiPhotographicVerification": {
+    "evidence": "../evidence/gpui-photographic-20261021/verification.json",
+    "parentFixtureCheck": "../evidence/gpui-photographic-parent-check-20261021.json",
+    "binarySha256": "96c9b64f64c0d9a7085aba7a9cb8f9a250f2ac216adf95511c0d2ed5f7601ba0",
+    "productPassed": 42,
+    "productFailed": 0,
+    "setupPassed": 5,
+    "coverage": "Fresh independent GUI processes load arctic fox, Mojave JPEG and Jim Devine through GTK, run Fully automatic, show Review and save SVGs byte-identical to both retained native files. Improve result and Back retain selections. Portrait High, Low and restored Medium complete with visible previews and real saves; restored Medium matches native again.",
+    "limits": "Linux X11, three retained photographs. High/Low outputs have no matching native references. Six probe incidents remain retained separately. No new original-software execution or full parity claim."
+  },
+  "behavior": {
+    "controls": "Review shows High, Medium and Low quality; Unlimited Colors and Custom Colors; Remove Background, Edit Result and Hand-pick Settings; Done Reviewing and Skip this page next time. Process as Artwork stays hidden for all three source categories. Current palette is visible only in fixed/two-color modes.",
+    "selection": "Quality highlights the current requested quality. Custom Colors is selected for paletteMode 0 or 1; Unlimited Colors for mode 2. GPUI processes through the shared Rust worker; the historical browser used /api/review.",
+    "completion": "Automatic/basic processing and basic segmentation-edit completion go to Review by default, or Export when skipReview is true. Review Next and Done Reviewing go to Export. Advanced background completion goes to advanced Export. Basic background completion always returns to Review.",
+    "back": "Basic Export Back goes to Review when Skip is false, otherwise to the earlier basic settings page. Review Back goes to that earlier page when Skip is false, or Export when Skip is true. The earlier basic page is palette selection for fixed palette mode, or color mode otherwise.",
+    "improve": "Basic Export exposes Improve result, which opens Review regardless of the skip choice. Advanced Export has its own saved-profile controls.",
+    "storage": "The historical browser processing-preferences root required selected, batch, outputOptions, autoUpdate, skipReview and quickSave. GPUI stores Boolean skipReview in its preferences document; the desktop run verifies persistence across relaunch.",
+    "http": "Historical browser API only: GET /api/reviewPreferences returns {skipReview}. POST accepts exactly that one Boolean field and updates atomically. Both idle workspaces share the choice; a running batch rejects mutation."
+  },
+  "referenceLimitations": [
+    "Skip values are seeded in the owned private QSettings namespace before startup. Window writer persistence is grounded in the retained REA reader/writer evidence; the observer does not drive the checkbox.",
+    "The existing private-desktop observation routine sets WA_DontShowOnScreen and shows the window for Qt visibility. No native button input or dialog answer is synthesized.",
+    "Customized palette/history review cases remain unfinished. Full-window Reset is a separate corpus with its current scope in application-reset-contract.json."
+  ],
+  "fullApplicationParity": false
+}

@@ -1,0 +1,321 @@
+{
+  "component": "Native numeric-stage progress and cancellation recovery",
+  "project": "openvector",
+  "status": "Observed segmentation, smoothing and fitting interruption workflows are implemented through the canonical engine, direct/task document API, batch runner, CLI worker and GUI controller. Segmentation host verification is recorded in segmentation-host-verification-checkpoint.json; its numerical foundation remains in segmentation-owner-verification-checkpoint.json. Earlier smoothing and fitting checkpoints remain preserved. Disabled-mask native progress captures, broader original GUI/scheduler conformance and full application parity remain unfinished.",
+  "requirement": "Match the original observable progress, cancellation cleanup, retained state and retries in the independent engine, CLI and GUI. Preserve the full 1:1, npm, publication and Rust/GPUI requirements.",
+  "singleImageHost": {
+    "contract": "single-image-processing-contract.json",
+    "ownership": "Single and batch processing share ProcessingJob and one cancellation cell, with separate completed view histories. HTTP admission permits one active operation. Numerical work stays in the worker while the host serves progress and Cancel.",
+    "interaction": "Cancel or Escape interrupts the current chain at an existing numerical checkpoint, retains the source and current wizard page, and permits retry on the same document. Basic edit completion commits history before its smoothing/fitting chain and retains that commit after interruption. Classification internals report completion only. Export interruption, full native editing cancellation timing and queued-request replacement remain unfinished.",
+    "browserEvidence": "../evidence/single-processing-browser-verification.json",
+    "verification": "Four stage-level cancellation/retry comparisons, real-worker HTTP cancellation, and trusted compiled-GUI Cancel/Escape/retry. These establish the independent host integration; they do not establish native GUI timing or busy-request parity."
+  },
+  "cachedVectorBoundary": {
+    "native": "ThreadManager kinds 3/4/5 call original needs-work predicates 0x46a720/0x46a860/0x46a900 for segmentation/smoothing/fitting. A false result skips the task without copying requested settings, loading a profile, clearing cancellation or resetting progress. The palette cache-hit settings copy is specific to palette kind 2.",
+    "resultProjection": "A cached scheduler request returns admission/completion information, not a new document method result. The independent API retains its prior result and complete fitted geometry. Geometry completion is checked separately from method-return availability.",
+    "verification": "Protocol 8 rejects misses before invoking the original scheduler. It preserves 43 earlier calibration rows and observes 36 cache-hit workflows after completed or cancelled advanced palette work. Defined cached contours and fitted geometry are serialized using retained producer tracking. No native worker task starts.",
+    "fixture": "../test/fixtures/vector-cached-requests-reference.ndjson.gz",
+    "reference": "../evidence/native-stage-vector-cache-build-verification.json",
+    "cases": 36,
+    "freshNativeProcesses": 166,
+    "limits": "Owned opaque 8x8 blocks, fixed/unlimited and aliased/antialiased profiles, raw checkpoints, idle scheduler cache hits only. Busy replacement, task startup and automatic chaining remain unverified."
+  },
+  "paletteInterruptionContract": {
+    "status": "The canonical palette refinement loop publishes its actual colors and produced labels through the private document service. All 480 native cancellation cases pass both direct analysis and runTask, including first-chance state, outer unwind and same-document retry.",
+    "order": "0x48dc00 initializes candidate colors before its first progress callback. Each callback precedes a full-grid assignment at 0x48d840. The return at 0x48dc51 proves the labels are initialized. Mean updates change the same live palette before the next callback. Starting another candidate replaces its palette while retaining the previous labels until assignment.",
+    "storage": "Changing grid dimensions invalidates label availability. Same-size allocation preserves existing labels. Region counts and region color indices retain their own lifetime during palette analysis. Neither allocated memory nor color values prove initialized labels.",
+    "cancellation": "The original palette business method throws NativeCancelTaskException to its caller. No new method result exists. It retains the live candidate, defined labels, completed earlier candidates, consumed random draws and cancellation progress; requested settings are not committed by the throwing method.",
+    "reference": "../evidence/native-stage-palette-iteration-build-verification.json",
+    "fixture": "../test/fixtures/palette-iteration-cancellation-reference.ndjson.gz",
+    "cases": 480,
+    "directAndTaskScenarios": 960,
+    "transitionCoverage": {
+      "status": "Sixty-four further native workflows match both document APIs without a runtime change.",
+      "resizedWorkingGridCases": 24,
+      "afterFittingCases": 24,
+      "afterEarlierCancellationCases": 16,
+      "directAndTaskScenarios": 128,
+      "workingGrid": "512x400 owned blocks reduce before palette work. Changed dimensions discard label availability before assignment, while old exported region records survive. First, second and final notifications are cancelled and retried.",
+      "retainedFitting": "Palette cancellation and retry preserve the existing region and geometry containers. A subsequent advanced Curve Complexity change performs actual fitting on retained contours; native progress is required in the reference before comparing direct/task execution.",
+      "statusProjection": "A throwing palette method has no new native result. The independent API retains its preceding result, including status 2 from an earlier segmentation cancellation. Successful retry records 0.",
+      "fixtures": ["../test/fixtures/palette-resize-cancellation-reference.ndjson.gz", "../test/fixtures/palette-after-fitting-cancellation-reference.ndjson.gz", "../test/fixtures/palette-after-cancellation-reference.ndjson.gz"],
+      "limits": "Raw and changed-integer observers on declared block inputs; basic and advanced profiles, fixed/unlimited controls, candidate counts up to 24. Native GUI timing and general scheduler work remain unverified."
+    },
+    "freshNativeProcesses": 1078,
+    "verification": "Thirty-one earlier calibration rows remain identical. Twelve pilot rows and 480 cancellation rows repeat in fresh processes with byte-identical finite responses. Matrix coverage includes 8x8 blocks, a 9x9 gradient, aliased/antialiased profiles, cold and prior-segmentation documents, all observed raw/changed-integer callbacks and candidate counts 2..6. No new native method result is asserted after a throw.",
+    "limits": "Numeric business-method observations only. No original GUI timing, scheduler work or arbitrary-input parity is established."
+  },
+  "cachedPaletteBoundary": {
+    "native": "A direct 0x46db00 palette call clears cancellation, loads its profile and supplied colors even on a cache hit, commits requested settings and returns 0. ThreadManager 0x43fdb0 palette kind 2 queries 0x469dd0 first. A cached request copies requested settings without calling the document method, reloading the profile, transferring supplied colors or clearing cancellation.",
+    "statusProjection": "Every successful direct palette call records result 0. A skipped task has no new document method result, so the API retains its prior document status. The numeric recorder's action-5 return is the actual ThreadManager request return and must not be treated as a document result.",
+    "verification": "Protocol 6 admits only cached original scheduler requests and rejects work before thread startup. Raw state comparisons include live shared controls outside the registered numeric parameter set. Thirty-one earlier calibration rows remain identical. Sixteen new cases compare both vector-stage APIs, with two vector cancellations per case and same-document retry. The complete checkpoint is cached-palette-handoff-verification-checkpoint.json.",
+    "checkpoint": "../evidence/cached-palette-handoff-verification-checkpoint.json",
+    "fixture": "../test/fixtures/segmentation-cached-palette-cancellation-reference.ndjson.gz",
+    "cases": 16,
+    "freshNativeProcesses": 114,
+    "runtimeFix": "Successful direct palette analysis now records status 0. The prior implementation retained status 2 from a preceding cancelled segmentation even though the original direct cached call returned success. Cached task skips retain the previous document result and cancellation flag.",
+    "limits": "Raw checkpoints, declared opaque block inputs and cached palette requests only. No native scheduler work, worker thread startup, busy replacement, automatic chaining or original GUI timing is claimed."
+  },
+  "smoothingInterruptionContract": {
+    "status": "The independent document APIs pass cold/warm cancellation and retry comparisons. Batch/worker forwarding, GUI cancellation at an active 100 percent, trusted browser Process/Cancel/retry and installed-package checks pass. The numerical foundation and GUI suites retain two and one previously known failures respectively.",
+    "cases": 388,
+    "nativeProcesses": 776,
+    "crossProtocolStateComparisons": 1552,
+    "fixture": "../test/fixtures/smoothing-cancellation-reference.ndjson.gz",
+    "audit": "../evidence/smoothing-progress-reference-audit.json",
+    "order": "Raw contour extraction precedes (8,-1,0). Raw references, penalty bytes and border counts exist at entry. (8,0,0) precedes antialias neighborhood flags; (8,0,1) follows those flags and precedes random perturbation. (8,1,0) follows coordinate initialization. Each optimizer step repairs before emitting (8,2,counter); each phase also advances to its full budget endpoint, even if it converges early. (8,3,0) precedes final antialias repair; (8,-2,0) follows it.",
+    "counter": "Optimizer callbacks count completed line calls from zero within the phase, added to preceding enabled-phase iteration budgets and rounded onto the 0..500 aggregate scale. 0x497c30 excludes disabled phase budgets; 0x46f7f0 uses an int32 product, double division, +0.5 and truncated int64 low DWORD. Suppress repeated phase/substep/counter tuples. Table selection depends on Shared antialias, not fixed/unlimited palette. Disabled-mask progress and int32 extremes are recovered from assembly but do not yet have direct progress captures.",
+    "cancellation": "The document method returns 2 and progress 100, retains cancellation, partial coordinates, flags, penalty bytes and consumed random draws, clears smoothing and fitting keys and leaves committed settings unchanged. The previous fitting key is still present in first-chance state; 0x46e18b clears it after unwind. A retry reconstructs raw contours and resumes the retained application random stream. Library-operation rollback remains a separate existing public contract.",
+    "warmCases": 16,
+    "warmNativeProcesses": 48,
+    "warmFixture": "../test/fixtures/smoothing-warm-cancellation-reference.ndjson.gz",
+    "warmReference": "../evidence/stage-cubics-smoothing-warm-cleanup-verification.json",
+    "hostBoundaryContract": "Batch processing forwards smoothing's native checkpoints to its existing progress sink. Cancellation unwinds the document before any completed smoothing event, fitting work or output write. The CLI worker checks its shared flag at those checkpoints; the GUI checks cancellation before deduplicating integer percentages and keeps a 100-percent active event incomplete. A retry keeps the loaded source and recomputes successfully.",
+    "hostVerification": {
+      "checkpoint": "../evidence/smoothing-host-verification-checkpoint.json",
+      "currentBatchTestsPassed": 31,
+      "guiTests": {"passed": 661, "failed": 1},
+      "installedApiTestsPassed": 18,
+      "installedBatchWorkerTestsPassed": 31,
+      "browser": "Owned 256x256 input. Trusted Process showed smoothing at 9 percent; trusted Cancel ended it at 13 percent without output and retained the source. Trusted retry wrote one SVG. Installed CLI output matched those SVG bytes. These host checks do not establish original GUI/scheduler timing."
+    },
+    "scope": "Cold direct document smoothing and same-document retries on four owned 8x8 block profiles in raw and changed-integer observation modes; warm quality changes cancelled at their first/final notification, retried and refitted. Original GUI/scheduler and arbitrary inputs remain unverified."
+  },
+  "segmentationInterruptionContract": {
+    "status": "The canonical segmentation and subpixel kernels publish their actual producer boundaries through a retained document owner. All 688 captured cancellation cases pass through both the direct method and runTask, including exact double progress fractions, first-chance state, post-unwind cleanup and retry. Batch/worker forwarding, GUI active-100-percent cancellation, unavailable/exported-but-incomplete map handling, trusted browser Process/Cancel/retry and installed package checks pass.",
+    "hostBoundaryContract": "Batch forwards the canonical segmentation checkpoints through the existing progress observer. An abort is checked inside that operation, before a completed segmentation event, downstream smoothing/fitting or output write. Worker acknowledgement and GUI cancellation polling retain their existing ordering. An active 100-percent event remains incomplete. The GUI may display segmentation only when its completed stage key exists; retained exported records or initialized labels alone do not establish completion. Cancellation retains the loaded source and a retry recomputes the operation.",
+    "hostVerification": {
+      "checkpoint": "../evidence/segmentation-host-verification-checkpoint.json",
+      "currentAndInstalledBatchWorkerTestsPassed": 34,
+      "guiTests": {"passed": 663, "failed": 1},
+      "installedApiTestsPassed": 25,
+      "browser": "Owned 512x512 input. Trusted Process showed Creating regions at 16 percent; trusted Cancel ended segmentation at 56 percent without output and retained the source. Trusted retry wrote one SVG, byte-identical to the installed CLI result. The owned browser and host were closed and the port was confirmed closed. These checks do not establish original GUI/scheduler timing."
+    },
+    "cases": {"coldAndSameSizeRetention": 441, "afterFitting": 22, "oddGradient": 225},
+    "completedPaletteHandoff": {
+      "cases": 1770,
+      "directAndTaskScenarios": 3540,
+      "workflowNativeProcesses": 3604,
+      "calibrationNativeProcesses": 124,
+      "fixture": "../test/fixtures/segmentation-after-palette-cancellation-reference.ndjson.gz",
+      "checkpoint": "../evidence/palette-handoff-verification-checkpoint.json",
+      "scope": "All observed segmentation cancellation ordinals after completed palette analysis on owned 8x8 blocks and a 9x9 gradient. Fixed/unlimited and aliased/antialiased profiles, raw/changed-integer observers, cold documents and documents with prior segmentation. A changed requested quality forces real segmentation after the warm palette handoff. Same-document retry matches uninterrupted native state.",
+      "paletteLabelProducer": "The original call at 0x46dca4 targets 0x48f2a0 and returns to 0x46dca9 after successful full-grid candidate assignment. Protocol 5 observes that return before exposing palette-produced labels. Cache hits do not visit the producer and cannot initialize new label storage.",
+      "rejectedObservation": "Protocol 4 added completed palette calls but inherited the earlier segmentation-only label observer. Its completed shared-field calibration passed, but it omitted defined palette labels. Those raw captures/source/binary remain preserved as limited evidence; protocol 4 does not prove handoff label availability.",
+      "verification": "The document suite passes 26 tests and a fresh installed consumer passes 27, including actual denied reads of the original and workspace and denied child creation. All 205 application/source files and the existing 125-file npm archive remain unchanged. No second full core or GUI run is claimed for this test/evidence-only phase.",
+      "limits": "Completed palette analysis only. Reduced working storage is covered separately by reducedWorkingHandoff. Interrupted palette assignment, cached palette handoffs, prior fitted-graph validity, editing/shadow interruption and original scheduler timing remain unverified."
+    },
+    "reducedWorkingHandoff": {
+      "cases": 16,
+      "directAndTaskScenarios": 32,
+      "freshNativeProcesses": 48,
+      "sourceDimensions": [512,400],
+      "paletteWorkingDimensions": [438,342],
+      "checkpoint": "../evidence/reduced-palette-handoff-verification-checkpoint.json",
+      "fixtures": [
+        "../test/fixtures/segmentation-reduced-palette-cancellation-reference.ndjson.gz",
+        "../test/fixtures/segmentation-reduced-palette-warm-cancellation-reference.ndjson.gz"
+      ],
+      "scope": "Owned four-color blocks, fixed/unlimited and aliased/antialiased profiles. Cold palette-to-segmentation and prior-segmentation-to-palette-to-changed-quality segmentation. Cancel at the first (2,-1) or final (6,-2) raw checkpoint, then retry on the same document. Full progress traces, pixel/map bytes, keys, typed parameters, palette cache and returned states match the original.",
+      "entry": "Completed palette analysis owns a defined 438x342 map. Full-source segmentation reallocates to 512x400 before (2,-1), where labels are unavailable. Warm runs retain the previously exported region counts/color IDs separately. At (6,-2), full-size labels and new exported records exist but cancellation still clears the completed stage key.",
+      "runtimeChange": "None. The existing retained owner reproduces the boundary without a large-image branch or restoration shim.",
+      "limits": "Two cancellation boundaries per profile, not every intermediate large-image label map. Other sizes, cache hits, interrupted palette analysis, prior fitted graphs, alpha/edit/shadow contexts and original scheduler timing remain unverified."
+    },
+    "newNativeProcesses": 1424,
+    "crossProtocolStateComparisons": 1332,
+    "references": [
+      "../test/fixtures/segmentation-cancellation-reference.ndjson.gz",
+      "../test/fixtures/segmentation-after-fitting-cancellation-reference.ndjson.gz",
+      "../test/fixtures/segmentation-gradient-cancellation-reference.ndjson.gz"
+    ],
+    "labels": "The first (2,-1,0) callback precedes 0x4aab30/0x4891a0. Newly allocated labels are unavailable; same-sized initialized storage retains the prior labels. At the producer return 0x4aab3b, every label is its pixel index. Later callbacks observe tiling, connected rebuilding and optimization writes. Do not publish zero-filled labels, read allocator residue, or normalize labels just to observe them. An independent partial-state view must represent unavailable labels explicitly.",
+    "separateLifetimes": "The live label map and palette are separate from the exported region records. Cold exported counts/color IDs remain empty until phase-6 transfer, while scratch optimization already has regions. Warm runs can retain prior exported records. Optimizer snapshots must not be substituted for the document's exported records.",
+    "geometryAvailability": "After fitting, allocated node/cubic slot counts survive segmentation. The unchanged helper deliberately omits contour serialization during action 1. Allocation counts alone do not establish a valid current contour graph, initialized edge contents or retained coordinate values. Preserve that observation gate instead of inferring geometry availability.",
+    "unwind": "Native continuation 0x46e04c clears segmentation-edit, smoothing and fitting keys, then sets progress 100. Cancellation also clears the segmentation key and returns 2 without committing requested settings. First-chance state can still contain the previous dependent keys. The interrupted label map/palette/region storage survives for retry.",
+    "implementationConstraint": "One canonical retained owner must publish the actual label/palette writers while retaining exported region-record state separately. Keep completed numerical behavior and caller ownership. Place checkpoints at the native boundaries and preserve post-unwind cleanup; do not add a completed-result facade or branch-specific cancellation substitute.",
+    "limits": "The references cover the declared block/gradient profiles, completed palette handoffs, the declared 512x400 working-size transition and selected post-fit boundaries. Other dimension transitions, interrupted/cached palette handoffs, edits/shadow interruption contexts, old geometry validity and broader original GUI/scheduler behavior remain unverified. Shadow progress rows recovered from original bytes do not themselves prove interruption conformance."
+  },
+  "targetSha256": "c491656b962debc215a8b6e757a9b2949ffe50a36b5f2db692706bcd4ebface1",
+  "native": {
+    "documentMethods": {
+      "segmentation": "0x46df50, including continuation 0x46e04c",
+      "smoothing": "0x46e0e0, including continuation 0x46e18b",
+      "fitting": "0x46e200, including continuation 0x46e2a9"
+    },
+    "dispatcher": "0x46f6e0 observes changed native phase/substep/counter tuples. The document callback at vtable+4 receives the fraction. A true return constructs and throws native CancelTaskException with ThrowInfo 0xa07520.",
+    "fraction": "0x46ead0 selects the table from task mode, Shared usePalette and antiAlias. Each observed row contains float32 start/end and signed int32 lower/upper counters. The native fraction clamps at its endpoints and linearly interpolates between them.",
+    "observers": "Three preserved numeric-only candidates record raw/changed-integer progress, defined label allocation, and defined cubic slots respectively. The latest candidate observes allocation/write boundaries while preserving raw old edges and node identifiers. Original instructions and ordinary frame unwinding are unchanged.",
+    "scope": "Direct document business methods. No native window, widget setter, key/pointer injection, dialog acknowledgement or original application startup is used. This does not establish GUI or scheduler cancellation behavior.",
+    "documentNotification": "0x468d60 rounds the fraction into progress +0x154, compares it with the retained last-notified percentage +0x1b4, calls the observer only on change, then stores the new last-notified value. Task reset through 0x46ea70 resets the dispatcher tuple but does not reset +0x1b4. Cancellation completion sets progress 100 without replacing the retained notification value."
+  },
+  "completedCalibration": {
+    "sourceProfiles": "Four owned 8x8 images/settings combinations: fixed/unlimited palette, each aliased/antialiased. Color and pixel inputs are explicit caller values; observed output state never supplies numerical inputs.",
+    "observationModes": 2,
+    "uniqueCompletedStageInputs": 12,
+    "observedStateVersions": 24,
+    "acceptedHelperComparisons": 48,
+    "freshNativeProcesses": 12,
+    "repeatability": "Every completed native response repeats byte for byte in its own protocol. All captured completed state fields also match the unchanged accepted engine/task helper.",
+    "fields": "Document settings, palette/candidate cache, source/working pixels, stage keys, 100 typed parameters, map/region records, contours, smoothing metadata and available fitted geometry. No new output-chain claim.",
+    "evidence": [
+      "../evidence/stage-progress-pilot-verification.json",
+      "../evidence/stage-progress-fixed-pilot-verification.json",
+      "../evidence/stage-progress-baseline-verification.json",
+      "../evidence/stage-progress-fixed-baseline-verification.json"
+    ]
+  },
+  "portableArithmetic": {
+    "profileSelectors": 7,
+    "observedRanges": 103,
+    "nativeFractionComparisons": 868,
+    "comparison": "Exact double bits, without tolerances. Both the source-byte table extraction and V8 calculation match every captured fraction. V8 also repacks each range to its exact source float32/int32 bytes.",
+    "independence": "The V8 check can read only the recovered JSON file. Actual original/helper reads and child creation are denied. This proves the arithmetic check only; it does not implement stage hooks.",
+    "limits": "Only the observed ranges in those seven selectors are verified. Other controls, images, unobserved table entries, classification and automatic aggregate progress remain unfinished.",
+    "evidence": [
+      "../evidence/stage-progress-all-profile-table-recovery.json",
+      "../evidence/stage-progress-v8-table-verification.json"
+    ]
+  },
+  "segmentationCancellationObservation": {
+    "input": "Fresh 8x8 unlimited-palette, aliased segmentation; cancel at its first dispatched checkpoint (2,-1,0), then retry on the same document.",
+    "nativeProcesses": 3,
+    "beforeUnwind": "The first-chance CancelTaskException snapshot has progress 6 and cancellation true.",
+    "afterUnwind": "The original document method catches the native exception internally and returns result 2. The outer development catch stays unused. Document progress becomes 100, cancellation remains true, and the segmentation key is cleared. Source/working images and the consumed session state remain. Retry returns 0 and recomputes the task.",
+    "provenance": "Status is the actual method return recorded by the development caller; it is not a fabricated native document member.",
+    "remaining": "All observed numeric-stage cancellation ordinals in the four calibration profiles are covered by initializedStorageRecovery. Unobserved images, settings and runtime integration remain unfinished.",
+    "evidence": "../evidence/stage-progress-first-cancellation-observation.json"
+  },
+  "partialStateGate": {
+    "passed": false,
+    "cause": "At the first segmentation checkpoint the helper serializes allocated label storage before region labels exist. Two fresh responses differ in four bytes, confined to the first-chance and post-unwind index buffers. The payload includes allocation residue and process-dependent addresses, not initialized region identifiers.",
+    "writerEvidence": "Historical protocol reads allocated labels before 0x4891a0 initializes them. Its repeatability failure remains preserved. The distinct defined-storage protocol observes initialization at 0x4aab3b and same-size retention through 0x481950; see initializedStorageRecovery.",
+    "policy": "Retain both raw failures. Do not zero, emulate, normalize or publish allocator residue as expected pixels. Establish initialized-state boundaries before accepting a partial-state fixture or adding runtime callbacks.",
+    "evidence": [
+      "../evidence/stage-progress-cancellation-initial-failure.txt",
+      "../evidence/stage-progress-cancellation-run.txt",
+      "../evidence/stage-progress-partial-state-repeat-difference.json",
+      "../evidence/stage-progress-label-producer-assembly.txt",
+      "../evidence/stage-progress-native-cleanup-assembly.txt"
+    ]
+  },
+  "integrity": {
+    "priorAcceptedHelpers": 43,
+    "candidateHelperSha256": "ba87bddb878db60d22cc8d76e574bf295839ff2a8e030712bd43eeab4eb0bf14",
+    "candidateAcceptedForCancellationFixtures": false,
+    "guard": "Compare the current invocation's original-settings fingerprint and desktop before/after work. Verify the existing helper/install guards. Never restore or require a historical user-preference state.",
+    "runtimeChanged": true,
+    "newCanonicalTests": true,
+    "npmArchiveChanged": true,
+    "fullApplicationParity": false,
+    "publicationPerformed": false,
+    "rustGpuiPortImplemented": false,
+    "definedStorageCandidateSha256": "52f5a0b076ee817bf2c8b7239b514bfe644a92f171f324c391c166c9fb83e3d4",
+    "definedStorageCalibrationPassed": true
+  },
+  "initializedStorageRecovery": {
+    "status": "The preserved defined-label calibration passes its recorded native scope. Current fitting integration is described in fittingStorageReuseRecovery; old raw protocols/captures remain unchanged.",
+    "groundTruth": [
+      "0x481950 keeps storage when dimensions match; changed dimensions allocate without initializing its elements.",
+      "0x4840d0 resets grid metadata after resize without filling labels.",
+      "0x4891a0 writes every label to its pixel identifier, then clears regions; 0x4aab3b is the return from that producer before later progress callbacks."
+    ],
+    "observer": "A separate protocol records label storage availability from actual resize and initialization execution points. It preserves previously initialized same-size storage and omits element bytes only while no producer has initialized the allocation.",
+    "policy": "Do not infer availability from region count, normalize data or change the preserved failed protocol. Calibrate complete states against the accepted helper and capture cancellation/retry anew.",
+    "protocol": 2,
+    "helperSha256": "52f5a0b076ee817bf2c8b7239b514bfe644a92f171f324c391c166c9fb83e3d4",
+    "completedStateComparisons": 24,
+    "segmentationCancellationCases": 441,
+    "segmentationNativeProcesses": 882,
+    "scope": "Four owned 8x8 source/settings profiles, fixed/unlimited palettes and aliased/antialiased processing, each in raw-checkpoint and changed-integer modes. Every observed segmentation checkpoint is cancelled and retried. A changed-quality same-size rerun retains the prior initialized map at its first checkpoint.",
+    "invariant": "Serialize label elements only after an observed producer initializes their allocation. Resize with unchanged dimensions preserves initialized labels; changed dimensions invalidate availability. Never synthesize label bytes.",
+    "remaining": "Integrate the retained fitting owner with native document cleanup and host cancellation. Add segmentation/smoothing partial-state owners and recover unobserved progress ranges and controls. These numeric observations do not establish GUI/scheduler equivalence.",
+    "evidence": [
+      "../evidence/native-stage-storage-build-verification.json",
+      "../evidence/stage-storage-pilot-verification.json",
+      "../evidence/stage-storage-segmentation-verification.json",
+      "../evidence/stage-storage-later-stages-verification.json",
+      "../evidence/stage-storage-recovery-checkpoint.json"
+    ],
+    "cancelledCasesByStage": {
+      "segmentation": 441,
+      "smoothing": 388,
+      "fitting": 40
+    },
+    "laterStageNativeProcesses": 856,
+    "pilotNativeProcesses": 10,
+    "rawNativeResponsesVerified": 1748,
+    "cleanup": "For all 869 cancellation cases, the native business method catches CancelTaskException internally, returns 2, sets progress to 100 and clears its own stage key. Every other serialized first-chance state field remains exact through unwind. Each retry returns 0. Every fresh native response repeats byte for byte."
+  },
+  "fittingStorageReuseRecovery": {
+    "status": "176 repeated native fitting cancellation/retry cases and 352 direct/task independent document workflows pass in the recorded scope.",
+    "groundTruth": [
+      "0x49b560 resets node kinds and keeper scratch. It does not clear the existing cubic buffer or region edges.",
+      "0x4a0f00 emits phase 10/substep 1 before every fourth region; 0x46f790 normalizes the region index to a 0..50 counter.",
+      "At 0x4a0fd9 the fitter frees the old cubic allocation, resets its count and allocates the newly reserved slots through 0x4a7990 without initializing coordinates.",
+      "0x49ef50 writes fitted interval coordinates before phase 10/substep 3. 0x49b620 rebuilds region edges afterwards."
+    ],
+    "invariant": "Preserve live fitting nodes, old reserved cubic count and old edges until their actual reset/rebuild producers. A referenced old edge alone does not prove that a reallocated cubic slot has initialized coordinates.",
+    "captureScope": "Record warm fitting cancellation before any cubic reallocation and after complete edge reconstruction with the unchanged defined-label observer. Do not read newly allocated cubic bytes through stale old edges.",
+    "remaining": "Implement segmentation/smoothing interruption and verify broader original GUI/scheduler behavior, native partial output-chain lifetimes and complete application conformance.",
+    "evidence": [
+      "../evidence/stage-storage-fitting-reuse-verification.json",
+      "../evidence/native-stage-cubics-build-verification.json",
+      "../evidence/stage-cubics-calibration-verification.json",
+      "../evidence/stage-cubics-cancellation-verification.json",
+      "../evidence/fitting-state-native-lifetime-assembly.json"
+    ],
+    "definedCubicObserver": {
+      "protocol": 3,
+      "invariant": "Emit coordinates only for slots whose fitting writer has completed in the current allocation. Preserve raw old edge references and node cubic identifiers independently of coordinate availability.",
+      "producerBoundaries": [
+        "phase 10/substep 2 follows cubic reallocation and precedes coordinate writes",
+        "phase 10/substep 3 follows 0x49ef50; kind-2 nodes identify the written slots"
+      ],
+      "calibration": "Reproduce complete and warm-reuse states against protocol 2 before capturing the intermediate allocation checkpoint. Use a separate helper; preserve both older helper executables and their raw captures.",
+      "helperSha256": "ba51838fd3490642c6c519300a46c320f1c7fccdea87bfedec751ceab58b3860",
+      "calibrationComparisons": 171
+    },
+    "independentOwner": {
+      "contract": "A retained ContourFitter owns nodes, region edges and sparse cubic storage. run resolves no settings; it receives validated numerical controls and emits exact raw fitting checkpoints. An observer exception stops work with the current owned state retained. snapshot exposes initialized cubic slots independently of old edges. The existing fitContours API creates a fresh owner and returns its completed referenced geometry.",
+      "scope": "One canonical fitting algorithm serves pure calls and the retained document. The batch runner, CLI worker and GUI controller share fitting checkpoints. Segmentation/smoothing interruption and complete GUI conformance remain unfinished.",
+      "progress": "Phase 10 checkpoints: -1 before reset, 0 after kind reset, 1 before every fourth region with counter=floor(region*50/count+0.5), 2 after replacing cubic allocation, 3 after interval writes, -2 after rebuilding edges. Suppress repeated phase/substep/counter tuples. Use the six exact recovered fitting ranges.",
+      "status": "Implemented canonical retained ContourFitter. Forty native warm cancellation/retry cases and all 2,727 prior completed graphs pass. Full core: 868/870 with the two existing failures; isolated GUI: 659/660 with the existing processing-reset failure; installed restricted API and CLI checks pass. No skips.",
+      "evidence": [
+        "../test/fixtures/fitting-cancellation-reference.ndjson.gz",
+        "../evidence/fitting-cancellation-verified-tests.txt",
+        "../evidence/fitting-state-installed-tests.txt",
+        "../evidence/fitting-state-package-identity.json",
+        "fitting-state-code-review.md"
+      ],
+      "checkpoint": "../evidence/fitting-state-verification-checkpoint.json"
+    },
+    "regionalRecovery": {
+      "status": "64 cancellation/retry cases and 24 completed-state comparisons pass in 160 native processes. The independent owner matches every captured state, including nonzero region counters.",
+      "invariant": "The retained owner must match exact native progress fractions, partial marker/slot state and retry results inside the every-fourth-region loop.",
+      "scope": "Four fixed/unlimited and aliased/antialiased profiles, both raw and changed-integer modes. Calibrate completed states against the preceding observer before capturing each fitting interruption ordinal.",
+      "evidence": [
+        "../evidence/stage-cubics-region-grid-verification.json",
+        "../evidence/fitting-regional-cancellation-tests.txt"
+      ]
+    },
+    "contourReplacement": {
+      "groundTruth": "Sixteen repeated native cases fit, recompute smoothing at a different quality, cancel early fitting and retry. Rebuilt contour nodes reset cubic identifiers to -1. Existing region edge lists, old cubic allocation and initialized coordinates all remain. The first independent contour-replacement test failed because it cleared those retained edges; the diagnostic remains.",
+      "ownerContract": "ContourFitter.setContours replaces smoothing nodes/contours while preserving existing region edges and cubic allocation. setRegions installs reconstructed region identities with empty edges while preserving cubic allocation. A new source/core creates a new owner.",
+      "evidence": "../evidence/stage-cubics-resmoothing-verification.json",
+      "regionReconstructionEvidence": "../evidence/stage-cubics-resegmenting-verification.json"
+    },
+    "documentIntegration": {
+      "status": "Implemented and verified. Full core 885/887 and GUI 660/661 retain their three known failures; installed public API 11/11 with actual read/child denials; installed CLI/worker and trusted browser cancellation/retry pass.",
+      "ownership": "One private retained ContourFitter per native core. Smoothing replaces contours within the same segmentation identity; segmentation/edit reconstruction replaces region identities; source replacement drops the owner. Public fitting fields are owned views of that live owner.",
+      "state": "fitting is null before a fitting request. During/after interruption it owns {complete:false,geometry,cubicAvailability,outputChains}; outputChains retains the previous assembled value or null. Success sets complete:true and assembles chains. Existing completed geometry fields retain their established representation.",
+      "progress": "fit(input) and runTask(fitting,input) accept optional onProgress. Every raw fitting checkpoint publishes exact phase/substep/counter/fraction/percent after committing the partial geometry view. requestCancel is polled after the observer.",
+      "cleanup": "Every failed fitting request invalidates its incomplete fitting key. Internal requested cancellation returns native status 2, sets progress 100 and retains partial geometry, parameters, PRNG and prior committed settings. An unrelated host callback exception propagates unchanged without becoming a cancellation result; its failed request cannot become a cache hit. Success returns status 0 and commits requested settings.",
+      "consumers": "The existing completed-fitted-geometry precondition for export and current result SVG is enforced through complete. The GUI retains its separate last completed display scene. Host/batch wiring is applied after document comparisons.",
+      "remaining": "Native GUI/scheduler behavior is not established by these direct method captures.",
+      "hostErrorScope": "JS host callback failures are an independent API extension, not a native exception oracle. The durable contract is error identity plus cache validity and retry; no native fatal-error recovery equivalence is claimed.",
+      "checkpoint": "../evidence/document-fitting-verification-checkpoint.json",
+      "review": "document-fitting-code-review.md",
+      "partialChainsLimit": "Existing completed outputChains remain available when the current fitting view retains them; a null view does not assert that every native exporter allocation was destroyed. Raw native partial-chain lifetimes and original GUI save eligibility remain unverified."
+    }
+  }
+}

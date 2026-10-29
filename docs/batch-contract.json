@@ -1,0 +1,311 @@
+{
+  "component": "Canonical batch conversion",
+  "status": "Shared basic/advanced filesystem execution, CLI and modernized batch workspace implemented with bounded native verification. Profile UI/service wiring, arbitrary mid-task interruption and full GUI conformance remain incomplete.",
+  "targetSha256": "c491656b962debc215a8b6e757a9b2949ffe50a36b5f2db692706bcd4ebface1",
+  "requirement": "Expose the original batch feature through the shared independent engine, CLI and modernized GUI, with no installed Vector Magic dependency. Preserve the final Rust/GPUI and npm distribution requirements.",
+  "gpuiFolderNavigation": {
+    "behavior": "Show Export Folder appears with a completed batch summary and opens that result's directory snapshot, not the current queue's later selection. A subsequent completed batch replaces the result snapshot.",
+    "dispatch": "Use GPUI open_with_system with the canonical filesystem path. Missing paths produce a recoverable error. A successfully dispatched repaired retry replaces the obsolete footer error with Ready; this does not claim acknowledgment from the external file manager.",
+    "beforeEvidence": "../evidence/gpui-batch-folder-20261021/lane-report.json",
+    "afterEvidence": "../evidence/gpui-folder-retry-after-20261021/verification.json",
+    "verified": "Fourteen actual Linux X11 checks pass. PCManFM opens exact Unicode/spaced completed paths; later queue selection leaves the completed target unchanged; the next completed batch advances it. Missing paths show an error, repaired retry opens the folder and restores Ready, and another removal shows a fresh error. Recent Folder Open also works. Windows Explorer checks open exact Unicode/spaced recent and completed paths. Current macOS Finder checks additionally prove missing-path errors and repaired retries. Sources, outputs and sentinels remain byte-identical.",
+    "additionalPlatformEvidence": [
+      "../evidence/full-parity-program-20261022/windows-input/verification.json",
+      "../evidence/full-parity-program-20261023/macos-desktop/verification.json"
+    ],
+    "remaining": "Windows missing-path and repaired-retry folder flows remain unverified. Ready means dispatch succeeded, not acknowledgment from the external application."
+  },
+  "gpuiBatchChoices": {
+    "evidence": "../evidence/full-parity-program-20261023/linux-workflow-followup/verification.json",
+    "source": "../evidence/full-parity-program-20261023/current-source/verification.json",
+    "binarySha256": "7978244fee5e7cc7b4c6e7a209cc448737b10cda7714de815e978db2219ad396",
+    "advancedCancel": "With five colors, complexity six, PDF and grouped cutouts, Cancel preserves the existing 115-byte output and its mtime, keeps the missing output absent, and leaves skipped/pending rows with zero converted, zero failed and one skipped.",
+    "advancedSkip": "The same process retains the controls, preserves the existing output, writes the missing 2008-byte PDF, and reports one converted, zero failed and one skipped. Independent pdfinfo and raster rendering accept the output.",
+    "formatScope": "One export format per run, as documented below. PDF to SVG to PDF replaces the selection. The attempted simultaneous-format route is retained as a mistaken acceptance requirement, not a missing batch feature.",
+    "cancelScope": "Cancel preserves prepared eligibility, not the queue before preparation. This agrees with queueComponent.overwrite and executionComponent.overwrite.",
+    "limits": "No new native comparison, exhaustive cross-product or full-parity claim. The separate large-image workflow failure in this evidence remains unresolved."
+  },
+  "reference": [
+    "../evidence/qt-resources/Resources/wp_load_batch.html",
+    "../evidence/qt-resources/Resources/wp_batch_settings.html",
+    "../evidence/qt-resources/Resources/wp_batch_summary.html"
+  ],
+  "documentedSurface": [
+    "Add multiple files; remove selected entries; clear queue; main-view thumbnails.",
+    "Shared basic vectorization controls and one export directory and format.",
+    "Shared shape/stroke/DXF export options.",
+    "Batch summary and detailed processing/detection log."
+  ],
+  "imageProcessingComponent": {
+    "status": "Implemented on ImageDocument. Nine basic per-image cases and ten advanced/session/retained-control execution cases compare complete computation and available exports. This component ends at fitting; queue execution and filesystem writing belong to BatchRunner.",
+    "api": "document.runBatchImage({extension,onProgress?,advanced?,category?,quality?,paletteMode?,colorCount?,backgroundMode?,...documentControls}, observeStage?)",
+    "defaults": "Category, quality and palette mode default to 3. Basic color count defaults to automatic (0), with explicit 2 through 12. Advanced count defaults to 2, with explicit 2 through 24. Transparency defaults to flatten to white (1), with preserve (0) and auto-detect (3). Reuse selected scalar document controls; advanced defaults false.",
+    "policy": [
+      "Basic mode classifies if category, quality or palette mode requires auto-detection; preserve explicit selections. Advanced mode skips classification, retains the category/quality/palette sentinels and does not resolve automatic transparency.",
+      "Flatten-to-white and explicit preserve modes retain an opaque white background color field. Automatic transparency uses the original source alpha type and resolved category, with the same white/alpha convention as single-image Auto.",
+      "An explicit Flexible Palette request (2) skips palette finding. Auto-detect (3) still evaluates candidates 2 through 12 when basic classification resolves to Flexible Palette. Select two for two-color mode. Apply an explicit count only when the requested mode is Fixed Palette (1); otherwise select the minimum-score candidate. Disabled count values remain stored but do not override flexible/automatic choices. Round the chosen palette through native 16-bit channels.",
+      "Advanced mode evaluates only the requested count when paletteMode is 1. Stored advanced profiles may carry mode 0: preserve their supplied BGRA palette and skip palette generation, even when the retained advanced count differs from two. Modes 2 and 3 also skip palette generation; retained supplied colors remain in settings while flexible segmentation does not use them. Mode 3 contributes no palette label to stage keys. Use the same segmentation, smoothing and fitting kernels as single-image processing.",
+      "Run segmentation, smoothing and fitting through the existing document scheduler. Preserve the application PRNG and source/cache ownership.",
+      "Selected document category, quality and palette mode permit the native sentinel 3, including during an advanced-to-basic batch transition. Basic processing kernels still require resolved category and quality. The transition is verified in the same retained PRNG session, including the second run overwrite preflight."
+    ],
+    "nativeReferences": [
+      "../evidence/native-batch-processing-uniform-pair-verification.json",
+      "../evidence/native-batch-processing-logo-alpha-auto-verification.json",
+      "../evidence/native-batch-processing-gradient-explicit-verification.json"
+    ],
+    "limits": "The per-image component ends at fitting. Use runExport and BatchRunner for post-export progress and task status. The GUI dispatches active palette checkpoints and completed task boundaries. Active progress/cancellation inside other numerical stages remains unfinished. Prior direct internal mode-0 failures used an empty palette. A saved profile with its real palette is a distinct, now captured GUI state; do not infer its behavior from those failures."
+  },
+  "observedQueue": {
+    "checkpoint": "../evidence/batch-planning-verification-checkpoint.json",
+    "identity": "Exact QString filename equality, preserving insertion order. Identical strings are rejected with a Close-button notification; slash, case and relative-path variants remain separate entries on the captured Windows build.",
+    "exportDirectory": "Initially the application directory. Every newly added filename replaces it with QFileInfo.absolutePath for that filename, so the last newly added file wins. A duplicate-only add retains the existing export directory. Explicit setter text is preserved.",
+    "exportFormat": "Initially ai. Direct setter preserves svg, SVG and an arbitrary format string. This establishes setter storage only, not supported conversion formats or successful export.",
+    "removal": "Deleting a selected record removes all selected records. Deleting an unselected record removes that record. Deletion renumbers remaining button indices, preserves order, and releases removed filename identity so it can be added again.",
+    "selection": "Disabling edits prevents selection through the actual QGraphicsItem producer. Enabling edits permits selection again. Direct internal slot invocation is not evidence that disabled GUI controls accept commands. A separate seven-state sequence confirms that disabling edits clears existing selection and re-enabling does not restore it.",
+    "invalidInputs": "The retained bad-file-then-valid capture passes original C++ exceptions through their original handlers. The batch log reports Failed To Open File. and continues to the valid image, exporting a.svg and reaching summary page 3 in both fresh processes. Invalid inputs do not receive vector output files. An all-invalid batch also completes at summary page 3 with no exports. This differs from an empty queue and a queue skipped entirely at overwrite preflight.",
+    "processingIndex": "Direct int setter preserves the observed -1 and 2 bit patterns. No processing transition has been inferred from this storage observation.",
+    "thumbnailObservation": "The original persistent thumbnail thread uses the BatchModel mutex. The probe waits for attempted flags under that mutex and dispatches original queued callbacks before observing settled successful inputs. It does not join the persistent thread or rewrite flags.",
+    "previousCheckpoint": "../evidence/batch-queue-verification-checkpoint.json"
+  },
+  "requiredRecovery": [
+    "Queue identity, ordering, duplicate and invalid-file handling.",
+    "Settings sentinel/default resolution and per-file shared session state.",
+    "Output naming, collisions, overwrite decisions and filesystem failure behavior.",
+    "Execution progress, completion, cancellation and retry transitions.",
+    "GUI navigation, enabled states, summary and export-folder action."
+  ],
+  "referenceProbe": "Development-only separate batch harness reuses the existing GUI loader. Existing GUI/engine reference executables stay byte-identical. Original installation and the full original saved-settings tree remain guarded; private values are hashed in memory and never retained. All test outputs stay in own workspace directories on a private desktop.",
+  "fullApplicationParity": false,
+  "published": false,
+  "queueComponent": {
+    "status": "Implemented and verified against 55 native queue states and 25 output-planning captures, including overwrite, skip, cancel, empty and invalid-file outcomes.",
+    "api": "BatchQueue({applicationDirectory,workingDirectory?}); addFiles, remove, removeSelected, clear, select, setAcceptingEdits, prepare and decideOverwrite.",
+    "ownership": "Own filename records and selection state. Return snapshots so consumers cannot mutate queue state. The caller owns thumbnail decoding, filesystem operations, application navigation and conversion execution.",
+    "identity": "Exact case-sensitive filename string equality. Keep insertion order and report duplicates. The last newly added file sets the export directory to its absolute parent; duplicate-only addition leaves it unchanged.",
+    "selection": "Selection requires accepting edits. Removing a selected record removes all selected records; removing an unselected record removes only that record. Renumber remaining button indices. Disabling edits clears existing selection; re-enabling does not restore it, as observed in the seven-state selection-disable recording.",
+    "outputNames": "Use the filename without its last suffix, including the empty basename of .hidden. Allocate unique case-sensitive basenames in queue order by trying _1, _2 and so on. Join the raw export-directory string, slash, allocated basename, dot and stored export-format string. Filesystem existence does not allocate a new name.",
+    "overwrite": "Preparation assigns every output path and initially marks existing paths as skipped. Overwrite marks all records eligible; skip retains the non-existing records; cancel preserves the prepared eligibility bits and prevents execution. Skipping every existing output prevents execution and displays the native Close-only No Files To Process warning. Empty queue handling displays an OK-only notice and navigates to page 1. These navigation/dialog effects remain controller work; the queue returns eligibility and shouldStart.",
+    "limits": "Queue snapshots cover queue identity, ordering, selection effects, output paths and eligibility. Native thumbnail flags, progress, logs, execution and GUI navigation require separate evidence and implementation."
+  },
+  "executionComponent": {
+    "status": "Implemented and verified against 39 original filesystem scenarios, seven cancellation/retry scenarios and twelve application-document workflow pairs. Observers include successful and failed load boundaries. Native load cancellation discards its image, while the previously recovered computation/export cancellations retain results.",
+    "api": "BatchRunner({queue,session?}) or BatchRunner({queue,document}).run({settings?,exportOptions?,decideOverwrite?,onStage?,signal?}); snapshot() through openvector/batch, which also exports BatchQueue.",
+    "defaults": {
+      "format": "ai",
+      "category": 3,
+      "quality": 3,
+      "paletteMode": 3,
+      "colorCount": 0,
+      "backgroundMode": 1,
+      "layout": "grouped-cutouts",
+      "thinStroke": false,
+      "curveMode": "dense-lines",
+      "compact": false,
+      "overwriteDecision": "skip",
+      "advanced": false
+    },
+    "lifetime": "One retained application PRNG session and reusable image document. Resolve input and output filesystem paths from the queue working directory without changing the stored filenames.",
+    "loadFailures": "Reset the source/core before attempting each input. A failed read/decode leaves zero-sized source and working images, empty vector/palette caches, fresh constructor parameters, task status 1 and progress 0. Keep the same ImageDocument and application PRNG. Batch selection commits while an image is present, and after a successful new load. With no image, an unsuccessful first load preserves the application-provided startup controls. Report Failed To Open File. and continue.",
+    "saveFailures": "Report Failed To Save File. and continue. Do not create missing export directories. The original missing-export-directory and valid-invalid-valid recording pairs establish these paths.",
+    "overwrite": "Call the asynchronous decision callback once when preflight finds existing outputs. Preserve eligibility on cancel; skip pre-existing outputs or overwrite all according to the decision. For every eligible record, save with the original replacement behavior: case-variant output aliases and files created after preflight are replaced. Separate original case-alias and controlled file-appearance captures prove this behavior. The single-image vectorize command retains its existing exclusive-write contract.",
+    "log": "Preserve original non-timing English log text and order, requested/detected settings and file transitions. Record own real start/end clocks and stage durations; validate native and independent clock fields separately rather than comparing different runs clocks as equal.",
+    "errors": "Invalid configuration fails before writes. File read/decode/preparation failures and write failures are per-image results. Unrecovered processing exceptions remain visible and stop execution; do not silently convert them into a different successful outcome.",
+    "limits": "Arbitrary mid-task interruption, saved-profile naming/persistence/MRU selection and full batch GUI conformance remain unresolved. The GUI reports completed task boundaries and supports navigation, summary and retry. Post-open filesystem write/close failure codes and streaming partial-output behavior need further native evidence.",
+    "checkpoint": "../evidence/batch-cancellation-verification-checkpoint.json",
+    "loadScheduling": "Source reset precedes the task request. A next-file load requested inside a successful export completion re-enters ThreadManager 0x43f910 while the export remains active, so 0x43f140 sets the document cancellation flag. Load itself does not clear that flag. Failed-load/save callbacks first clear the active task and do not set it. Subsequent computation resets cancellation normally. This flag alone does not mean the batch was cancelled.",
+    "documentLoadApi": "session.createDocument() creates an empty document with raw document defaults. The application can commitSettings(controls) without running a numerical stage; GUI startup controls differ from raw constructor defaults. document.runBatchLoad(controls, load) resets the old source before calling the host reader/decoder. If an old image exists, commit the batch selection first; otherwise commit after successful load. Failure leaves task status 1. Direct setSource validates before replacement. cancelLoad() clears the loaded image again, resets cancellation and preserves the completed load result, matching MainModel cancelledTask(8)."
+  },
+  "cli": {
+    "syntax": "openvector batch <image...> [--output-dir directory] [--format svg|eps|pdf|ai|dxf] [--settings controls.json] [--layout stacked|cutouts|grouped-cutouts] [--thin-stroke] [--compact] [--dxf-mode splines|sparse-lines|dense-lines] [--overwrite skip|replace|cancel]",
+    "output": "Write vector files to the selected existing directory. Default directory is the last newly added source image parent. Emit one JSON batch summary on stdout. Expected load/save failures also produce concise stderr diagnostics. Do not prompt.",
+    "exitCodes": {
+      "0": "Complete with no file failures, including explicitly skipped existing outputs.",
+      "1": "Invalid arguments/configuration, a file load/save failure, or a visible processing failure.",
+      "130": "Cancelled at overwrite preflight or by Ctrl-C. A second Ctrl-C forces worker termination."
+    },
+    "help": "batch --help and help batch display command-specific help without executing work. --version retains existing behavior.",
+    "scope": "Basic and supplied advanced batch configurations with the original five file formats. Set advanced true to use the existing document scalar controls and a fixed count up to 24. Saved-profile persistence and selection remain controller work. No profile migration or compatibility command is introduced.",
+    "interrupts": {
+      "status": "Implemented. Five worker cancellation cases match native boundaries; real isolated Windows Ctrl-C, Ctrl-Break and double Ctrl-C runs verify acknowledgement, exit 130, summary behavior and preservation of completed bytes.",
+      "execution": "One worker thread runs the existing BatchRunner. The main thread owns process signals and remains responsive during synchronous engine work. No alternate vectorization engine is introduced.",
+      "first": "On the first SIGINT, or SIGBREAK on Windows, acknowledge cancellation on stderr immediately. Request cooperative cancellation at a palette refinement checkpoint or the next completed task boundary. Return the ordinary cancelled JSON summary and exit 130.",
+      "second": "A second interrupt terminates the worker, reports forced cancellation on stderr and exits 130 without a JSON summary. Files already written remain; an active write can be incomplete.",
+      "limits": "Palette refinement and task-boundary cancellation share the direct API implementation. Other in-kernel cancellation, rollback and native partial-file streaming remain unrecovered.",
+      "completionRace": "A job that completes before the cancellation request remains complete; completed work is not rolled back or rewritten as an unfinished result.",
+      "checkpoint": "../evidence/batch-worker-verification-checkpoint.json"
+    }
+  },
+  "paletteChoices": {
+    "reference": "../evidence/native-batch-processing-gui-menu-choices-verified-verification.json",
+    "choices": {
+      "1": "Custom colors",
+      "2": "Unlimited colors",
+      "3": "Auto-detect"
+    },
+    "twoColors": "Choose paletteMode 1 and colorCount 2. Mode 0 is not exposed by the original batch menu and must be rejected at the batch boundary. Single-image mode 0 remains valid.",
+    "evidence": "Read actual CustomMenuButton action labels and parallel values from the constructor-owned lists in two fresh original processes. QAction data is unused. Earlier failed QObject-child observers and internal mode-0 calls are retained as diagnostics, not supported GUI behavior."
+  },
+  "advancedControls": {
+    "switch": "advanced: true",
+    "fields": [
+      "sensitivity",
+      "antiAlias",
+      "complexity",
+      "minimumPixels",
+      "artifactRejection",
+      "clusterColors",
+      "smoothness",
+      "detectCorners",
+      "curveComplexity",
+      "smoothingAntiAlias"
+    ],
+    "validation": "Use the existing document scalar ranges and booleans. In basic mode retain explicitly supplied inactive advanced controls, as the native selected profile does; do not reset omitted controls on a retained document. Validate the full configuration before queue mutation or file writes.",
+    "log": "Saved Advanced Settings and transparency in the preamble. No detected category/quality/palette lines. Emit Number of Colors only when a fixed palette was selected.",
+    "scope": "Process supplied advanced controls. The shared saved-profile API/CLI and GUI selection service are implemented. Rename/delete use the same list without applying settings; full native dialog interaction remains unverified. See saved-profiles-contract.json."
+  },
+  "exportTask": {
+    "status": "Implemented. All 51 integer phases match native captures; 39 filesystem scenarios compare available full post-export document state, including progress and status. Four cases additionally compare completed computation/export task boundaries.",
+    "reference": [
+      "../evidence/native-batch-processing-task-trace-uniform-boundaries-verification.json",
+      "../evidence/native-batch-processing-export-progress-table-verification.json",
+      "../evidence/native-batch-processing-task-trace-failed-save-verified-verification.json"
+    ],
+    "documentApi": "document.runExport(save): save receives the bound progress callback and resolves a numeric task result. The document owns progress, cancellation flag reset and final task status; the host owns the output destination. The host serializes document operations while save is pending. Zero denotes success; the captured failed-open task returns 4.",
+    "writerApi": "All six fitted-graph exporters accept optional onProgress(percent). Emit at the native every-fourth-region checkpoints, suppress identical quantized phases, and preserve byte output.",
+    "progress": "Reset the document progress to 0 and cancellation to false. Use native 0x47c660 row checkpoints and 0x46f790 quantization floor(row*50/count+0.5). Native float32 endpoints are 0.0565590001642704 and 0.9632200002670288; phases 0..50 map through those endpoints and document percentage rounding. No forced 100 on completion.",
+    "fileLifecycle": "Open or truncate an eligible output before invoking the serializer, as the original writer does. Failed opens do not traverse geometry and leave progress 0 with result 4. Close every opened handle, including when serialization throws. Keep internal processing failures visible.",
+    "observer": "BatchRunner onStage receives an owned completed computation/export snapshot before accepting its completion log or scheduling the next task. An aborted signal at this boundary preserves task state and output files, sets cancellation and stops continuation.",
+    "limits": "Arbitrary mid-task interruption and native streaming partial files remain unfinished. CLI OS signals and GUI controller integration use verified completed task boundaries. Native result-code parity is established for captured filesystem conditions; post-open write/close errors remain unverified."
+  },
+  "cancellationObservations": {
+    "scope": "Deterministic native worker-completion boundaries before queued Qt completion. This does not establish arbitrary in-kernel cancellation timing.",
+    "behavior": "Calling the real cancelTask slot after smoothing, fitting or export sets native cancellation state, returns to batch settings page 2, drops the cancelled task completion log and prevents later files. A file already saved by task 6 remains. A failed-open export cancelled before controller completion retains status 4 and zero progress without accepting its failure log. No forced completion clock or summary is produced.",
+    "references": [
+      "../evidence/native-batch-processing-task-cancel-after-fitting-verified-verification.json",
+      "../evidence/native-batch-processing-task-cancel-after-export-verification.json",
+      "../evidence/native-batch-processing-task-cancel-second-fitting-verification.json",
+      "../evidence/native-batch-processing-task-cancel-fitting-retry-verification.json",
+      "../evidence/native-batch-processing-task-cancel-export-retry-overwrite-verification.json",
+      "../evidence/native-batch-processing-task-cancel-after-smoothing-verification.json",
+      "../evidence/native-batch-processing-task-cancel-failed-export-verification.json",
+      "../evidence/native-batch-processing-task-cancel-fitting-retry-files-verification.json",
+      "../evidence/native-batch-processing-task-cancel-export-retry-files-verification.json"
+    ],
+    "retry": "Four paired native retry recordings restart the same retained session from page 2 to summary page 3. Two additionally retain an intermediate full document snapshot and actual file inventory before later writes. The export-cancel retry keeps the first file, asks about overwrite, then replaces it when overwrite is chosen. The independent API matches both inventories, all observed task boundaries, full document mathematics, random state and non-timing logs."
+  },
+  "originalSettingsGuards": {
+    "scope": "Every native subprocess capture keeps its recording-time full-tree fingerprint and enforces equality before/after both fresh executions. Historical captures do not require the user to preserve those preferences forever. The current read-only auditor separately asserts its own before/after fingerprint equality.",
+    "historicalAudit": "Validate each retained capture guard and fingerprint structure, its raw response hashes, flags and protected installation. Do not substitute an allowlist of prior fingerprints or restore the original settings to satisfy an old capture.",
+    "betweenCaptureObservation": "../evidence/batch-export-original-settings-epoch-observation.json",
+    "retainedFailure": "../evidence/batch-export-historical-guard-failure.txt",
+    "privacy": "Only hashes, counts and write timestamps are retained. Private settings values are never saved."
+  },
+  "cancellationComponent": {
+    "status": "Implemented and verified against seven paired native cancellation/retry scenarios, including nine independent jobs and complete document comparisons. Arbitrary in-kernel interruption remains outside this recovered boundary.",
+    "api": "BatchRunner.run({signal?,onProgress?,onStage?,...}); snapshot() returns owned running/queue/document state.",
+    "signal": "Accept a standard AbortSignal. Empty queues remain empty. A pre-aborted nonempty request returns cancelled before preparation or document mutation. Abort during an asynchronous overwrite decision cancels preflight without changing the retained document.",
+    "boundary": "Notify onStage after each load (including a failed load), computation or export completes but before committing that task completion log or scheduling the next task. If the observer aborts its signal, set document cancellation, stop the job, retain its current queue index, and omit the cancelled completion log and final clocks/summary.",
+    "files": "Keep already written outputs. Unprocessed eligible file results stay pending; preflight-skipped results stay skipped. Do not roll back the filesystem or restore old document/random state.",
+    "reservedCancellation": "Rust CANCEL_TASK is a cancellation outcome whether raised by the document or its observer. Return the cancelled BatchResult with completed file records, counts, pending work and partial log even when a completed-stage observer has not yet set the separate runner signal. Ordinary observer or processing errors remain errors. A raw document cancellation flag alone is not this signal; normal native load scheduling can set that flag without cancelling the batch.",
+    "retry": "Run again with a fresh signal on the same runner. Reuse its session and document lifetime. Apply ordinary output preflight again, including overwrite decisions for files already saved.",
+    "limits": "Palette and fitting checkpoints and completed task boundaries are implemented. Segmentation/smoothing interruption, native partial-file streaming and full GUI conformance remain unfinished.",
+    "checkpoint": "../evidence/batch-cancellation-verification-checkpoint.json",
+    "loadCompletion": "MainModel::cancelledTask at 0x431c40 calls source reset 0x430ed0 for task 8. A cancelled load discards its raster and clears cancellation again; other recovered cancellation stages retain their document results. Native references: gui-single-cancel-first-load, gui-single-cancel-failed-load and gui-single-cancel-second-load.",
+    "paletteCheckpoints": {
+      "status": "Implemented and verified through the direct API, acknowledged worker observers, retained-state retry, GUI controller and trusted browser Process/Cancel clicks. Existing direct document progress/cancellation still matches all 234 recorded native scenarios.",
+      "evidence": "Native document cancellation operation 97/98; test/document-cancellation.test.mjs retains 234 recorded scenarios and the exact palette state/PRNG/progress assertions.",
+      "api": "Optional onProgress({index,filename,stage,status,colorCount,iteration,fraction,percent}) observes active palette checkpoints. onStage continues to mean completed task.",
+      "semantics": "Check AbortSignal after each progress observer. Request document cancellation at the existing palette checkpoint; retain source, completed prior candidates, live core and consumed PRNG. Do not emit a completed palette event, its log line, export or final summary clocks. Retry with a fresh signal on the same runner. Observer exceptions remain processing failures.",
+      "worker": "The CLI worker polls the shared cancellation flag at each palette checkpoint. Explicit host progress observers use acknowledged IPC so synchronous observer cancellation is not lost. No progress IPC is sent without an observer.",
+      "gui": "Publish changed integer palette progress without pixel payloads. Poll cancellation at every checkpoint, even when the integer percentage repeats. In-task palette cancellation retains the loaded source; it does not take the cancelled-load reset branch.",
+      "remaining": "Segmentation/smoothing interruption, native export streaming and full application parity remain unfinished.",
+      "presentation": "The palette readout says Palette analysis: N%, including 100% while native refinement still has checkpoints remaining. It does not label an active task as completed.",
+      "guiEventPhase": "job.current.complete is false at every active palette checkpoint, including 100%; true only after an actual completed task. Completion traces and cancel-after-task consumers use this explicit flag, never a percentage or first publication heuristic.",
+      "checkpoint": "../evidence/palette-batch-cancellation-verification-checkpoint.json"
+    },
+    "remainingStageRecovery": "stage-progress-contract.json",
+    "fittingCheckpoints": {
+      "contract": "stage-progress-contract.json",
+      "status": "Implemented and verified through native direct/task comparisons, shared runner, acknowledged worker, GUI controller, restricted installed API, installed CLI/worker and trusted browser Process/Cancel/retry clicks.",
+      "api": "onProgress({index,filename,stage:fitting,status,phase,substep,counter,fraction,percent}). onStage still means completed task.",
+      "semantics": "Poll AbortSignal after the progress observer. Do not emit a completed fitting stage, its log line or any output after interruption. Keep the loaded source and partial document, then retry with a fresh signal.",
+      "presentation": "Active work says Fitting curves: N%; completion says Fitted curves. The complete field controls this distinction, including active 100-percent stages.",
+      "checkpoint": "../evidence/document-fitting-verification-checkpoint.json"
+    }
+  },
+  "guiComponent": {
+    "status": "Implemented development preview: file queue, basic/advanced settings, completed-task progress, overwrite decisions, cancellation/retry, summary and processing log.",
+    "pages": [
+      "files",
+      "settings",
+      "progress",
+      "summary"
+    ],
+    "ownership": "The GUI owns one application CoreSession and ImageDocument across single-image and batch work. BatchRunner accepts an existing document instead of creating a separate session; its idle document getter lets the GUI adopt a document created by a first batch.",
+    "runnerApi": "BatchRunner({queue,session?}) or BatchRunner({queue,document}); supplying both session and document is invalid. document is the actual mutable document for an idle controller; snapshot() continues to return owned copies. The host serializes all document operations during a job.",
+    "files": "Use native Windows multiple-file selection in the desktop preview so original paths and last-source-folder defaults are preserved. The shared BatchQueue owns identity, selection and naming.",
+    "execution": "Run the shared BatchRunner in the existing GUI worker. Publish owned queue/job state for responsive reads, active palette progress and cancellation. Retain the same document/random stream for retries.",
+    "ui": "Keep the black workspace, dense file list/thumbnail area and right-hand wizard, with the existing shadcn controls and Lucide icons.",
+    "limits": "Saved-profile persistence/MRU, arbitrary in-kernel progress/cancellation, native desktop drag/drop and full batch UI conformance remain incomplete. Windows picker and folder-reveal interactions are not yet verified.",
+    "nativeDocumentEvidence": {
+      "references": [
+        "../evidence/native-batch-processing-gui-single-then-basic-verification.json",
+        "../evidence/native-batch-processing-gui-single-then-advanced-verification.json",
+        "../evidence/native-batch-processing-gui-single-then-invalid-verified-verification.json",
+        "../evidence/native-batch-processing-gui-single-valid-then-invalid-verification.json",
+        "../evidence/native-batch-processing-gui-single-invalid-then-valid-verification.json",
+        "../evidence/native-batch-processing-gui-single-advanced-invalid-verification.json",
+        "../evidence/native-batch-processing-gui-single-valid-invalid-valid-verification.json",
+        "../evidence/native-batch-processing-gui-single-failed-save-then-invalid-verification.json",
+        "../evidence/native-batch-processing-gui-first-batch-invalid-verification.json",
+        "../evidence/native-batch-processing-gui-single-cancel-first-load-verification.json",
+        "../evidence/native-batch-processing-gui-single-cancel-failed-load-verification.json",
+        "../evidence/native-batch-processing-gui-single-cancel-second-load-verification.json"
+      ],
+      "identity": "The MainModel document pointer stays stable. A repeated core pointer may be allocator address reuse: source reset 0x46e500 destroys and reconstructs the core. Retain the application PRNG, not the old image core."
+    },
+    "runtimeContract": {
+      "state": "One persistent GUI worker owns one GuiEngine and BatchController. GET /api/batch reads a host-cached owned snapshot, including queue, controls, page, thumbnails, current task, overwrite prompt and summary.",
+      "commands": "POST /api/batch accepts enter, leave, add, select, remove, remove-selected, clear, configure, apply-profile, page, start, decide and cancel. Native pick-files, pick-folder and reveal-folder commands belong to the Windows host.",
+      "serialization": "Mutating operations and pickers serialize. During a job only state reads, overwrite decisions and cancellation are accepted. All single-image document operations reject while batch work is active.",
+      "cancel": "The host sets a SharedArrayBuffer cancellation flag immediately. The worker observes it at palette refinement checkpoints and completed load/computation/export boundaries. It polls even when the displayed integer percentage repeats. Awaiting overwrite is also cancellable. Completion that wins the race remains complete.",
+      "controls": "Own one full requested profile with distinct basic/advanced counts, palette count and background recommendation. Settings/colorCounts snapshots are derived. configure validates processing/export settings before mutation; apply-profile performs the native advanced-only profile copy. The shared processing path accepts supplied BGRA palettes.",
+      "scopeLimits": "Queue thumbnail rendering is an independent display projection; exact original thumbnail pixel resampling and preflight selection clearing have not been established. Native desktop drag/drop, recent folders and saved profile persistence remain gaps.",
+      "thumbnails": "Snapshots carry thumbnail metadata and immutable content IDs. Pixel payloads are published once when images are added, cached by the host and read through GET /api/batch-thumbnail?id=... . Progress never republishes pixel payloads. Removed image IDs are evicted. Gallery result labels join the last summary by exact filename, not current row position.",
+      "queueEditing": "Adding images preserves the current page, including settings page 2, as observed in the corrected application-model-reset corpus. Removing or clearing images returns to the file page in the current GUI implementation; native page behavior for those mutations remains unverified. The last completed summary remains available as a log; Show Export Folder uses the completed job directory.",
+      "accessibility": "Use boolean aria-busy state, named controls, a focused heading after page navigation and Cancel as the default overwrite-dialog focus."
+    },
+    "nativeHostVerification": {
+      "checkpoint": "../evidence/gui-batch-picker-abi-verification.json",
+      "verified": "Actual COM creation, inherited vtable options, filesystem-folder roundtrip, Unicode paths and empty-selection JSON. The SDK interface order is checked against the locally installed Windows header.",
+      "unverified": "Interactive file/folder selection and opening Explorer. Native computer-use controls are disabled; no native picker or Explorer UI was opened or driven."
+    },
+    "verificationCheckpoint": "../evidence/gui-batch-workspace-verification-checkpoint.json"
+  },
+  "verificationLimits": {
+    "nodeWorkerPermissions": "Node 24.12 does not inherit its permission model into worker threads. Actual outside-allowlist reads in the worker contradict the earlier workerInheritedDenials=true report; permission.has alone is not proof of denial. Direct installed library tests run without worker or child permissions. Installed CLI/worker behavior tests run separately.",
+    "documentation": "https://nodejs.org/download/release/v24.12.0/docs/api/permissions.html#permission-model-constraints",
+    "supersededClaim": "../evidence/batch-worker-installed-isolation.json workerInheritedDenials=true",
+    "currentProbe": "../evidence/batch-document-load-installed-isolation.json",
+    "retainedFailedProbe": "../evidence/batch-document-load-installed-isolation-initial-failure.txt"
+  },
+  "savedProfilesContract": "saved-profiles-contract.json",
+  "savedProfileExecution": {
+    "status": "Implemented through the shared settings/profile owner and one batch processing path. Nine paired native workflows compare 17 complete numerical documents, 1,700 typed parameters, full selected/requested profiles, task traces and SVG bytes.",
+    "settings": "The one batch settings record accepts a BGRA palette array. Basic direct paletteMode 0 remains rejected because it is absent from the basic menu. Advanced mode 0 from a saved profile follows the same pipeline as all other batch settings, with supplied colors preserved.",
+    "selection": "Own one full requested profile, including separate basic/advanced counts, palette count and background recommendation. Loading a batch profile copies only the native advanced fields and forces both requested and selected single-image advanced flags true, without committing the current image document.",
+    "load": "Each attempted file copies the requested profile into selected GUI controls, with opaque white as the selected background color. Source reset clears the committed document palette. A successful load then commits the requested colors; a failed load keeps them only in the selected/requested profile.",
+    "completion": "Explicit paletteCount returned by processing updates the selected advanced and palette counts. Skipped palette generation preserves the requested counts, including custom advanced count 7 with a two-color stored palette. Requested profiles remain unchanged across files.",
+    "cancelLoad": "Reset selected palette, palette count 2, background mode -1, transparent white and recommendation -1. Preserve the requested profile and the committed advanced count.",
+    "evidence": "../evidence/record-native-batch-profiles.py",
+    "remaining": "Saved-profile GUI buttons/service, restart-loaded empty palettes, bounded Play/Fast Forward and rename/delete are implemented separately. Full native dialog interaction, later guided replay and complete modal behavior remain unfinished.",
+    "audit": "../evidence/batch-profiles-native-audit.json",
+    "fixture": "../test/fixtures/batch-profiles-reference.ndjson.gz",
+    "gui": "BatchController.selectedProfile() owns the full requested profile. command({command: apply-profile, profile}) applies the advanced-only copy. GuiEngine.runBatch accepts a full profile and passes its processing projection to BatchRunner. Snapshot settings/colorCounts are derived for current controls; no second mutable settings/count owner remains.",
+    "stageSelection": "Completed segmentation/smoothing/fitting events carry the controller paletteCount explicitly. Null means generation was skipped. The GUI uses that value rather than inferring counts from palette length.",
+    "verificationCheckpoint": "../evidence/batch-profiles-verification-checkpoint.json",
+    "paletteRuntime": "Every file load clears customization. Completed palette generation refreshes the selected palette count, revert copy and customization. Skipped generation preserves the runtime revert copy and requested counters, including a five-color edited palette with requested count 4 and a four-color revert copy. Five paired native runtime workflows verify ten complete documents and 1,000 parameter records.",
+    "paletteRuntimeAudit": "../evidence/batch-palette-runtime-native-audit.json",
+    "paletteRuntimeFixture": "../test/fixtures/batch-palette-runtime-reference.ndjson.gz"
+  }
+}

@@ -1,0 +1,21 @@
+This directory contains the FreeType gray rasterizer distributed with Qt 4.4.3.
+Its original copyright and FreeType Project License headers are retained.
+The accompanying FTL.TXT is the unmodified upstream license.
+
+OpenVector changes to qgrayraster.c:
+- Replace setjmp/longjmp pool exhaustion with an explicit worker overflow flag.
+  The original band subdivision and retry remain the error recovery mechanism.
+- Remove unused allocating raster constructors/destructors and the function
+  table. The freestanding wrapper supplies the raster object and memory pool.
+- The allocator retains the observed x86 reference's 3200-byte control quota
+  independently of the modified worker layout. This preserves pool-growth
+  retries and any pixels already composed before those retries.
+- Remove unused stdio/stdlib includes and nonlocal-jump declarations.
+
+The two private headers are unmodified. No Qt application or widget code is
+included. Source provenance and hashes are recorded in
+evidence/bitmap-raster-source-identity.json in the OpenVector repository.
+
+This software is based in part on the work of the FreeType Team.
+Portions are copyright 1996-2004 The FreeType Project (www.freetype.org).
+All rights reserved.

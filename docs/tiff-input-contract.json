@@ -1,0 +1,159 @@
+{
+  "component": "Independent TIFF input",
+  "status": "Independent decoder matches1663 repeat-identical original decode/source/preparation cases and twenty complete GUI conversions. 129 decode rejection cases and two generic-reader access/heap failures are captured. Broader format/error behavior and universal application parity remain unfinished.",
+  "targetSha256": "c491656b962debc215a8b6e757a9b2949ffe50a36b5f2db692706bcd4ebface1",
+  "reference": {
+    "reader": "ReadTIFFImage 0x5da490, REA1099",
+    "operation": 92,
+    "corpora": [
+      "../test/fixtures/tiff-input-reference.ndjson.gz",
+      "../test/fixtures/tiff-extended-input-reference.ndjson.gz",
+      "../test/fixtures/tiff-quantum-matrix-input-reference.ndjson.gz",
+      "../test/fixtures/tiff-layout-success-input-reference.ndjson.gz",
+      "../test/fixtures/tiff-tile-variants-input-reference.ndjson.gz",
+      "../test/fixtures/tiff-gray-tile-stride-input-reference.ndjson.gz",
+      "../test/fixtures/tiff-sample-format-input-reference.ndjson.gz",
+      "../test/fixtures/tiff-fax-input-reference.ndjson.gz",
+      "../test/fixtures/tiff-storage-order-input-reference.ndjson.gz",
+      "../test/fixtures/tiff-jpeg-input-reference.ndjson.gz",
+      "../test/fixtures/tiff-jpeg-strips-input-reference.ndjson.gz",
+      "../test/fixtures/tiff-jpeg-layout-success-input-reference.ndjson.gz",
+      "../test/fixtures/tiff-jpeg-samples-input-reference.ndjson.gz",
+      "../test/fixtures/tiff-jpeg-single-row-input-reference.ndjson.gz",
+      "../test/fixtures/tiff-jpeg-gray-alpha-input-reference.ndjson.gz",
+      "../test/fixtures/jpeg-alpha-modes-input-reference.ndjson.gz",
+      "../test/fixtures/tiff-legacy-codecs-input-reference.ndjson.gz",
+      "../test/fixtures/tiff-legacy-layout-input-reference.ndjson.gz",
+      "../test/fixtures/tiff-thunder-commands-input-reference.ndjson.gz",
+      "../test/fixtures/tiff-thunder-retained-row-input-reference.ndjson.gz",
+      "../test/fixtures/tiff-thunder-initial-row-input-reference.ndjson.gz",
+      "../test/fixtures/tiff-legacy-row-framing-input-reference.ndjson.gz",
+      "../test/fixtures/tiff-predictor3-input-reference.ndjson.gz",
+      "../test/fixtures/tiff-predictor3-layout-input-reference.ndjson.gz",
+      "../test/fixtures/tiff-predictor3-fill-verified-input-reference.ndjson.gz",
+      "../test/fixtures/tiff-fill-order-codecs-verified-input-reference.ndjson.gz",
+      "../test/fixtures/tiff-predictor3-boundaries-input-reference.ndjson.gz",
+      "../test/fixtures/tiff-predictor3-white-input-reference.ndjson.gz",
+      "../test/fixtures/tiff-gray-padding-input-reference.ndjson.gz",
+      "../test/fixtures/tiff-gray-padding32-input-reference.ndjson.gz",
+      "../test/fixtures/tiff-gray-three-input-reference.ndjson.gz",
+      "../test/fixtures/tiff-gray-planar-predictor3-input-reference.ndjson.gz",
+      "../test/fixtures/tiff-packbits-tile-framing-verified-input-reference.ndjson.gz"
+    ],
+    "authority": "Native raw/source/preparation bytes govern numerical behavior. TIFF structure follows the primary specification; linked reader and legacy source explain import choices. Encoded writer inputs remain separate from expectations.",
+    "conversion": "../test/fixtures/tiff-conversion-reference.ndjson.gz",
+    "jpegConversion": "../test/fixtures/tiff-jpeg-conversion-reference.ndjson.gz",
+    "grayAlphaConversion": "../test/fixtures/jpeg-alpha-conversion-reference.ndjson.gz",
+    "legacyConversion": "../test/fixtures/tiff-legacy-conversion-reference.ndjson.gz",
+    "predictorConversion": "../test/fixtures/tiff-predictor-conversion-reference.ndjson.gz"
+  },
+  "api": "Private decodeTiffPixels returns owned original PixelPacket BGRA, intrinsic hasAlpha, dimensions and colorspace, plus an owned black plane for CMYK. decodeTiff normalizes ink into the common RGB BGRA contract. The existing root decodeImage export serves CLI/GUI/library callers.",
+  "directory": "Classic TIFF first IFD, both byte orders. First image raster survives later pages. Scanline import ignores orientation; the tile delegate applies orientations1..4 and equivalent5..8 within each visible tile, including partial edges, without transposing dimensions.",
+  "compression": "Captured uncompressed, PackBits, TIFF LZW, Adobe Deflate and CCITT RLE/Group3/Group4. TIFF LZW has MSB packing and early width growth; CCITT handles T4 mixed1D/2D and fill alignment. Storage prediction is reconstructed before tile addressing and native import quirks. Compressed planar multi-row strips reproduce the original scanline-seek failure. Compression7 JPEG uses shared coefficient reconstruction, per-block sample planes and TIFF photometric import, including tiles, planar one-row strips, complete/abbreviated tables and progressive frames. JPEG suppresses TIFF FillOrder bit reversal. NeXT2-bit literal rows, byte spans and runs, plus ThunderScan4-bit raw samples, repeats and packed2/3-bit deltas, have independent decoders. Both reverse encoded bytes before decompression for FillOrder2. ThunderScan retains a zero-initialized quantum scanline across row and strip boundaries. Floating predictor3 reconstructs32/64-bit samples through MSB-first byte planes; source captures cover LZW and both Deflate codes. FillOrder2 reverses compressed storage before decoding for non-JPEG/non-fax codecs. PackBits scanline packets cannot cross a row; tile packets may cross rows inside the native tile read unit.",
+  "pixels": "Bilevel, packed2/4/8 gray/palette, RGB/RGBA/gray-alpha/CMYK, unsigned16 and integer32 gray, float32/64 gray. Direct16-bit import rounds division by257; tiled gray16 takes its high byte. Packed2/4 gray ignores white-is-zero. Integer32 Q8 conversion wraps the uint32 addition8421504 before division16843009. Floating sample import casts scaled values to float32 before Q8 rounding, including64-bit samples, as observed at every byte half boundary and in native quantum-import pseudocode. Multi-sample grayscale follows byte padding and IndexQuantum versus GrayQuantum inversion. Non-tiled planar grayscale reads only plane0, including compressed multi-row strips; RGB/CMYK retain their distinct plane-seek failure. Multi-byte storage normalizes to original little-endian order before byte-skew/padding import.",
+  "alpha": "Intrinsic matte comes from photometric interpretation, samples per pixel and ExtraSamples. Associated alpha is disassociated during raw import; common source preparation then applies the existing premultiplication. Preserve the native order scale=1/(alpha*(1/255)), followed by scale*channel and Q8 rounding; rearranging to channel*255/alpha changes half-boundary results. Zero alpha selects scale1, retaining hidden raw colors. ExtraSamples0 on captured four-channel RGB still produces intrinsic matte. Do not infer intrinsic alpha from nonopaque pixels alone.",
+  "ownership": "Do not mutate encoded bytes, use captured pixels as computation inputs, call original binaries or spawn runtime subprocesses. Runtime uses only independent code and Node built-ins.",
+  "remaining": "Remaining configured compression modes, additional photometrics/sample combinations and packed multi-sample layouts and metadata transforms, non-finite behavior, malformed/error completion and native diagnostic wording remain unfinished. Unavailable old-JPEG compression6 matches18 native rejections; it is not a missing decoder in this build. Word-aligned CCITT RLEW still lacks a native capture. Generic YCbCr raster memory corruption in the original remains a universal-parity limitation. Full application and Rust/GPUI parity are not established.",
+  "fullApplicationParity": false,
+  "published": false,
+  "tileQuirks": "Partial gray16 tiles reproduce the old put16bitbwtile byte-valued fromskew after host endian swabbing. Forty-two width/endian/orientation counterfactuals and eight predictor-order cases verify this. Tile CMYK converts ink to RGB bytes but retains colorspace12 and a zero black plane; source normalization then follows that retained tag. Tile unassociated alpha is premultiplied by the delegate; unspecified/associated alpha passes through.",
+  "reuse": {
+    "ccittTables": "MIT-licensed white/black run tables from Photopea UTIF.js commit588351078202eebccdb3ba996f5b98c640e4265a; independent bitstream decoder. See ../src/tiff-licenses.txt.",
+    "normalization": "JPEG and TIFF share the existing owned-pixel boundary in src/pixel-input.mjs. No browser decoder, native program, child process or runtime dependency package.",
+    "jpeg": "Private readJpegSamples and convertJpegYCbCr own common numerical reconstruction in jpeg-input.mjs. Standalone markers and TIFF photometric tags independently choose interpretation; do not invert ink twice.",
+    "legacyCodecs": "Independent JavaScript reconstruction with libtiff390beta source context. Preserve Sam Leffler and Silicon Graphics notices in ../src/tiff-licenses.txt."
+  },
+  "jpegCompression": {
+    "status": "300 successful native import/preparation cases and six complete native GUI conversions match. Two malformed table/frame marker rejections,18 unavailable old-JPEG rejections and two generic-reader process failures are retained.",
+    "storage": "Compression7 uses per-strip/tile JPEG frames, with optional shared JPEGTables. Reconstruct entropy coefficients and component samples through the same independent JPEG numerical kernel. TIFF photometric tags own interpretation; do not apply standalone CMYK inversion to TIFF ink samples.",
+    "reference": [
+      "../test/fixtures/tiff-jpeg-input-reference.ndjson.gz",
+      "../test/fixtures/tiff-jpeg-strips-input-reference.ndjson.gz",
+      "../test/fixtures/tiff-jpeg-layout-success-input-reference.ndjson.gz",
+      "../test/fixtures/tiff-jpeg-samples-input-reference.ndjson.gz",
+      "../test/fixtures/tiff-jpeg-single-row-input-reference.ndjson.gz",
+      "../test/fixtures/tiff-jpeg-gray-alpha-input-reference.ndjson.gz",
+      "../test/fixtures/jpeg-alpha-modes-input-reference.ndjson.gz"
+    ],
+    "remaining": "Further malformed/truncated/header mismatch behavior and inherited JPEG table state require more recovery. Original generic-reader overflows cannot establish deterministic universal parity.",
+    "genericReader": "REA confirms the non-tiled YCbCr generic reader passes a5*width+1-byte Q8 quantum buffer to a4*width*height-byte RGBA writer, then imports consecutive bytes as red-only pixels. Preserve defined single-row byte import. Larger rasters exceed owned storage in the original and produce access/heap failures; keep those observations and fail explicitly rather than reproducing memory corruption. This remains a universal-parity limitation.",
+    "verified": "Gray/RGB/CMYK, RGB-alpha ExtraSamples0/1/2, one-row planar strips and planar tiles, YCbCr tiled4:4:4/4:2:2/4:2:0, single-row generic red-byte import, native orientation, both TIFF byte orders, FillOrder2, local/shared/mixed/duplicate tables, baseline/progressive frames and non-MCU final strip rows. Grayscale-plus-alpha JPEG planes use the existing TIFF alpha rules, including108 raw/source/preparation comparisons across ExtraSamples0/1/2 and two full automatic conversions.",
+    "componentBoundary": "Raw JPEG reconstruction must not impose a standalone file color-count policy. TIFF validates the decoded plane count against SamplesPerPixel and imports grayscale-plus-alpha through its existing TIFF rules. Standalone two-component JPEG remains explicitly unsupported because original fresh outputs are unstable; do not reinterpret it as alpha or inject observed bytes."
+  },
+  "unavailableCodecs": {
+    "nativeAvailability": "REA1110/1111 and the built-in table show old-JPEG6, ISO JBIG34661 and PixarLog32909 use the unavailable initializer. Preserve explicit rejection; do not invent decoders for features missing from this build.",
+    "oldJpegReference": "../test/fixtures/tiff-old-jpeg-unavailable-errors-reference.ndjson.gz",
+    "oldJpegCases": 18,
+    "evidence": "../evidence/tiff-codec-table-observations.json"
+  },
+  "legacyCodecs": {
+    "status": "579 repeat-identical original import/source/preparation cases and four complete GUI conversions match. Four malformed row commands reproduce the native rejection boundary.",
+    "boundary": "Use one independent row-command path through existing TIFF import. NeXT/ThunderScan reverse encoded bytes before decompression for FillOrder2. ThunderScan owns one zero-initialized retained scanline across all strips; terminal runs preserve known initial zero bytes or bytes from a prior row. SetQuantumDepth0x519f30 clears the original quantum buffer. No undefined-byte rejection is justified for this path.",
+    "source": "../evidence/tiff-legacy-codecs-primary-source.json",
+    "knownNativeThunderIssue": "Terminal runs omit full-byte stores. The original quantum buffer starts at zero and is reused across rows and strips; reproduce that defined retained state.",
+    "remaining": "Malformed/error behavior, additional depth/photometric combinations and tile behavior require further captures.",
+    "reference": [
+      "../test/fixtures/tiff-legacy-codecs-input-reference.ndjson.gz",
+      "../test/fixtures/tiff-legacy-layout-input-reference.ndjson.gz",
+      "../test/fixtures/tiff-thunder-commands-input-reference.ndjson.gz",
+      "../test/fixtures/tiff-thunder-retained-row-input-reference.ndjson.gz",
+      "../test/fixtures/tiff-thunder-initial-row-input-reference.ndjson.gz",
+      "../test/fixtures/tiff-legacy-row-framing-input-reference.ndjson.gz"
+    ],
+    "coverage": {
+      "tiff-legacy-codecs": 98,
+      "tiff-legacy-layout": 36,
+      "tiff-thunder-commands": 385,
+      "tiff-thunder-retained-row": 32,
+      "tiff-thunder-initial-row": 3,
+      "tiff-legacy-row-framing": 25
+    },
+    "initializationEvidence": "../evidence/1108-native-tiff-quantum-depth-allocation.json: SetQuantumDepth0x519f30 zeroes the quantum buffer; ../evidence/1117-native-tiff-thunder-analysis.json: native terminal-run stores and delta decoder.",
+    "errors": "../test/fixtures/tiff-legacy-row-framing-errors-reference.ndjson.gz"
+  },
+  "floatingPredictor": {
+    "status": "480 repeat-identical native import/source/preparation cases and five complete GUI conversions match, with102 new native rejection cases.",
+    "boundary": "Predictor metadata belongs to LZW/Deflate codecs. Original rejects any predictor tag with captured raw/PackBits files, including value1, and rejects horizontal prediction for32/64-bit data and floating prediction for integer formats. FillOrder2 reverses stored compressed bytes before decoding, except JPEG and the fax decoder which owns its bit reader. Reconstruct floating byte planes per complete row before canonical little-endian sample import. Original tiled delegate rejects32/64-bit samples.",
+    "primarySource": "../evidence/tiff-predictor3-primary-source.json",
+    "remaining": "Additional packed multi-sample, unusual tag/codec/depth combinations, non-finite import, truncated/error diagnostics and unrelated application behavior remain required work.",
+    "sampleStorage": "Use one canonical little-endian decoded sample buffer, matching the original x86 TIFF decoder. Floating predictor returns this order directly; other multi-byte blocks normalize once after prediction. Direct grayscale multi-sample import uses byte padding, not sample padding. Its planar path reads only plane0 and can consume paired values plus the zero-filled tail of the retained quantum scanline.",
+    "coverage": {
+      "tiff-predictor3": 12,
+      "tiff-predictor3-layout": 144,
+      "tiff-predictor3-fill-verified": 8,
+      "tiff-fill-order-codecs-verified": 40,
+      "tiff-predictor3-boundaries": 12,
+      "tiff-predictor3-white": 16,
+      "tiff-gray-padding": 96,
+      "tiff-gray-padding32": 48,
+      "tiff-gray-three": 64,
+      "tiff-gray-planar-predictor3": 36,
+      "tiff-packbits-tile-framing-verified": 4
+    },
+    "reference": [
+      "../test/fixtures/tiff-predictor3-input-reference.ndjson.gz",
+      "../test/fixtures/tiff-predictor3-layout-input-reference.ndjson.gz",
+      "../test/fixtures/tiff-predictor3-fill-verified-input-reference.ndjson.gz",
+      "../test/fixtures/tiff-fill-order-codecs-verified-input-reference.ndjson.gz",
+      "../test/fixtures/tiff-predictor3-boundaries-input-reference.ndjson.gz",
+      "../test/fixtures/tiff-predictor3-white-input-reference.ndjson.gz",
+      "../test/fixtures/tiff-gray-padding-input-reference.ndjson.gz",
+      "../test/fixtures/tiff-gray-padding32-input-reference.ndjson.gz",
+      "../test/fixtures/tiff-gray-three-input-reference.ndjson.gz",
+      "../test/fixtures/tiff-gray-planar-predictor3-input-reference.ndjson.gz",
+      "../test/fixtures/tiff-packbits-tile-framing-verified-input-reference.ndjson.gz"
+    ],
+    "errors": [
+      "../test/fixtures/tiff-predictor3-errors-reference.ndjson.gz",
+      "../test/fixtures/tiff-predictor3-fill-encoding-errors-reference.ndjson.gz",
+      "../test/fixtures/tiff-predictor-packbits-registration-errors-reference.ndjson.gz",
+      "../test/fixtures/tiff-packbits-row-boundary-errors-reference.ndjson.gz"
+    ],
+    "rea": {
+      "setup": "../evidence/1128-native-tiff-predictor-setup-analysis.json",
+      "decodeSetup": "../evidence/1130-native-tiff-predictor-decode-setup.json",
+      "floatAccumulation": "../evidence/1131-native-tiff-floating-predictor-analysis.json",
+      "scope": "Native accumulation/transposition projection spans239 noncontiguous body bytes; repeat-identical captures establish actual output behavior."
+    }
+  }
+}

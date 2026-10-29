@@ -1,0 +1,36 @@
+[package]
+name = "openvector-gui"
+description = "OpenVector desktop application (GPUI)."
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[lib]
+path = "src/lib.rs"
+
+[[bin]]
+name = "openvector-gui"
+path = "src/main.rs"
+
+[dependencies]
+gpui.workspace = true
+gpui_platform.workspace = true
+openvector = { path = "../openvector" }
+serde_json = { version = "1", features = ["float_roundtrip"] }
+image = "0.25"
+unicode-segmentation = "1.12"
+
+[target.'cfg(target_os = "linux")'.dependencies]
+libc = "0.2"
+
+[target.'cfg(target_os = "windows")'.dependencies]
+windows-sys = { version = "0.61", features = ["Win32_Globalization"] }
+
+[target.'cfg(target_os = "macos")'.dependencies]
+core-foundation-sys = "0.8"
+
+[dev-dependencies]
+gpui = { workspace = true, features = ["test-support"] }
+flate2 = "1"
+base64 = "0.22"

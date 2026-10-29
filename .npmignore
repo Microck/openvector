@@ -1,0 +1,6 @@
+# package.json files is the distribution allowlist.
+# Keep generated native artifacts eligible even though Git excludes them.
+**/target/**
+**/node_modules/**
+**/__pycache__/**
+**/*.pyc

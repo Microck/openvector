@@ -1,0 +1,39 @@
+OpenVector modification notice
+
+rust/crates/openvector/src/bitmap_raster/square_stroke.rs is a Rust
+translation of OpenVector's src/vendor/qt-bezier/square-stroke.mjs, which is a
+JavaScript translation and specialization of selected QBezier and QStroker
+routines from Qt 4.5.3. Original copyright:
+Copyright (C) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+Original project: https://github.com/qt/qt/tree/v4.5.3/src/gui/painting
+
+This modified component is distributed under the GNU Lesser General Public
+License version 2.1. The complete license is in license-lgpl.txt. The upstream
+Nokia Qt LGPL Exception version 1.1 is retained in lgpl-exception.txt. This
+translation does not rely on the exception's unmodified-header permission.
+Native packages ship those two files and this notice with the prefix
+qt-bezier-.
+
+Changes in square-stroke.mjs, 2026-10-18:
+- Replaced Qt classes with ordinary JavaScript arrays and scalar arithmetic.
+- Retained bounded subdivision, offset-error checks, degenerate curves,
+  circle approximation, threshold relaxation and original arithmetic quirks.
+- Specialized the stroker to one device-space line or cubic edge, width one,
+  square caps and bevel joins, as used by the bitmap seam pass.
+- Removed unrelated dash, polygon, arc, intersection and query interfaces.
+- Moved public input validation and coordinate mapping to the MIT caller.
+
+Rust translation changes, documented 2026-10-21:
+- Translated square-stroke.mjs to Rust, with fixed-size f64 arrays for points
+  and curves, an enum for offset results and the crate's PathCommand type for
+  input and output commands.
+- The entry point takes one start point and one line or cubic edge. The MIT
+  caller, src/bitmap_raster.rs, validates and maps that input.
+
+The Rust module is not a separate or runtime-replaceable component. Cargo
+compiles it into the openvector library crate, which is statically linked into
+each native binary: the openvector command-line executable, the Node-API
+library (openvector-node.node) and the openvector-gui executable. Using a
+modified version requires rebuilding those binaries from source.
+No Vector Magic or Qt installation is required by this component.

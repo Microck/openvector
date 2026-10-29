@@ -1,0 +1,61 @@
+{
+  "requirement": "Implement independent OpenVector functionality equivalent to the Vector Magic Windows app through one shared Rust engine, CLI, GPUI desktop app and npm interface.",
+  "requestedOn": "2026-10-17",
+  "executionDeadline": {
+    "replacedAt": "2026-10-20T22:28:36Z",
+    "deadline": "2026-10-21T22:28:36Z",
+    "basis": "User replaced the previous deadline with 24 hours from now. Completion criteria remain unchanged."
+  },
+  "delegationModels": "Use only Astra or Sol. The user's latest instruction supersedes the earlier Opus preference.",
+  "status": "Shared Rust engine, CLI, npm and GPUI implementations are undergoing differential and actual-workflow verification. Full application parity is not established; docs/parity-matrix.md tracks evidence and unresolved gaps.",
+  "sequence": [
+    "Retain the JavaScript implementation and native captures as development references, including known failing cases.",
+    "Port the engine and replay the native captures with the Rust differential harness.",
+    "Build the native desktop GUI directly with GPUI, preserving Vector Magic workflows with a modernized Zeron-inspired design.",
+    "Verify Rust CLI, GUI and npm access, fresh native comparisons and actual GUI workflows. Publication is outside the current authorization."
+  ],
+  "retainedRequirements": [
+    "Independent operation with no installed Vector Magic dependency.",
+    "All required CLI and GUI behavior and outputs.",
+    "Free and open source under the OpenVector project name.",
+    "npm distribution exposing the same Rust engine, with no JavaScript engine fallback.",
+    "No commits, pushes or publication during the current implementation task."
+  ],
+  "presentation": "Preserve Vector Magic's structure and features with deep design reference to https://github.com/zeronsh/zeron. Use a true black background, white primary text and dense controls without decorative chrome.",
+  "finalImplementation": "Rust engine and native GPUI GUI. The current JavaScript implementation remains a development reference during the port, not a second shipping runtime or an automatic fallback.",
+  "upstream": {
+    "gpui": "https://github.com/zed-industries/zed/tree/main/crates/gpui",
+    "gpuix": "https://github.com/remorses/gpuix",
+    "inspection": "Official GPUI README describes a Rust GPU-accelerated framework with native Windows support. gpuix describes Node.js/Bun bindings for React or Solid. Use GPUI directly for the requested Rust GUI; gpuix may inform reference work but is not selected as the final runtime.",
+    "verifiedOn": "2026-10-18",
+    "macosTextBackend": "The desktop GUI must enable gpui_platform/font-kit, which forwards to gpui_macos/font-kit and the pinned gpui_apple text backend. NoopTextSystem is not a valid shipping desktop text renderer. Enabling the existing feature must preserve the locked dependency revisions; actual readable text and native input require macOS desktop verification.",
+    "versionDecision": "Workspace pins zed-industries/zed revision b0f1e1cb2f4be4c7df054f96a2a2721aa878ba6c for GPUI and gpui_platform. Maintained crates under rust/vendor use that same revision: gpui_wgpu, gpui_windows and gpui_apple fix tile-local texture sampling; gpui, gpui_linux, gpui_macos and gpui_windows carry native export-drag lifecycle support. Windows embeds HLSL sources and uses the existing D3D compiler when creating renderer shaders, removing host-Windows SDK and build-directory requirements in both profiles at the cost of release startup compilation. Inherited dependency versions and features remain unchanged; the obsolete Windows SDK lookup build dependency is removed. Successful platform builds and executable GUI workflow verification remain required."
+  },
+  "clipboardImport": {
+    "requirement": "GPUI reads real OS clipboard image entries and sends encoded bytes to the same Rust decoder/document source admission as file loading. Path and clipboard origins remain explicit; no temporary source files or fictional recent-file entries.",
+    "presentation": "Expose Paste image and Ctrl/Cmd+V outside text fields. Text fields consume paste as text, including image-only clipboard contents. Refuse import during active jobs, batch mode or another modal; confirm replacement of segmentation edits. Failed or cancelled admission retains the current document.",
+    "namingEvidence": "source-entry-contract.json records the static native clipboard handler assigning clipboard.png in the current source directory and the display title [From clipboard]. source-history-reference.ndjson.gz covers real-path history only; retained gui/source-controller.mjs records only successful disk loads. Use clipboard.png solely as an export suggestion, never as a readable source or recent file.",
+    "limits": "Original Windows clipboard acquisition, exact clipboard alpha conversion, clipboard preview scaling and after-answer replacement behavior remain unverified. The GPUI import requires separate live platform proof; this requirement is not a native parity claim."
+  },
+  "sourceFileProtection": {
+    "requirement": "CLI vectorize and GPUI save admission must reject an output identifying its file-backed source, including direct paths, symlinks and hardlinks, before overwrite confirmation or writing, even when CLI --force is supplied. Both use the shared Rust filesystem-identity helper, not only canonical or case-folded paths. Unix identity checks must use metadata without opening file contents or requiring read permission on a writable destination. Distinct case-sensitive filenames remain distinct. Clipboard names are not file identities. A different output remains saveable after rejection.",
+    "evidence": "The disposable-image workflow in evidence/gpui-save-aliases-20261021/check.py exposed source truncation through a confirmed hardlink save and rejection of a write-only destination. evidence/cli-source-aliases-20261021/check.py exposed symlink/hardlink source truncation under --force and false rejection of a distinct case-sensitive filename. This is an application safety requirement, not a claim about the original application's behavior."
+  },
+  "dragResult": {
+    "nativeEvidence": "window-reset-contract.json records two DragResultWidget owners, AI/DXF/EMF/EPS/PDF/SVG choices, AI default and Minimize on drag enabled.",
+    "implementation": "Prepare exports through the shared Rust engine and hand real files to the OS using copy-only native drag/drop. Distinguish rejection before native acceptance, platform start, accepted drop, cancellation and failure. Minimize only after native ownership is established. Keep the active file alive throughout handoff; retain it on native start or completion of an accepted attempt, including cancellation/failure, because a destination may read it later. Rejected startup does not retain a never-offered file, and cannot undo retention from an earlier accepted attempt. Recheck current source/geometry, export options and workflow state at gesture admission and native handoff; stale preparation and cancellation must not expose partial or unrelated files.",
+    "limits": "Native drop effects, precise minimize/restore timing and export-file lifetime have not been captured. Platform implementations and actual receiver workflows require verification; these implementation requirements do not establish native parity."
+  },
+  "unresolvedWork": [
+    "Numerical equivalence, float operation order, random-stream ownership and encoded-image quirks in Rust.",
+    "GPUI render, input, dialogs, clipboard, accessibility and desktop packaging behavior.",
+    "npm bindings and supported-platform package distribution.",
+    "Native GUI tests, rendering proof and fresh-input output comparisons."
+  ],
+  "fullApplicationParity": false,
+  "published": false,
+  "windowsExecutable": {
+    "requirement": "Windows release GUI executables use the Windows GUI subsystem so normal desktop launch does not create a console window. Debug builds retain console diagnostics. CLI binaries retain their console subsystem.",
+    "verification": "Inspect the packaged PE subsystem and exercise the exact package executable on the authorized Windows test host. A cross-build alone does not prove runtime behavior."
+  }
+}

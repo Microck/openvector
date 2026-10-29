@@ -1,0 +1,68 @@
+{
+  "project": "openvector",
+  "status": "Native startup and source/reset effects verified. Quick Save choices, persistence and GUI format selection are verified separately in quick-save-contract.json. Direct save, bitmap export and drag-result operations remain unfinished.",
+  "reference": "../test/fixtures/window-export-preferences-reference.ndjson.gz",
+  "nativeAudit": "../evidence/window-export-preferences-native-audit.json",
+  "nativeCases": 21,
+  "nativeProcesses": 42,
+  "referenceSnapshots": 65,
+  "executedSnapshotsIncludingRepeats": 130,
+  "widgetsPerSnapshot": 16,
+  "observer": "Existing read-only window-labels observer. Private QSettings seeds precede startup; no widget setter, native input or dialog answer is supplied by the observer.",
+  "nativeOwners": {
+    "quickSave": {
+      "basicOffset": "0x1b4",
+      "advancedOffset": "0x1c4",
+      "formats": ["ai", "dxf", "emf", "eps", "pdf", "svg"],
+      "defaultFormat": "ai",
+      "defaultExpanded": false,
+      "reader": "0x41dfe0",
+      "writer": "0x41bc80"
+    },
+    "bitmapExport": {
+      "basicOffset": "0x1dc",
+      "advancedOffset": "0x1e0",
+      "formats": ["bmp", "jpg", "png", "tif"],
+      "defaultFormat": "png",
+      "defaultExpanded": false,
+      "defaultScale": 1,
+      "reader": "0x41e4a0",
+      "writer": "0x41c330"
+    },
+    "dragResult": {
+      "basicOffset": "0x1b8",
+      "advancedOffset": "0x1c8",
+      "formats": ["ai", "dxf", "emf", "eps", "pdf", "svg"],
+      "defaultFormat": "ai",
+      "defaultMinimizeOnDrag": true,
+      "reader": "0x41ea30",
+      "writer": "0x41b050"
+    }
+  },
+  "behavior": {
+    "format": "Basic and advanced selections are independent. Saved extensions are lowercased; unrecognized values leave the constructor selection unchanged. All six vector formats and all four bitmap formats were observed.",
+    "directory": "Quick Save and bitmap folders restore separately. Missing/empty values select the process working directory. Existing folders use native separators and a canonical path. A saved nonexistent folder is retained as its native-separated text.",
+    "scale": "Bitmap scale is synchronized between both widgets. The basic reader runs first, then the advanced reader. The advanced saved value, or its default 1, determines both final scales. A basic-only 0.25 seed ends at 1 in both widgets; an advanced-only 3.5 seed ends at 3.5 in both. Distinct 0.25/3.5 seeds also end at 3.5. Positive observations include 0.125, 0.5, 2.75 and 16.",
+    "scaleLimits": "In the cold window, zero and -0.5 seeds both become 1/150 in both widgets after native size-control updates. This is a measured cold-window result, not a general constant or proof of behavior at other image dimensions.",
+    "imageLoad": "Opening a real bitmap replaces all four Quick Save/bitmap folders with its containing directory, including custom restored folders. Formats, expansion flags, minimize-on-drag and scale remain unchanged in the observed flow.",
+    "modelReset": "Application-model reset changes those four folders even though it does not run full window reset. The blank source event selects the parent of the working directory in both tested working directories. Other captured window fields retain their values. The batch export directory remains a separate owner.",
+    "storageKeys": "Quick Save, bitmap and drag fields are root values formed by directly concatenating the widget identifier and field name, without a slash. Expansion is stored under VmQt::MainModel::ToggleGroupBox:<widget>/expanded. Exact raw layout belongs only to the native reference, not OpenVector's JSON storage."
+  },
+  "staticEvidence": {
+    "owners": "../evidence/window-export-002-owners.json",
+    "keyAndReaders": "../evidence/window-export-003-key-and-readers.json",
+    "windowReader": "../evidence/window-lifecycle-009-window-preference-reader.c",
+    "windowWriter": "../evidence/window-lifecycle-005-window-writer.c",
+    "keyConcatenation": "0x401a70",
+    "formatSelection": "0x41d6a0 and 0x41d5b0",
+    "directorySelection": "0x41a9a0"
+  },
+  "limitations": [
+    "The native window writer was inspected statically and was not executed by this observer.",
+    "No save, overwrite, drag, minimize, clipboard or bitmap-render operation is exercised by these cases.",
+    "Exact dimension-dependent scale limits, arbitrary source changes and failed loads require further evidence.",
+    "The first grouped-field seeds were ignored and remain separate rejected restoration evidence. Accepted root-value seeds use new immutable recording names.",
+    "A later unsupported REA tool request closed that session. The ten completed decompilations and their evidence records remain saved; no new final REA snapshot is claimed."
+  ],
+  "fullApplicationParity": false
+}

@@ -1,0 +1,17 @@
+{
+  "project": "openvector",
+  "status": "Seven paired native workflows pass exact visibility/history and complete-document comparisons after correcting source/reset ownership. Frozen GUI 297/297, installed direct 264/264, HTTP 6/6, installed CLI 19/19 and broader lifecycle tests 354/354 pass. Full parity remains unproven.",
+  "scope": "Advanced guided background removal, undo/redo/revert, forward/back navigation, Start/Reset and retained visibility after cached or updated vector processing.",
+  "referenceBoundary": "A separate opt-in helper calls the original MainModel business method at 0x425710 with two double coordinates, only on background page 15. It synthesizes no native input, answers no dialogs and retains the private desktop/namespace and modal abort guards. Accepted reference executables remain unchanged.",
+  "observation": "Read logical visibility bits, per-region visibility queries and region-ID undo/redo lists. Capture the active flag only after entry into background mode has initialized it. Do not treat allocator padding, pointers or uninitialized tool fields as expected state.",
+  "sourceLifetime": "Native source replacement and full Reset preserve the logical visibility slot count, unhide every slot, move Undo into Redo and leave background mode. Start retains visibility/history and only leaves the mode. Visibility is session-owned across source resets, not recreated with the numerical image state. New vector acceptance replaces the slot count, unhides slots and transfers the current Undo list into Redo.",
+  "completion": "Require byte-identical paired fresh native responses, complete reparsing, unchanged original files/settings/input desktop, differential document/history checks and actual installed-browser checks for any necessary runtime changes.",
+  "nativeAudit": "../evidence/profile-background-native-audit.json",
+  "fixture": "../test/fixtures/profile-background-reference.ndjson.gz",
+  "checkpoint": "../evidence/profile-background-verification-checkpoint.json",
+  "browser": "../evidence/profile-background-browser-verification.json",
+  "verifiedCases": "Undo/Redo/Revert; Export and Back; cached re-entry; Start and Reset; changed smoothing followed by Redo; source replacement; merging two regions into one followed by Redo of an out-of-range old region ID.",
+  "emptyImage": "Native source replacement leaves the editor QImage at width/height/format zero with no pixels. Compare this against the absent displayed segmentation, then compare every nonempty image pixel as before.",
+  "browserScope": "Thirteen actual React UI checks, six native exposed-state projections and a separate closed-source Reset assertion. Projections compare selected/committed controls, counts, stage keys, palette candidates/scores, visibility and ordered histories, active state and SVG. Closed-source visibility is checked through the internal engine snapshot, while GET /api/state returns null.",
+  "fullApplicationParity": false
+}

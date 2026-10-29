@@ -1,0 +1,2173 @@
+{
+  "sourceSha256": "c491656b962debc215a8b6e757a9b2949ffe50a36b5f2db692706bcd4ebface1",
+  "nativeProbeSha256": "2eef4e58198535712f618c5477961960976bcdb5bbd66b3de6c202ac1415438d",
+  "requestSha256": "f9cab525861e29f138ebdd95e9e9dc5d3391608b52d1441db0a8eec5ed59fc48",
+  "recordingSha256": "67860b2678bbf39148111018b1eb5032b0195a3d4392b19c3e4bc119fdd78bb4",
+  "wholeNativeResponseRepeatIdentical": true,
+  "originalResponsePayloadMatchesOperation66": true,
+  "nativeOperation": 81,
+  "contextBytes": 68,
+  "cases": [
+    {
+      "id": "solid-2-.png-0-0",
+      "shared": [
+        0,
+        1,
+        0,
+        1,
+        1,
+        0
+      ],
+      "edge": [
+        50.0,
+        0.01
+      ],
+      "parameters": {
+        "SubPixelSegmentation::self_weight_eps": 0.10000000149011612,
+        "SubPixelSegmentation::self_weight_penalty_low": 0.009999999776482582,
+        "SubPixelSegmentation::self_weight_penalty_high": 1.0,
+        "SubPixelSegmenter::lambda_f": 0.05000000074505806,
+        "SubPixelSegmenter::use_connected_24_iteration": 0,
+        "SubPixelSegmenter::color_cluster_margin": 0.10000000149011612,
+        "EdgeImage::edge_weight_scale": 50.0,
+        "EdgeImage::edge_weight_floor": 0.01,
+        "Shared::is_anti_aliased": 1,
+        "clusterColors": true,
+        "shadowing": true,
+        "shadowControl": 0
+      },
+      "contextBits": "00000000010000000000000001000000010000000000000000000000000049407b14ae47e17a843fcdcccc3d0ad7233c0000803fcdcc4c3d00000000cdcccc3d"
+    },
+    {
+      "id": "solid-2-.jpg-0-0",
+      "shared": [
+        0,
+        1,
+        0,
+        1,
+        1,
+        0
+      ],
+      "edge": [
+        50.0,
+        0.01
+      ],
+      "parameters": {
+        "SubPixelSegmentation::self_weight_eps": 0.10000000149011612,
+        "SubPixelSegmentation::self_weight_penalty_low": 0.009999999776482582,
+        "SubPixelSegmentation::self_weight_penalty_high": 1.0,
+        "SubPixelSegmenter::lambda_f": 0.05000000074505806,
+        "SubPixelSegmenter::use_connected_24_iteration": 0,
+        "SubPixelSegmenter::color_cluster_margin": 0.10000000149011612,
+        "EdgeImage::edge_weight_scale": 50.0,
+        "EdgeImage::edge_weight_floor": 0.01,
+        "Shared::is_anti_aliased": 1,
+        "clusterColors": true,
+        "shadowing": true,
+        "shadowControl": 0
+      },
+      "contextBits": "00000000010000000000000001000000010000000000000000000000000049407b14ae47e17a843fcdcccc3d0ad7233c0000803fcdcc4c3d00000000cdcccc3d"
+    },
+    {
+      "id": "stripes-2-.png-0-0",
+      "shared": [
+        0,
+        1,
+        0,
+        1,
+        1,
+        0
+      ],
+      "edge": [
+        50.0,
+        0.01
+      ],
+      "parameters": {
+        "SubPixelSegmentation::self_weight_eps": 0.10000000149011612,
+        "SubPixelSegmentation::self_weight_penalty_low": 0.009999999776482582,
+        "SubPixelSegmentation::self_weight_penalty_high": 1.0,
+        "SubPixelSegmenter::lambda_f": 0.05000000074505806,
+        "SubPixelSegmenter::use_connected_24_iteration": 0,
+        "SubPixelSegmenter::color_cluster_margin": 0.10000000149011612,
+        "EdgeImage::edge_weight_scale": 50.0,
+        "EdgeImage::edge_weight_floor": 0.01,
+        "Shared::is_anti_aliased": 1,
+        "clusterColors": true,
+        "shadowing": true,
+        "shadowControl": 0
+      },
+      "contextBits": "00000000010000000000000001000000010000000000000000000000000049407b14ae47e17a843fcdcccc3d0ad7233c0000803fcdcc4c3d00000000cdcccc3d"
+    },
+    {
+      "id": "stripes-2-.jpg-0-0",
+      "shared": [
+        0,
+        1,
+        0,
+        1,
+        1,
+        0
+      ],
+      "edge": [
+        50.0,
+        0.01
+      ],
+      "parameters": {
+        "SubPixelSegmentation::self_weight_eps": 0.10000000149011612,
+        "SubPixelSegmentation::self_weight_penalty_low": 0.009999999776482582,
+        "SubPixelSegmentation::self_weight_penalty_high": 1.0,
+        "SubPixelSegmenter::lambda_f": 0.05000000074505806,
+        "SubPixelSegmenter::use_connected_24_iteration": 0,
+        "SubPixelSegmenter::color_cluster_margin": 0.10000000149011612,
+        "EdgeImage::edge_weight_scale": 50.0,
+        "EdgeImage::edge_weight_floor": 0.01,
+        "Shared::is_anti_aliased": 1,
+        "clusterColors": true,
+        "shadowing": true,
+        "shadowControl": 0
+      },
+      "contextBits": "00000000010000000000000001000000010000000000000000000000000049407b14ae47e17a843fcdcccc3d0ad7233c0000803fcdcc4c3d00000000cdcccc3d"
+    },
+    {
+      "id": "checker-2-.png-0-0",
+      "shared": [
+        0,
+        1,
+        0,
+        1,
+        1,
+        0
+      ],
+      "edge": [
+        50.0,
+        0.01
+      ],
+      "parameters": {
+        "SubPixelSegmentation::self_weight_eps": 0.10000000149011612,
+        "SubPixelSegmentation::self_weight_penalty_low": 0.009999999776482582,
+        "SubPixelSegmentation::self_weight_penalty_high": 1.0,
+        "SubPixelSegmenter::lambda_f": 0.05000000074505806,
+        "SubPixelSegmenter::use_connected_24_iteration": 0,
+        "SubPixelSegmenter::color_cluster_margin": 0.10000000149011612,
+        "EdgeImage::edge_weight_scale": 50.0,
+        "EdgeImage::edge_weight_floor": 0.01,
+        "Shared::is_anti_aliased": 1,
+        "clusterColors": true,
+        "shadowing": true,
+        "shadowControl": 0
+      },
+      "contextBits": "00000000010000000000000001000000010000000000000000000000000049407b14ae47e17a843fcdcccc3d0ad7233c0000803fcdcc4c3d00000000cdcccc3d"
+    },
+    {
+      "id": "checker-2-.jpg-0-0",
+      "shared": [
+        0,
+        1,
+        0,
+        1,
+        1,
+        0
+      ],
+      "edge": [
+        50.0,
+        0.01
+      ],
+      "parameters": {
+        "SubPixelSegmentation::self_weight_eps": 0.10000000149011612,
+        "SubPixelSegmentation::self_weight_penalty_low": 0.009999999776482582,
+        "SubPixelSegmentation::self_weight_penalty_high": 1.0,
+        "SubPixelSegmenter::lambda_f": 0.05000000074505806,
+        "SubPixelSegmenter::use_connected_24_iteration": 0,
+        "SubPixelSegmenter::color_cluster_margin": 0.10000000149011612,
+        "EdgeImage::edge_weight_scale": 50.0,
+        "EdgeImage::edge_weight_floor": 0.01,
+        "Shared::is_anti_aliased": 1,
+        "clusterColors": true,
+        "shadowing": true,
+        "shadowControl": 0
+      },
+      "contextBits": "00000000010000000000000001000000010000000000000000000000000049407b14ae47e17a843fcdcccc3d0ad7233c0000803fcdcc4c3d00000000cdcccc3d"
+    },
+    {
+      "id": "gradient-2-.png-0-0",
+      "shared": [
+        0,
+        1,
+        0,
+        1,
+        1,
+        0
+      ],
+      "edge": [
+        50.0,
+        0.01
+      ],
+      "parameters": {
+        "SubPixelSegmentation::self_weight_eps": 0.10000000149011612,
+        "SubPixelSegmentation::self_weight_penalty_low": 0.009999999776482582,
+        "SubPixelSegmentation::self_weight_penalty_high": 1.0,
+        "SubPixelSegmenter::lambda_f": 0.05000000074505806,
+        "SubPixelSegmenter::use_connected_24_iteration": 0,
+        "SubPixelSegmenter::color_cluster_margin": 0.10000000149011612,
+        "EdgeImage::edge_weight_scale": 50.0,
+        "EdgeImage::edge_weight_floor": 0.01,
+        "Shared::is_anti_aliased": 1,
+        "clusterColors": true,
+        "shadowing": true,
+        "shadowControl": 0
+      },
+      "contextBits": "00000000010000000000000001000000010000000000000000000000000049407b14ae47e17a843fcdcccc3d0ad7233c0000803fcdcc4c3d00000000cdcccc3d"
+    },
+    {
+      "id": "gradient-2-.jpg-0-0",
+      "shared": [
+        0,
+        1,
+        0,
+        1,
+        1,
+        0
+      ],
+      "edge": [
+        50.0,
+        0.01
+      ],
+      "parameters": {
+        "SubPixelSegmentation::self_weight_eps": 0.10000000149011612,
+        "SubPixelSegmentation::self_weight_penalty_low": 0.009999999776482582,
+        "SubPixelSegmentation::self_weight_penalty_high": 1.0,
+        "SubPixelSegmenter::lambda_f": 0.05000000074505806,
+        "SubPixelSegmenter::use_connected_24_iteration": 0,
+        "SubPixelSegmenter::color_cluster_margin": 0.10000000149011612,
+        "EdgeImage::edge_weight_scale": 50.0,
+        "EdgeImage::edge_weight_floor": 0.01,
+        "Shared::is_anti_aliased": 1,
+        "clusterColors": true,
+        "shadowing": true,
+        "shadowControl": 0
+      },
+      "contextBits": "00000000010000000000000001000000010000000000000000000000000049407b14ae47e17a843fcdcccc3d0ad7233c0000803fcdcc4c3d00000000cdcccc3d"
+    },
+    {
+      "id": "alpha-2-.png-0-0",
+      "shared": [
+        0,
+        1,
+        0,
+        1,
+        1,
+        0
+      ],
+      "edge": [
+        50.0,
+        0.01
+      ],
+      "parameters": {
+        "SubPixelSegmentation::self_weight_eps": 0.10000000149011612,
+        "SubPixelSegmentation::self_weight_penalty_low": 0.009999999776482582,
+        "SubPixelSegmentation::self_weight_penalty_high": 1.0,
+        "SubPixelSegmenter::lambda_f": 0.05000000074505806,
+        "SubPixelSegmenter::use_connected_24_iteration": 0,
+        "SubPixelSegmenter::color_cluster_margin": 0.10000000149011612,
+        "EdgeImage::edge_weight_scale": 50.0,
+        "EdgeImage::edge_weight_floor": 0.01,
+        "Shared::is_anti_aliased": 1,
+        "clusterColors": true,
+        "shadowing": true,
+        "shadowControl": 0
+      },
+      "contextBits": "00000000010000000000000001000000010000000000000000000000000049407b14ae47e17a843fcdcccc3d0ad7233c0000803fcdcc4c3d00000000cdcccc3d"
+    },
+    {
+      "id": "alpha-2-.jpg-0-0",
+      "shared": [
+        0,
+        1,
+        0,
+        1,
+        1,
+        0
+      ],
+      "edge": [
+        50.0,
+        0.01
+      ],
+      "parameters": {
+        "SubPixelSegmentation::self_weight_eps": 0.10000000149011612,
+        "SubPixelSegmentation::self_weight_penalty_low": 0.009999999776482582,
+        "SubPixelSegmentation::self_weight_penalty_high": 1.0,
+        "SubPixelSegmenter::lambda_f": 0.05000000074505806,
+        "SubPixelSegmenter::use_connected_24_iteration": 0,
+        "SubPixelSegmenter::color_cluster_margin": 0.10000000149011612,
+        "EdgeImage::edge_weight_scale": 50.0,
+        "EdgeImage::edge_weight_floor": 0.01,
+        "Shared::is_anti_aliased": 1,
+        "clusterColors": true,
+        "shadowing": true,
+        "shadowControl": 0
+      },
+      "contextBits": "00000000010000000000000001000000010000000000000000000000000049407b14ae47e17a843fcdcccc3d0ad7233c0000803fcdcc4c3d00000000cdcccc3d"
+    },
+    {
+      "id": "noise-2-.png-0-0",
+      "shared": [
+        0,
+        1,
+        0,
+        1,
+        1,
+        0
+      ],
+      "edge": [
+        50.0,
+        0.01
+      ],
+      "parameters": {
+        "SubPixelSegmentation::self_weight_eps": 0.10000000149011612,
+        "SubPixelSegmentation::self_weight_penalty_low": 0.009999999776482582,
+        "SubPixelSegmentation::self_weight_penalty_high": 1.0,
+        "SubPixelSegmenter::lambda_f": 0.05000000074505806,
+        "SubPixelSegmenter::use_connected_24_iteration": 0,
+        "SubPixelSegmenter::color_cluster_margin": 0.10000000149011612,
+        "EdgeImage::edge_weight_scale": 50.0,
+        "EdgeImage::edge_weight_floor": 0.01,
+        "Shared::is_anti_aliased": 1,
+        "clusterColors": true,
+        "shadowing": true,
+        "shadowControl": 0
+      },
+      "contextBits": "00000000010000000000000001000000010000000000000000000000000049407b14ae47e17a843fcdcccc3d0ad7233c0000803fcdcc4c3d00000000cdcccc3d"
+    },
+    {
+      "id": "noise-2-.jpg-0-0",
+      "shared": [
+        0,
+        1,
+        0,
+        1,
+        1,
+        0
+      ],
+      "edge": [
+        50.0,
+        0.01
+      ],
+      "parameters": {
+        "SubPixelSegmentation::self_weight_eps": 0.10000000149011612,
+        "SubPixelSegmentation::self_weight_penalty_low": 0.009999999776482582,
+        "SubPixelSegmentation::self_weight_penalty_high": 1.0,
+        "SubPixelSegmenter::lambda_f": 0.05000000074505806,
+        "SubPixelSegmenter::use_connected_24_iteration": 0,
+        "SubPixelSegmenter::color_cluster_margin": 0.10000000149011612,
+        "EdgeImage::edge_weight_scale": 50.0,
+        "EdgeImage::edge_weight_floor": 0.01,
+        "Shared::is_anti_aliased": 1,
+        "clusterColors": true,
+        "shadowing": true,
+        "shadowControl": 0
+      },
+      "contextBits": "00000000010000000000000001000000010000000000000000000000000049407b14ae47e17a843fcdcccc3d0ad7233c0000803fcdcc4c3d00000000cdcccc3d"
+    },
+    {
+      "id": "solid-4-.png-0-0",
+      "shared": [
+        0,
+        1,
+        0,
+        1,
+        1,
+        0
+      ],
+      "edge": [
+        50.0,
+        0.01
+      ],
+      "parameters": {
+        "SubPixelSegmentation::self_weight_eps": 0.10000000149011612,
+        "SubPixelSegmentation::self_weight_penalty_low": 0.009999999776482582,
+        "SubPixelSegmentation::self_weight_penalty_high": 1.0,
+        "SubPixelSegmenter::lambda_f": 0.05000000074505806,
+        "SubPixelSegmenter::use_connected_24_iteration": 0,
+        "SubPixelSegmenter::color_cluster_margin": 0.10000000149011612,
+        "EdgeImage::edge_weight_scale": 50.0,
+        "EdgeImage::edge_weight_floor": 0.01,
+        "Shared::is_anti_aliased": 1,
+        "clusterColors": true,
+        "shadowing": true,
+        "shadowControl": 0
+      },
+      "contextBits": "00000000010000000000000001000000010000000000000000000000000049407b14ae47e17a843fcdcccc3d0ad7233c0000803fcdcc4c3d00000000cdcccc3d"
+    },
+    {
+      "id": "solid-4-.jpg-0-0",
+      "shared": [
+        0,
+        1,
+        0,
+        1,
+        1,
+        0
+      ],
+      "edge": [
+        50.0,
+        0.01
+      ],
+      "parameters": {
+        "SubPixelSegmentation::self_weight_eps": 0.10000000149011612,
+        "SubPixelSegmentation::self_weight_penalty_low": 0.009999999776482582,
+        "SubPixelSegmentation::self_weight_penalty_high": 1.0,
+        "SubPixelSegmenter::lambda_f": 0.05000000074505806,
+        "SubPixelSegmenter::use_connected_24_iteration": 0,
+        "SubPixelSegmenter::color_cluster_margin": 0.10000000149011612,
+        "EdgeImage::edge_weight_scale": 50.0,
+        "EdgeImage::edge_weight_floor": 0.01,
+        "Shared::is_anti_aliased": 1,
+        "clusterColors": true,
+        "shadowing": true,
+        "shadowControl": 0
+      },
+      "contextBits": "00000000010000000000000001000000010000000000000000000000000049407b14ae47e17a843fcdcccc3d0ad7233c0000803fcdcc4c3d00000000cdcccc3d"
+    },
+    {
+      "id": "stripes-4-.png-0-0",
+      "shared": [
+        0,
+        1,
+        0,
+        1,
+        1,
+        0
+      ],
+      "edge": [
+        50.0,
+        0.01
+      ],
+      "parameters": {
+        "SubPixelSegmentation::self_weight_eps": 0.10000000149011612,
+        "SubPixelSegmentation::self_weight_penalty_low": 0.009999999776482582,
+        "SubPixelSegmentation::self_weight_penalty_high": 1.0,
+        "SubPixelSegmenter::lambda_f": 0.05000000074505806,
+        "SubPixelSegmenter::use_connected_24_iteration": 0,
+        "SubPixelSegmenter::color_cluster_margin": 0.10000000149011612,
+        "EdgeImage::edge_weight_scale": 50.0,
+        "EdgeImage::edge_weight_floor": 0.01,
+        "Shared::is_anti_aliased": 1,
+        "clusterColors": true,
+        "shadowing": true,
+        "shadowControl": 0
+      },
+      "contextBits": "00000000010000000000000001000000010000000000000000000000000049407b14ae47e17a843fcdcccc3d0ad7233c0000803fcdcc4c3d00000000cdcccc3d"
+    },
+    {
+      "id": "stripes-4-.jpg-0-0",
+      "shared": [
+        0,
+        1,
+        0,
+        1,
+        1,
+        0
+      ],
+      "edge": [
+        50.0,
+        0.01
+      ],
+      "parameters": {
+        "SubPixelSegmentation::self_weight_eps": 0.10000000149011612,
+        "SubPixelSegmentation::self_weight_penalty_low": 0.009999999776482582,
+        "SubPixelSegmentation::self_weight_penalty_high": 1.0,
+        "SubPixelSegmenter::lambda_f": 0.05000000074505806,
+        "SubPixelSegmenter::use_connected_24_iteration": 0,
+        "SubPixelSegmenter::color_cluster_margin": 0.10000000149011612,
+        "EdgeImage::edge_weight_scale": 50.0,
+        "EdgeImage::edge_weight_floor": 0.01,
+        "Shared::is_anti_aliased": 1,
+        "clusterColors": true,
+        "shadowing": true,
+        "shadowControl": 0
+      },
+      "contextBits": "00000000010000000000000001000000010000000000000000000000000049407b14ae47e17a843fcdcccc3d0ad7233c0000803fcdcc4c3d00000000cdcccc3d"
+    },
+    {
+      "id": "checker-4-.png-0-0",
+      "shared": [
+        0,
+        1,
+        0,
+        1,
+        1,
+        0
+      ],
+      "edge": [
+        50.0,
+        0.01
+      ],
+      "parameters": {
+        "SubPixelSegmentation::self_weight_eps": 0.10000000149011612,
+        "SubPixelSegmentation::self_weight_penalty_low": 0.009999999776482582,
+        "SubPixelSegmentation::self_weight_penalty_high": 1.0,
+        "SubPixelSegmenter::lambda_f": 0.05000000074505806,
+        "SubPixelSegmenter::use_connected_24_iteration": 0,
+        "SubPixelSegmenter::color_cluster_margin": 0.10000000149011612,
+        "EdgeImage::edge_weight_scale": 50.0,
+        "EdgeImage::edge_weight_floor": 0.01,
+        "Shared::is_anti_aliased": 1,
+        "clusterColors": true,
+        "shadowing": true,
+        "shadowControl": 0
+      },
+      "contextBits": "00000000010000000000000001000000010000000000000000000000000049407b14ae47e17a843fcdcccc3d0ad7233c0000803fcdcc4c3d00000000cdcccc3d"
+    },
+    {
+      "id": "checker-4-.jpg-0-0",
+      "shared": [
+        0,
+        1,
+        0,
+        1,
+        1,
+        0
+      ],
+      "edge": [
+        50.0,
+        0.01
+      ],
+      "parameters": {
+        "SubPixelSegmentation::self_weight_eps": 0.10000000149011612,
+        "SubPixelSegmentation::self_weight_penalty_low": 0.009999999776482582,
+        "SubPixelSegmentation::self_weight_penalty_high": 1.0,
+        "SubPixelSegmenter::lambda_f": 0.05000000074505806,
+        "SubPixelSegmenter::use_connected_24_iteration": 0,
+        "SubPixelSegmenter::color_cluster_margin": 0.10000000149011612,
+        "EdgeImage::edge_weight_scale": 50.0,
+        "EdgeImage::edge_weight_floor": 0.01,
+        "Shared::is_anti_aliased": 1,
+        "clusterColors": true,
+        "shadowing": true,
+        "shadowControl": 0
+      },
+      "contextBits": "00000000010000000000000001000000010000000000000000000000000049407b14ae47e17a843fcdcccc3d0ad7233c0000803fcdcc4c3d00000000cdcccc3d"
+    },
+    {
+      "id": "gradient-4-.png-0-0",
+      "shared": [
+        0,
+        1,
+        0,
+        1,
+        1,
+        0
+      ],
+      "edge": [
+        50.0,
+        0.01
+      ],
+      "parameters": {
+        "SubPixelSegmentation::self_weight_eps": 0.10000000149011612,
+        "SubPixelSegmentation::self_weight_penalty_low": 0.009999999776482582,
+        "SubPixelSegmentation::self_weight_penalty_high": 1.0,
+        "SubPixelSegmenter::lambda_f": 0.05000000074505806,
+        "SubPixelSegmenter::use_connected_24_iteration": 0,
+        "SubPixelSegmenter::color_cluster_margin": 0.10000000149011612,
+        "EdgeImage::edge_weight_scale": 50.0,
+        "EdgeImage::edge_weight_floor": 0.01,
+        "Shared::is_anti_aliased": 1,
+        "clusterColors": true,
+        "shadowing": true,
+        "shadowControl": 0
+      },
+      "contextBits": "00000000010000000000000001000000010000000000000000000000000049407b14ae47e17a843fcdcccc3d0ad7233c0000803fcdcc4c3d00000000cdcccc3d"
+    },
+    {
+      "id": "gradient-4-.jpg-0-0",
+      "shared": [
+        0,
+        1,
+        0,
+        1,
+        1,
+        0
+      ],
+      "edge": [
+        50.0,
+        0.01
+      ],
+      "parameters": {
+        "SubPixelSegmentation::self_weight_eps": 0.10000000149011612,
+        "SubPixelSegmentation::self_weight_penalty_low": 0.009999999776482582,
+        "SubPixelSegmentation::self_weight_penalty_high": 1.0,
+        "SubPixelSegmenter::lambda_f": 0.05000000074505806,
+        "SubPixelSegmenter::use_connected_24_iteration": 0,
+        "SubPixelSegmenter::color_cluster_margin": 0.10000000149011612,
+        "EdgeImage::edge_weight_scale": 50.0,
+        "EdgeImage::edge_weight_floor": 0.01,
+        "Shared::is_anti_aliased": 1,
+        "clusterColors": true,
+        "shadowing": true,
+        "shadowControl": 0
+      },
+      "contextBits": "00000000010000000000000001000000010000000000000000000000000049407b14ae47e17a843fcdcccc3d0ad7233c0000803fcdcc4c3d00000000cdcccc3d"
+    },
+    {
+      "id": "alpha-4-.png-0-0",
+      "shared": [
+        0,
+        1,
+        0,
+        1,
+        1,
+        0
+      ],
+      "edge": [
+        50.0,
+        0.01
+      ],
+      "parameters": {
+        "SubPixelSegmentation::self_weight_eps": 0.10000000149011612,
+        "SubPixelSegmentation::self_weight_penalty_low": 0.009999999776482582,
+        "SubPixelSegmentation::self_weight_penalty_high": 1.0,
+        "SubPixelSegmenter::lambda_f": 0.05000000074505806,
+        "SubPixelSegmenter::use_connected_24_iteration": 0,
+        "SubPixelSegmenter::color_cluster_margin": 0.10000000149011612,
+        "EdgeImage::edge_weight_scale": 50.0,
+        "EdgeImage::edge_weight_floor": 0.01,
+        "Shared::is_anti_aliased": 1,
+        "clusterColors": true,
+        "shadowing": true,
+        "shadowControl": 0
+      },
+      "contextBits": "00000000010000000000000001000000010000000000000000000000000049407b14ae47e17a843fcdcccc3d0ad7233c0000803fcdcc4c3d00000000cdcccc3d"
+    },
+    {
+      "id": "alpha-4-.jpg-0-0",
+      "shared": [
+        0,
+        1,
+        0,
+        1,
+        1,
+        0
+      ],
+      "edge": [
+        50.0,
+        0.01
+      ],
+      "parameters": {
+        "SubPixelSegmentation::self_weight_eps": 0.10000000149011612,
+        "SubPixelSegmentation::self_weight_penalty_low": 0.009999999776482582,
+        "SubPixelSegmentation::self_weight_penalty_high": 1.0,
+        "SubPixelSegmenter::lambda_f": 0.05000000074505806,
+        "SubPixelSegmenter::use_connected_24_iteration": 0,
+        "SubPixelSegmenter::color_cluster_margin": 0.10000000149011612,
+        "EdgeImage::edge_weight_scale": 50.0,
+        "EdgeImage::edge_weight_floor": 0.01,
+        "Shared::is_anti_aliased": 1,
+        "clusterColors": true,
+        "shadowing": true,
+        "shadowControl": 0
+      },
+      "contextBits": "00000000010000000000000001000000010000000000000000000000000049407b14ae47e17a843fcdcccc3d0ad7233c0000803fcdcc4c3d00000000cdcccc3d"
+    },
+    {
+      "id": "noise-4-.png-0-0",
+      "shared": [
+        0,
+        1,
+        0,
+        1,
+        1,
+        0
+      ],
+      "edge": [
+        50.0,
+        0.01
+      ],
+      "parameters": {
+        "SubPixelSegmentation::self_weight_eps": 0.10000000149011612,
+        "SubPixelSegmentation::self_weight_penalty_low": 0.009999999776482582,
+        "SubPixelSegmentation::self_weight_penalty_high": 1.0,
+        "SubPixelSegmenter::lambda_f": 0.05000000074505806,
+        "SubPixelSegmenter::use_connected_24_iteration": 0,
+        "SubPixelSegmenter::color_cluster_margin": 0.10000000149011612,
+        "EdgeImage::edge_weight_scale": 50.0,
+        "EdgeImage::edge_weight_floor": 0.01,
+        "Shared::is_anti_aliased": 1,
+        "clusterColors": true,
+        "shadowing": true,
+        "shadowControl": 0
+      },
+      "contextBits": "00000000010000000000000001000000010000000000000000000000000049407b14ae47e17a843fcdcccc3d0ad7233c0000803fcdcc4c3d00000000cdcccc3d"
+    },
+    {
+      "id": "noise-4-.jpg-0-0",
+      "shared": [
+        0,
+        1,
+        0,
+        1,
+        1,
+        0
+      ],
+      "edge": [
+        50.0,
+        0.01
+      ],
+      "parameters": {
+        "SubPixelSegmentation::self_weight_eps": 0.10000000149011612,
+        "SubPixelSegmentation::self_weight_penalty_low": 0.009999999776482582,
+        "SubPixelSegmentation::self_weight_penalty_high": 1.0,
+        "SubPixelSegmenter::lambda_f": 0.05000000074505806,
+        "SubPixelSegmenter::use_connected_24_iteration": 0,
+        "SubPixelSegmenter::color_cluster_margin": 0.10000000149011612,
+        "EdgeImage::edge_weight_scale": 50.0,
+        "EdgeImage::edge_weight_floor": 0.01,
+        "Shared::is_anti_aliased": 1,
+        "clusterColors": true,
+        "shadowing": true,
+        "shadowControl": 0
+      },
+      "contextBits": "00000000010000000000000001000000010000000000000000000000000049407b14ae47e17a843fcdcccc3d0ad7233c0000803fcdcc4c3d00000000cdcccc3d"
+    },
+    {
+      "id": "solid-8-.png-0-0",
+      "shared": [
+        0,
+        1,
+        0,
+        1,
+        1,
+        0
+      ],
+      "edge": [
+        50.0,
+        0.01
+      ],
+      "parameters": {
+        "SubPixelSegmentation::self_weight_eps": 0.10000000149011612,
+        "SubPixelSegmentation::self_weight_penalty_low": 0.009999999776482582,
+        "SubPixelSegmentation::self_weight_penalty_high": 1.0,
+        "SubPixelSegmenter::lambda_f": 0.05000000074505806,
+        "SubPixelSegmenter::use_connected_24_iteration": 0,
+        "SubPixelSegmenter::color_cluster_margin": 0.10000000149011612,
+        "EdgeImage::edge_weight_scale": 50.0,
+        "EdgeImage::edge_weight_floor": 0.01,
+        "Shared::is_anti_aliased": 1,
+        "clusterColors": true,
+        "shadowing": true,
+        "shadowControl": 0
+      },
+      "contextBits": "00000000010000000000000001000000010000000000000000000000000049407b14ae47e17a843fcdcccc3d0ad7233c0000803fcdcc4c3d00000000cdcccc3d"
+    },
+    {
+      "id": "solid-8-.png-1-1",
+      "shared": [
+        0,
+        1,
+        0,
+        1,
+        1,
+        0
+      ],
+      "edge": [
+        50.0,
+        0.01
+      ],
+      "parameters": {
+        "SubPixelSegmentation::self_weight_eps": 0.10000000149011612,
+        "SubPixelSegmentation::self_weight_penalty_low": 0.009999999776482582,
+        "SubPixelSegmentation::self_weight_penalty_high": 1.0,
+        "SubPixelSegmenter::lambda_f": 0.05000000074505806,
+        "SubPixelSegmenter::use_connected_24_iteration": 0,
+        "SubPixelSegmenter::color_cluster_margin": 0.10000000149011612,
+        "EdgeImage::edge_weight_scale": 50.0,
+        "EdgeImage::edge_weight_floor": 0.01,
+        "Shared::is_anti_aliased": 1,
+        "clusterColors": true,
+        "shadowing": true,
+        "shadowControl": 0
+      },
+      "contextBits": "00000000010000000000000001000000010000000000000000000000000049407b14ae47e17a843fcdcccc3d0ad7233c0000803fcdcc4c3d00000000cdcccc3d"
+    },
+    {
+      "id": "solid-8-.jpg-0-0",
+      "shared": [
+        0,
+        1,
+        0,
+        1,
+        1,
+        0
+      ],
+      "edge": [
+        50.0,
+        0.01
+      ],
+      "parameters": {
+        "SubPixelSegmentation::self_weight_eps": 0.10000000149011612,
+        "SubPixelSegmentation::self_weight_penalty_low": 0.009999999776482582,
+        "SubPixelSegmentation::self_weight_penalty_high": 1.0,
+        "SubPixelSegmenter::lambda_f": 0.05000000074505806,
+        "SubPixelSegmenter::use_connected_24_iteration": 0,
+        "SubPixelSegmenter::color_cluster_margin": 0.10000000149011612,
+        "EdgeImage::edge_weight_scale": 50.0,
+        "EdgeImage::edge_weight_floor": 0.01,
+        "Shared::is_anti_aliased": 1,
+        "clusterColors": true,
+        "shadowing": true,
+        "shadowControl": 0
+      },
+      "contextBits": "00000000010000000000000001000000010000000000000000000000000049407b14ae47e17a843fcdcccc3d0ad7233c0000803fcdcc4c3d00000000cdcccc3d"
+    },
+    {
+      "id": "solid-8-.jpg-1-1",
+      "shared": [
+        0,
+        1,
+        0,
+        1,
+        1,
+        0
+      ],
+      "edge": [
+        50.0,
+        0.01
+      ],
+      "parameters": {
+        "SubPixelSegmentation::self_weight_eps": 0.10000000149011612,
+        "SubPixelSegmentation::self_weight_penalty_low": 0.009999999776482582,
+        "SubPixelSegmentation::self_weight_penalty_high": 1.0,
+        "SubPixelSegmenter::lambda_f": 0.05000000074505806,
+        "SubPixelSegmenter::use_connected_24_iteration": 0,
+        "SubPixelSegmenter::color_cluster_margin": 0.10000000149011612,
+        "EdgeImage::edge_weight_scale": 50.0,
+        "EdgeImage::edge_weight_floor": 0.01,
+        "Shared::is_anti_aliased": 1,
+        "clusterColors": true,
+        "shadowing": true,
+        "shadowControl": 0
+      },
+      "contextBits": "00000000010000000000000001000000010000000000000000000000000049407b14ae47e17a843fcdcccc3d0ad7233c0000803fcdcc4c3d00000000cdcccc3d"
+    },
+    {
+      "id": "stripes-8-.png-0-0",
+      "shared": [
+        0,
+        1,
+        0,
+        1,
+        1,
+        0
+      ],
+      "edge": [
+        50.0,
+        0.01
+      ],
+      "parameters": {
+        "SubPixelSegmentation::self_weight_eps": 0.10000000149011612,
+        "SubPixelSegmentation::self_weight_penalty_low": 0.009999999776482582,
+        "SubPixelSegmentation::self_weight_penalty_high": 1.0,
+        "SubPixelSegmenter::lambda_f": 0.05000000074505806,
+        "SubPixelSegmenter::use_connected_24_iteration": 0,
+        "SubPixelSegmenter::color_cluster_margin": 0.10000000149011612,
+        "EdgeImage::edge_weight_scale": 50.0,
+        "EdgeImage::edge_weight_floor": 0.01,
+        "Shared::is_anti_aliased": 1,
+        "clusterColors": true,
+        "shadowing": true,
+        "shadowControl": 0
+      },
+      "contextBits": "00000000010000000000000001000000010000000000000000000000000049407b14ae47e17a843fcdcccc3d0ad7233c0000803fcdcc4c3d00000000cdcccc3d"
+    },
+    {
+      "id": "stripes-8-.png-1-1",
+      "shared": [
+        0,
+        1,
+        0,
+        1,
+        1,
+        0
+      ],
+      "edge": [
+        50.0,
+        0.01
+      ],
+      "parameters": {
+        "SubPixelSegmentation::self_weight_eps": 0.10000000149011612,
+        "SubPixelSegmentation::self_weight_penalty_low": 0.009999999776482582,
+        "SubPixelSegmentation::self_weight_penalty_high": 1.0,
+        "SubPixelSegmenter::lambda_f": 0.05000000074505806,
+        "SubPixelSegmenter::use_connected_24_iteration": 0,
+        "SubPixelSegmenter::color_cluster_margin": 0.10000000149011612,
+        "EdgeImage::edge_weight_scale": 50.0,
+        "EdgeImage::edge_weight_floor": 0.01,
+        "Shared::is_anti_aliased": 1,
+        "clusterColors": true,
+        "shadowing": true,
+        "shadowControl": 0
+      },
+      "contextBits": "00000000010000000000000001000000010000000000000000000000000049407b14ae47e17a843fcdcccc3d0ad7233c0000803fcdcc4c3d00000000cdcccc3d"
+    },
+    {
+      "id": "stripes-8-.jpg-0-0",
+      "shared": [
+        0,
+        1,
+        0,
+        1,
+        1,
+        0
+      ],
+      "edge": [
+        50.0,
+        0.01
+      ],
+      "parameters": {
+        "SubPixelSegmentation::self_weight_eps": 0.10000000149011612,
+        "SubPixelSegmentation::self_weight_penalty_low": 0.009999999776482582,
+        "SubPixelSegmentation::self_weight_penalty_high": 1.0,
+        "SubPixelSegmenter::lambda_f": 0.05000000074505806,
+        "SubPixelSegmenter::use_connected_24_iteration": 0,
+        "SubPixelSegmenter::color_cluster_margin": 0.10000000149011612,
+        "EdgeImage::edge_weight_scale": 50.0,
+        "EdgeImage::edge_weight_floor": 0.01,
+        "Shared::is_anti_aliased": 1,
+        "clusterColors": true,
+        "shadowing": true,
+        "shadowControl": 0
+      },
+      "contextBits": "00000000010000000000000001000000010000000000000000000000000049407b14ae47e17a843fcdcccc3d0ad7233c0000803fcdcc4c3d00000000cdcccc3d"
+    },
+    {
+      "id": "stripes-8-.jpg-1-1",
+      "shared": [
+        0,
+        1,
+        0,
+        1,
+        1,
+        0
+      ],
+      "edge": [
+        50.0,
+        0.01
+      ],
+      "parameters": {
+        "SubPixelSegmentation::self_weight_eps": 0.10000000149011612,
+        "SubPixelSegmentation::self_weight_penalty_low": 0.009999999776482582,
+        "SubPixelSegmentation::self_weight_penalty_high": 1.0,
+        "SubPixelSegmenter::lambda_f": 0.05000000074505806,
+        "SubPixelSegmenter::use_connected_24_iteration": 0,
+        "SubPixelSegmenter::color_cluster_margin": 0.10000000149011612,
+        "EdgeImage::edge_weight_scale": 50.0,
+        "EdgeImage::edge_weight_floor": 0.01,
+        "Shared::is_anti_aliased": 1,
+        "clusterColors": true,
+        "shadowing": true,
+        "shadowControl": 0
+      },
+      "contextBits": "00000000010000000000000001000000010000000000000000000000000049407b14ae47e17a843fcdcccc3d0ad7233c0000803fcdcc4c3d00000000cdcccc3d"
+    },
+    {
+      "id": "checker-8-.png-0-0",
+      "shared": [
+        0,
+        1,
+        0,
+        1,
+        1,
+        0
+      ],
+      "edge": [
+        50.0,
+        0.01
+      ],
+      "parameters": {
+        "SubPixelSegmentation::self_weight_eps": 0.10000000149011612,
+        "SubPixelSegmentation::self_weight_penalty_low": 0.009999999776482582,
+        "SubPixelSegmentation::self_weight_penalty_high": 1.0,
+        "SubPixelSegmenter::lambda_f": 0.05000000074505806,
+        "SubPixelSegmenter::use_connected_24_iteration": 0,
+        "SubPixelSegmenter::color_cluster_margin": 0.10000000149011612,
+        "EdgeImage::edge_weight_scale": 50.0,
+        "EdgeImage::edge_weight_floor": 0.01,
+        "Shared::is_anti_aliased": 1,
+        "clusterColors": true,
+        "shadowing": true,
+        "shadowControl": 0
+      },
+      "contextBits": "00000000010000000000000001000000010000000000000000000000000049407b14ae47e17a843fcdcccc3d0ad7233c0000803fcdcc4c3d00000000cdcccc3d"
+    },
+    {
+      "id": "checker-8-.png-1-1",
+      "shared": [
+        0,
+        1,
+        0,
+        1,
+        1,
+        0
+      ],
+      "edge": [
+        50.0,
+        0.01
+      ],
+      "parameters": {
+        "SubPixelSegmentation::self_weight_eps": 0.10000000149011612,
+        "SubPixelSegmentation::self_weight_penalty_low": 0.009999999776482582,
+        "SubPixelSegmentation::self_weight_penalty_high": 1.0,
+        "SubPixelSegmenter::lambda_f": 0.05000000074505806,
+        "SubPixelSegmenter::use_connected_24_iteration": 0,
+        "SubPixelSegmenter::color_cluster_margin": 0.10000000149011612,
+        "EdgeImage::edge_weight_scale": 50.0,
+        "EdgeImage::edge_weight_floor": 0.01,
+        "Shared::is_anti_aliased": 1,
+        "clusterColors": true,
+        "shadowing": true,
+        "shadowControl": 0
+      },
+      "contextBits": "00000000010000000000000001000000010000000000000000000000000049407b14ae47e17a843fcdcccc3d0ad7233c0000803fcdcc4c3d00000000cdcccc3d"
+    },
+    {
+      "id": "checker-8-.jpg-0-0",
+      "shared": [
+        0,
+        1,
+        0,
+        1,
+        1,
+        0
+      ],
+      "edge": [
+        50.0,
+        0.01
+      ],
+      "parameters": {
+        "SubPixelSegmentation::self_weight_eps": 0.10000000149011612,
+        "SubPixelSegmentation::self_weight_penalty_low": 0.009999999776482582,
+        "SubPixelSegmentation::self_weight_penalty_high": 1.0,
+        "SubPixelSegmenter::lambda_f": 0.05000000074505806,
+        "SubPixelSegmenter::use_connected_24_iteration": 0,
+        "SubPixelSegmenter::color_cluster_margin": 0.10000000149011612,
+        "EdgeImage::edge_weight_scale": 50.0,
+        "EdgeImage::edge_weight_floor": 0.01,
+        "Shared::is_anti_aliased": 1,
+        "clusterColors": true,
+        "shadowing": true,
+        "shadowControl": 0
+      },
+      "contextBits": "00000000010000000000000001000000010000000000000000000000000049407b14ae47e17a843fcdcccc3d0ad7233c0000803fcdcc4c3d00000000cdcccc3d"
+    },
+    {
+      "id": "checker-8-.jpg-1-1",
+      "shared": [
+        0,
+        1,
+        0,
+        1,
+        1,
+        0
+      ],
+      "edge": [
+        50.0,
+        0.01
+      ],
+      "parameters": {
+        "SubPixelSegmentation::self_weight_eps": 0.10000000149011612,
+        "SubPixelSegmentation::self_weight_penalty_low": 0.009999999776482582,
+        "SubPixelSegmentation::self_weight_penalty_high": 1.0,
+        "SubPixelSegmenter::lambda_f": 0.05000000074505806,
+        "SubPixelSegmenter::use_connected_24_iteration": 0,
+        "SubPixelSegmenter::color_cluster_margin": 0.10000000149011612,
+        "EdgeImage::edge_weight_scale": 50.0,
+        "EdgeImage::edge_weight_floor": 0.01,
+        "Shared::is_anti_aliased": 1,
+        "clusterColors": true,
+        "shadowing": true,
+        "shadowControl": 0
+      },
+      "contextBits": "00000000010000000000000001000000010000000000000000000000000049407b14ae47e17a843fcdcccc3d0ad7233c0000803fcdcc4c3d00000000cdcccc3d"
+    },
+    {
+      "id": "gradient-8-.png-0-0",
+      "shared": [
+        0,
+        1,
+        0,
+        1,
+        1,
+        0
+      ],
+      "edge": [
+        50.0,
+        0.01
+      ],
+      "parameters": {
+        "SubPixelSegmentation::self_weight_eps": 0.10000000149011612,
+        "SubPixelSegmentation::self_weight_penalty_low": 0.009999999776482582,
+        "SubPixelSegmentation::self_weight_penalty_high": 1.0,
+        "SubPixelSegmenter::lambda_f": 0.05000000074505806,
+        "SubPixelSegmenter::use_connected_24_iteration": 0,
+        "SubPixelSegmenter::color_cluster_margin": 0.10000000149011612,
+        "EdgeImage::edge_weight_scale": 50.0,
+        "EdgeImage::edge_weight_floor": 0.01,
+        "Shared::is_anti_aliased": 1,
+        "clusterColors": true,
+        "shadowing": true,
+        "shadowControl": 0
+      },
+      "contextBits": "00000000010000000000000001000000010000000000000000000000000049407b14ae47e17a843fcdcccc3d0ad7233c0000803fcdcc4c3d00000000cdcccc3d"
+    },
+    {
+      "id": "gradient-8-.png-1-1",
+      "shared": [
+        0,
+        1,
+        0,
+        1,
+        1,
+        0
+      ],
+      "edge": [
+        50.0,
+        0.01
+      ],
+      "parameters": {
+        "SubPixelSegmentation::self_weight_eps": 0.10000000149011612,
+        "SubPixelSegmentation::self_weight_penalty_low": 0.009999999776482582,
+        "SubPixelSegmentation::self_weight_penalty_high": 1.0,
+        "SubPixelSegmenter::lambda_f": 0.05000000074505806,
+        "SubPixelSegmenter::use_connected_24_iteration": 0,
+        "SubPixelSegmenter::color_cluster_margin": 0.10000000149011612,
+        "EdgeImage::edge_weight_scale": 50.0,
+        "EdgeImage::edge_weight_floor": 0.01,
+        "Shared::is_anti_aliased": 1,
+        "clusterColors": true,
+        "shadowing": true,
+        "shadowControl": 0
+      },
+      "contextBits": "00000000010000000000000001000000010000000000000000000000000049407b14ae47e17a843fcdcccc3d0ad7233c0000803fcdcc4c3d00000000cdcccc3d"
+    },
+    {
+      "id": "gradient-8-.jpg-0-0",
+      "shared": [
+        0,
+        1,
+        0,
+        1,
+        1,
+        0
+      ],
+      "edge": [
+        50.0,
+        0.01
+      ],
+      "parameters": {
+        "SubPixelSegmentation::self_weight_eps": 0.10000000149011612,
+        "SubPixelSegmentation::self_weight_penalty_low": 0.009999999776482582,
+        "SubPixelSegmentation::self_weight_penalty_high": 1.0,
+        "SubPixelSegmenter::lambda_f": 0.05000000074505806,
+        "SubPixelSegmenter::use_connected_24_iteration": 0,
+        "SubPixelSegmenter::color_cluster_margin": 0.10000000149011612,
+        "EdgeImage::edge_weight_scale": 50.0,
+        "EdgeImage::edge_weight_floor": 0.01,
+        "Shared::is_anti_aliased": 1,
+        "clusterColors": true,
+        "shadowing": true,
+        "shadowControl": 0
+      },
+      "contextBits": "00000000010000000000000001000000010000000000000000000000000049407b14ae47e17a843fcdcccc3d0ad7233c0000803fcdcc4c3d00000000cdcccc3d"
+    },
+    {
+      "id": "gradient-8-.jpg-1-1",
+      "shared": [
+        0,
+        1,
+        0,
+        1,
+        1,
+        0
+      ],
+      "edge": [
+        50.0,
+        0.01
+      ],
+      "parameters": {
+        "SubPixelSegmentation::self_weight_eps": 0.10000000149011612,
+        "SubPixelSegmentation::self_weight_penalty_low": 0.009999999776482582,
+        "SubPixelSegmentation::self_weight_penalty_high": 1.0,
+        "SubPixelSegmenter::lambda_f": 0.05000000074505806,
+        "SubPixelSegmenter::use_connected_24_iteration": 0,
+        "SubPixelSegmenter::color_cluster_margin": 0.10000000149011612,
+        "EdgeImage::edge_weight_scale": 50.0,
+        "EdgeImage::edge_weight_floor": 0.01,
+        "Shared::is_anti_aliased": 1,
+        "clusterColors": true,
+        "shadowing": true,
+        "shadowControl": 0
+      },
+      "contextBits": "00000000010000000000000001000000010000000000000000000000000049407b14ae47e17a843fcdcccc3d0ad7233c0000803fcdcc4c3d00000000cdcccc3d"
+    },
+    {
+      "id": "alpha-8-.png-0-0",
+      "shared": [
+        0,
+        1,
+        0,
+        1,
+        1,
+        0
+      ],
+      "edge": [
+        50.0,
+        0.01
+      ],
+      "parameters": {
+        "SubPixelSegmentation::self_weight_eps": 0.10000000149011612,
+        "SubPixelSegmentation::self_weight_penalty_low": 0.009999999776482582,
+        "SubPixelSegmentation::self_weight_penalty_high": 1.0,
+        "SubPixelSegmenter::lambda_f": 0.05000000074505806,
+        "SubPixelSegmenter::use_connected_24_iteration": 0,
+        "SubPixelSegmenter::color_cluster_margin": 0.10000000149011612,
+        "EdgeImage::edge_weight_scale": 50.0,
+        "EdgeImage::edge_weight_floor": 0.01,
+        "Shared::is_anti_aliased": 1,
+        "clusterColors": true,
+        "shadowing": true,
+        "shadowControl": 0
+      },
+      "contextBits": "00000000010000000000000001000000010000000000000000000000000049407b14ae47e17a843fcdcccc3d0ad7233c0000803fcdcc4c3d00000000cdcccc3d"
+    },
+    {
+      "id": "alpha-8-.png-1-1",
+      "shared": [
+        0,
+        1,
+        0,
+        1,
+        1,
+        0
+      ],
+      "edge": [
+        50.0,
+        0.01
+      ],
+      "parameters": {
+        "SubPixelSegmentation::self_weight_eps": 0.10000000149011612,
+        "SubPixelSegmentation::self_weight_penalty_low": 0.009999999776482582,
+        "SubPixelSegmentation::self_weight_penalty_high": 1.0,
+        "SubPixelSegmenter::lambda_f": 0.05000000074505806,
+        "SubPixelSegmenter::use_connected_24_iteration": 0,
+        "SubPixelSegmenter::color_cluster_margin": 0.10000000149011612,
+        "EdgeImage::edge_weight_scale": 50.0,
+        "EdgeImage::edge_weight_floor": 0.01,
+        "Shared::is_anti_aliased": 1,
+        "clusterColors": true,
+        "shadowing": true,
+        "shadowControl": 0
+      },
+      "contextBits": "00000000010000000000000001000000010000000000000000000000000049407b14ae47e17a843fcdcccc3d0ad7233c0000803fcdcc4c3d00000000cdcccc3d"
+    },
+    {
+      "id": "alpha-8-.jpg-0-0",
+      "shared": [
+        0,
+        1,
+        0,
+        1,
+        1,
+        0
+      ],
+      "edge": [
+        50.0,
+        0.01
+      ],
+      "parameters": {
+        "SubPixelSegmentation::self_weight_eps": 0.10000000149011612,
+        "SubPixelSegmentation::self_weight_penalty_low": 0.009999999776482582,
+        "SubPixelSegmentation::self_weight_penalty_high": 1.0,
+        "SubPixelSegmenter::lambda_f": 0.05000000074505806,
+        "SubPixelSegmenter::use_connected_24_iteration": 0,
+        "SubPixelSegmenter::color_cluster_margin": 0.10000000149011612,
+        "EdgeImage::edge_weight_scale": 50.0,
+        "EdgeImage::edge_weight_floor": 0.01,
+        "Shared::is_anti_aliased": 1,
+        "clusterColors": true,
+        "shadowing": true,
+        "shadowControl": 0
+      },
+      "contextBits": "00000000010000000000000001000000010000000000000000000000000049407b14ae47e17a843fcdcccc3d0ad7233c0000803fcdcc4c3d00000000cdcccc3d"
+    },
+    {
+      "id": "alpha-8-.jpg-1-1",
+      "shared": [
+        0,
+        1,
+        0,
+        1,
+        1,
+        0
+      ],
+      "edge": [
+        50.0,
+        0.01
+      ],
+      "parameters": {
+        "SubPixelSegmentation::self_weight_eps": 0.10000000149011612,
+        "SubPixelSegmentation::self_weight_penalty_low": 0.009999999776482582,
+        "SubPixelSegmentation::self_weight_penalty_high": 1.0,
+        "SubPixelSegmenter::lambda_f": 0.05000000074505806,
+        "SubPixelSegmenter::use_connected_24_iteration": 0,
+        "SubPixelSegmenter::color_cluster_margin": 0.10000000149011612,
+        "EdgeImage::edge_weight_scale": 50.0,
+        "EdgeImage::edge_weight_floor": 0.01,
+        "Shared::is_anti_aliased": 1,
+        "clusterColors": true,
+        "shadowing": true,
+        "shadowControl": 0
+      },
+      "contextBits": "00000000010000000000000001000000010000000000000000000000000049407b14ae47e17a843fcdcccc3d0ad7233c0000803fcdcc4c3d00000000cdcccc3d"
+    },
+    {
+      "id": "noise-8-.png-0-0",
+      "shared": [
+        0,
+        1,
+        0,
+        1,
+        1,
+        0
+      ],
+      "edge": [
+        50.0,
+        0.01
+      ],
+      "parameters": {
+        "SubPixelSegmentation::self_weight_eps": 0.10000000149011612,
+        "SubPixelSegmentation::self_weight_penalty_low": 0.009999999776482582,
+        "SubPixelSegmentation::self_weight_penalty_high": 1.0,
+        "SubPixelSegmenter::lambda_f": 0.05000000074505806,
+        "SubPixelSegmenter::use_connected_24_iteration": 0,
+        "SubPixelSegmenter::color_cluster_margin": 0.10000000149011612,
+        "EdgeImage::edge_weight_scale": 50.0,
+        "EdgeImage::edge_weight_floor": 0.01,
+        "Shared::is_anti_aliased": 1,
+        "clusterColors": true,
+        "shadowing": true,
+        "shadowControl": 0
+      },
+      "contextBits": "00000000010000000000000001000000010000000000000000000000000049407b14ae47e17a843fcdcccc3d0ad7233c0000803fcdcc4c3d00000000cdcccc3d"
+    },
+    {
+      "id": "noise-8-.png-1-1",
+      "shared": [
+        0,
+        1,
+        0,
+        1,
+        1,
+        0
+      ],
+      "edge": [
+        50.0,
+        0.01
+      ],
+      "parameters": {
+        "SubPixelSegmentation::self_weight_eps": 0.10000000149011612,
+        "SubPixelSegmentation::self_weight_penalty_low": 0.009999999776482582,
+        "SubPixelSegmentation::self_weight_penalty_high": 1.0,
+        "SubPixelSegmenter::lambda_f": 0.05000000074505806,
+        "SubPixelSegmenter::use_connected_24_iteration": 0,
+        "SubPixelSegmenter::color_cluster_margin": 0.10000000149011612,
+        "EdgeImage::edge_weight_scale": 50.0,
+        "EdgeImage::edge_weight_floor": 0.01,
+        "Shared::is_anti_aliased": 1,
+        "clusterColors": true,
+        "shadowing": true,
+        "shadowControl": 0
+      },
+      "contextBits": "00000000010000000000000001000000010000000000000000000000000049407b14ae47e17a843fcdcccc3d0ad7233c0000803fcdcc4c3d00000000cdcccc3d"
+    },
+    {
+      "id": "noise-8-.jpg-0-0",
+      "shared": [
+        0,
+        1,
+        0,
+        1,
+        1,
+        0
+      ],
+      "edge": [
+        50.0,
+        0.01
+      ],
+      "parameters": {
+        "SubPixelSegmentation::self_weight_eps": 0.10000000149011612,
+        "SubPixelSegmentation::self_weight_penalty_low": 0.009999999776482582,
+        "SubPixelSegmentation::self_weight_penalty_high": 1.0,
+        "SubPixelSegmenter::lambda_f": 0.05000000074505806,
+        "SubPixelSegmenter::use_connected_24_iteration": 0,
+        "SubPixelSegmenter::color_cluster_margin": 0.10000000149011612,
+        "EdgeImage::edge_weight_scale": 50.0,
+        "EdgeImage::edge_weight_floor": 0.01,
+        "Shared::is_anti_aliased": 1,
+        "clusterColors": true,
+        "shadowing": true,
+        "shadowControl": 0
+      },
+      "contextBits": "00000000010000000000000001000000010000000000000000000000000049407b14ae47e17a843fcdcccc3d0ad7233c0000803fcdcc4c3d00000000cdcccc3d"
+    },
+    {
+      "id": "noise-8-.jpg-1-1",
+      "shared": [
+        0,
+        1,
+        0,
+        1,
+        1,
+        0
+      ],
+      "edge": [
+        50.0,
+        0.01
+      ],
+      "parameters": {
+        "SubPixelSegmentation::self_weight_eps": 0.10000000149011612,
+        "SubPixelSegmentation::self_weight_penalty_low": 0.009999999776482582,
+        "SubPixelSegmentation::self_weight_penalty_high": 1.0,
+        "SubPixelSegmenter::lambda_f": 0.05000000074505806,
+        "SubPixelSegmenter::use_connected_24_iteration": 0,
+        "SubPixelSegmenter::color_cluster_margin": 0.10000000149011612,
+        "EdgeImage::edge_weight_scale": 50.0,
+        "EdgeImage::edge_weight_floor": 0.01,
+        "Shared::is_anti_aliased": 1,
+        "clusterColors": true,
+        "shadowing": true,
+        "shadowControl": 0
+      },
+      "contextBits": "00000000010000000000000001000000010000000000000000000000000049407b14ae47e17a843fcdcccc3d0ad7233c0000803fcdcc4c3d00000000cdcccc3d"
+    },
+    {
+      "id": "solid-16-.png-0-0",
+      "shared": [
+        0,
+        1,
+        0,
+        1,
+        1,
+        0
+      ],
+      "edge": [
+        50.0,
+        0.01
+      ],
+      "parameters": {
+        "SubPixelSegmentation::self_weight_eps": 0.10000000149011612,
+        "SubPixelSegmentation::self_weight_penalty_low": 0.009999999776482582,
+        "SubPixelSegmentation::self_weight_penalty_high": 1.0,
+        "SubPixelSegmenter::lambda_f": 0.05000000074505806,
+        "SubPixelSegmenter::use_connected_24_iteration": 0,
+        "SubPixelSegmenter::color_cluster_margin": 0.10000000149011612,
+        "EdgeImage::edge_weight_scale": 50.0,
+        "EdgeImage::edge_weight_floor": 0.01,
+        "Shared::is_anti_aliased": 1,
+        "clusterColors": true,
+        "shadowing": true,
+        "shadowControl": 0
+      },
+      "contextBits": "00000000010000000000000001000000010000000000000000000000000049407b14ae47e17a843fcdcccc3d0ad7233c0000803fcdcc4c3d00000000cdcccc3d"
+    },
+    {
+      "id": "solid-16-.png-1-1",
+      "shared": [
+        0,
+        1,
+        0,
+        1,
+        1,
+        0
+      ],
+      "edge": [
+        50.0,
+        0.01
+      ],
+      "parameters": {
+        "SubPixelSegmentation::self_weight_eps": 0.10000000149011612,
+        "SubPixelSegmentation::self_weight_penalty_low": 0.009999999776482582,
+        "SubPixelSegmentation::self_weight_penalty_high": 1.0,
+        "SubPixelSegmenter::lambda_f": 0.05000000074505806,
+        "SubPixelSegmenter::use_connected_24_iteration": 0,
+        "SubPixelSegmenter::color_cluster_margin": 0.10000000149011612,
+        "EdgeImage::edge_weight_scale": 50.0,
+        "EdgeImage::edge_weight_floor": 0.01,
+        "Shared::is_anti_aliased": 1,
+        "clusterColors": true,
+        "shadowing": true,
+        "shadowControl": 0
+      },
+      "contextBits": "00000000010000000000000001000000010000000000000000000000000049407b14ae47e17a843fcdcccc3d0ad7233c0000803fcdcc4c3d00000000cdcccc3d"
+    },
+    {
+      "id": "solid-16-.jpg-0-0",
+      "shared": [
+        0,
+        1,
+        0,
+        1,
+        1,
+        0
+      ],
+      "edge": [
+        50.0,
+        0.01
+      ],
+      "parameters": {
+        "SubPixelSegmentation::self_weight_eps": 0.10000000149011612,
+        "SubPixelSegmentation::self_weight_penalty_low": 0.009999999776482582,
+        "SubPixelSegmentation::self_weight_penalty_high": 1.0,
+        "SubPixelSegmenter::lambda_f": 0.05000000074505806,
+        "SubPixelSegmenter::use_connected_24_iteration": 0,
+        "SubPixelSegmenter::color_cluster_margin": 0.10000000149011612,
+        "EdgeImage::edge_weight_scale": 50.0,
+        "EdgeImage::edge_weight_floor": 0.01,
+        "Shared::is_anti_aliased": 1,
+        "clusterColors": true,
+        "shadowing": true,
+        "shadowControl": 0
+      },
+      "contextBits": "00000000010000000000000001000000010000000000000000000000000049407b14ae47e17a843fcdcccc3d0ad7233c0000803fcdcc4c3d00000000cdcccc3d"
+    },
+    {
+      "id": "solid-16-.jpg-1-1",
+      "shared": [
+        0,
+        1,
+        0,
+        1,
+        1,
+        0
+      ],
+      "edge": [
+        50.0,
+        0.01
+      ],
+      "parameters": {
+        "SubPixelSegmentation::self_weight_eps": 0.10000000149011612,
+        "SubPixelSegmentation::self_weight_penalty_low": 0.009999999776482582,
+        "SubPixelSegmentation::self_weight_penalty_high": 1.0,
+        "SubPixelSegmenter::lambda_f": 0.05000000074505806,
+        "SubPixelSegmenter::use_connected_24_iteration": 0,
+        "SubPixelSegmenter::color_cluster_margin": 0.10000000149011612,
+        "EdgeImage::edge_weight_scale": 50.0,
+        "EdgeImage::edge_weight_floor": 0.01,
+        "Shared::is_anti_aliased": 1,
+        "clusterColors": true,
+        "shadowing": true,
+        "shadowControl": 0
+      },
+      "contextBits": "00000000010000000000000001000000010000000000000000000000000049407b14ae47e17a843fcdcccc3d0ad7233c0000803fcdcc4c3d00000000cdcccc3d"
+    },
+    {
+      "id": "stripes-16-.png-0-0",
+      "shared": [
+        0,
+        1,
+        0,
+        1,
+        1,
+        0
+      ],
+      "edge": [
+        50.0,
+        0.01
+      ],
+      "parameters": {
+        "SubPixelSegmentation::self_weight_eps": 0.10000000149011612,
+        "SubPixelSegmentation::self_weight_penalty_low": 0.009999999776482582,
+        "SubPixelSegmentation::self_weight_penalty_high": 1.0,
+        "SubPixelSegmenter::lambda_f": 0.05000000074505806,
+        "SubPixelSegmenter::use_connected_24_iteration": 0,
+        "SubPixelSegmenter::color_cluster_margin": 0.10000000149011612,
+        "EdgeImage::edge_weight_scale": 50.0,
+        "EdgeImage::edge_weight_floor": 0.01,
+        "Shared::is_anti_aliased": 1,
+        "clusterColors": true,
+        "shadowing": true,
+        "shadowControl": 0
+      },
+      "contextBits": "00000000010000000000000001000000010000000000000000000000000049407b14ae47e17a843fcdcccc3d0ad7233c0000803fcdcc4c3d00000000cdcccc3d"
+    },
+    {
+      "id": "stripes-16-.png-1-1",
+      "shared": [
+        0,
+        1,
+        0,
+        1,
+        1,
+        0
+      ],
+      "edge": [
+        50.0,
+        0.01
+      ],
+      "parameters": {
+        "SubPixelSegmentation::self_weight_eps": 0.10000000149011612,
+        "SubPixelSegmentation::self_weight_penalty_low": 0.009999999776482582,
+        "SubPixelSegmentation::self_weight_penalty_high": 1.0,
+        "SubPixelSegmenter::lambda_f": 0.05000000074505806,
+        "SubPixelSegmenter::use_connected_24_iteration": 0,
+        "SubPixelSegmenter::color_cluster_margin": 0.10000000149011612,
+        "EdgeImage::edge_weight_scale": 50.0,
+        "EdgeImage::edge_weight_floor": 0.01,
+        "Shared::is_anti_aliased": 1,
+        "clusterColors": true,
+        "shadowing": true,
+        "shadowControl": 0
+      },
+      "contextBits": "00000000010000000000000001000000010000000000000000000000000049407b14ae47e17a843fcdcccc3d0ad7233c0000803fcdcc4c3d00000000cdcccc3d"
+    },
+    {
+      "id": "stripes-16-.jpg-0-0",
+      "shared": [
+        0,
+        1,
+        0,
+        1,
+        1,
+        0
+      ],
+      "edge": [
+        50.0,
+        0.01
+      ],
+      "parameters": {
+        "SubPixelSegmentation::self_weight_eps": 0.10000000149011612,
+        "SubPixelSegmentation::self_weight_penalty_low": 0.009999999776482582,
+        "SubPixelSegmentation::self_weight_penalty_high": 1.0,
+        "SubPixelSegmenter::lambda_f": 0.05000000074505806,
+        "SubPixelSegmenter::use_connected_24_iteration": 0,
+        "SubPixelSegmenter::color_cluster_margin": 0.10000000149011612,
+        "EdgeImage::edge_weight_scale": 50.0,
+        "EdgeImage::edge_weight_floor": 0.01,
+        "Shared::is_anti_aliased": 1,
+        "clusterColors": true,
+        "shadowing": true,
+        "shadowControl": 0
+      },
+      "contextBits": "00000000010000000000000001000000010000000000000000000000000049407b14ae47e17a843fcdcccc3d0ad7233c0000803fcdcc4c3d00000000cdcccc3d"
+    },
+    {
+      "id": "stripes-16-.jpg-1-1",
+      "shared": [
+        0,
+        1,
+        0,
+        1,
+        1,
+        0
+      ],
+      "edge": [
+        50.0,
+        0.01
+      ],
+      "parameters": {
+        "SubPixelSegmentation::self_weight_eps": 0.10000000149011612,
+        "SubPixelSegmentation::self_weight_penalty_low": 0.009999999776482582,
+        "SubPixelSegmentation::self_weight_penalty_high": 1.0,
+        "SubPixelSegmenter::lambda_f": 0.05000000074505806,
+        "SubPixelSegmenter::use_connected_24_iteration": 0,
+        "SubPixelSegmenter::color_cluster_margin": 0.10000000149011612,
+        "EdgeImage::edge_weight_scale": 50.0,
+        "EdgeImage::edge_weight_floor": 0.01,
+        "Shared::is_anti_aliased": 1,
+        "clusterColors": true,
+        "shadowing": true,
+        "shadowControl": 0
+      },
+      "contextBits": "00000000010000000000000001000000010000000000000000000000000049407b14ae47e17a843fcdcccc3d0ad7233c0000803fcdcc4c3d00000000cdcccc3d"
+    },
+    {
+      "id": "checker-16-.png-0-0",
+      "shared": [
+        0,
+        1,
+        0,
+        1,
+        1,
+        0
+      ],
+      "edge": [
+        50.0,
+        0.01
+      ],
+      "parameters": {
+        "SubPixelSegmentation::self_weight_eps": 0.10000000149011612,
+        "SubPixelSegmentation::self_weight_penalty_low": 0.009999999776482582,
+        "SubPixelSegmentation::self_weight_penalty_high": 1.0,
+        "SubPixelSegmenter::lambda_f": 0.05000000074505806,
+        "SubPixelSegmenter::use_connected_24_iteration": 0,
+        "SubPixelSegmenter::color_cluster_margin": 0.10000000149011612,
+        "EdgeImage::edge_weight_scale": 50.0,
+        "EdgeImage::edge_weight_floor": 0.01,
+        "Shared::is_anti_aliased": 1,
+        "clusterColors": true,
+        "shadowing": true,
+        "shadowControl": 0
+      },
+      "contextBits": "00000000010000000000000001000000010000000000000000000000000049407b14ae47e17a843fcdcccc3d0ad7233c0000803fcdcc4c3d00000000cdcccc3d"
+    },
+    {
+      "id": "checker-16-.png-1-1",
+      "shared": [
+        0,
+        1,
+        0,
+        1,
+        1,
+        0
+      ],
+      "edge": [
+        50.0,
+        0.01
+      ],
+      "parameters": {
+        "SubPixelSegmentation::self_weight_eps": 0.10000000149011612,
+        "SubPixelSegmentation::self_weight_penalty_low": 0.009999999776482582,
+        "SubPixelSegmentation::self_weight_penalty_high": 1.0,
+        "SubPixelSegmenter::lambda_f": 0.05000000074505806,
+        "SubPixelSegmenter::use_connected_24_iteration": 0,
+        "SubPixelSegmenter::color_cluster_margin": 0.10000000149011612,
+        "EdgeImage::edge_weight_scale": 50.0,
+        "EdgeImage::edge_weight_floor": 0.01,
+        "Shared::is_anti_aliased": 1,
+        "clusterColors": true,
+        "shadowing": true,
+        "shadowControl": 0
+      },
+      "contextBits": "00000000010000000000000001000000010000000000000000000000000049407b14ae47e17a843fcdcccc3d0ad7233c0000803fcdcc4c3d00000000cdcccc3d"
+    },
+    {
+      "id": "checker-16-.jpg-0-0",
+      "shared": [
+        0,
+        1,
+        0,
+        1,
+        1,
+        0
+      ],
+      "edge": [
+        50.0,
+        0.01
+      ],
+      "parameters": {
+        "SubPixelSegmentation::self_weight_eps": 0.10000000149011612,
+        "SubPixelSegmentation::self_weight_penalty_low": 0.009999999776482582,
+        "SubPixelSegmentation::self_weight_penalty_high": 1.0,
+        "SubPixelSegmenter::lambda_f": 0.05000000074505806,
+        "SubPixelSegmenter::use_connected_24_iteration": 0,
+        "SubPixelSegmenter::color_cluster_margin": 0.10000000149011612,
+        "EdgeImage::edge_weight_scale": 50.0,
+        "EdgeImage::edge_weight_floor": 0.01,
+        "Shared::is_anti_aliased": 1,
+        "clusterColors": true,
+        "shadowing": true,
+        "shadowControl": 0
+      },
+      "contextBits": "00000000010000000000000001000000010000000000000000000000000049407b14ae47e17a843fcdcccc3d0ad7233c0000803fcdcc4c3d00000000cdcccc3d"
+    },
+    {
+      "id": "checker-16-.jpg-1-1",
+      "shared": [
+        0,
+        1,
+        0,
+        1,
+        1,
+        0
+      ],
+      "edge": [
+        50.0,
+        0.01
+      ],
+      "parameters": {
+        "SubPixelSegmentation::self_weight_eps": 0.10000000149011612,
+        "SubPixelSegmentation::self_weight_penalty_low": 0.009999999776482582,
+        "SubPixelSegmentation::self_weight_penalty_high": 1.0,
+        "SubPixelSegmenter::lambda_f": 0.05000000074505806,
+        "SubPixelSegmenter::use_connected_24_iteration": 0,
+        "SubPixelSegmenter::color_cluster_margin": 0.10000000149011612,
+        "EdgeImage::edge_weight_scale": 50.0,
+        "EdgeImage::edge_weight_floor": 0.01,
+        "Shared::is_anti_aliased": 1,
+        "clusterColors": true,
+        "shadowing": true,
+        "shadowControl": 0
+      },
+      "contextBits": "00000000010000000000000001000000010000000000000000000000000049407b14ae47e17a843fcdcccc3d0ad7233c0000803fcdcc4c3d00000000cdcccc3d"
+    },
+    {
+      "id": "gradient-16-.png-0-0",
+      "shared": [
+        0,
+        1,
+        0,
+        1,
+        1,
+        0
+      ],
+      "edge": [
+        50.0,
+        0.01
+      ],
+      "parameters": {
+        "SubPixelSegmentation::self_weight_eps": 0.10000000149011612,
+        "SubPixelSegmentation::self_weight_penalty_low": 0.009999999776482582,
+        "SubPixelSegmentation::self_weight_penalty_high": 1.0,
+        "SubPixelSegmenter::lambda_f": 0.05000000074505806,
+        "SubPixelSegmenter::use_connected_24_iteration": 0,
+        "SubPixelSegmenter::color_cluster_margin": 0.10000000149011612,
+        "EdgeImage::edge_weight_scale": 50.0,
+        "EdgeImage::edge_weight_floor": 0.01,
+        "Shared::is_anti_aliased": 1,
+        "clusterColors": true,
+        "shadowing": true,
+        "shadowControl": 0
+      },
+      "contextBits": "00000000010000000000000001000000010000000000000000000000000049407b14ae47e17a843fcdcccc3d0ad7233c0000803fcdcc4c3d00000000cdcccc3d"
+    },
+    {
+      "id": "gradient-16-.png-1-1",
+      "shared": [
+        0,
+        1,
+        0,
+        1,
+        1,
+        0
+      ],
+      "edge": [
+        50.0,
+        0.01
+      ],
+      "parameters": {
+        "SubPixelSegmentation::self_weight_eps": 0.10000000149011612,
+        "SubPixelSegmentation::self_weight_penalty_low": 0.009999999776482582,
+        "SubPixelSegmentation::self_weight_penalty_high": 1.0,
+        "SubPixelSegmenter::lambda_f": 0.05000000074505806,
+        "SubPixelSegmenter::use_connected_24_iteration": 0,
+        "SubPixelSegmenter::color_cluster_margin": 0.10000000149011612,
+        "EdgeImage::edge_weight_scale": 50.0,
+        "EdgeImage::edge_weight_floor": 0.01,
+        "Shared::is_anti_aliased": 1,
+        "clusterColors": true,
+        "shadowing": true,
+        "shadowControl": 0
+      },
+      "contextBits": "00000000010000000000000001000000010000000000000000000000000049407b14ae47e17a843fcdcccc3d0ad7233c0000803fcdcc4c3d00000000cdcccc3d"
+    },
+    {
+      "id": "gradient-16-.jpg-0-0",
+      "shared": [
+        0,
+        1,
+        0,
+        1,
+        1,
+        0
+      ],
+      "edge": [
+        50.0,
+        0.01
+      ],
+      "parameters": {
+        "SubPixelSegmentation::self_weight_eps": 0.10000000149011612,
+        "SubPixelSegmentation::self_weight_penalty_low": 0.009999999776482582,
+        "SubPixelSegmentation::self_weight_penalty_high": 1.0,
+        "SubPixelSegmenter::lambda_f": 0.05000000074505806,
+        "SubPixelSegmenter::use_connected_24_iteration": 0,
+        "SubPixelSegmenter::color_cluster_margin": 0.10000000149011612,
+        "EdgeImage::edge_weight_scale": 50.0,
+        "EdgeImage::edge_weight_floor": 0.01,
+        "Shared::is_anti_aliased": 1,
+        "clusterColors": true,
+        "shadowing": true,
+        "shadowControl": 0
+      },
+      "contextBits": "00000000010000000000000001000000010000000000000000000000000049407b14ae47e17a843fcdcccc3d0ad7233c0000803fcdcc4c3d00000000cdcccc3d"
+    },
+    {
+      "id": "gradient-16-.jpg-1-1",
+      "shared": [
+        0,
+        1,
+        0,
+        1,
+        1,
+        0
+      ],
+      "edge": [
+        50.0,
+        0.01
+      ],
+      "parameters": {
+        "SubPixelSegmentation::self_weight_eps": 0.10000000149011612,
+        "SubPixelSegmentation::self_weight_penalty_low": 0.009999999776482582,
+        "SubPixelSegmentation::self_weight_penalty_high": 1.0,
+        "SubPixelSegmenter::lambda_f": 0.05000000074505806,
+        "SubPixelSegmenter::use_connected_24_iteration": 0,
+        "SubPixelSegmenter::color_cluster_margin": 0.10000000149011612,
+        "EdgeImage::edge_weight_scale": 50.0,
+        "EdgeImage::edge_weight_floor": 0.01,
+        "Shared::is_anti_aliased": 1,
+        "clusterColors": true,
+        "shadowing": true,
+        "shadowControl": 0
+      },
+      "contextBits": "00000000010000000000000001000000010000000000000000000000000049407b14ae47e17a843fcdcccc3d0ad7233c0000803fcdcc4c3d00000000cdcccc3d"
+    },
+    {
+      "id": "alpha-16-.png-0-0",
+      "shared": [
+        0,
+        1,
+        0,
+        1,
+        1,
+        0
+      ],
+      "edge": [
+        50.0,
+        0.01
+      ],
+      "parameters": {
+        "SubPixelSegmentation::self_weight_eps": 0.10000000149011612,
+        "SubPixelSegmentation::self_weight_penalty_low": 0.009999999776482582,
+        "SubPixelSegmentation::self_weight_penalty_high": 1.0,
+        "SubPixelSegmenter::lambda_f": 0.05000000074505806,
+        "SubPixelSegmenter::use_connected_24_iteration": 0,
+        "SubPixelSegmenter::color_cluster_margin": 0.10000000149011612,
+        "EdgeImage::edge_weight_scale": 50.0,
+        "EdgeImage::edge_weight_floor": 0.01,
+        "Shared::is_anti_aliased": 1,
+        "clusterColors": true,
+        "shadowing": true,
+        "shadowControl": 0
+      },
+      "contextBits": "00000000010000000000000001000000010000000000000000000000000049407b14ae47e17a843fcdcccc3d0ad7233c0000803fcdcc4c3d00000000cdcccc3d"
+    },
+    {
+      "id": "alpha-16-.png-1-1",
+      "shared": [
+        0,
+        1,
+        0,
+        1,
+        1,
+        0
+      ],
+      "edge": [
+        50.0,
+        0.01
+      ],
+      "parameters": {
+        "SubPixelSegmentation::self_weight_eps": 0.10000000149011612,
+        "SubPixelSegmentation::self_weight_penalty_low": 0.009999999776482582,
+        "SubPixelSegmentation::self_weight_penalty_high": 1.0,
+        "SubPixelSegmenter::lambda_f": 0.05000000074505806,
+        "SubPixelSegmenter::use_connected_24_iteration": 0,
+        "SubPixelSegmenter::color_cluster_margin": 0.10000000149011612,
+        "EdgeImage::edge_weight_scale": 50.0,
+        "EdgeImage::edge_weight_floor": 0.01,
+        "Shared::is_anti_aliased": 1,
+        "clusterColors": true,
+        "shadowing": true,
+        "shadowControl": 0
+      },
+      "contextBits": "00000000010000000000000001000000010000000000000000000000000049407b14ae47e17a843fcdcccc3d0ad7233c0000803fcdcc4c3d00000000cdcccc3d"
+    },
+    {
+      "id": "alpha-16-.jpg-0-0",
+      "shared": [
+        0,
+        1,
+        0,
+        1,
+        1,
+        0
+      ],
+      "edge": [
+        50.0,
+        0.01
+      ],
+      "parameters": {
+        "SubPixelSegmentation::self_weight_eps": 0.10000000149011612,
+        "SubPixelSegmentation::self_weight_penalty_low": 0.009999999776482582,
+        "SubPixelSegmentation::self_weight_penalty_high": 1.0,
+        "SubPixelSegmenter::lambda_f": 0.05000000074505806,
+        "SubPixelSegmenter::use_connected_24_iteration": 0,
+        "SubPixelSegmenter::color_cluster_margin": 0.10000000149011612,
+        "EdgeImage::edge_weight_scale": 50.0,
+        "EdgeImage::edge_weight_floor": 0.01,
+        "Shared::is_anti_aliased": 1,
+        "clusterColors": true,
+        "shadowing": true,
+        "shadowControl": 0
+      },
+      "contextBits": "00000000010000000000000001000000010000000000000000000000000049407b14ae47e17a843fcdcccc3d0ad7233c0000803fcdcc4c3d00000000cdcccc3d"
+    },
+    {
+      "id": "alpha-16-.jpg-1-1",
+      "shared": [
+        0,
+        1,
+        0,
+        1,
+        1,
+        0
+      ],
+      "edge": [
+        50.0,
+        0.01
+      ],
+      "parameters": {
+        "SubPixelSegmentation::self_weight_eps": 0.10000000149011612,
+        "SubPixelSegmentation::self_weight_penalty_low": 0.009999999776482582,
+        "SubPixelSegmentation::self_weight_penalty_high": 1.0,
+        "SubPixelSegmenter::lambda_f": 0.05000000074505806,
+        "SubPixelSegmenter::use_connected_24_iteration": 0,
+        "SubPixelSegmenter::color_cluster_margin": 0.10000000149011612,
+        "EdgeImage::edge_weight_scale": 50.0,
+        "EdgeImage::edge_weight_floor": 0.01,
+        "Shared::is_anti_aliased": 1,
+        "clusterColors": true,
+        "shadowing": true,
+        "shadowControl": 0
+      },
+      "contextBits": "00000000010000000000000001000000010000000000000000000000000049407b14ae47e17a843fcdcccc3d0ad7233c0000803fcdcc4c3d00000000cdcccc3d"
+    },
+    {
+      "id": "noise-16-.png-0-0",
+      "shared": [
+        0,
+        1,
+        0,
+        1,
+        1,
+        0
+      ],
+      "edge": [
+        50.0,
+        0.01
+      ],
+      "parameters": {
+        "SubPixelSegmentation::self_weight_eps": 0.10000000149011612,
+        "SubPixelSegmentation::self_weight_penalty_low": 0.009999999776482582,
+        "SubPixelSegmentation::self_weight_penalty_high": 1.0,
+        "SubPixelSegmenter::lambda_f": 0.05000000074505806,
+        "SubPixelSegmenter::use_connected_24_iteration": 0,
+        "SubPixelSegmenter::color_cluster_margin": 0.10000000149011612,
+        "EdgeImage::edge_weight_scale": 50.0,
+        "EdgeImage::edge_weight_floor": 0.01,
+        "Shared::is_anti_aliased": 1,
+        "clusterColors": true,
+        "shadowing": true,
+        "shadowControl": 0
+      },
+      "contextBits": "00000000010000000000000001000000010000000000000000000000000049407b14ae47e17a843fcdcccc3d0ad7233c0000803fcdcc4c3d00000000cdcccc3d"
+    },
+    {
+      "id": "noise-16-.png-1-1",
+      "shared": [
+        0,
+        1,
+        0,
+        1,
+        1,
+        0
+      ],
+      "edge": [
+        50.0,
+        0.01
+      ],
+      "parameters": {
+        "SubPixelSegmentation::self_weight_eps": 0.10000000149011612,
+        "SubPixelSegmentation::self_weight_penalty_low": 0.009999999776482582,
+        "SubPixelSegmentation::self_weight_penalty_high": 1.0,
+        "SubPixelSegmenter::lambda_f": 0.05000000074505806,
+        "SubPixelSegmenter::use_connected_24_iteration": 0,
+        "SubPixelSegmenter::color_cluster_margin": 0.10000000149011612,
+        "EdgeImage::edge_weight_scale": 50.0,
+        "EdgeImage::edge_weight_floor": 0.01,
+        "Shared::is_anti_aliased": 1,
+        "clusterColors": true,
+        "shadowing": true,
+        "shadowControl": 0
+      },
+      "contextBits": "00000000010000000000000001000000010000000000000000000000000049407b14ae47e17a843fcdcccc3d0ad7233c0000803fcdcc4c3d00000000cdcccc3d"
+    },
+    {
+      "id": "noise-16-.jpg-0-0",
+      "shared": [
+        0,
+        1,
+        0,
+        1,
+        1,
+        0
+      ],
+      "edge": [
+        50.0,
+        0.01
+      ],
+      "parameters": {
+        "SubPixelSegmentation::self_weight_eps": 0.10000000149011612,
+        "SubPixelSegmentation::self_weight_penalty_low": 0.009999999776482582,
+        "SubPixelSegmentation::self_weight_penalty_high": 1.0,
+        "SubPixelSegmenter::lambda_f": 0.05000000074505806,
+        "SubPixelSegmenter::use_connected_24_iteration": 0,
+        "SubPixelSegmenter::color_cluster_margin": 0.10000000149011612,
+        "EdgeImage::edge_weight_scale": 50.0,
+        "EdgeImage::edge_weight_floor": 0.01,
+        "Shared::is_anti_aliased": 1,
+        "clusterColors": true,
+        "shadowing": true,
+        "shadowControl": 0
+      },
+      "contextBits": "00000000010000000000000001000000010000000000000000000000000049407b14ae47e17a843fcdcccc3d0ad7233c0000803fcdcc4c3d00000000cdcccc3d"
+    },
+    {
+      "id": "noise-16-.jpg-1-1",
+      "shared": [
+        0,
+        1,
+        0,
+        1,
+        1,
+        0
+      ],
+      "edge": [
+        50.0,
+        0.01
+      ],
+      "parameters": {
+        "SubPixelSegmentation::self_weight_eps": 0.10000000149011612,
+        "SubPixelSegmentation::self_weight_penalty_low": 0.009999999776482582,
+        "SubPixelSegmentation::self_weight_penalty_high": 1.0,
+        "SubPixelSegmenter::lambda_f": 0.05000000074505806,
+        "SubPixelSegmenter::use_connected_24_iteration": 0,
+        "SubPixelSegmenter::color_cluster_margin": 0.10000000149011612,
+        "EdgeImage::edge_weight_scale": 50.0,
+        "EdgeImage::edge_weight_floor": 0.01,
+        "Shared::is_anti_aliased": 1,
+        "clusterColors": true,
+        "shadowing": true,
+        "shadowControl": 0
+      },
+      "contextBits": "00000000010000000000000001000000010000000000000000000000000049407b14ae47e17a843fcdcccc3d0ad7233c0000803fcdcc4c3d00000000cdcccc3d"
+    }
+  ],
+  "fixture": "../test/fixtures/classifier-context-reference.json"
+}

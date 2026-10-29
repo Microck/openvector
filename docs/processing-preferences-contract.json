@@ -1,0 +1,43 @@
+{
+  "project": "openvector",
+  "status": "Processing-preference owner and independent host restart verified against eight native workflows. Complete window/quit parity remains unfinished.",
+  "reference": "../test/fixtures/preferences-reference.ndjson.gz",
+  "inputs": "../test/fixtures/preferences-inputs.json",
+  "nativeAudit": "../evidence/preferences-native-audit.json",
+  "nativeCases": 8,
+  "nativeProcesses": 34,
+  "restartPhases": 9,
+  "documentCaptures": 8,
+  "verification": {
+    "nativeParameterRecords": 800,
+    "newTestsPassed": 13,
+    "profileAndCliTestsPassed": 38,
+    "isolatedGuiTests": {
+      "passed": 365,
+      "failed": 1,
+      "skipped": 0
+    },
+    "knownFailure": "Existing processing-batch-controls setter-only backgroundMode 2 comparison; unchanged.",
+    "installedPackageFiles": 64,
+    "publicImports": 19,
+    "checkpoint": "../evidence/processing-preferences-verification-checkpoint.json"
+  },
+  "behavior": {
+    "stored": "Selected and batch processing controls, separate requested color counters, palette-count metadata and background recommendation. Batch export directory/format and shared outputOptions also survive native save/restart. Shared output choices live once at the file root; the former batch-local field is rejected, without migration.",
+    "colors": "Share the existing saved-profile QColor projection: each rounded 16-bit channel contributes its high byte. Restore opaque RGB. Palette color arrays are not stored.",
+    "startup": "Restore selected controls before committing the initial blank document. Reset selected paletteColorCount to zero and start with an empty runtime backup. Batch paletteColorCount survives. Startup has no loaded image, queued files or active batch workspace.",
+    "storage": "One canonical processing-preferences JSON file beside profile/source storage. Missing file means cold defaults. Invalid content fails explicitly without replacing it. Atomic writes preserve the old file and remove their own temporary file on failure.",
+    "host": "OpenVector saves this owner on clean idle shutdown before terminating its worker. No HTTP operation can choose a preference path. A save failure remains visible and shutdown still releases owned resources.",
+    "scope": "Shared output-option persistence and workspace/model-reset lifetime match eight additional native workflows; see export-preferences-contract.json. The canonical file also stores the three Auto-update checked choices and skipReview; see auto-preferences-contract.json and review-ui-contract.json. Other window preference owners remain separate. Quick Save choices now share this file; see quick-save-contract.json. Bitmap choices and shared scale now share the canonical file; see bitmap-gui-contract.json. The file requires all seven current root owners, including bitmapSave."
+  },
+  "referenceLimitations": [
+    "The frozen document observer requires a completed worker result. The initial preferences-clean attempt exits 15 at that observer guard and remains rejected evidence. Accepted cases observe cold startup selection first, then load a real source before full document capture.",
+    "Captured persistence calls the native model writer 0x42aac0 directly. Exact native quit ordering, write-error UI and shutdown during active processing remain unverified.",
+    "No native dialogs are answered, no native input is synthesized, and no widget setters are used."
+  ],
+  "remaining": [
+    "Complete window preference owners and full window reset.",
+    "Verify native quit ordering, active-job shutdown and write-error presentation."
+  ],
+  "fullApplicationParity": false
+}

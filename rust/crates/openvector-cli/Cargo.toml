@@ -1,0 +1,20 @@
+[package]
+name = "openvector-cli"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[[bin]]
+name = "openvector"
+path = "src/main.rs"
+
+[dependencies]
+openvector = { path = "../openvector" }
+ctrlc = { version = "3", features = ["termination"] }
+serde_json = { version = "1", features = ["float_roundtrip"] }
+serde = "1"
+
+[dev-dependencies]
+flate2 = "1"
+base64 = "0.22"

@@ -1,0 +1,105 @@
+{
+  "project": "openvector",
+  "component": "Vector file export interruption",
+  "status": "Captured text buffering, EMF buffered serialization and Windows file sharing for both are implemented and match the native captures. Native GUI export lifecycle, post-open disk errors and all-input behavior remain unfinished.",
+  "reference": {
+    "method": "Original C1 document save at 0x468e50 with a by-value 28-byte wide string and original output settings. Owned documents finish segmentation, smoothing and fitting before saving to owned evidence paths.",
+    "cancel": "The original virtual progress receiver requests original cancellation at a declared changed-integer callback ordinal. An external C++ catch observes normal original-frame unwind. No original instruction, widget, readiness state or exception context is patched.",
+    "corpus": "../test/fixtures/export-interruption-reference.ndjson.gz",
+    "audit": "../evidence/check-export-interruption.py",
+    "checkpoint": "../evidence/export-interruption-verification-checkpoint.json",
+    "scope": "660 cases, each repeated in a second fresh native process: 390 completed exports and 270 interrupted saves. Two explicit opaque four-color grids, 64x64 and 128x128. SVG, PDF, EPS, AI, DXF and EMF; three layouts; both stroke choices; both EPS styles; three DXF curve modes.",
+    "completedComparison": "390 completed outputs match the independent exporters exactly, using geometry computed independently from declared pixels and controls. EPS receives the captured, validated wall-clock CreationDate as environment metadata. EMF receives actual device measurements.",
+    "limits": "The corpus covers selected output-option combinations and checkpoints, not every input or their Cartesian product. Native GUI task admission, cleanup, result publication and queued requests are outside this direct document-method observation."
+  },
+  "settings": {
+    "layout": "Word 0: stacked=0, cutouts=1, grouped-cutouts=2.",
+    "epsStyle": "Word 1: compact=0, verbose=1.",
+    "thinStroke": "Word 2 is an inverted enum: thin stroke enabled=0, disabled=1.",
+    "dxfCurveMode": "Word 3: splines=0, sparse-lines=1, dense-lines=2."
+  },
+  "observations": {
+    "resultLifetime": "Cancellation escapes this method as the original cancellation exception. No new method result exists. The UINT_MAX word in raw state.status belongs to the external caller, not to stored C1 result state or an application status code.",
+    "document": "Each save resets visible progress and cancellation. The observed source/working dimensions, PRNG, settings bits, exposed palette bits, cache keys and region/node/reserved cubic-slot counts stay unchanged. Retry on the same document succeeds at a new output filename. Coordinates of reserved cubic slots are not read.",
+    "progress": "The native sink emits changed integer values, with 16 callbacks ending at 91 for the 64x64 grid and 50 ending at 95 for the 128x128 grid. Initial repeated phase values can be suppressed on retry. Callback ordinals are not raw serializer checkpoint counts. A successful save does not force visible progress to 100 in these observations.",
+    "afterProcessExit": "Interrupted SVG, PDF, EPS, AI and DXF files are prefixes of their completed counterparts, apart from the separately validated EPS clock. Interrupted EMF files may be empty or contain drawing records with an unfinished header. A nonempty partial EMF body matches the completed body prefix, but its whole file is not a finalized-file prefix.",
+    "atActualUnwind": "OVSX/3 separately reads each file after return or caught unwind, while the original document and process still live. Of 90 cases repeated twice, 148 reads succeed and 32 fail with CRT errno 13. All 32 unreadable observations are cancelled EMF saves. Twenty readable observations have more bytes after process exit. These are cancelled SVG, AI and DXF files; PDF and EPS bytes are unchanged in this sample. No stream flush or original handle close is performed by the observer.",
+    "unreadableFiles": "An unsuccessful fopen establishes unreadability through that observer at that moment. It does not establish a specific Win32 sharing error, GUI cleanup policy or how long the original handle survives. Unreadable bytes are unknown, not an empty-file observation."
+  },
+  "fileState": {
+    "checkpoint": "../evidence/export-file-state-verification-checkpoint.json",
+    "corpus": "../test/fixtures/export-file-state-reference.ndjson.gz",
+    "scope": "57 further direct document-method cases, each repeated in a fresh process. Six formats use the same declared 64x64 opaque grid with stacked layout and thin stroke. This does not establish all-format/all-option error behavior or native GUI notification behavior.",
+    "sameTargetRetry": "Each format completes a baseline, cancels on the first callback and retries that filename, then cancels on the last callback and retries that filename. All retry methods return 0. SVG, PDF, EPS, AI and DXF expose complete bytes at return and retain baseline bytes after process exit. EMF retries remain unreadable at return; after exit, the first target is empty and the late target remains the 16,376-byte unfinished file despite success returns. Do not replace observed native behavior with inferred successful file creation.",
+    "openFailures": "A missing parent directory, a directory target and an existing read-only marker file each produce result 4 with no progress callbacks for SVG, PDF, EPS and AI. DXF and EMF instead traverse 16 callbacks, end at progress 91 and return 0. They create no missing file and retain the read-only marker bytes. None of these calls throws. Each is followed by a valid save on the same document.",
+    "extensions": "An unsupported suffix, no suffix and uppercase .SVG each return 1, with no callbacks or output, in this direct entry-point sample. This is exact native filename dispatch, not evidence that a GUI format picker admits an uppercase format.",
+    "document": "Observed PRNG, dimensions, settings bits, exposed palette bits, cache keys and geometry container counts stay unchanged through these sequences. Progress and cancellation reset before each attempt; a returned result remains separate from actual file existence and readability.",
+    "completedComparison": "22 readable completed byte snapshots at actual return match the independently computed exporters. Six baseline exports, ten readable same-target retries and six valid saves after failures are included. Unreadable EMF retries and success returns without output are excluded from completed-byte claims.",
+    "workerHandler": "Original x86 EH metadata identifies a std::bad_alloc catch at 0x436d00, beyond Ghidra's reported 0x436cff body end. It stores worker result 3. CancelTaskException has distinct catchable types and does not match that handler. This is static evidence, not a successful worker replay or cancellation-result observation. The original worker admission check is preserved.",
+    "knownIndependentGap": "The canonical buffered text file owner now implements the captured DXF open-failure distinction. EMF sharing/ownership and native controller cleanup remain incomplete; direct method success is still distinct from actual file creation."
+  },
+  "fileResourceLifetime": {
+    "checkpoint": "../evidence/export-resources-verification-checkpoint.json",
+    "corpus": "../test/fixtures/export-stream-buffer-reference.ndjson.gz",
+    "status": "Original file handles and initialized CRT buffers are recovered. Captured text and EMF file-owner behavior is implemented, including Windows share modes (see emfFileAccess).",
+    "scope": "The same 30 complete/first-cancel/retry/last-cancel/retry calls across six formats, stacked layout, thin stroke and the declared 64x64 grid. Three separately preserved observers each ran two fresh processes. These are measurement controls over one source image, not 90 distinct inputs.",
+    "processCounts": "Absolute process handle counts vary with the environment. The first recorder's assertion that absolute counts must repeat failed and remains rejected evidence. Each admitted comparison preserves raw counts and compares growth from that process's own initial count.",
+    "ownership": "Successful saves have zero net handle growth. Each cancelled save adds exactly one retained handle in these sequences. Read-only current-process snapshots identify that added handle as a disk-file handle whose path equals the cancelled output. The file-reading observer introduces no retained handle. The added handles remain through the final observation before observer process exit.",
+    "crt": "For each cancelled text-format save, an active original CRT FILE entry matches the retained OS handle. Its buffer capacity is 4096 bytes. Only its initialized pending range is read, bounded by that capacity. Cancelled EMF files do not appear in the examined builtin CRT FILE entries; their added disk-file handles are still identified separately.",
+    "pendingBytes": "First/last cancellation pending raw byte counts are SVG 101/227, PDF 0/0, EPS 0/0, AI 1410/2 and DXF 115/0. For the nonempty text buffers, LF-to-CRLF translation explains the entire difference between the file readable at unwind and its bytes after process exit. First AI cancellation therefore retains 1456 physical bytes in a 1410-byte raw buffer; first DXF retains 135 physical bytes in 115 raw bytes.",
+    "verifiedLayout": "The original CRT's initialization maps twenty builtin FILE entries at stride 32, and its own _fileno reads the descriptor at offset 16. The observer restricts reads to active entries matching identified added file handles. No allocated-but-uninitialized buffer bytes are read.",
+    "limits": "This establishes observed resource retention and pending bytes through the stated final observation. It does not establish document-destruction cleanup, GUI task completion, arbitrary-sized path buffering, write-error behavior or the complete native flush schedule. Those remain required before file-owner parity is claimed."
+  },
+  "textSerialization": {
+    "status": "Implemented: one LF serializer with explicit flush markers per text format, shared by the existing in-memory export function and the buffered Node file writer. Completed bytes and 188 interrupted text outputs remain exact.",
+    "checkpoint": "../evidence/export-serialization-verification-checkpoint.json",
+    "api": "serializeSvg, serializePdf, serializeEps, serializeAi and serializeDxf accept existing options and synchronous write(text, flush=false). Text uses native LF line endings and single-byte Latin-1 characters. A true flush flag drains the file buffer after that chunk. Existing export functions collect this same serialization and translate LF to CRLF, retaining their return types.",
+    "ordering": "Emit initialized headers before traversal progress. Flush at native stream boundaries, retain pending bytes and the actual descriptor on traversal exceptions, and propagate the exception without a footer. PDF offsets count physical Latin-1 bytes after LF-to-CRLF translation.",
+    "verification": "Use independently computed geometry for all text-format cases in the native interruption corpus. Compare completed output and bytes emitted before each native cancellation point with the observed files after process exit. Verify exception identity and unchanged source geometry.",
+    "limits": "A serializer emission alone is not a physical file write. The file owner applies buffering and translation. Native GUI export cancellation, EMF and arbitrary-sized path buffering remain outside the verified text scope."
+  },
+  "implementationRequirements": [
+    "Use one canonical serializer for in-memory SDK output and file export. Preserve completed bytes.",
+    "Model real write and close/finalization order before exposing cancellation. Buffering the whole output and leaving an empty file on a serializer exception does not satisfy the reference.",
+    "Keep observations at unwind separate from files read after process exit. Do not manufacture a successful close or finalize an interrupted EMF header.",
+    "Recover native task/controller cleanup and save-error result publication before claiming GUI cancellation or file-lifetime parity.",
+    "Place eventual file/cancellation/retry assertions in the existing integration suites. Do not add a second exporter algorithm or normalize reference mismatches away."
+  ],
+  "excludedClaims": [
+    "Other same-filename overwrite and cancellation cases beyond the declared sequences",
+    "Post-open disk errors, actual worker cancellation and native notification behavior",
+    "All-input or full application parity",
+    "GitHub/npm publication or a Rust/GPUI port"
+  ],
+  "bufferedTextFiles": {
+    "status": "Implemented; integration comparisons cover 558 save attempts: 470 text corpus cases, 25 resource cases, 15 long-path rollover cases, 25 same-target steps and 23 file-error/unsupported-suffix steps. Actual Windows handle growth and file bytes before and after process exit are checked.",
+    "api": "Internal writeVectorFile(filename,input) dispatches exact lowercase suffixes (svg, pdf, eps, ai, dxf, emf) to the canonical serializer and returns {status,error}; it does not change exclusive-output CLI protections.",
+    "buffer": "4096 raw single-byte characters. Translate LF to CRLF when writing physical bytes, not when filling the raw buffer.",
+    "lifetime": "Successful traversal flushes and closes. A serializer/progress exception retains the descriptor and pending buffer until process exit; each retained stream flushes at its existing file position, including after a later same-target retry.",
+    "openFailures": "SVG/PDF/EPS/AI return 4 before traversal. DXF and EMF still traverse with discarded writes and return 0 despite the open failure. Unsupported, missing and uppercase suffixes return 1 without traversal.",
+    "limits": "Captured direct-method text bytes, retained-handle growth and Win32 share modes are covered. Native GUI cleanup, post-open disk errors and general all-input behavior remain unverified.",
+    "verification": "test/vector-output.test.mjs owns real child-process file lifecycle assertions. Geometry is computed from declared pixels and controls. Captured interval-validated EPS clock text is supplied as environment input. No current or expected bytes are normalized. test/batch-runner.test.mjs retains native batch output/result comparisons.",
+    "largePaths": "Two fresh original processes repeat 15 calls on an explicit 128x176 comb image with 14 fitted regions. Its third/fourth SVG paths are 6664/6506 bytes long. Cancellation after four regions exposes an incomplete fourth path after raw 4096-byte rollover. Independent geometry and actual file bytes match at unwind and process exit for all five text formats."
+  },
+  "emfFileAccess": {
+    "status": "Implemented: Windows saves open through src/native/file-win32-x64.node with CREATE_ALWAYS and FILE_GENERIC_WRITE|FILE_READ_ATTRIBUTES. Text files share read/write, EMF files share nothing. All 348 probes after 87 saves match the native captures.",
+    "helperProof": "../evidence/native-export-file-access-build-verification.json",
+    "scope": "87 calls across distinct-filename, same-target and file-error groups, each repeated in a fresh original process. Six formats and the declared 64x64 grid.",
+    "sharing": "After cancelled EMF saves, OPEN_EXISTING with share read/write/delete and desired generic read, generic write or delete fails with error 32. FILE_READ_ATTRIBUTES succeeds. Original retained handles have access mask 0x120196.",
+    "sizes": "Attribute queries and retained-handle GetFileSizeEx report 0 bytes after first cancellation and 16376 after late thin-stroke cancellation. Same-target retry returns 0 but retains the same handle and size. These equal after-exit lengths; content at unwind remains unreadable.",
+    "observer": "The observer opens existing owned evidence files, queries size and closes only its own new handles. It never reads/writes/truncates/deletes data, changes file offsets, closes original handles or flushes original buffers.",
+    "corpus": "../test/fixtures/export-file-access-reference.ndjson.gz, derived by ../evidence/build-export-file-access-reference.py, which drops only per-process handle values and refuses to write if the two fresh native repeats differ otherwise.",
+    "textContrast": "Cancelled text saves allow generic read and generic write opens but deny delete access with error 32. The earlier Node fs writer allowed all four probes (../evidence/export-independent-file-access-verification.json, kept as the counterexample that motivated the native module).",
+    "independentProbe": "../evidence/export-independent-file-access-verification.json",
+    "implementation": "Node fs cannot set Windows share modes, so a CRT-free Node-API module owns Win32 handles: open(path,share), write(handle,bytes,position) and close(handle). Position -1 continues at the handle's own file pointer (text); EMF passes explicit offsets. Buffering and serialization stay in src/vector-file.mjs and the format serializers. Other platforms use plain fs descriptors. Built on Linux with mingw-w64 by ../tools/build-file-win32.py; proof in ../evidence/file-win32-build-verification.json. Only win32-x64 is built.",
+    "verification": "test/vector-output.test.mjs: a child process saves each captured request and runs ../evidence/query-export-file-access.ps1 from a separate PowerShell process right after each save, comparing desired access, success, Win32 error and size. The ownership test now includes all 190 EMF interruption saves, EMF resource, same-target and file-error steps, and Windows handle growth.",
+    "limits": "Retained-handle access masks are not re-read from the independent process; handle growth and probe results are. Windows ARM64 has no module yet. EMF write failures after a successful open return 4 by analogy with text files; the original behavior there is unmeasured."
+  },
+  "emfSerialization": {
+    "status": "Implemented: one positioned, buffered serializer also supplies the existing in-memory exporter. All 190 EMF interruption-corpus outputs match, including 108 complete and 82 cancelled outputs.",
+    "api": "serializeEmf(input,write) uses synchronous write(bytes,position). Position is an explicit physical byte offset. Only successful traversal emits the final header rewrite at offset 0. Existing exportEmf collects these same writes and retains Uint8Array output.",
+    "bufferHypothesis": "The implemented 16384-byte whole-record buffer matches every captured EMF interruption output across both declared grid sizes, layouts and stroke settings. This is observable conformance for that corpus, not a direct measurement of the native GDI allocation or all-input proof.",
+    "fileOwnershipLimit": "Superseded: writeVectorFile owns EMF files with the native share mode. Interrupted EMF handles are retained without further writes until process exit, matching the unchanged after-exit sizes.",
+    "verification": "test/emf.test.mjs computes geometry from declared pixels/settings, runs document cancellation at the captured raw checkpoint ordinal, and compares complete positioned-write output against original post-exit files. Success rewrites the header exactly once; cancellation does not. Existing complete-file/device tests retain their expected bytes."
+  }
+}

@@ -1,0 +1,227 @@
+{
+  "component": "Saved advanced settings profiles",
+  "status": "Shared profile API/CLI, single/batch ownership, worker persistence, bounded replay/navigation/reset rename/delete and explicit profile conversion implemented. Native list primitives and static branch composition cover profile management; full native dialog interaction remains unverified.",
+  "targetSha256": "c491656b962debc215a8b6e757a9b2949ffe50a36b5f2db692706bcd4ebface1",
+  "ownership": "Profiles belong to OpenVector and do not read or modify Vector Magic's settings. The shared component accepts an explicit storage filename; native captures use only the private clean Qt application namespace.",
+  "native": {
+    "save": "0x42da50",
+    "select": "0x42c6b0",
+    "moveToFront": "0x42bb90",
+    "persist": "0x42aac0 calls 0x441210",
+    "batchAdvancedCopy": "0x444400",
+    "rename": "0x42b620 static full handler; original post-dialog list primitives captured separately with prepared confirmation decisions.",
+    "delete": "0x42b960 static full handler; original post-dialog list primitives captured separately with prepared confirmation decisions.",
+    "saveWidgetConnections": "0x41be50 and 0x424140 connect the one-argument QString signal to the one-argument model slot. Static REA evidence only; see ../evidence/profile-service-native-ui-findings.json."
+  },
+  "records": {
+    "name": "Exact QString contents: preserve case, whitespace, Unicode and normalization distinctions. The storage component accepts an empty name as the direct native save slot does; this does not prove that the original naming dialog accepts it.",
+    "profile": "A document settings snapshot plus colorCount (native advanced count), basicColorCount, paletteColorCount and recommendedBackgroundMode. Preserve these distinct bookkeeping values.",
+    "capacity": 200,
+    "save": "Clone the supplied profile and prepend a new name. Overwriting an existing exact name replaces its profile and moves it to the front. Drop the last entry if capacity is exceeded.",
+    "defaultName": "Default Advanced Settings",
+    "defaultProfile": "Raw document-constructor scalar defaults, advanced true, colorCount 2, basicColorCount 0, paletteColorCount 2 and recommendedBackgroundMode -1. Background is transparent black and the palette is empty.",
+    "reservedSave": "Saving the exact default name uses the built-in default profile, ignoring the supplied settings. Case variants are ordinary names.",
+    "select": "Return the selected owned profile and its previous list index, moving it to the front. A missing name returns index -1 and leaves the list unchanged.",
+    "startup": "Restore saved entries in order, then insert or replace the built-in default entry at the front. It occupies one of the 200 slots, including when it was evicted before restart."
+  },
+  "application": {
+    "single": "Copy the stored profile into the document before forcing the separately selected GUI settings into advanced mode. Keep geometry, pixels, parameter table, random state and cache keys intact. A missing name changes no state. The document committed advanced flag can differ from the selected flag.",
+    "batch": "Copy advanced count, sensitivity, anti-alias, segmentation controls, smoothing controls, palette colors, palette count and palette mode; force requested batch advanced true. Force the selected single-image advanced flag true too, without committing that image document. Preserve the batch category, quality, basic count and transparency controls.",
+    "sideEffects": "Selecting settings alone does not run vectorization. Native fast-forward and play commands add processing behavior and remain separate controller requirements.",
+    "guiOwner": {
+      "startup": "One complete selected profile owns settings, advanced color count, basic color count, palette color count and recommended background mode. Clean startup uses opaque black, advanced count 2, basic count 0, palette count 0 and recommendation 0. An empty retained document commits these startup controls before any selection or image load.",
+      "configuration": "Changing selected controls alone does not commit document settings or process the image. Profile selection commits the stored settings and advanced count before forcing the separately selected advanced flag true, including when no source has been loaded.",
+      "firstLoad": "Preserve every selected profile control and counter. Loading the source does not recommit later selected edits or overwrite an earlier profile commit.",
+      "retainedLoad": "Commit current selected processing controls and requested count after source validation succeeds, then clear committed palette colors. Clear selected palette colors and reset palette count to 2, background mode to -1, background to transparent white and recommendation to -1. Clear customization but retain its runtime revert copy. Invalid uploads preserve the existing document.",
+      "automatic": "Adopt settings and the explicit paletteCount/recommendedBackgroundMode returned by the shared automatic controller. Keep palette count separate from the mutable palette length.",
+      "inspection": "GuiEngine.selectedProfile() and snapshot() return owned profile/document snapshots, with the committed advanced count exposed separately. configureProfile(patch) validates selected changes before mutation; applyProfile(profile) validates and commits the stored settings without running processing or discarding the retained scene.",
+      "nativeEvidence": "Eight cold/retained source-lifecycle cases plus four preceding selection workflows drive the real GuiEngine. Twenty complete documents and 2,000 typed parameter records match, alongside every available full selected-profile frame. See ../evidence/profile-lifecycle-native-audit.json and ../test/fixtures/profile-lifecycle-reference.ndjson.gz.",
+      "remaining": "Reset during editing/background work, batch-reset interactions, later guided replay and full native dialog interaction remain unfinished.",
+      "paletteRuntime": "Stored profile selection preserves the current revert copy and customization flag. Saving records paletteColorCount separately from current palette length. Eight paired workflows verify full selected/runtime state and eight complete documents with 800 typed parameter records."
+    },
+    "nativeDocumentEvidence": {
+      "audit": "../evidence/profile-document-native-audit.json",
+      "cases": 4,
+      "nativeProcesses": 8,
+      "completeDocuments": 10,
+      "typedParameterRecords": 1000,
+      "scope": "Retained single/default selection, batch selection and a subsequent source reload. No native dialogs or input synthesis."
+    },
+    "batchExecution": {
+      "contract": "batch-contract.json",
+      "nativeAudit": "../evidence/batch-profiles-native-audit.json",
+      "cases": 9,
+      "nativeProcesses": 18,
+      "completeDocuments": 17,
+      "typedParameterRecords": 1700,
+      "scope": "Actual saved-profile loading and filesystem conversion, including supplied palettes, fixed/flexible modes, failed loads, retained requested colors and first/second load cancellation. GUI Play, Fast Forward, Save and batch Use are implemented; full native dialog interaction remains unverified."
+    }
+  },
+  "persistence": {
+    "format": "One OpenVector-owned JSON document containing profiles in current order. Each entry has a name and profile. No Qt registry import, old-format adapter or migration path.",
+    "palette": "Palette colors remain in memory when saved and selected. The original persists their count without their color values. Write and restore an empty palette while retaining paletteColorCount.",
+    "background": "Native QColor stores 16-bit channels. Persistence takes the high eight bits of each RGB channel; reload forces alpha to one. OpenVector's JSON stores those next-startup channel values, avoiding an unnecessary copy of the native registry representation.",
+    "write": "Write an owned temporary file and rename it over the selected settings file. A failed write stays visible and does not intentionally discard the previous file.",
+    "read": "An absent file creates fresh defaults. Malformed JSON or invalid profile data fails visibly. Restoration reinserts the built-in default profile."
+  },
+  "guiService": {
+    "scope": "Historical JavaScript HTTP/browser reference. The current desktop implementation is described in gpui below.",
+    "status": "The current frozen GUI passes 297/297 tests; installed direct tests pass 264/264, six fresh HTTP worker checks and 19 installed CLI checks pass. The background checkpoint corrects visibility/history lifetime across source replacement and Reset.",
+    "storage": "The local GUI uses ~/.openvector/profiles.json across working directories. startGui accepts an explicit absolute profileFilename for isolated installations and tests. Listing or startup never creates the directory/file. Save and successful selection persist the current order; a failed write remains visible and preserves any prior file.",
+    "commands": "GET /api/profiles lists exact names. POST save snapshots selected single-image settings; replacing an exact existing name requires force:true. POST select applies the existing native copy order to the active single-image or batch owner without processing. POST play or fast-forward requires a loaded image in single-image mode, selects the profile and returns its replay outcome. Play returns the next wizard page for the browser timer owner; Fast Forward executes the shared pipeline. All successful mutations persist current order. POST rename accepts an exact newName and force for collisions. POST delete removes the named profile. Management replies carry names and previous indices without replacing image/batch state; rename no-ops do not write.",
+    "ownership": "One worker-owned SavedAdvancedProfiles instance serves both workspaces. The browser cannot submit replacement settings or choose a storage path. Mutations use the host's existing serialization and are rejected during batch processing.",
+    "errors": "Malformed storage fails startup visibly. Missing names, invalid commands and replacement conflicts do not mutate the list/document/file. If persistence fails after a valid mutation, current session state remains visible; no automatic rollback or old-format recovery path is introduced.",
+    "resetLists": "SavedAdvancedProfiles.reset() and the host reset command recreate the built-in saved list without applying a profile or changing the loaded document. The host rejects active/running batches and persists through its existing atomic writer. See factory-reset-contract.json for this historical model scope and application-reset-contract.json for the separate full-window Reset evidence.",
+    "verificationCheckpoint": "../evidence/profile-background-verification-checkpoint.json"
+  },
+  "gpui": {
+    "status": "Implemented. All 59 GUI/controller/worker checks pass. Actual profile/disclosure workflows pass 35 checks on frozen binary 30185c4f1a36fe8558de0e798225071f85c2e83446fcda0bb4123e3287bb045f; see ../evidence/gpui-profile-controls-live-20261021/verification.json. Recent Basic workflows separately pass 23 evidence checks at ../evidence/gpui-recent-basic-live-20261021/analysis.json. These are GPUI observations, not fresh original dialog/reset captures.",
+    "controls": "Mode has independent Recent Basic Settings and Saved Advanced Settings disclosures. Advanced Export has Save Settings. Batch has the same save row plus Use, Rename and Delete. There is no separate profiles dialog.",
+    "naming": "One name field is shared across these pages. Suggest the first unused exact-case Settings N from N=1 at startup, full model reset, Start Over from Load and successful replacement of an existing source. Successful Save clears it. Empty Save does nothing; whitespace is preserved. A declined overwrite keeps the draft and stored bytes.",
+    "rename": "A separate Change Settings Label prompt starts with the exact existing name. Collision and deletion confirmations default to Cancel. Rename does not consume the save-name draft.",
+    "replay": "Play and advanced Fast Forward retain their separate routing. Basic replay with an unrecognized palette mode applies controls, remains on Mode and emits no error. Advanced Fast Forward retains its explicit non-processing error.",
+    "evidence": "profile-reset-reference rows cover startup, save, Start Over and reload name behavior. Static handlers 0x41cb10, 0x41c130, 0x430ed0/0x4312cc and 0x42b620 establish save, suggestion, full reset and rename rules. ../evidence/recent-basic-integration-20261021/gui-tests.txt contains passing real-worker and controller checks.",
+    "limits": "A cancelled or failed replacement retains the old document and name in GPUI; no native outcome capture settles that case. Batch-mode load naming and native reset callers 0x431c69/0x43526b remain unmapped. GPUI preserves the name after a failed immediate store write; the original writes on clean exit. Live cancellation during recent replay remains to be exercised."
+  },
+  "verification": {
+    "method": "Two fresh runs per case, with separate process restarts inside persistence cases. Compare complete binary responses, all captured profile fields, palettes and private settings values.",
+    "guards": "Hash all 43 original installation files and the full original settings tree before/after; preserve the input desktop; remove only the owned private namespace. No original instructions or license checks are patched.",
+    "ui": "OpenVector rename/delete dialogs pass 13 installed-browser checks, including exact labels, collision/delete confirmation, cancellation, draft retention and focus restoration. Native dialogs, their focus/default buttons and full widget conformance remain unverified.",
+    "fullApplicationParity": false,
+    "checkpoint": "../evidence/batch-profiles-verification-checkpoint.json",
+    "nativeAudit": "../evidence/saved-profiles-native-audit.json",
+    "libraryCheckpoint": "../evidence/saved-profiles-verification-checkpoint.json",
+    "cliCheckpoint": "../evidence/profile-cli-verification-checkpoint.json",
+    "ownerCheckpoint": "../evidence/profile-owner-verification-checkpoint.json",
+    "paletteRuntimeCheckpoint": "../evidence/profile-palettes-verification-checkpoint.json",
+    "serviceCheckpoint": "../evidence/profile-service-verification-checkpoint.json",
+    "managementCheckpoint": "../evidence/profile-management-verification-checkpoint.json",
+    "conversionCheckpoint": "../evidence/profile-conversion-verification-checkpoint.json",
+    "guidedCheckpoint": "../evidence/profile-guided-verification-checkpoint.json",
+    "pendingUpdateConfirmationCheckpoint": "../evidence/profile-modal-verification-checkpoint.json"
+  },
+  "api": {
+    "scope": "Historical JavaScript reference API, not an installed npm subpath. Current Rust-backed npm exports come from openvector; see README.md and npm/index.d.mts.",
+    "module": "openvector/profiles",
+    "exports": [
+      "SavedAdvancedProfiles",
+      "defaultAdvancedProfile",
+      "defaultAdvancedProfileName",
+      "applyAdvancedProfile",
+      "runAdvancedProfile"
+    ],
+    "methods": "put(name, profile), select(name), rename(name,newName,{force:false}), remove(name), snapshot(), size, writeFile(filename), static readFile(filename); runAdvancedProfile(document,profile,{paletteRuntime,onStage})",
+    "writes": "The parent directory must exist. Serialize concurrent commands/writes in the application owner."
+  },
+  "cli": {
+    "syntax": [
+      "openvector profiles list --file profiles.json",
+      "openvector profiles show --file profiles.json --name NAME",
+      "openvector profiles save --file profiles.json --name NAME --input profile.json|- [--force]",
+      "openvector profiles select --file profiles.json --name NAME",
+      "openvector profiles rename --file profiles.json --name OLD --new-name NEW [--force]",
+      "openvector profiles delete --file profiles.json --name NAME"
+    ],
+    "output": "JSON only on stdout. list returns owned entries; show returns one profile; save returns the saved name/profile entry; select returns its previous index and profile. Float32 channels serialize as JSON arrays.",
+    "input": "Explicit file required; no default path, environment lookup or prompt. Save accepts the full profile API record from a JSON file or stdin (-). Names preserve exact strings, including an explicitly supplied empty string.",
+    "reads": "list/show do not create or write a file. Every invocation is a fresh application startup, so the built-in entry moves to the front on read.",
+    "writes": "save writes only after full validation. Replacing an existing exact name requires --force. select moves a found name to the front and writes the list. A missing name fails without writing. Parent directory must exist. Rename preserves source settings/position and requires --force for a collision. Empty or unchanged new labels do not write. Delete explicitly confirms noninteractive removal. Both reject missing sources without writing.",
+    "errors": "Exit 0 on success/help, 1 for invalid arguments, missing names, malformed data or filesystem errors. Diagnostics on stderr, no stack trace, no partial JSON on failure.",
+    "help": "profiles --help, profiles SUBCOMMAND --help and help profiles show command help before reading any settings file.",
+    "limits": "The profiles management subcommands do not convert images. Explicit saved-profile conversion flags belong to vectorize and batch; see conversionCli.",
+    "status": "Implemented and verified with real processes, stdin, file input, exact names, overwrite protection, JSON output and error/file preservation checks."
+  },
+  "replayObservation": {
+    "status": "Fifteen paired native workflows captured, including thirteen with visible widget layout. Engine, service and browser entry replay are implemented and verified for that bounded scope.",
+    "scope": "A separate opt-in helper invokes original Play/Fast Forward slots only with an already loaded image and outside batch mode. Every modal aborts before any answer. It observes joined real workers and typed parameters without changing original instructions or state objects.",
+    "staticBehavior": "Fast Forward selects the profile and derives bounds from palette mode and paletteColorCount. Play sets continuing and dispatches wizard advancement. Captured Play, source reload and full reset now match continuing; later replay navigation remains incomplete.",
+    "nativeAudit": "../evidence/profile-replay-window-native-audit.json",
+    "verifiedBehavior": "Fast Forward uses palette mode 0 as exactly two colors; fixed mode 1 uses paletteColorCount, or the automatic 2..12 range when it is zero; flexible mode 2 skips palette generation. Completed palette selection updates requested count and palette metadata before segmentation/smoothing/fitting. Mode 3 selects the profile without processing. Play opens Transparency for source alpha regardless of stored flattening, otherwise Palette Selection, normalizing mode 0 to 1 on palette-page entry. The existing page timer generates the requested advanced count only when its native entry predicate schedules it. Play with existing colors does not recalculate them.",
+    "staticSave": "REA observes nonempty exact-string validation, overwrite Yes/No flags 0x14000 and clear-after-success in 0x41cb10. Native 0x41c130 chooses the first unused Settings N name on mainModelReset; the browser now shares its pure format and reset-driven lifetime.",
+    "checkpoint": "../evidence/profile-replay-verification-checkpoint.json",
+    "navigation": {
+      "contract": "Entering advanced Palette Selection changes mode 0 to fixed mode 1 before scheduling or processing. Transparency entry itself retains mode 0. The following page uses the selected requested count for palette work; completed segmentation regions can exist without extracted contour nodes.",
+      "scope": "Three new serial paired native workflows: alpha flattened to white, alpha preserved, and opaque Palette-to-Segmentation navigation. Four complete documents and 400 typed parameter records. Two intentionally excluded concurrent captures are retained separately.",
+      "nativeAudit": "../evidence/profile-navigation-native-audit.json",
+      "implementationSeam": "wizardPageSettings in gui/auto-update.mjs is the canonical pure selected-control transition for page entry, shared by browser navigation and service replay. AutoUpdate remains the sole timer owner.",
+      "status": "Implemented and verified: three serial paired workflows, full native selected/runtime state and four complete documents; the frozen GUI build passes 255 tests and the browser reaches completed segmentation.",
+      "checkpoint": "../evidence/profile-navigation-verification-checkpoint.json"
+    },
+    "resetObservation": {
+      "status": "Implemented and verified for five serial paired native workflows: selected/runtime state, continuing, name and fifteen complete documents match. The final GUI passes 261 tests; post-simplification browser checks pass.",
+      "nativeAudit": "../evidence/profile-reset-native-audit.json",
+      "scope": "Five serial paired workflows, fifteen complete documents, 1,500 typed document parameters and fifteen joined tasks, including custom processing controls, retained palette backup and a source reload after Play.",
+      "verifiedBehavior": "Start Over outside Load moves to Load while retaining the source and continuing flag. Leaving either palette page commits its selected settings; leaving Export does not. Full reset clears source, continuing and selected colors, sets palette metadata 2 and transparency mode -1/transparent white, retains processing controls/count and the palette revert backup, and clears customization. Constructor parameters and candidates reset while the application random stream persists. Successful source reload clears continuing. Native Settings N suggestions skip exact occupied names on model reset, including successful source load and full reset; ordinary navigation and direct model saves alone preserve the field.",
+      "implementationSeam": "GuiEngine.leavePalette commits selected controls/count when the browser leaves either palette page. GuiEngine.reset creates a blank document from retained processing controls and uses the shared source-palette transition before clearing selected transparency metadata. One App-level name draft survives pages/workspaces; suggestProfileName is the shared pure reset-driven formatter.",
+      "remaining": "Reset during editing/background work, altered batch settings during full reset, broader invalid-load/modal paths and full replay lifecycle conformance remain unfinished.",
+      "staticEvidence": "REA 0x432560 dispatches Start Over by current page. REA 0x4318c0 copies settings through 0x46d8f0/0x46d840 when leaving page 11 or 12. REA 0x430ed0 establishes full reset ordering and clears the native continuing byte.",
+      "checkpoint": "../evidence/profile-navigation-verification-checkpoint.json"
+    }
+  },
+  "guiControls": {
+    "status": "Visible controls verified in an isolated browser against the real host and worker; full native widget parity remains unfinished.",
+    "names": "One browser list mirrors the worker-owned exact names across single-image and batch workspaces. Empty stored names remain selectable.",
+    "single": "Wizard Mode offers Play and Fast Forward per saved name. Play follows the returned page and existing Auto-Update timer. Fast Forward shows the resulting vector and export controls. Auto-detect mode preserves the current page when no processing occurs.",
+    "save": "Advanced export offers a name field and Save. Disable only for the empty string; preserve whitespace. Queue the operation after pending selection changes. An exact-name replacement requires confirmation before force:true. Successful Save clears the field; cancelling replacement preserves the field and exact storage bytes.",
+    "batch": "Batch settings offers Use per profile. Apply through the shared service and accept the host-owned batch revision and projection.",
+    "remaining": "Reset while editing/background work, later guided replay and native modal focus/default-button conformance remain unfinished. OpenVector management and replacement confirmations focus Cancel.",
+    "verification": "../evidence/profile-replay-browser-verification.json",
+    "nameDraft": "One App-owned draft survives wizard and workspace changes. Save clears it only on success. A successful image load or full reset recalculates the first unused Settings N suggestion; ordinary page changes preserve it.",
+    "managementVerification": "../evidence/profile-management-final-browser-verification.json"
+  },
+  "management": {
+    "status": "Implemented and verified against six paired native primitive recordings, focused library/CLI/service tests, a frozen GUI build, fresh installed package and 13 browser checks. Full native dialog interaction remains unverified.",
+    "rename": "Find the exact source name first. Missing, empty new name and unchanged name do not mutate. An accepted distinct label changes only the source name at its existing position. On an exact collision, confirmation is required; rename the source and remove the destination name and settings at their previous index. Keep the source profile, including when the new label is Default Advanced Settings. Do not select, save, reorder or process the image.",
+    "delete": "Find the exact source, require confirmation, then remove its name and profile together. Missing or cancelled operations change nothing. Removing the built-in entry is allowed in-session; startup reconstructs it.",
+    "labels": "Preserve exact case, whitespace, Unicode and normalization. Empty existing names can be renamed or deleted. An empty new label is an accepted no-op.",
+    "api": "rename(name,newName,{force:false}) returns the previous source index, changed and previous replacedIndex (-1 when absent). A collision without force throws before mutation. remove(name) returns the previous index, or -1 when absent.",
+    "cli": "rename --name OLD --new-name NEW [--force]; delete --name NAME. Both require --file. Missing sources fail without writing; rename no-ops do not write. delete is the explicit noninteractive confirmation. Results are JSON.",
+    "guiService": "POST profiles rename uses newName and force; delete removes an explicitly confirmed name. Return current names and mutation metadata, without replacing selected/document/batch state. Persist successful changes only. Reject mutations during batch work.",
+    "gui": "Advanced Export rows expose rename/delete. Rename starts with the exact existing label and asks before replacing a collision; delete asks before removal. Cancel, empty and unchanged labels do not dispatch mutations. Preserve the shared settings-name draft. Native widget row modes separate these controls from Play/Fast Forward; the source contains no built-in-label guard.",
+    "nativeEvidence": [
+      "../evidence/profile-management-002-delete.json",
+      "../evidence/profile-management-003-rename.json",
+      "../evidence/profile-management-004-remove-string.json",
+      "../evidence/profile-management-005-remove-settings.json",
+      "../evidence/profile-management-006-get-name.json",
+      "../evidence/profile-management-009-row-constructor.json"
+    ],
+    "referenceScope": "Static full handlers establish branching. Any prepared confirmation corpus composes original list primitives in that observed order; it does not exercise QInputDialog, QMessageBox, native focus/default buttons or user input.",
+    "nativeAudit": "../evidence/profile-management-native-audit.json",
+    "fixture": "../test/fixtures/profile-management-reference.ndjson.gz",
+    "keyboard": "OpenVector selects the existing rename label, focuses Cancel in destructive/overwrite confirmations, restores the opening row control on cancel, and focuses the stable list heading after a committed mutation. These modernized keyboard choices are verified in OpenVector only."
+  },
+  "conversionCli": {
+    "status": "Implemented and verified: four native single-image output comparisons, four paired cold batch cases (eight original processes), complete native cold/cache-hit document state, 176 source CLI tests, 19 installed CLI tests and installed GUI replay checks. Full application parity remains unfinished.",
+    "arguments": "vectorize and batch accept --profile NAME with --profiles-file PATH. Both must be supplied together; preserve exact labels, including empty existing names. The storage path cannot be stdin. No implicit home/environment file.",
+    "single": "Load/validate the image, commit stored controls before forcing the selected advanced flag, then use the same advanced replay operation as GUI Fast Forward. Palette mode 0 searches exactly two; mode 1 uses paletteColorCount or 2..12 for zero; mode 2 skips generation; mode 3 selects without processing and a fresh CLI document has no vector to export. Never run automatic classification first.",
+    "batch": "Read --settings first as the base requested batch controls. Apply saved advanced controls and count with the canonical native batch profile projection. Preserve batch category, quality, basic count and transparency; force advanced mode. Pass the resulting controls through the existing worker/BatchRunner path.",
+    "storage": "Finding a missing label or rejecting arguments does not write. A successful profile selection moves it to the front and persists, as native selection does. Single-image input decoding precedes that persistent selection. No profile values are edited by conversion.",
+    "api": "runAdvancedProfile(document,profile,{paletteRuntime,onStage}) returns an owned selected profile/runtime, a final snapshot separate from observer snapshots, paletteRequested and per-stage didWork flags, or null for mode 3. Optional onStage(stage,completed) reports owned snapshots after each completed task. The owner commits initial stored settings and persists MRU selection. GUI adoption preserves completed-stage changes if later processing fails.",
+    "verification": "Final frozen GUI 269/269, installed direct tests 236/236, separate HTTP workers 6/6, installed CLI tests 19/19, source CLI suite 176/176 and four installed-browser checks. Main-process capabilities are tested directly; no worker permission inheritance claim.",
+    "editPlans": "The saved profile selects initial conversion. Existing --edits commands keep their declared behavior, including automatic processing after source replacement; no second profile-specific edit interpreter is introduced.",
+    "checkpoint": "../evidence/profile-conversion-verification-checkpoint.json",
+    "batchNativeAudit": "../evidence/profile-conversion-batch-native-audit.json",
+    "batchFixture": "../test/fixtures/profile-conversion-batch-reference.ndjson.gz"
+  },
+  "guidedObservation": {
+    "status": "Seventeen UI workflows plus one separate unavailable-model-call observation recorded in 36 original processes. The engine/service harness passes 135 full document comparisons. The new backward browser flow passes eight UI checks and seven native state projections; earlier forward browser evidence remains retained.",
+    "scope": "Seventeen UI workflows plus one explicitly unavailable direct model call. Play is exposed on Wizard Mode. The native Play slot sets continuing and delegates to current-page Next; calling it on Export leaves Export unchanged. That negative direct-call recording does not define the broader OpenVector service action outside its visible GUI control context.",
+    "pages": "Advanced forward progression is Palette 12, Segmentation 13, Edit Segmentation 14, Smoothing 16, Remove Background 15, Export 17. Source alpha first adds Transparency 6; white selection precedes Palette.",
+    "timers": "Palette, segmentation and smoothing use the existing one-shot timers. A cached palette callback can populate selected colors without launching a numerical worker. Completed geometry remains available throughout a cached replay from Wizard Mode.",
+    "reset": "Start from unmodified editing/background pages returns to Load with image retained; the next Reset closes it. Seventeen UI workflows verify selected controls, document settings/geometry/cache/parameter state, name draft and palette runtime. Editor activity, modified-pixel/history exit behavior and other reset contexts remain unverified.",
+    "nativeAudit": "../evidence/profile-guided-native-audit.json",
+    "fixture": "../test/fixtures/profile-guided-reference.ndjson.gz",
+    "sourceDispatch": [
+      "../evidence/1244-native-profile-play.c",
+      "../evidence/1083-native-fresh-next-press.json"
+    ],
+    "remaining": "Editing/background modifications, overwrite confirmations, other control combinations and broader native modal interaction.",
+    "backwardObservation": "Native Back returns Export 17 to Background 15, Smoothing 16, Editing 14, Segmentation 13, Palette 12 and Mode 4; source alpha adds Transparency 6 between Palette and Mode. Continuation stays true. Seven paired workflows verify default/fixed/flexible palettes, alpha-white, cached replay after returning to Mode, and dirty segmentation/smoothing reverts. Dirty Back first restores committed controls without leaving the page; the next Back moves to the preceding page. Pixel edits and their history remain outside this scope.",
+    "dirtyUpdate": "A changed segmentation or smoothing control makes Next update the current page first. Later presses continue to editing/background only after settings and cached document stages match. These two no-edit cases pass exact document/profile comparisons.",
+    "taskEvidenceLimit": "69 joined native task observations and their 6,900 typed parameter records are retained. Independent GUI comparisons currently verify complete document state after each task group, not every intermediate worker snapshot; do not count all task records as independent conformance checks.",
+    "checkpoint": "../evidence/profile-backward-verification-checkpoint.json",
+    "browser": "../evidence/profile-backward-browser-verification.json",
+    "browserScope": "Actual React forward initialization followed by all six Back transitions. Seven exposed state projections verify selected/committed controls, keys, palette candidates/scores, region counts and SVG. This complements the engine/service orchestration harness; it does not turn all seventeen prepared workflows into automated React end-to-end tests."
+  }
+}

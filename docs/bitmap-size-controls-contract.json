@@ -1,0 +1,134 @@
+{
+  "project": "openvector",
+  "status": "Bitmap scale producers and native slider-derived view-scale reuse are implemented with bounded verification. Remaining viewer geometry, full bitmap lifecycle and exceptional numeric behavior remain unfinished.",
+  "parent": "bitmap-gui-contract.json",
+  "targetSha256": "c491656b962debc215a8b6e757a9b2949ffe50a36b5f2db692706bcd4ebface1",
+  "numericProbeIntent": "New helper 35 constructs owned QString values from length-prefixed UTF-16. Record QString::toInt(base 10), toDouble, trailing-percent removal, percent conversion and fixed-one-decimal formatting, with success flags and raw double bits. All existing 34 reference executables stay frozen. No model setting, widget setter, synthesized input or native dialog acknowledgement is permitted. Compare repeat processes before promoting conversion results.",
+  "localeProbeIntent": "New helper 36 reads owned default, system and C QLocale names and numeric characters. It classifies all 65536 owned QChar code units through isSpace without assigning any widget or model state. Earlier 35 reference executables stay frozen. Compare repeat processes before using the locale context or whitespace inventory.",
+  "numericImplementation": "gui/numeric-text.mjs owns locale-symbol normalization, strict signed-int32 conversion, binary64 conversion, percentage suffix handling and fixed-one-decimal formatting. createNumericText receives explicit single-code-unit decimal/group/zero/positive/negative/exponent symbols once per session and returns integer, double and percent operations with value/ok results. It tries the supplied locale, then C, as the native operation does. gui/bitmap-size.mjs consumes these primitives at the worker text boundary. gui/test/numeric-text.test.mjs owns primitive conformance against the immutable native corpus; it does not substitute expected values for computation.",
+  "sizeOwnerImplementation": "gui/bitmap-size.mjs owns one shared scale, original dimensions and separate basic/advanced field presentations. Cold dimensions are 150 by 250 at scale one. Model setScale stores only; source imageChanged(true) refreshes both panes, while false retains fields. Typed commits and native small/large increment commands update the selected pane and shared scale. Other-pane field text remains retained until its refresh. Commands return settled state; corrections that repeat an axis/boundary fail explicitly without committing size state. Native behavior for those cycles remains unverified.",
+  "hostLocaleImplementation": "The Windows text boundary reads GetThreadLocale and GetLocaleInfoW for decimal point, group separator, first native digit and negative sign, matching Qt 4.4.3's system-locale source. Positive sign is fixed plus; all valid pinned locale records use exponent e. The owned host context is initialized on first text commit and retained for that GUI worker session. No original application or Qt library is read at product runtime.",
+  "gpuiHostLocaleImplementation": {
+    "status": "Integrated Linux tests and actual Spanish-locale Apply/Save-only workflows pass. Windows private-desktop Apply and Save-only both accept comma and dot percentages under es-ES. macOS locale execution remains unverified.",
+    "capture": "First bitmap text commit per process. NumericLocale::host caches symbols or the discovery error.",
+    "linux": "Private POSIX LC_NUMERIC locale from LC_ALL, LC_NUMERIC and LANG, using nl_langinfo_l. No global or thread locale mutation.",
+    "windows": "GetThreadLocale and GetLocaleInfoW preserve the retained first-QChar decimal, group, zero and negative-sign boundary.",
+    "macos": "CFLocaleCopyCurrent and CFNumberFormatter read system numeric preferences without requiring terminal locale variables.",
+    "parsing": "Try host symbols, then the existing C parser. Failed numeric parsing becomes zero at the existing bitmap boundary.",
+    "errors": "Host locale discovery failures propagate through the workflow error path, without silently substituting the C locale.",
+    "evidence": "../evidence/gpui-numeric-locale-20261021/integration.json",
+    "desktopEvidence": "../evidence/gpui-numeric-locale-after-20261021/",
+    "desktopAcceptance": "Under LC_ALL=es_ES.UTF-8, comma and dot 125 percent inputs through Apply and Save-only each persist scale 1.25 and export 150x100 PNG from the unchanged 120x80 source. Six product acceptance checks pass; setup/cleanup checks are counted separately. Windows private-desktop Apply and Save-only each change 256x192 to 320x240 for comma and dot inputs; all four PNGs are byte-identical. Each case starts from a visually verified 100-percent reset. See ../evidence/gpui-windows-complete-20261021/lane-result.json, bound to Windows binary b911b7ada83d20acbdde0017d04534a0ca70aeda303c00078bbf445c45c1cbd6. This checkpoint precedes the later scrollbar changes. Retained earlier probe failures are not counted as product passes.",
+    "presentationEvidence": "../evidence/gpui-text-presentation-trace-20261021/verification.json",
+    "presentationAcceptance": "Ten exact visible-field checks pass on the clean binary, alongside the existing numeric/output checks. Filename, Width, Height and Percent update without reopening or extra input. Tracing shows queued XTest input can be processed after an early screenshot; matching state reaches canvas paint in 3.456 to 18.305 ms in the diagnostic. No production redraw workaround was added.",
+    "presentationLimits": "Earlier stale frames remain recorded. The first matching clean captures occurred 0.673 to 2.063 seconds after passive observation began; sampling and shared-container load prevent treating those as exact presentation latency. Responsiveness and Windows/macOS presentation timing remain unverified."
+  },
+  "sizeHttpContract": "GET and successful POST /api/bitmapSize return the size owner's snapshot. POST commits use command=commit, mode basic/advanced, field width/height/percent and text. Step commands use command=step, mode, field width/height, direction -1/1 and size small/large. A loaded source is required for mutation. Existing pending-save, batch, loopback-origin and serialization guards apply. Default bitmap downloads use the shared scale; per-download scale remains a local override. Document state also projects bitmapSize. The Bitmap Export disclosure commits through these operations. The shared scale persists through the canonical bitmapSave preference owner.",
+  "evidence": {
+    "literals": "../evidence/bitmap-size-static-literals.json",
+    "constructors": "../evidence/bitmap-size-011-constructors.json",
+    "handlers": "../evidence/bitmap-size-013-handlers.json",
+    "spinnerValue": "../evidence/bitmap-size-014-spinner-value.json",
+    "spinnerTextAndButtons": "../evidence/bitmap-size-017-spinner-parser.json",
+    "bitmapMetaCallAssembly": "../evidence/bitmap-size-metacall-assembly.txt",
+    "spinnerMetaCallAssembly": "../evidence/bitmap-size-spinner-metacall-assembly.txt",
+    "roundingAssembly": "../evidence/bitmap-size-rounding-assembly.txt",
+    "displayAssembly": "../evidence/bitmap-size-percent-display-assembly.txt",
+    "constructorAssembly": "../evidence/bitmap-size-widget-constructor-assembly.txt",
+    "observedControls": "../test/fixtures/bitmap-controls-reference.ndjson.gz",
+    "numericConversions": "../test/fixtures/qt-numeric-reference.ndjson.gz",
+    "numericConversionAudit": "../evidence/qt-numeric-native-audit.json",
+    "localeContext": "../test/fixtures/qt-locale-reference.ndjson.gz",
+    "localeContextAudit": "../evidence/qt-locale-native-audit.json",
+    "sizeBackendAudit": "../evidence/bitmap-size-verification-checkpoint.json",
+    "audit": "../evidence/bitmap-size-static-analysis-checkpoint.json"
+  },
+  "owners": {
+    "bitmap": "CustomBitmapExportWidget constructor 0x421f90 owns width spinner +0x4c, height spinner +0x50 and percentage QLineEdit +0x54. Original dimensions are +0x80/+0x84; scale is a double at +0x88.",
+    "spinner": "CustomSpinner constructor 0x415720 owns QLineEdit +0x74, lower bound +0xb0, upper bound +0xb4, current integer +0xb8, large increment +0xbc, snap flag +0xc0 and small increment +0xc4.",
+    "connections": "The width and height spinners emit valueChanged(int) to updateFromWidth(int) and updateFromHeight(int). Percentage editingFinished() calls updateFromScaleEdit(). Spinner editingFinished() calls setValueFromTextEdit()."
+  },
+  "integerFields": {
+    "range": [
+      1,
+      10000
+    ],
+    "admission": "0x413a90 calls QString::toInt with null success pointer and explicit base 10. It passes the result to 0x4139d0 with notification enabled. Do not substitute parseInt prefix acceptance.",
+    "setter": "0x4139d0 clamps to the inclusive stored bounds, stores the integer, replaces the field text with QString::number(integer), and emits valueChanged when its notification argument is true.",
+    "buttons": "The bitmap constructor calls 0x412700 with snap=true and small increment 5. The constructor supplies large increment 25. Plus snaps to (trunc(current/increment)+1)*increment. Minus snaps from the upper bound: upper-(trunc((upper-current)/increment)+1)*increment. The shared setter then clamps. Button methods 0x413b10/0x413b50 use small increment; 0x413ba0/0x413be0 use large increment."
+  },
+  "percentageField": {
+    "parser": "0x41d2a0 reads the complete text. If QString::endsWith('%', case-sensitive) is true, chop exactly one trailing character. Call QString::toDouble with null success pointer and multiply the result by 0.01 before 0x41ce60. This is percentage input, including text without a percent sign.",
+    "display": "0x41af00 calls QString::number(scale*100, 'f', 1), then replaces the percentage text. The percent sign is an adjacent label, not part of the formatted field value."
+  },
+  "numericReference": {
+    "cases": 91,
+    "nativeProcesses": 6,
+    "fixtureSha256": "bf311ab7a016a7831011a532e05500216ed5fd68ee079efe3ce10d41e62dac18",
+    "helperSha256": "1e152f089ee1e856ee8ca6610a400d4f6db0a39ab002a07917750eb09a2a23c1",
+    "ownership": "Each input is an owned QString. The helper records integer/double success flags, raw double bits, percentage suffix removal and fixed-one-decimal formatting. It never assigns text to a widget or invokes a widget setter.",
+    "locale": "Pinned Qt source shows QString numeric conversion tries the default QLocale with FailOnGroupSeparators, then the C locale. Owned QLocale getters establish both default and system as es_ES for this reference session, matching the host's es-ES locale. The session accepts both 1,5 and 1.5 as 1.5, and interprets 1,000 as 1.0. This does not establish other default locales. QString::number formatting retains a decimal point.",
+    "observedFailures": "Empty strings, embedded NULs, junk suffixes, integer fractions/exponents, signed-int overflow, floating overflow, and nonzero floating underflow rounded to zero return zero with the corresponding failure flag in the captured corpus. Native UI handlers ignore that flag before applying their size normalization.",
+    "specialValues": "The corpus preserves negative-zero bits. Literal nan and inf are accepted, while +nan and Infinity are rejected. NaN, infinity and subnormal results are retained as raw little-endian binary64 bytes. Negative zero formats as 0.0.",
+    "formatting": "One-decimal native outputs include 1.25 -> 1.2 and 1.15 -> 1.1. These measurements prohibit assuming JavaScript toFixed or decimal half-up rounding is equivalent.",
+    "suffix": "A final literal percent sign is removed before conversion. 125% parses as scale 1.25; 125% followed by a space does not lose the sign and conversion fails. 1,25% parses using the session locale."
+  },
+  "localeReference": {
+    "nativeProcesses": 2,
+    "qcharCodeUnitsClassified": 65536,
+    "whitespaceCodeUnits": 25,
+    "fixtureSha256": "f1c74e8b9526efbf17a38de1ba079155c185a83dc6ee115e261a1f9ed0605fec",
+    "helperSha256": "8e32ee9e621451aa4740b3f9b8a3c2ba667782b04e0d2051f3c40e813a55429a",
+    "ownership": "Owned default/system/C QLocale values and every owned BMP QChar are observed. No global locale setter, model setter, widget setter or native input is invoked. QLocale's four-byte public value layout and hidden result pointers are verified against the pinned header and original DLL assembly.",
+    "whitespace": "All 65536 native classifications are represented by the fixture's ordered list and the independent isNumericSpace operation. U+180E is a space in this version; U+0085, U+200B and U+FEFF are not. Normalization maps locale symbols before handling trailing whitespace, preserving a space-like group separator's meaning."
+  },
+  "sizing": {
+    "setScale": "0x41af90 stores and emits a changed scale only. It does not update size fields. This explains the existing collapsed-widget model-scale captures; they do not establish editor clamping behavior.",
+    "scaleCommit": "0x41ce60 stores/emits the requested changed scale first. Compute width from originalWidth*scale+0.5, using x87 round-toward-zero conversion to signed 64-bit followed by its low 32 bits. Set width without notification. If clamping changed the integer, call updateFromWidth with the clamped value. Then perform the corresponding height operation using the current scale, followed by percentage display refresh.",
+    "widthCommit": "0x41cdc0 sets scale=width/originalWidth and emits if changed. It computes and silently sets the corresponding height. If height clamps, call updateFromHeight with the clamped value. Refresh percentage display.",
+    "heightCommit": "0x41c290 mirrors widthCommit using height/originalHeight, then computes and silently sets width. If width clamps, call updateFromWidth. Refresh percentage display.",
+    "rounding": "For finite nonnegative dimensions in range, the observed conversion equals trunc(originalDimension*scale+0.5). The assembly uses control-word bits 0x0c00, so the decompiler's ROUND label must not be interpreted as round-to-nearest or banker's rounding."
+  },
+  "limits": [
+    "No native widget setter, synthesized pointer/key input or native dialog answer was used.",
+    "The 91-case conversion corpus is bounded evidence. Default/system locale names and all BMP whitespace cases are established for the captured session. Other locale configurations, broader number boundaries, and host-to-native locale mapping still need coverage before claiming general numeric-text parity.",
+    "Exceptional x87 conversions, extreme aspect ratios and transient scale signal ordering are traced but not dynamically verified through native widgets. Independent correction cycles return a diagnostic and retain the prior size state; native behavior for those cycles is unverified.",
+    "The current GUI owner refreshes dimensions on explicit source-file opens. Additional preprocessing size-change and batch-to-single bitmap-field lifetimes need native comparison before claiming complete lifecycle parity.",
+    "The native Qt metacall entry 0x461830 lacks a registered Ghidra procedure in this analysis. Its exact disassembly and vtable establish handler calls; the handler functions themselves decompile successfully. No analysis boundary was fabricated.",
+    "The preset catalog, native numeric zoom domain and slider-derived bitmap binding are implemented. Native scrollbar/center geometry, exact wheel-anchor arithmetic, exceptional numeric cases, full bitmap lifecycle and full application parity remain incomplete or unverified."
+  ],
+  "fullApplicationParity": false,
+  "scaleProducersIntent": "Recover x1/x2/x4 buttons, the More menu and the view-scale getter through saved REA analysis and original instructions. New helper 37 will only read the button scale list, action text and the viewer slider/value getters on existing bitmap widgets. Earlier 36 reference executables stay frozen. No widget setter, native input or dialog acknowledgement is permitted.",
+  "scaleProducerStaticFindings": {
+    "buttons": [
+      1,
+      2,
+      4
+    ],
+    "more": [
+      5,
+      6,
+      8,
+      10,
+      12,
+      16,
+      20,
+      24
+    ],
+    "fromView": "0x41d280 calls QGraphicsView subclass getter 0x445a60, stores its binary64 result, then calls updateFromScale. No percent-text conversion occurs.",
+    "viewerScale": "The native logarithmic getter and separate slider producer are implemented through independently generated source values. The displayed transform can differ from its slider-derived export scale after direct scale actions. See viewer-zoom-contract.json for the numeric contract and remaining geometry limits."
+  },
+  "scaleProducerContract": "POST bitmapSize accepts preset with mode and value from the closed native button/menu catalog, or view-scale with mode and a positive finite value from the current viewport. Both feed the same updateFromScale path directly, without percentage parsing. The selected pane refreshes and its peer retains field text while sharing model scale.",
+  "viewportBindingContract": "The canonical viewport reference retains displayed matrix scale and integer slider position separately. Viewer updates it synchronously. Use view scale reads the native getter value for the current slider, rather than the displayed matrix zoom. The scale runtime and remaining geometry limits are authoritative in viewer-zoom-contract.json.",
+  "scaleProducerReference": {
+    "fixture": "../test/fixtures/bitmap-scale-reference.ndjson.gz",
+    "audit": "../evidence/bitmap-scale-native-audit.json",
+    "processes": 6,
+    "nativeHelpersFrozen": 37,
+    "fileFixture": "../test/fixtures/bitmap-view-scenes-reference.ndjson.gz",
+    "fileAudit": "../evidence/bitmap-view-scenes-native-audit.json",
+    "fileProcesses": 6,
+    "wholePngFiles": 3,
+    "viewerWidgetSlotsInvoked": false
+  }
+}

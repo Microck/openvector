@@ -1,0 +1,64 @@
+{
+  "component": "Q8 resizing and large-image working reduction",
+  "targetSha256": "c491656b962debc215a8b6e757a9b2949ffe50a36b5f2db692706bcd4ebface1",
+  "status": "Private sampling, triangle filtering, native Geometry fit and working reduction match all 32232 native cases. Full suite, fresh installed package and restricted runtime pass. Fresh source/working classification is separately verified by image-state-contract.json; stateful controller/cache lifecycle remains unfinished.",
+  "scope": "Validated prepared BGRA bytes, explicit positive source/target dimensions and native sampling/filter and matte controls. File decoding and GUI profile selection remain separate.",
+  "sample": {
+    "reference": "0x4fa400",
+    "coordinates": "Truncate ((outputCoordinate+0.5)*sourceDimension)/targetDimension in that double order and copy the Q8 pixel. Alpha is copied even when the explicit matte flag is zero."
+  },
+  "filtered": {
+    "reference": "0x4fbb50, horizontal 0x4f80f0, vertical 0x4f9270",
+    "filter": "Filter 3 maps to triangle 0x4f7c30 with support 1 and box window 0x4f7910. Blur is explicitly 1 for the working-reduction branch.",
+    "passOrder": "Horizontal then vertical when (sourceWidth+targetWidth)*targetHeight < (sourceHeight+targetHeight)*targetWidth; otherwise vertical then horizontal. Preserve Q8 quantization between passes.",
+    "arithmetic": {
+      "weights": "Float32 target/source ratio and reciprocal. Lower tap bound uses the retained double center minus support minus 1e-6; upper bound and tap distances use its float32 store. Float32 coefficient sums and normalized weights.",
+      "matteColors": "Effective weight is float32(alpha*weight*(1/255)) with double reciprocal arithmetic. Every BGR accumulation stores float32.",
+      "matteOpacity": "In each four-tap group, opacity stores float32 after the first and fourth tap; the middle additions retain double precision. Remainder taps store float32.",
+      "alphaSum": "Four-tap alpha groups store float32 after the second and third tap and retain the fourth double addition; trailing taps accumulate double. The two native axes preserve their original addition order. If abs(alphaSum)<=1e-6 use reciprocal one; otherwise reciprocal is double 1/alphaSum.",
+      "nonMatteColors": "Blue spills after group taps 1/3/4, green after 3/4, red after 2/3. Red retains double precision through the fourth and trailing taps. Other trailing sums store float32. Opacity stores float32 every tap.",
+      "quantization": "Clamp each accumulated output to byte range and truncate(value+0.5); convert opacity back to alpha. Preserve Q8 bytes between passes, including same-size filtered passes."
+    },
+    "matte": "Use the explicit original Image::matte flag. Native Q8 stores opacity=255-alpha. Filtered colors depend on opacity when matte is enabled; exported BGRA behavior for disabled matte must also match."
+  },
+  "workingImage": {
+    "reference": "0x4738b0",
+    "trigger": "Signed int32 width*height >200000 after preprocessing.",
+    "scale": "Double sqrt(150000/area), then truncate(originalDimension*scale+0.5) for geometry width/height. Original ParseMetaGeometry can subsequently preserve aspect and adjust dimensions.",
+    "dispatch": "Shared::is_anti_aliased at core+0x20c selects native sampling when zero and filter-3 resizing when nonzero.",
+    "ownership": "The original stage retains its preprocessed cache and resizes a local Q8 image before exporting the working byte grid. Capture both dimensions and pixels to establish this behavior.",
+    "geometry": "Native Geometry omits zero width/height in its text producer. Two nonzero dimensions select min(double width ratio, float32 height ratio). A single nonzero requested dimension first converts its integer value to float32, then divides by the source dimension in double. Unchanged or empty Geometry returns source dimensions; other results use half-up integer conversion and clamp each dimension to one."
+  },
+  "fullApplicationParity": false,
+  "published": false,
+  "verification": {
+    "kernelCases": 12084,
+    "kernelBytes": 7283504,
+    "geometryCases": 20056,
+    "wholeWorkingCases": 92,
+    "workingBytes": 60106968,
+    "resizedWorkingCases": 70,
+    "emptyWorkingCases": 4,
+    "wholeNativeResponsesRepeatIdentically": true,
+    "nativeGeometryTextProducerVerified": true,
+    "source": "../src/image-resize.mjs",
+    "test": "../test/image-resize.test.mjs",
+    "proof": "../evidence/image-resize-native-reference.json",
+    "fullSuite": {
+      "tests": 214,
+      "pass": 214,
+      "fail": 0,
+      "durationMs": 668794.0395,
+      "report": "../evidence/image-resize-full-test-run.txt"
+    },
+    "installedPackage": "../evidence/image-resize-package-archive-verification.json",
+    "restrictedRuntime": "../evidence/isolated-image-resize-verification.json"
+  },
+  "sourceGradientRecovery": {
+    "nativeOperation": 89,
+    "cases": 5,
+    "proof": "../evidence/image-source-gradients-native-reference.json",
+    "fixture": "../test/fixtures/image-source-gradients-reference.ndjson.gz",
+    "scope": "Native evidence for the next integration stage, not shipped source-gradient integration. Original Gaussian blur retains full preprocessed source dimensions; gradient loops use working dimensions and each raster own row stride. Working pixels remain unchanged."
+  }
+}

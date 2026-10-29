@@ -1,0 +1,54 @@
+{
+  "status": "Implementation in progress; full application parity remains required.",
+  "library": {
+    "api": "document.runAutomatic({extension,...selectedControls}, observeStage?)",
+    "defaults": "Unspecified controls use current committed document settings. Input must contain extension. Validate before changing state; force advanced=false after validating controls.",
+    "policy": [
+      "Classify every invocation. Apply category/quality/palette recommendations.",
+      "Scan the prepared original lazily for alpha type 0/1/2; invalidate only on source replacement.",
+      "Use opaque white background only for category 1 with binary alpha; transparent white otherwise.",
+      "For palette modes 0/1, evaluate candidates 2..12, choose the completed minimum score, and pass colors through native 16-bit channel rounding. Skip palette selection for mode 2.",
+      "Run segmentation, smoothing and fitting through the canonical completed-task scheduler. Preserve session PRNG and native cache rules."
+    ],
+    "result": [
+      "settings: owned selected controls",
+      "paletteCount: selected integer or null when palette selection was skipped",
+      "sourceAlphaType: 0, 1 or 2",
+      "recommendedBackgroundMode: 0 or 1",
+      "state: owned final document snapshot"
+    ],
+    "observer": "Optional stage observer receives owned snapshots. It cannot change algorithm inputs/results through those snapshots. No observer copying when absent.",
+    "errors": "Throw; preserve existing stage errors. Validation errors precede processing. No native executable or recorded intermediate input."
+  },
+  "cli": {
+    "usage": "openvector vectorize <image|-> [--filename name] [--format svg|eps|pdf|ai|dxf] [--output path|-] [--force]",
+    "input": "PNG/BMP bytes detected by content. Source filename supplies canonical metadata. Stdin requires --filename; --filename is rejected for ordinary file input.",
+    "output": "SVG to stdout by default. Infer format from an output file suffix unless --format is explicit. --output - writes stdout. Named output leaves stdout empty. No partial vector output on conversion failure.",
+    "overwrite": "Existing output requires --force. Reject the same resolved input/output path. Conversion completes before file writes.",
+    "help": "-h/--help ignores other arguments; help vectorize is supported. Standalone --version prints package version.",
+    "errors": "One diagnostic on stderr, exit 1. Success exit 0. No prompts, ANSI or animations. TTY-only plain progress on stderr.",
+    "componentCommands": "Retain existing JSON component command behavior."
+  },
+  "gui": {
+    "operation": "automatic",
+    "button": "Enable the existing Fully automatic choice. Use the shared document operation and display the fitted result.",
+    "selectedSettings": "Keep selected controls distinct from committed document settings. Reopening a source preserves selected scalar controls but clears palette and resets background to native retained-load values. Include unsaved frontend selected controls with the next open request.",
+    "uploadApi": "All POST operations use JSON. Open sends {name,bytes:base64,settings?}; there is one upload representation. Actual file limit remains 64 MiB; JSON wire limit 96 MiB. No old raw-body upload adapter.",
+    "layout": "Keep the established black/white shadcn layout and Lucide icons. No decorative animation."
+  },
+  "verification": [
+    "Strict 36-action native Auto corpus with all 3600 typed parameters, selected/committed settings, caches, pixels, geometry and PRNG.",
+    "Retain earlier 1287 direct/controller document actions.",
+    "CLI real-process output, stdin, five formats, help/version, errors and overwrite checks.",
+    "Real GUI engine/HTTP worker tests, source and fresh packaged build.",
+    "Installed package runs with original/workspace engine reads and child creation denied."
+  ],
+  "remainingBeyondThisChange": [
+    "Other codecs and known 16-bit Adam7 failure",
+    "Manual edits/undo/redo",
+    "Batch and saved-profile workflows",
+    "In-flight cancellation/scheduling and complete failures",
+    "Remaining UI features and full application parity"
+  ],
+  "published": false
+}

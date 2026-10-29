@@ -1,0 +1,54 @@
+{
+  "component": "Viewer keyboard state",
+  "status": "Six native view-dispatch workflows and real-browser integration verified. Full shortcut, scheduling and application parity remain unfinished.",
+  "targetSha256": "c491656b962debc215a8b6e757a9b2949ffe50a36b5f2db692706bcd4ebface1",
+  "reference": {
+    "press": "0x44b350, raw LLVM assembly; Ghidra does not define this procedure.",
+    "release": "0x44b470, raw LLVM assembly; an initial query at 0x44b480 was not the entry and was rejected.",
+    "observed": "Six fresh-process-repeat workflows establish actual Qt modifier normalization, temporary Pan, persistent restore tool, B/V event flags, Primary/Base/Current layer separation, mode-10 and batch guards. Direct key dispatch does not activate the A/D Qt shortcut path in the owned hidden window."
+  },
+  "capture": {
+    "operation": 114,
+    "actions": {
+      "25": "Construct public QKeyEvent and synchronously dispatch to the actual owned VmMainView. Record resulting tool, histories and auxiliary input state.",
+      "26": "Read-only auxiliary viewer-state observation.",
+      "27": "Read Primary/Base/Current layer IDs plus actual layer-button enabled and view-focus getters.",
+      "28": "Invoke an observed integer/bool/void VmMainView Qt slot.",
+      "29": "Invoke an observed integer/bool/void MainModel Qt slot.",
+      "30": "Dispatch a real constructed QFocusEvent. Direct focus-in/out events preserve captured keyboard state; OS window activation remains unverified."
+    },
+    "constraints": "No OS keyboard injection, foreground activation or original installation changes. Preserve existing action wires and accepted helper snapshots. Expected state is only an assertion."
+  },
+  "implementation": "ViewerInput owns keyboard/layer state; React renders snapshots. Browser pointer and key producers share viewerModifiers. Tool changes enter the existing ordered document gesture queue. Current tool and Primary/Base/Current layers are separate.",
+  "rules": {
+    "press": "Update Shift state from current event modifiers. Set held B/V flags from this key only, clearing the other flag. Change current layer only for an enabled B/V target. With Shift and a non-Pan tool, retain the tool and enter Pan.",
+    "release": "Clear the matching B/V flag. Restore Base layer only when neither remains. When Shift is absent, restore the retained tool if the prior Shift flag is set and the current tool is Pan; then clear the Shift flag.",
+    "restoreLifetime": "Retained Pan restore tool is not reset when the user later selects Pan. A subsequent Shift press/release from Pan can therefore restore the earlier tool. Selecting another tool during temporary Pan prevents restoration on release.",
+    "modifiers": "B/V still process with Ctrl/Alt/Meta, and repeated key events are not skipped.",
+    "guards": "Mode 10 and the native batch flag suppress viewer key changes. Qt shortcuts, pointer pan movement, focus loss and processing-time routing remain separate verification work."
+  },
+  "verification": {
+    "nativeWorkflows": 6,
+    "nativeActions": 99,
+    "wholeFreshProcessPairsRepeat": true,
+    "fixture": "../test/fixtures/viewer-input-reference.ndjson.gz",
+    "guiTests": 81,
+    "browser": "../evidence/viewer-input-browser-verification.json",
+    "browserSteps": 13,
+    "remaining": "Qt A/D/etc shortcut activation, normal OS focus/window deactivation, processing-time routing, layer-button pointer press/release semantics and broader editable-widget focus contexts.",
+    "layerRouting": "Static original input/sampling dataflow and an isolated before/after browser check establish the bounded layer-independent admission correction. Held B/V in that browser check use declared DOM key events, not trusted key holds or new native pointer capture. See ../evidence/layer-routing-browser-verification.json and viewer-layer-code-review.md."
+  },
+  "pointerProducer": {
+    "source": "https://www.w3.org/TR/2026/REC-pointerevents3-20260630/#chorded-button-interactions",
+    "contract": "Use one PointerEvent producer for first, intermediate and final button changes. A changed button with its held-state bit set is a press; a cleared bit is a release. A button value of -1 is movement. Convert DOM left/middle/right button indices to the existing Qt-style bit values 1/4/2 and preserve the full held-button mask and current modifiers. Tools use the left held bit, regardless of which button caused the press. Pan starts on a changed left press and ends on any release, matching the pinned Qt 4.4.3 ScrollHandDrag implementation. Keep the existing gesture wire and capture owner.",
+    "browserFixture": "../test/fixtures/browser-pointer-chords.json",
+    "nativePressEvidence": "../evidence/viewer-press-pencil-assembly.txt",
+    "nativeMoveEvidence": "../evidence/viewer-pointer-move-assembly.txt",
+    "qtPanSource": "../artifacts/qt-4.4.3-viewer-reference/src/gui/graphicsview/qgraphicsview.cpp",
+    "nativeChordCapturePerformed": false,
+    "fullPointerParity": false,
+    "browserVerification": "../evidence/button-chords-browser-verification.json",
+    "verificationCheckpoint": "../evidence/viewer-button-chords-verification-checkpoint.json",
+    "codeReview": "viewer-button-chords-code-review.md"
+  }
+}

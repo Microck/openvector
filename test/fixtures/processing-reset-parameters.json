@@ -1,0 +1,502 @@
+{
+  "Shared::is_anti_aliased": {
+    "kind": "int32",
+    "offset": 524,
+    "count": 1
+  },
+  "Shared::image_type_code": {
+    "kind": "int32",
+    "offset": 540,
+    "count": 1
+  },
+  "Preprocessor::filter_type": {
+    "kind": "int32",
+    "offset": 768,
+    "count": 1
+  },
+  "Preprocessor::reduce_noise_order": {
+    "kind": "int32",
+    "offset": 772,
+    "count": 1
+  },
+  "PaletteFinder::cost_per_color": {
+    "kind": "float32",
+    "offset": 1652,
+    "count": 1
+  },
+  "PaletteFinder::use_16_hist_bins": {
+    "kind": "int32",
+    "offset": 1656,
+    "count": 1
+  },
+  "PaletteFinder::use_26_connected_peaks": {
+    "kind": "int32",
+    "offset": 1660,
+    "count": 1
+  },
+  "EdgeImage::edge_weight_scale": {
+    "kind": "float64",
+    "offset": 80,
+    "count": 1
+  },
+  "EdgeImage::edge_weight_floor": {
+    "kind": "float64",
+    "offset": 88,
+    "count": 1
+  },
+  "Segmenter::max_iterations": {
+    "kind": "int32",
+    "offset": 2356,
+    "count": 1
+  },
+  "Segmenter::lambda_pre": {
+    "kind": "float32",
+    "offset": 2360,
+    "count": 1
+  },
+  "Segmenter::lambda_initial": {
+    "kind": "float32",
+    "offset": 2364,
+    "count": 1
+  },
+  "Segmenter::lambda_final": {
+    "kind": "float32",
+    "offset": 2368,
+    "count": 1
+  },
+  "Segmenter::min_num_pixels": {
+    "kind": "int32",
+    "offset": 2372,
+    "count": 1
+  },
+  "Segmenter::num_iter_btwn_renum": {
+    "kind": "int32",
+    "offset": 2376,
+    "count": 1
+  },
+  "Segmenter::rise_fraction": {
+    "kind": "float32",
+    "offset": 2380,
+    "count": 1
+  },
+  "Segmenter::size_penalty_weight": {
+    "kind": "float32",
+    "offset": 2384,
+    "count": 1
+  },
+  "Segmenter::size_penalty_power": {
+    "kind": "float32",
+    "offset": 2388,
+    "count": 1
+  },
+  "Segmenter::use_over_seg_diag_extr": {
+    "kind": "int32",
+    "offset": 2352,
+    "count": 1
+  },
+  "SubPixelSegmenter::lambda_f": {
+    "kind": "float32",
+    "offset": 2468,
+    "count": 1
+  },
+  "SubPixelSegmenter::beach_lambda_f": {
+    "kind": "float32",
+    "offset": 2444,
+    "count": 1
+  },
+  "SubPixelSegmenter::color_cluster_margin": {
+    "kind": "float32",
+    "offset": 2448,
+    "count": 1
+  },
+  "SubPixelSegmenter::use_connected_24_iteration": {
+    "kind": "int32",
+    "offset": 2452,
+    "count": 1
+  },
+  "SuperPixelSegmenter::lambda_f": {
+    "kind": "float32",
+    "offset": 2548,
+    "count": 1
+  },
+  "SuperPixelSegmenter::use_connected_24_iteration": {
+    "kind": "int32",
+    "offset": 2552,
+    "count": 1
+  },
+  "SubPixelSegmentation::self_weight_eps": {
+    "kind": "float32",
+    "offset": 352,
+    "count": 1
+  },
+  "SubPixelSegmentation::self_weight_penalty_low": {
+    "kind": "float32",
+    "offset": 356,
+    "count": 1
+  },
+  "SubPixelSegmentation::self_weight_penalty_high": {
+    "kind": "float32",
+    "offset": 360,
+    "count": 1
+  },
+  "SuperPixels::self_weight_eps": {
+    "kind": "float32",
+    "offset": 428,
+    "count": 1
+  },
+  "SuperPixels::self_weight_penalty_low": {
+    "kind": "float32",
+    "offset": 432,
+    "count": 1
+  },
+  "SuperPixels::self_weight_penalty_high": {
+    "kind": "float32",
+    "offset": 436,
+    "count": 1
+  },
+  "FlowField::affinity_cost_scale": {
+    "kind": "float32",
+    "offset": 220,
+    "count": 1
+  },
+  "ContourSmoother::measurement_types": {
+    "kind": "int32",
+    "offset": 6284,
+    "count": 3
+  },
+  "ContourSmoother::optimizer_type": {
+    "kind": "int32",
+    "offset": 6384,
+    "count": 3
+  },
+  "ContourSmoother::prior_types": {
+    "kind": "int32",
+    "offset": 6296,
+    "count": 3
+  },
+  "ContourSmoother::prior_strengths": {
+    "kind": "float64",
+    "offset": 6312,
+    "count": 3
+  },
+  "ContourSmoother::length_penalty_weights": {
+    "kind": "float64",
+    "offset": 6336,
+    "count": 3
+  },
+  "ContourSmoother::do_puncture_corners": {
+    "kind": "int32",
+    "offset": 6360,
+    "count": 3
+  },
+  "ContourSmoother::is_enabled": {
+    "kind": "int32",
+    "offset": 6372,
+    "count": 3
+  },
+  "ContourSmoother::length_barrier_weight": {
+    "kind": "float64",
+    "offset": 6416,
+    "count": 1
+  },
+  "ContourSmoother::air_pressure_weight": {
+    "kind": "float64",
+    "offset": 6400,
+    "count": 1
+  },
+  "ContourSmoother::perturbation_range": {
+    "kind": "float64",
+    "offset": 6408,
+    "count": 1
+  },
+  "ContourSmoother::puncture_flatness_thresh": {
+    "kind": "float64",
+    "offset": 6424,
+    "count": 1
+  },
+  "ContourSmoother::puncture_corner_thresh": {
+    "kind": "float64",
+    "offset": 6432,
+    "count": 1
+  },
+  "ContourSmoother::anti_inv_pot_meas_scale": {
+    "kind": "float64",
+    "offset": 6440,
+    "count": 1
+  },
+  "ContourSmoother::anti_inv_pot_prior_scale": {
+    "kind": "float64",
+    "offset": 6448,
+    "count": 1
+  },
+  "ContourSmoother::phase_0.cg_line_search_type": {
+    "kind": "int32",
+    "offset": 6904,
+    "count": 1
+  },
+  "ContourSmoother::phase_1.cg_line_search_type": {
+    "kind": "int32",
+    "offset": 7104,
+    "count": 1
+  },
+  "ContourSmoother::phase_2.cg_line_search_type": {
+    "kind": "int32",
+    "offset": 7304,
+    "count": 1
+  },
+  "ContourSmoother::phase_0.cg_iter_for_restart": {
+    "kind": "int32",
+    "offset": 6800,
+    "count": 1
+  },
+  "ContourSmoother::phase_1.cg_iter_for_restart": {
+    "kind": "int32",
+    "offset": 7000,
+    "count": 1
+  },
+  "ContourSmoother::phase_2.cg_iter_for_restart": {
+    "kind": "int32",
+    "offset": 7200,
+    "count": 1
+  },
+  "ContourSmoother::phase_0.cg_min_iter": {
+    "kind": "int32",
+    "offset": 6804,
+    "count": 1
+  },
+  "ContourSmoother::phase_1.cg_min_iter": {
+    "kind": "int32",
+    "offset": 7004,
+    "count": 1
+  },
+  "ContourSmoother::phase_2.cg_min_iter": {
+    "kind": "int32",
+    "offset": 7204,
+    "count": 1
+  },
+  "ContourSmoother::phase_0.cg_max_iter": {
+    "kind": "int32",
+    "offset": 6808,
+    "count": 1
+  },
+  "ContourSmoother::phase_1.cg_max_iter": {
+    "kind": "int32",
+    "offset": 7008,
+    "count": 1
+  },
+  "ContourSmoother::phase_2.cg_max_iter": {
+    "kind": "int32",
+    "offset": 7208,
+    "count": 1
+  },
+  "ContourSmoother::phase_0.cg_knock_out_count_down": {
+    "kind": "int32",
+    "offset": 6812,
+    "count": 1
+  },
+  "ContourSmoother::phase_1.cg_knock_out_count_down": {
+    "kind": "int32",
+    "offset": 7012,
+    "count": 1
+  },
+  "ContourSmoother::phase_2.cg_knock_out_count_down": {
+    "kind": "int32",
+    "offset": 7212,
+    "count": 1
+  },
+  "ContourSmoother::phase_0.cg_use_eps_from_step": {
+    "kind": "int32",
+    "offset": 6820,
+    "count": 1
+  },
+  "ContourSmoother::phase_1.cg_use_eps_from_step": {
+    "kind": "int32",
+    "offset": 7020,
+    "count": 1
+  },
+  "ContourSmoother::phase_2.cg_use_eps_from_step": {
+    "kind": "int32",
+    "offset": 7220,
+    "count": 1
+  },
+  "ContourSmoother::phase_0.cg_quad_line_srch_max_iter": {
+    "kind": "int32",
+    "offset": 6920,
+    "count": 1
+  },
+  "ContourSmoother::phase_1.cg_quad_line_srch_max_iter": {
+    "kind": "int32",
+    "offset": 7120,
+    "count": 1
+  },
+  "ContourSmoother::phase_2.cg_quad_line_srch_max_iter": {
+    "kind": "int32",
+    "offset": 7320,
+    "count": 1
+  },
+  "ContourSmoother::phase_0.cg_min_eps": {
+    "kind": "float64",
+    "offset": 6824,
+    "count": 1
+  },
+  "ContourSmoother::phase_1.cg_min_eps": {
+    "kind": "float64",
+    "offset": 7024,
+    "count": 1
+  },
+  "ContourSmoother::phase_2.cg_min_eps": {
+    "kind": "float64",
+    "offset": 7224,
+    "count": 1
+  },
+  "ContourSmoother::phase_0.cg_max_eps": {
+    "kind": "float64",
+    "offset": 6832,
+    "count": 1
+  },
+  "ContourSmoother::phase_1.cg_max_eps": {
+    "kind": "float64",
+    "offset": 7032,
+    "count": 1
+  },
+  "ContourSmoother::phase_2.cg_max_eps": {
+    "kind": "float64",
+    "offset": 7232,
+    "count": 1
+  },
+  "ContourSmoother::phase_0.cg_step_fraction": {
+    "kind": "float64",
+    "offset": 6848,
+    "count": 1
+  },
+  "ContourSmoother::phase_1.cg_step_fraction": {
+    "kind": "float64",
+    "offset": 7048,
+    "count": 1
+  },
+  "ContourSmoother::phase_2.cg_step_fraction": {
+    "kind": "float64",
+    "offset": 7248,
+    "count": 1
+  },
+  "ContourSmoother::phase_0.cg_rel_tol": {
+    "kind": "float64",
+    "offset": 6888,
+    "count": 1
+  },
+  "ContourSmoother::phase_1.cg_rel_tol": {
+    "kind": "float64",
+    "offset": 7088,
+    "count": 1
+  },
+  "ContourSmoother::phase_2.cg_rel_tol": {
+    "kind": "float64",
+    "offset": 7288,
+    "count": 1
+  },
+  "ContourSmoother::phase_0.cg_abs_tol": {
+    "kind": "float64",
+    "offset": 6896,
+    "count": 1
+  },
+  "ContourSmoother::phase_1.cg_abs_tol": {
+    "kind": "float64",
+    "offset": 7096,
+    "count": 1
+  },
+  "ContourSmoother::phase_2.cg_abs_tol": {
+    "kind": "float64",
+    "offset": 7296,
+    "count": 1
+  },
+  "ContourSmoother::phase_0.cg_quad_line_srch_rel_tol": {
+    "kind": "float64",
+    "offset": 6912,
+    "count": 1
+  },
+  "ContourSmoother::phase_1.cg_quad_line_srch_rel_tol": {
+    "kind": "float64",
+    "offset": 7112,
+    "count": 1
+  },
+  "ContourSmoother::phase_2.cg_quad_line_srch_rel_tol": {
+    "kind": "float64",
+    "offset": 7312,
+    "count": 1
+  },
+  "ContourSmoother::phase_0.cg_max_step_size": {
+    "kind": "float64",
+    "offset": 6928,
+    "count": 1
+  },
+  "ContourSmoother::phase_1.cg_max_step_size": {
+    "kind": "float64",
+    "offset": 7128,
+    "count": 1
+  },
+  "ContourSmoother::phase_2.cg_max_step_size": {
+    "kind": "float64",
+    "offset": 7328,
+    "count": 1
+  },
+  "ContourSmoother::phase_0.cg_num_blind_steps": {
+    "kind": "int32",
+    "offset": 6868,
+    "count": 1
+  },
+  "ContourSmoother::phase_1.cg_num_blind_steps": {
+    "kind": "int32",
+    "offset": 7068,
+    "count": 1
+  },
+  "ContourSmoother::phase_2.cg_num_blind_steps": {
+    "kind": "int32",
+    "offset": 7268,
+    "count": 1
+  },
+  "ContourSmoother::phase_0.cg_num_seeing_steps": {
+    "kind": "int32",
+    "offset": 6872,
+    "count": 1
+  },
+  "ContourSmoother::phase_1.cg_num_seeing_steps": {
+    "kind": "int32",
+    "offset": 7072,
+    "count": 1
+  },
+  "ContourSmoother::phase_2.cg_num_seeing_steps": {
+    "kind": "int32",
+    "offset": 7272,
+    "count": 1
+  },
+  "ContourSmoother::phase_0.cg_blind_blend_latest": {
+    "kind": "float64",
+    "offset": 6880,
+    "count": 1
+  },
+  "ContourSmoother::phase_1.cg_blind_blend_latest": {
+    "kind": "float64",
+    "offset": 7080,
+    "count": 1
+  },
+  "ContourSmoother::phase_2.cg_blind_blend_latest": {
+    "kind": "float64",
+    "offset": 7280,
+    "count": 1
+  },
+  "BezierFitter::max_iterations": {
+    "kind": "int32",
+    "offset": 7968,
+    "count": 1
+  },
+  "BezierFitter::stat_thresh_initial": {
+    "kind": "float64",
+    "offset": 7944,
+    "count": 1
+  },
+  "BezierFitter::stat_thresh_final": {
+    "kind": "float64",
+    "offset": 7952,
+    "count": 1
+  }
+}

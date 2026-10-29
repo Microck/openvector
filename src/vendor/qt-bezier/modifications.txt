@@ -1,0 +1,25 @@
+OpenVector modification notice, 2026-10-18
+
+square-stroke.mjs is a JavaScript translation and specialization of selected
+QBezier and QStroker routines from Qt 4.5.3. Original copyright:
+Copyright (C) 2009 Nokia Corporation and/or its subsidiary(-ies).
+All rights reserved.
+Original project: https://github.com/qt/qt/tree/v4.5.3/src/gui/painting
+
+This modified component is distributed under the GNU Lesser General Public
+License version 2.1. The complete license is in license-lgpl.txt. The upstream
+Nokia Qt LGPL Exception version 1.1 is retained in lgpl-exception.txt. This
+translation does not rely on the exception's unmodified-header permission.
+
+Changes:
+- Replaced Qt classes with ordinary JavaScript arrays and scalar arithmetic.
+- Retained bounded subdivision, offset-error checks, degenerate curves,
+  circle approximation, threshold relaxation and original arithmetic quirks.
+- Specialized the stroker to one device-space line or cubic edge, width one,
+  square caps and bevel joins, as used by the bitmap seam pass.
+- Removed unrelated dash, polygon, arc, intersection and query interfaces.
+- Moved public input validation and coordinate mapping to the MIT caller.
+
+The module is supplied as editable source and imported at runtime. Users may
+modify it, replace it and run the MIT caller against their modified version.
+No Vector Magic or Qt installation is required by this component.

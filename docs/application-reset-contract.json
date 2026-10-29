@@ -1,0 +1,156 @@
+{
+  "project": "openvector",
+  "status": "Retained registered-host full-window No/Yes comparisons cover Review page19 and empty/one-entry queues. Fresh C13 native cases1/2/3 and their twelve-row Rust comparison are complete. Basic Export and Basic/Advanced first-Transparency captures pass all six Reset tests. The current Linux GUI also passes painted Transparency cancellation/Yes checks with normal exits and owned-runner cleanup. Full application parity is not established.",
+  "reference": "../test/fixtures/application-model-reset-reference.ndjson.gz",
+  "inputReference": "../test/fixtures/application-model-reset-inputs.json",
+  "nativeAudit": "../evidence/application-model-reset-native-audit.json",
+  "nativeCases": 7,
+  "nativeProcesses": 28,
+  "verification": {
+    "nativeResetWorkflows": 4,
+    "completeDocumentComparisons": 5,
+    "parameterRecordsCompared": 500,
+    "newTestsPassed": 10,
+    "isolatedGuiSuite": {"passed": 352, "failed": 1, "skipped": 0},
+    "knownFailure": "Existing processing-batch-controls setter-only backgroundMode 2 comparison; unchanged.",
+    "checkpoint": "../evidence/application-reset-verification-checkpoint.json"
+  },
+  "windowRecovery20261021": {
+    "scope": "Static recovery and one trusted Python-only station experiment. Zero original Reset Everything executions were authorized.",
+    "entry": "Public VmQt resetEverything method46 dispatches to0x451750. The genuine warning defaults/focuses No0x10000; only Yes0x4000 enters the reset body.",
+    "mappedDefaults": "The handler clears lists, calls model reset0x430ed0(1,1,1), restores16 mapped widget defaults and refreshes the window. These static mappings are not post-confirmation runtime proof.",
+    "pageGap": "Retained model-only evidence preserves page19. Full-window final refresh reads the retained model page, but intervening Yes-only notification ownership remains unresolved. Do not change Rust navigation from this inference alone.",
+    "safety": "The clean default application name does not redirect the explicit activation store. Its writer is conditionally unreachable under the reviewed fresh/no-activation admission. Yes-only callback, default-backend and nested-owner closure remains incomplete, so no Yes grant was made.",
+    "isolation": "One trusted Python child was explicitly bound to an owned private desktop on the measured invisible session0 service station, exited0 and released its resources. This is not an original-window reset or implicit-inheritance proof.",
+    "evidence": ["../evidence/parity-gap-research-sol-20261021/window-reset/findings.json", "../evidence/native-window-reset-full-sol-20261021/guard-review/findings.json", "../evidence/native-window-reset-full-sol-20261021/guard-review-activation/findings.json", "../evidence/native-window-reset-full-sol-20261021/guard-review-files/findings.json", "../evidence/native-window-reset-full-sol-20261021/capture/station-child-measured/report.json"],
+    "historicalApiScope": "ApplicationController and HTTP names below describe the retained pre-Rust model coordinator, not a runtime fallback or the current CLI/npm engine."
+  },
+  "windowAttempt20261022": {
+    "status": "Blocked before recorder entry; no Reset dialog or post-confirmation behavior observed.",
+    "scope": "Parent admitted only No,No,Yes,Yes inside an identity-checked disposable VM while holding an atomic exclusive lock. The sequence stopped after its first process failed to load.",
+    "recorderProcessesStarted": 1,
+    "completedCaptures": 0,
+    "loaderExit": "0xc0000135",
+    "missingPrerequisite": "The recorder imports x86 vcruntime140.dll, which was absent from its stage, installation directory and SysWOW64. A valid Microsoft-signed redistributable was subsequently installed; the failed capture was not repeated.",
+    "cleanup": "No remaining native processes; protected state and all43 installation files unchanged; exact namespace restoration, unchanged input desktop and released private desktop verified. Grant revoked, external lock released and scheduled task removed.",
+    "evidence": "../evidence/full-parity-program-20261022/vm-original/parent-admission-r4/archive-pin.json",
+    "runtimeDependency": "../evidence/full-parity-program-20261022/vm-original/parent-admission-r4/runtime-install-result.json",
+    "limit": "This disposable-VM admission does not establish live-host Yes-write confinement or full-window reset parity."
+  },
+  "windowStartupAttemptR5": {
+    "status": "Recorder exited14 before opening the original executable; no Reset observation.",
+    "recorderProcessesStarted": 1,
+    "completedCaptures": 0,
+    "cause": "Launcher supplied AmbivalencePaletteReferenceReset+PID, but frozen recorder startup accepts only AmbivalencePaletteReference followed by decimal digits.",
+    "correction": "A separate launcher copy removes only the incompatible Reset suffix. Recorder, requests and protected guards remain unchanged; a fresh reviewed VM admission is required.",
+    "cleanup": "All guard safety receipts passed. Grant revoked, lock released, scheduled task removed, all33 guest evidence files retained and hash-verified; whole owned VM and disk directory destroyed.",
+    "evidence": "../evidence/full-parity-program-20261022/vm-original/parent-admission-r5/summary.json",
+    "rootCause": "../evidence/full-parity-program-20261022/vm-original/reset-desktop-prefix-correction/rootcause.json",
+    "limit": "One counted recorder attempt, not a successful native Reset capture or full-window parity proof."
+  },
+  "windowInspectionAttemptR6": {
+    "status": "Nested PowerShell idle inspection timed out before any recorder or original launch.",
+    "completedCaptures": 0,
+    "cleanup": "Grant revoked, lock removed, all43 installation hashes verified, zero native processes/tasks, whole VM destroyed.",
+    "evidence": "../evidence/full-parity-program-20261022/vm-original/parent-admission-r6/summary.json"
+  },
+  "windowFirstRunAttemptR7": {
+    "status": "One original run stopped at RegistrationDialog before the Reset boundary; recorder exit19 and guard exit1.",
+    "completedCaptures": 0,
+    "modal": "Action1, phase0, page21, no prior clicks; unexpected modal rejected.",
+    "protectedState": "Strict equality failed: native created an empty HKCU Software\\VectorMagic\\Vector Magic Desktop Edition 1 child, observed in both views. Installation43 and frozen tools were unchanged.",
+    "cleanup": "Owned namespace restored exactly, private desktop released, grant revoked and lock removed. No later case ran. Zero native processes/tasks verified before whole-VM destruction.",
+    "evidence": "../evidence/full-parity-program-20261022/vm-original/parent-admission-r7/summary.json",
+    "limit": "Not a Reset observation or safety pass. Existing public startup imagery offers Evaluate with saving disabled, but a legitimate capture preparation flow and its state ownership remain unverified. No activation, license transfer, modal suppression or relaxed equality is authorized."
+  },
+  "publicEvaluationRounds": {
+    "status": "Closed by user decision 2026-10-22 without observation. Four disposable-VM setup rounds never launched the original: r1 idle expiry, r2 unsupported lease flag, r3 interrupted acquisition, r4 observer setup stall with unestablished cause. The Yoga provider sets dynamic memory up to 1 TiB regardless of requested size; no provider change was made.",
+    "completedCaptures": 0,
+    "evidence": "../evidence/full-parity-program-20261022/continuation-lanes-20261022.json",
+    "limit": "First-run Evaluate and clean restart remain unverified. Reopening that discarded setup lane requires a fresh decision on VM infrastructure. Registered-host full-window Reset was subsequently captured separately below."
+  },
+  "windowCaptureRegisteredHost": {
+    "status": "Captured. One run on the user-authorized registered Windows 10 reference host (WIN-7R225JAK3UT), four counted original launches, cases No,No,Yes,Yes, no retries or modal incidents.",
+    "completedCaptures": 4,
+    "observed": "Both No cases leave decoded state unchanged. Both Yes cases produce identical decoded results changing sourceWidth, sourceHeight, resetWidgets, selected, batch, savedProfiles, sourceHistory and batchQueue. Returned and drained state match in every case.",
+    "isolation": "VM disposability replaced by reviewed adapter-r4: host-only backup, baseline restore before each case, typed equality across 8 registry and 6 AppData roots, protected registration subtree byte-identical. Final profile equals baseline 7e9d2c8f…7ffa6; 43 installation pins unchanged; no residual tasks or processes.",
+    "evidence": "../evidence/full-parity-program-20261022/win10-host-reset/capture-r1/verification.json",
+    "admission": "../evidence/full-parity-program-20261022/win10-host-reset/capture-admission-decision.json",
+    "limit": "Registered profile and one captured starting state on one host. First-run Evaluate and clean restart remain unverified. Rust semantic comparison is recorded in windowRustComparison."
+  },
+  "windowCapturePopulatedQueue": {
+    "status": "Captured in one bounded run with four launches No,No,Yes,Yes and no capture retries.",
+    "evidence": "../evidence/full-parity-program-20261023/queue-reset-capture/verification.json",
+    "condition": "One pinned 5x7 source is open and independently queued; single-image mode 0, model and stack page 19 (Review Result), idle processing cursor 0.",
+    "observed": "No preserves the queue and source. Yes clears both while retaining page 19, export directory and AI format. Returned and drained states match; both same-answer replicate pairs match all decoded semantic fields.",
+    "integrity": "Parent verified all 63 manifest members and both replicate pairs. Final typed state equals the pre-run baseline across 8 registry and 6 AppData roots, all 43 installation pins match, and exact owned task/process/lock absence is retained.",
+    "rustComparison": "Passed in the expanded four-case semantic fixture and all six Reset-module tests; see ../evidence/full-parity-program-20261023/queue-reset-rust-comparison/verification.json.",
+    "limit": "One idle queued entry in single-image mode. Native graphics-item selection, queued thumbnail pixels and active batch processing are not inferred from these captures."
+  },
+  "windowRustComparison": {
+    "reference": "../test/fixtures/application-window-reset-reference.json",
+    "test": "native_full_window_reset_no_yes_matches_decoded_capture",
+    "observed": "Retained native No preserves Review page19 and Yes closes the source without navigation. Fresh case1 captures Basic Export page18 with14/16 nondefault flags. Fresh cases2/3 capture Basic/Advanced first-Transparency page6 using the exact19x23 transparent PNG. Each native history has No/No/Yes/Yes, equal same-answer snapshots and equal returned/drained business state. No preserves the source, controls, mode and entry guards. Yes clears the source and both guards, restores Basic mode and retains page6.",
+    "correction": "One canonical derived fixture uses R3 source ownership: filename is model+0xcc and sourceDirectory is model+0xc4. Historical raw evidence remains untouched. The test selects each captured page rather than forcing Review, seeds all16 mapped owners, and compares before/return/drained state. Cases2/3 also seed the actual entry-before controls and clear guards on pages5/4, then exercise Next/Advanced to reach Transparency and compare initialized controls and guards before Reset. Each new state contributes one No and one Yes consumer row; native replicate equality stays in evidence.",
+    "sourceLifetimeInvariant": "Transparency first-entry initialization requires an open document. Confirmed Reset may retain page6 after closing the source; refreshing that empty page must preserve both cleared entry guards and the native Reset-selected defaults rather than initialize a new source.",
+    "verification": "The expanded twelve-row fixture exercises eighteen scenarios, including actual first-entry actions and Enter/Escape cancellation. Its first run exposed empty retained-page reinitialization:5 passed,1 failed. Requiring a document for first-entry initialization fixes the cause without changing native expectations or assertions:6 Reset tests passed,0 failed. The broader GUI suite passes71 tests,0 failures,1 existing locale-specific ignore. Workspace all-targets check and current GUI build pass. Both simplification passes and independent Standards/Spec reviews have zero findings. The exact rebuilt Linux binary passes actual painted Basic/Advanced Transparency cancellation and confirmed Reset; both processes exit0 and the disposable runner is destroyed. Evidence: ../evidence/full-parity-program-20261023/reset-transparency-linux-smoke-r1/verification.json. The earlier core square_stroke.rs:96 Clippy error remains unchanged; no lint pass is claimed.",
+    "limit": "No full parity claim. The native-backed suite checks semantic controls, modes, entry guards and before/returned/drained ownership; painted Linux checks cancellation pixels/preferences and the retained empty Transparency page. Qt allocation/QObject metadata, registration/private-desktop bytes, arbitrary host logs and native presentation labels have no asserted Rust equivalence. Bitmap pane dimensions are derived from captured scales and source size, not native pane-dimension bytes. This source correction is not included in the earlier Windows/macOS binaries or private package."
+  },
+  "broaderWindowCapture20261026": {
+    "case1Evidence": "../evidence/full-parity-program-20261023/reset-current-c13-parent-reference-r2/case-1-native/safe-evidence.json",
+    "case1Pin": {"bytes": 234388, "sha256": "3f76cd5d2db3e3db116b158fe53aa8e6a195a4214dd8ea8fb883b910bb405423"},
+    "nativeVerification": "../evidence/full-parity-program-20261023/reset-current-c13-parent-reference-r2/case-1-native/verification.json",
+    "independentFinalProof": "../evidence/full-parity-program-20261023/reset-current-c13-parent-reference-r2/case-1-native/independent-final-proof.json",
+    "inputCorrespondence": "Safe string hashes are SHA256 of UTF16LE. Semantic string preimages match retained fixture strings or actual execution-bundle inputs, including slash-normalized path spellings. Unknown string hashes are not replaced with predictions.",
+    "transparentSource": {"path": "../evidence/full-parity-program-20261023/reset-broader-reference-preparation-r2/fixtures/transparent-19x23.png", "bytes": 297, "sha256": "1c9b625395a1c71321f20d67d2098ac4e4901cf033a475c0654e32c0ce0075d0"},
+    "implementationReport": "../evidence/full-parity-program-20261023/reset-broader-rust-comparison-20261026-r1/report.json",
+    "transparencyComparison": {
+      "nativeStatus": "Cases2/3 independently complete; root/caller/worker/child checked zero, authenticated8-registry/6-AppData-root equality, zero differences and all43 installation files unchanged in each final proof.",
+      "case2Evidence": "../evidence/full-parity-program-20261023/reset-current-c13-parent-reference-r3/case-2-native/safe-evidence.json",
+      "case2Pin": {"bytes": 210754, "sha256": "868697b7f649f11ecc02653031f9ec66c52d6d42d3f7c7e1960dad208f768e8e"},
+      "case3Evidence": "../evidence/full-parity-program-20261023/reset-current-c13-parent-reference-r3/case-3-native/safe-evidence.json",
+      "case3Pin": {"bytes": 210358, "sha256": "34f950428e9e8528a2e46e6070eba7452ca40af72bc4aadad0f6d05255f28e0a"},
+      "implementationReport": "../evidence/full-parity-program-20261023/reset-transparency-rust-comparison-r1/report.json",
+      "inputCorrespondence": "../evidence/full-parity-program-20261023/reset-transparency-rust-comparison-r1/input-correspondence.json",
+      "preservation": "../evidence/full-parity-program-20261023/reset-transparency-rust-comparison-r1/preservation.json",
+      "rustVerification": "PARENT_PENDING. This implementation task runs only JSON derivation and static byte checks; no tests, builds, lint, formatters or native execution.",
+      "fullParity": false
+    },
+    "fullParity": false
+  },
+  "paintedCurrentVerification": {
+    "linux": "../evidence/full-parity-program-20261023/reset-desktop/verification.json",
+    "linuxBinarySha256": "7978244fee5e7cc7b4c6e7a209cc448737b10cda7714de815e978db2219ad396",
+    "windows": "../evidence/full-parity-program-20261023/windows-desktop/verification.json",
+    "windowsBinarySha256": "7a0782dffff58d869599e657ece42f0c3106e0734163d86971ce3837b1d4f22b",
+    "macos": "../evidence/full-parity-program-20261023/macos-desktop/verification.json",
+    "macosBinarySha256": "a54949849ea81aed246290103421458cb227a5bdac0a8916d58546ca677c8390",
+    "linuxReview": "../evidence/full-parity-program-20261023/queue-reset-rust-comparison/verification.json",
+    "linuxReviewObserved": "The unchanged current binary completed Automatic to Review. Default No preserved viewport pixels exactly; Yes closed the source, disabled Export, showed the empty-image prompt and retained the painted Review page. Seven screenshots and owned process/display cleanup are retained.",
+    "observed": "The retained platform binaries paint Basic Export, preserve viewport pixels on cancellation, clear the source while retaining Export on Yes, and recover through a new Open/conversion. Linux and Windows also save the recovered vector. Linux and macOS use OS input and native choosers; Windows uses owned-HWND messages and native dialogs on a never-activated desktop.",
+    "sourceBinding": "The earlier builds retain their own frozen source bindings. Current Rust differs from the496-member old source closure in three files;493 still match exactly. app.rs now includes both palette Add admission and the empty-Transparency source-lifetime correction, alongside the two updated GUI regression files. The current Linux binary d21e861074ae36b13b85c3699d0505ed058307d22edbfd70e770ce912935f7f7 has new painted Transparency proof; earlier platform binaries do not contain this correction. See ../evidence/full-parity-program-20261023/delivery-provenance-pending.json. Final private delivery must use the settled source and fixture.",
+    "currentTransparencyLinux": "../evidence/full-parity-program-20261023/reset-transparency-linux-smoke-r1/verification.json",
+    "recoveryComparison": "../evidence/full-parity-program-20261023/reset-rng-diagnosis/verification.json",
+    "randomHistory": "The recovered Windows SVG exactly matches the second conversion in the same CoreSession: RNG 1 -> 1581, Reset retains 1581, then conversion reaches 6311. Comparing that 672-byte result with the 670-byte fresh-session reference was a history mismatch, not a demonstrated product defect.",
+    "limits": "These desktop runs do not add native reference states or prove physical Windows input. The Linux before/after exports use changed processing state and are not asserted byte-identical."
+  },
+  "behavior": {
+    "admission": "Restore Default Settings remains enabled on native batch queue page 1 and settings page 2. Model reset preserves batch mode and the current wizard page. Active processing is outside this captured scope.",
+    "scope": "Clear saved lists, source history, cached icons, batch queue and source document; restore selected processing defaults. Preserve current directory, batch workspace/page, advanced requested batch controls/palette and export options.",
+    "ownership": "ApplicationController.resetModel uses synchronous domain operations on the existing profile, source, batch and image owners. Local controller commands call those same operations with their existing admission checks. No alternate state, store or force flag.",
+    "persistence": "Complete the in-memory model reset before attempting both existing independent atomic stores. Attempt both writes even when one fails. A failure reports each failed store and applicationResult containing the actual reset session. Cross-file atomicity is not claimed.",
+    "protocol": "POST /api/resetApplicationModel accepts null, uses existing origin/serialization rules, and rejects running batches. Worker batch publication precedes the reply, including write errors. The response contains document, selection, profiles, sources and batch snapshots.",
+    "window": "The coordinator does not claim to reset window widgets, preferences, confirmation state or browser navigation. No Reset Everything GUI action is exposed by this model endpoint."
+  },
+  "referenceCorrections": [
+    "The initially named application-batch-menu case sets page 19 while the batch flag is true. Retained review-visibility captures identify page 19 as Review Result and page 18 as Basic Export. The flag/page observation does not prove batch-files admission. The former Reset prose and test mapping calling page 19 Export were incorrect; see ../evidence/full-parity-program-20261023/photographic-reference-review/findings.json.",
+    "Native Start Over at 0x432560 handles page 1 through the batch queue. Existing batch records and page-transition code establish batch pages 1, 2 and 3. The corrected admission case explicitly observes page 1; the settings case observes page 2.",
+    "The original application-reset corpus used a newline between queued paths, producing one invalid joined filename. Its raw captures remain historical evidence. The application-model-reset corpus uses the native NUL delimiter and verifies two distinct queue entries. Older captures must not be regenerated with the corrected encoder and presented as original evidence."
+  ],
+  "remaining": [
+    "The captured Review, Basic Export and Basic/Advanced first-Transparency states now have native-backed Rust comparisons. Other uncaptured starting pages are not covered. The populated-queue reference covers one idle entry in single-image mode, not active batch processing.",
+    "First-run Evaluate, clean restart and protected-state ownership on an unregistered install remain unobserved (see publicEvaluationRounds). Live latch on protected-state mismatch was not exercised by design.",
+    "Resolve the earlier setter-only transparency comparison and remaining full application parity gaps."
+  ],
+  "fullApplicationParity": false
+}

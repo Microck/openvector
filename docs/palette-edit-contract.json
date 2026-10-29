@@ -1,0 +1,54 @@
+{
+  "component": "Advanced palette selection and manual palette edits",
+  "status": "Selected-palette ownership matches ten native workflows. The browser connects count, color, candidate and revert controls to that owner and the verified Auto-Update timer. Complete application parity remains unfinished.",
+  "targetSha256": "c491656b962debc215a8b6e757a9b2949ffe50a36b5f2db692706bcd4ebface1",
+  "reference": {
+    "requestedCount": "advUpdatePalette at 0x427ee0 passes selected-settings +0x10 as the exact requested palette count. This is separate from the current selected palette length.",
+    "customized": "Selected-settings byte +0xd4 gates the original Overwrite Palette Edits? warning. Real QMessageBox Cancel (0x400000) is the default and preserves edits; real OK (0x400) replaces them. Both captured twice on a private desktop without switching the input desktop.",
+    "page": "Advanced page 12 normalizes two-color mode 0 to fixed mode 1. Entering with an existing palette does not itself request palette generation.",
+    "recalculation": "A palette update requests exactly the selected count and retains previous segmentation/vector cache keys. Ten native workflows cover count changes, cache hits, candidate selection and manual edit/revert lifetimes. The first fresh-source palette update occurs after the original 500 ms timer, without an automatic classification run.",
+    "requestedRange": "Original CustomSpinner at MainWindow +0x168 has native minimum 2 and maximum 24. Constructor call at 0x456cef passes 2 and 0x18; actual widget metadata capture agrees. Native tasks at counts 13 and 24 complete successfully.",
+    "manual": "setPaletteColor, addColor and deleteColor mark customization without scheduling palette Auto-Update. Revert copies the saved palette and clears customization. List selection copies and quantizes candidate colors, sets requested count to its length, refreshes the revert copy and clears customization.",
+    "addButton": "CustomPaletteWidget::updateView at 0x4109e0 computes the selected palette length, compares it to 24 at 0x410ce8, and calls QWidget::setDisabled(length == 24) on its Add button at +0x1c. This public admission condition is separate from the direct addColor slot's 25-color ceiling. Requested count and paletteColorCount do not control the button. Static evidence: ../evidence/full-parity-program-20261023/manual-recent-reference-controls-r2/report.md."
+  },
+  "verification": [
+    "Observe requested count, customization byte and original QObject slot metadata without mutating them.",
+    "Record count changes, cache hits, list selection and palette edit/revert lifetimes in two fresh native processes.",
+    "Record actual overwrite dialog acceptance and cancellation before implementing browser dispatch.",
+    "Keep declared user actions separate from native expected palette/settings/geometry assertions."
+  ],
+  "publication": "Private until full application parity is verified.",
+  "implementationContract": "Document palette requests accept counts 2..24; automatic classification continues to evaluate the original 2..12 range. Existing palette-generation and refinement algorithms supply the full advanced range without alternate codepaths.",
+  "gpuiValidationRecovery": {
+    "behavior": "Invalid RGBA input preserves the palette and keeps the editor open with its error. A corrected valid submission applies the color, closes the editor and clears both the error flag and obsolete footer error text. Normal non-error progress/save messages are not cleared at workflow entry.",
+    "beforeEvidence": "../evidence/gpui-live-20261020/manual-palette-bitmap-verification.json",
+    "verification": "Seven actual desktop checks pass after the fix, alongside the extended regression in the 67 passing GUI/controller/worker tests. The original invalid input preserves palette/store bytes; corrected RGBA values reappear through real field Copy, the swatch changes and the idle footer exactly matches its baseline. Evidence: ../evidence/gpui-validation-recovery-20261021/verification.json. Earlier detector/OCR probe failures remain retained separately."
+  },
+  "gpuiPublicAddBoundary": {
+    "behavior": "Add uses current selected palette length, not requested count or paletteColorCount. At 24 selected colors it is disabled; deleting to 23 re-enables it even while paletteColorCount remains 24. The direct-slot 25-color ceiling is unchanged.",
+    "verification": "The focused GPUI click regression and ten Linux painted/lifecycle checks pass on binary 9d20d15cc6b696c7807699d86f8fee697d888ba2523455df037cd2897f56735b. Fourteen Windows checks pass on binary 9c3e8c11b1dda6c98f0ab246a478e8d609e742764a1db714f910caec977b3a7a. Both paint selected lengths 23,24,24,23,24 and Add enabled states true,false,false,true,false. Disabled-click pixels and store bytes remain unchanged; requested count stays 23; Delete retains paletteColorCount 24; normal exit and exact owned-resource cleanup pass.",
+    "evidence": "../evidence/full-parity-program-20261023/manual-palette-add-boundary/verification.json",
+    "windowsEvidence": "../evidence/full-parity-program-20261023/palette-windows-current/verification.json",
+    "macosStatus": "The current-source ARM64 macOS build and public Add boundary pass on binary 470d4906e6ac8e924494efa7edb878b4cb6d9ea1b2e881a5e02e4e815167979f. Actual painted selected lengths are 23,24,24,23,24; Add is disabled at 24 and re-enabled after Delete to 23. Disabled-click palette pixels and preference bytes are identical; requested count stays 23 and Delete retains paletteColorCount 24. The focused Mac regression passes 1/1, normal GUI exit is 0, and the owned guest/stage/processes are absent. Parent verified all 450 payload pins. Earlier toolchain/storage blocks remain historical, not current.",
+    "macosEvidence": "../evidence/full-parity-program-20261023/palette-macos-current-r7/verification.json",
+    "limit": "The original public-button predicate is established statically. No new original execution or complete accumulated manual-session comparison is claimed."
+  },
+  "stateOwner": "Rust profile_palette::apply_palette_command owns the shared transition kernel. GPUI OpenVectorApp owns selected settings; Workflows owns PaletteRuntime and temporary editor fields. Candidate completion refreshes colors, palette count and revert copy without changing the requested count. src/profile-palette.mjs remains a retained differential reference, not the production runtime.",
+  "fixtures": [
+    "../test/fixtures/palette-controls-reference.ndjson.gz",
+    "../test/fixtures/advanced-workflow-reference.ndjson.gz",
+    "../test/fixtures/profile-palettes-reference.ndjson.gz",
+    "../test/fixtures/batch-palette-runtime-reference.ndjson.gz"
+  ],
+  "browserVerification": "../evidence/palette-timers-browser-verification.json",
+  "runtimeProfileRules": {
+    "paletteCount": "Store paletteColorCount separately from requested count and current palette length. addColor updates it to the new length; deleteColor leaves it unchanged; revert and candidate replacement update it to the restored/replaced length.",
+    "profileLoad": "Loading a stored profile copies its current colors, requested count and palette count, but preserves the current runtime revert palette and customization flag. Default Advanced Settings follows the same rule.",
+    "sourceLoad": "A retained-image replacement commits current selected processing controls and requested count, then clears committed document colors. It clears selected colors, uses palette count 2, clears customization and retains the runtime revert palette. The first source load preserves the earlier startup/profile commit.",
+    "addLimit": "The direct addColor slot does nothing at 25 selected colors, including when customization is false. Its lower-level 25th-color admission does not bypass the public Add button, which is disabled at 24 selected colors.",
+    "nativeEvidence": "Eight paired profile/palette workflows capture runtime backup/customization, complete selected/stored profiles, eight complete numerical documents and 800 typed parameter records. Five additional paired batch workflows capture ten complete documents and 1,000 parameter records. See profile-palettes-native-audit.json and batch-palette-runtime-native-audit.json under ../evidence/.",
+    "status": "Shared transition kernel, browser/engine owners, compact worker/HTTP commands and native comparisons pass. Visible browser upload/count/recalculate/add/delete/revert/source-replacement checks pass."
+  },
+  "runtimeBrowserVerification": "../evidence/profile-palettes-browser-verification.json",
+  "runtimeCheckpoint": "../evidence/profile-palettes-verification-checkpoint.json"
+}

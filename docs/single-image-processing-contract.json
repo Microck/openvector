@@ -1,0 +1,37 @@
+{
+  "project": "openvector",
+  "component": "Single-image processing progress and cancellation",
+  "status": "Implemented. Four numerical-stage cancellation/retry comparisons, real-worker HTTP cancellation and trusted compiled-browser Cancel/Escape/retry pass. The browser dependency boundary is repaired. Final document checks pass 67/67, focused GUI checks 62/62 and installed checks 68/68. Source/archive/installation bytes match. Full application parity remains unfinished.",
+  "checkpoint": "../evidence/single-processing-verification-checkpoint.json",
+  "editingFinish": {
+    "status": "Implemented. Four document tests, three GUI/HTTP integration tests, five installed checks and trusted compiled-browser Cancel/Escape/retry pass. The full editing suites retain their known alpha-palette failure; the GUI suite retains its known batch-background failure.",
+    "checkpoint": "../evidence/editing-processing-verification-checkpoint.json",
+    "order": "Basic Edit result Next commits editing history before smoothing and fitting. Cancellation retains that committed checkpoint and the live numerical state, stops later stages, and keeps the editing page open for retry. Advanced Next remains commit-only.",
+    "api": "finishEditing(input,onStage) accepts optional stage-tagged input.onProgress and an optional owned completed-task observer. Validate both before committing edits. A task that actually ran with status 2 stops the chain using the shared CancelTaskException. Completed-task observer snapshots and the final returned snapshot have separate ownership.",
+    "host": "The existing worker ProcessingJob wraps edit finish. It serves the same progress, Cancel and Escape path. After interruption, the editor projection reflects its actual committed history and Pan tool. A completed vector scene is replaced only after successful fitting.",
+    "verification": "Compare interrupted finishEditing with explicit commitEditing plus the same native-verified smoothing/fitting tasks. Verify that fitting never starts after smoothing cancellation, retry retains edits and randomness, and invalid observers cause no edit commit. Verify the GUI projection and real HTTP/browser admission separately.",
+    "limits": "This verifies independent workflow integration. Native editing cancellation/controller timing, full editing equivalence and the existing alpha-palette failure remain unresolved."
+  },
+  "moduleBoundary": "Profile selection remains browser-safe. The cancellation exception has one dependency-free owner shared by numerical document and profile replay. The existing image-document export references that same class. Browser palette controls must not import or initialize bitmap codecs or the numerical document.",
+  "requirement": "Expose progress and Cancel for single-image numerical processing. Preserve the loaded source, defined partial document state and consumed randomness; allow retry on the same document. Keep one numerical engine and one shared cancellation flag.",
+  "jobOwnership": "Single-image and batch controllers retain their separate view histories. Both use one ProcessingJob implementation. The host serializes operation admission, so only the active job uses the shared cancellation cell. These are current workflow contexts, not compatibility paths.",
+  "checkpoints": "Use existing palette, segmentation, smoothing and fitting checkpoints. Check cancellation before deduplicating integer progress. An active 100-percent checkpoint is not task completion.",
+  "cancellation": "Request cancellation on the document and let its business method unwind. Palette throws without a new method result. Segmentation, smoothing and fitting return status 2 and progress 100. The job records cancellation separately from the document result. Retry starts a new job and clears the shared cancellation request.",
+  "displayOwnership": "Completed bitmap and vector display scenes are separate from live document buffers. Do not publish an incomplete segmentation as an editable completed map. An operation that is cancelled must not navigate as if it completed successfully.",
+  "nativeEvidence": [
+    "../tools/probe-engine-native.c",
+    "../test/fixtures/document-cancellation-reference.ndjson.gz",
+    "../test/fixtures/segmentation-cancellation-reference.ndjson.gz",
+    "../test/fixtures/smoothing-cancellation-reference.ndjson.gz",
+    "../test/fixtures/fitting-cancellation-reference.ndjson.gz"
+  ],
+  "verificationRequired": [
+    "Unchanged batch behavior through the extracted job owner",
+    "Single-image progress and cancellation at each verified numerical stage",
+    "Retained source and defined partial state, followed by successful retry",
+    "Host remains responsive to progress polling and cancellation while its CPU worker runs",
+    "Compiled GUI with trusted Process, Cancel and retry interactions",
+    "Appropriate core, GUI, package and source identity checks"
+  ],
+  "limits": "Classification internals, queued-request replacement and complete native GUI timing remain unverified. This work does not establish full application parity. Original application writes, widget setters, readiness overrides and instruction patches are excluded."
+}

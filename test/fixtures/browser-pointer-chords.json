@@ -1,0 +1,42 @@
+{
+  "producer": "Trusted Chromium mouse input through agent-browser, right then left press/release, no keyboard modifiers held.",
+  "browserCapture": "../../evidence/button-chords-before-browser-events.json",
+  "nativeUiInputOrDialogs": false,
+  "events": [
+    {
+      "type": "pointermove",
+      "button": -1,
+      "buttons": 0,
+      "pointerType": "mouse",
+      "isTrusted": true
+    },
+    {
+      "type": "pointerdown",
+      "button": 2,
+      "buttons": 2,
+      "pointerType": "mouse",
+      "isTrusted": true
+    },
+    {
+      "type": "pointermove",
+      "button": 0,
+      "buttons": 3,
+      "pointerType": "mouse",
+      "isTrusted": true
+    },
+    {
+      "type": "pointermove",
+      "button": 0,
+      "buttons": 2,
+      "pointerType": "mouse",
+      "isTrusted": true
+    },
+    {
+      "type": "pointerup",
+      "button": 2,
+      "buttons": 0,
+      "pointerType": "mouse",
+      "isTrusted": true
+    }
+  ]
+}

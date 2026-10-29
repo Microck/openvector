@@ -1,0 +1,707 @@
+{
+  "component": "Independent vector shape assembly and export under reconstruction",
+  "status": "All six fitted-graph serializers pass complete native byte corpora, 183 source tests and strict fresh offline package checks. Full image conversion and application parity remain unfinished.",
+  "boundary": "Completed fitted shared nodes, referenced cubic coordinates and region edge records from fitContours. Preserve nesting, colors, edge references and direction. DXF additionally requires the original normalized float32 BGRA palette, including entries absent from region byte colors. Document APIs must retain this state for the library, CLI and GUI.",
+  "reference_executable_sha256": "c491656b962debc215a8b6e757a9b2949ffe50a36b5f2db692706bcd4ebface1",
+  "assembly": {
+    "reference": "0x47d4c0",
+    "observed_structure": "Clear and rebuild each region child list from parent IDs. Collect child boundary runs adjacent to each parent, join runs by shared endpoint node identity and retain ordered hole-edge references. The output array has one vector per region; hole lists contain numeric [region,edge] pairs. Capture these before independently implementing the join rules.",
+    "storage": "Region output vectors are 16 bytes with initialized begin/end/capacity at +4/+8/+12. Ghidra does not recognize constructor 0x474560 as a procedure; exact objdump bytes verify those three zero stores. Never serialize allocator residue or process pointers. Nested list nodes store region/edge at +8/+12.",
+    "constructor_evidence": "../evidence/output-hole-vector-constructor-assembly.txt",
+    "status": "Implemented and exact-native-compared.",
+    "cases": 2872,
+    "base_fitted_inputs": 2712,
+    "visibility_probes": 160,
+    "child_links": 1095,
+    "hole_paths": 994,
+    "hole_edge_pairs": 2360,
+    "maximum_hole_runs": 83,
+    "duplicate_start_junctions": 8,
+    "algorithm": "Build child-adjacent edge runs in original order, retain the last candidate for each starting node, then follow/consume links in run order. A Map replaces the verified naive quadratic scan while preserving its last-match rule.",
+    "recording": "../evidence/engine-output-shapes-native-reference.json",
+    "fixture": "../test/fixtures/output-shapes-reference.json",
+    "driver": "../tools/record-output-shapes.py"
+  },
+  "grouping": {
+    "reference": "0x47c2f0",
+    "observed_structure": "Classes use exact four-byte region colors and retain first-encounter class order plus region order within each class. Output records contain region ID and flags: 0 first, 1 last, 2 singleton, 3 middle.",
+    "status": "Implemented and exact-native-compared across all 2872 states."
+  },
+  "visibility": {
+    "reference": "0x46c330",
+    "observed_structure": "Regions inside the stored bitset range are visible when their hidden bit is zero; IDs beyond the current bitset size remain visible. Capture remove/restore behavior and grouping interactions before designing document edits.",
+    "status": "Implemented and exact-native-compared.",
+    "queries": 112496,
+    "word_boundary_probes": [
+      31,
+      32,
+      33,
+      63,
+      64,
+      65
+    ],
+    "range_probes": [
+      1023,
+      1024,
+      1025
+    ]
+  },
+  "export_controller": {
+    "reference": "0x47c660",
+    "shape_modes": {
+      "0": "stacked shapes",
+      "1": "cutouts",
+      "2": "cutouts grouped by color"
+    },
+    "edge_emission": "0x4741b0 emits line endpoints for edge type 0 and forward/reversed cubic points for types 1/2. Hole emission traverses stored edge lists in reverse with reverse-edge selection. Region visibility and writer color acceptance precede shape emission.",
+    "pending": "All six writers share the verified native traversal. Document editing/state, application environment acquisition and complete application behavior remain unfinished.",
+    "compound_argument": "Pass the same has-holes boolean to shape begin/end, as exact 0x47c660 stack-offset-0x1c stores/loads prove.",
+    "cubic_callback": "0x4741b0 passes already oriented control points, start kind, then the combined native direction flag. The direction flag remains observable in DXF sampling. One canonical walker now matches that contract; other writers consume oriented points directly.",
+    "progress": {
+      "reference": "0x47c660 / 0x46f790 / 0x46ead0 / 0x468d60",
+      "implemented": "Optional onProgress(percent) on all six serializers. Emit before color/visibility filtering every fourth row; suppress duplicate quantized phases. Completed output can finish below 100.",
+      "phase": "floor(row*50/regionCount+0.5)",
+      "float32Endpoints": [
+        0.0565590001642704,
+        0.9632200002670288
+      ],
+      "nativePhases": 51,
+      "recording": "../evidence/native-batch-processing-export-progress-table-verification.json",
+      "fixture": "../test/fixtures/export-progress-reference.json",
+      "tests": "../test/vector-output.test.mjs",
+      "documentBoundary": "ImageDocument.runExport owns progress reset, cancellation-flag reset and final task result. BatchRunner owns opening/truncation, serialization, writes and handle closure. See batch-contract.json for limits."
+    }
+  },
+  "formats": [
+    "svg",
+    "eps",
+    "pdf",
+    "ai",
+    "dxf",
+    "emf"
+  ],
+  "svg_observations": {
+    "current_examples": "Original known-settings outputs use fixed two-decimal coordinates, RGB hex fills and two-decimal opacity. 0x4760f0 emits 1.00 for alpha bytes >=251 and formats lower bytes after multiplication by 1/255. Preserve observed premultiplied color bytes; do not invent an unpremultiplication step.",
+    "pending": "SVG serialization for the documented fitted graph/options is implemented and exact-native-compared. Other formats and full application parity remain pending.",
+    "confirmed_wrapper": "0x47ca40",
+    "confirmed_constructor": "0x4759e0",
+    "confirmed_vtable": "0x8dcfa0",
+    "vtable_evidence": "../evidence/svg-confirmed-vtable.json",
+    "color_acceptance": "Shared method 0x475b40 accepts only alpha bytes strictly greater than 10. Exact assembly is retained; Ghidra does not recognize this tiny method as a procedure.",
+    "color_acceptance_evidence": "../evidence/writer-color-acceptance-assembly.txt",
+    "group_ids": "0x475de0 emits <g id=\"#...\"> using the eight hexadecimal RRGGBBAA digits from 0x475eb0.",
+    "stroke": "SVG writer copied settings+8 equals zero for the optional same-color 0.09375 stroke; default value one omits it.",
+    "dimensions": "Header uses output integer dimensions in pt and source integer dimensions in viewBox. Coordinates remain unscaled. Native controlled captures are required to establish every formatting byte.",
+    "capture_contract": "Development mode 49 runs the original SVG dispatcher after original fitting/assembly with explicit shape mode, stroke policy, output dimensions and hidden words. It embeds exact closed-file bytes in the numeric response, using one owned temporary SVG file. Test all three shape modes, both stroke policies, visibility boundaries, dimensions, alpha cutoff/opacity and signed/tie coordinates before implementation.",
+    "cases": 17436,
+    "geometries": 2743,
+    "fixture": "../test/fixtures/svg-reference.json",
+    "driver": "../tools/record-svg.py",
+    "decimal_conversion": {
+      "reference": "MSVCP71 num_put double 0x7c3c0f5f; MSVCR71 sprintf 0x7c36a42b, __fltout2 0x7c372a35, $I10_OUTPUT 0x7c371e14",
+      "contract": "Fixed streams repeatedly multiply magnitudes >=1e35 by the binary double 1e-10, then reinsert zeros. Coordinate precision is two. The CRT first converts with 17 decimal digits using its own long-format arithmetic, then rounds the requested fixed field. Native raw sprintf probes preserve all finite exponents, adjacent rounding-boundary values and signed zero.",
+      "raw_cases": 16406,
+      "raw_fixture": "../test/fixtures/cpp-fixed-reference.json",
+      "current_failures": 0,
+      "status": "Implemented: original truncated 16-bit product diagonals, nearest-even 80-bit rounding, radix-eight decimal-power composition, 88-bit fractional digit extraction and two-stage decimal rounding. Effective power constants are generated from exact rational powers, not copied or keyed to corpus values.",
+      "power_constants_evidence": "../evidence/msvcr71-decimal-power-constants.json",
+      "evidence_bundle": "../evidence/rea-msvcr71-formatting-evidence-bundle.json",
+      "repeat_driver": "../tools/record-cpp-formatting.py"
+    }
+  },
+  "known_reference": "../evidence/engine-reference-exports; 15 known-settings images and 90 default stacked-shape exports. Original repeated runs match 75 files byte-for-byte, with creation-date-only differences in 15 EPS files.",
+  "acceptance": "Compare numeric assembled paths, region/hole/group order and visibility first. Then compare each serializer and export option against original known-settings files. Identify permitted timestamp differences explicitly; visual similarity alone is insufficient.",
+  "next_recovery": "Implement independent EMF binary records after expanded GDI arithmetic/environment probes. Full image decoding/preprocessing, automatic classification/count selection, unsupported numerical modes, document editing and GUI parity remain pending.",
+  "completion": "All six serializers are implemented for the documented fitted-graph contracts. Full decoding/preprocessing, automatic classification/count selection, unsupported numerical modes, document editing, environment acquisition and GUI parity remain unfinished.",
+  "evidence_bundle": "../evidence/rea-pdf-complete-ai-recovery-evidence-bundle.json",
+  "evidence_bundle_records": 337,
+  "evidence_label_corrections": {
+    "note": "Evidence filenames are analyst hypotheses, not format identity. Original dispatcher 0x47cfb0 proves PDF dispatches to 0x47cd80 and SVG to 0x47ca40.",
+    "pdf_mislabeled_svg": [
+      "172-svg-writer-constructor",
+      "175-svg-export-wrapper-exact",
+      "446-svg-initialize through 454-svg-finish"
+    ],
+    "pdf_constructor": "0x476370",
+    "pdf_vtable": "0x8dd18c",
+    "svg_wrapper": "0x47ca40",
+    "effect": "Numeric assembly uses verified addresses and is unaffected. SVG capture and serializer use the dispatcher-confirmed SVG wrapper."
+  },
+  "public_svg": {
+    "entrypoint": "openvector/svg",
+    "function": "exportSvg",
+    "input": "{ geometry, width, height, layout?, thinStroke?, outputWidth?, outputHeight?, hiddenRegions? }",
+    "defaults": {
+      "layout": "stacked",
+      "thinStroke": false,
+      "hiddenRegions": [],
+      "outputDimensions": "Source dimensions when both output dimensions are omitted."
+    },
+    "layout_values": [
+      "stacked",
+      "cutouts",
+      "grouped-cutouts"
+    ],
+    "dimensions": "Positive signed int32 integers. Output width and height must either both be supplied or both omitted. Header dimensions are pt; source viewBox and coordinates remain unchanged.",
+    "geometry": "Completed fitContours graph. Validate finite coordinates, byte BGRA colors, parent and contour references, initialized cubic slots and edge references once at boundary. Preserve read-only caller storage; do not synthesize missing topology.",
+    "visibility": "hiddenRegions lists existing nonnegative region IDs. Duplicate IDs are idempotent. An empty list keeps every accepted region visible. Convert once to original hidden-bit layout internally.",
+    "output": "Exact SVG UTF-8 string including native CRLF bytes. No timestamps or random draws.",
+    "cli": "openvector export-svg <document.json|->. Same input as exportSvg, raw SVG to stdout, diagnostics to stderr, exit 0 on success or 1 on error, no partial SVG. Existing numerical commands retain JSON output.",
+    "verification": "All 17436 native byte strings through public API; both CLI input sources, all three layouts and both stroke options, invalid graph/options produce no stdout. Extend prepared public pipeline through export and compare 15 original SVG files."
+  },
+  "eps_recovery": {
+    "status": "Implemented and exact-native-compared; original repeats, complete source suite and fresh offline package pass.",
+    "wrapper": "0x47c970",
+    "constructor": "0x478540",
+    "vtable": "0x8ddb44",
+    "methods": {
+      "initialize": "0x4786c0",
+      "accept-color": "0x477380",
+      "group-begin": "0x4785e0",
+      "group-end": "0x4789a0",
+      "shape-begin": "0x478600",
+      "shape-end": "0x478bb0",
+      "line": "0x478dd0",
+      "cubic": "0x478f60",
+      "finish": "0x478670"
+    },
+    "vtable_evidence": "../evidence/eps-confirmed-vtable.json",
+    "known_output": "Default known-settings files use EPSF-3.0, local CreationDate, LanguageLevel 3, integer bounding box, flipped vertical coordinates, two-decimal path operands, three-decimal RGB components and fill. Controlled captures remain required for scaling, alpha, layout, stroke and edge cases.",
+    "timestamp_comparison": "CreationDate differs across repeat captures; permit only that explicit line when comparing repeated original EPS files. Never ignore unrelated bytes.",
+    "color_acceptance": "Exact 0x477380 assembly accepts only alpha bytes strictly greater than 50, unlike the SVG cutoff of 10. Ghidra does not recognize this tiny method; use the retained exact bytes.",
+    "color_acceptance_evidence": "../evidence/eps-color-acceptance-assembly.txt",
+    "color_emission": "Shape/group endings convert each RGB byte to float32 using float32 1/255 and stream precision three. Controlled native captures must pin those decimal strings. The alpha channel is not emitted as opacity in the inspected default fill path.",
+    "coordinate_transform": {
+      "reference": "0x478f30",
+      "x": "(outputWidth*x)/sourceWidth",
+      "y": "((sourceHeight-y)*outputHeight)/sourceHeight",
+      "arithmetic": "Preserve multiplication/division and subtraction/multiplication/division order. Confirm exact x87 storage/arithmetic behavior with controlled captures."
+    },
+    "capture_contract": "Mode 51 shares original fitting/assembly and closed-file capture with SVG, then dispatches .eps. Explicit settings are layout, stroke, output width/height and PostScript operator style. The dispatcher itself supplies diagnostic flag zero (47d2b8 push 0); no uninitialized ABI argument is used. Preserve complete CreationDate bytes per file and pass that exact metadata into independent comparisons.",
+    "decimal_precision_three": "Mode 52 calls the original resolved sprintf import with %0.3f on retained finite values, new three-decimal tie/adjacent probes and all float32 normalized RGB bytes. Keep the two-decimal corpus unchanged.",
+    "cases": 41010,
+    "geometries": 3005,
+    "fixture": "../test/fixtures/eps-reference.json.gz",
+    "driver": "../tools/record-eps.py",
+    "stream_state": "Before the first coordinate, color output uses general precision three; drawing any edge sets fixed formatting for the rest of the file. Empty groups can emit general RGB values and close/fill before any newpath. All 256 byte values are captured in hidden groups. Preserve this native behavior.",
+    "overflow_cases": 72,
+    "hidden_byte_color_cases": 3072,
+    "native_repeat": "Entire binary response matches except exactly 41010 CreationDate payloads. Proof: ../evidence/eps-native-repeatability.json"
+  },
+  "svg_package": {
+    "verified": true,
+    "files": 30,
+    "entrypoints": 11,
+    "bytes": 73688,
+    "sha256": "8d1a62b794e81242a5519723bfeff32ebbc94880d3d659ed859bf466d9a1e777",
+    "proof": "../evidence/svg-package-archive-verification.json",
+    "installation_directory": "D:\\migracion\\ambivalence-verification\\svg-final",
+    "source_suite": {
+      "tests": 146,
+      "failures": 0,
+      "skipped": 0,
+      "duration_ms": 576176.4642,
+      "report": "../evidence/svg-full-test-run.txt"
+    }
+  },
+  "public_eps": {
+    "entrypoint": "openvector/eps",
+    "function": "exportEps",
+    "input": "{ geometry, width, height, layout?, thinStroke?, outputWidth?, outputHeight?, hiddenRegions?, compact?, creationDate? }",
+    "shared_boundary": "Reuse the same fitted graph validation, layout, dimensions and hidden-region normalization as SVG. One canonical shared edge/hole traversal drives both writers; format-specific color acceptance and formatting stay in each writer.",
+    "defaults": {
+      "layout": "stacked",
+      "thinStroke": false,
+      "hiddenRegions": [],
+      "compact": false,
+      "creationDate": "Current local ctime-style date, without its trailing newline.",
+      "outputDimensions": "Source width/height when both output dimensions are omitted."
+    },
+    "metadata": "Optional creationDate is literal printable single-line ASCII metadata (1..255 characters). It replaces only the CreationDate value; it does not alter coordinates, layout or colors. This allows byte-exact capture comparison and reproducible exports without mocking the clock.",
+    "numeric_contract": "Coordinates are transformed in original x87 53-bit register arithmetic with extended exponent range, then stored as double. RGB components use float32 byte normalization and stream precision three. Paths use precision two; accepted colors have alpha >50. Preserve the native Inf formatting when finite source coordinates overflow final scaled double storage.",
+    "cli": "openvector export-eps <document.json|->. Same input as exportEps; raw EPS bytes on stdout, stderr diagnostic and exit 1 without partial output on failure.",
+    "verification": "Compare every captured EPS byte with its actual CreationDate supplied as metadata, including all layouts/strokes/styles/visibility/alpha/dimensions and scaled finite extremes. Check the real default clock separately and preserve every SVG comparison."
+  },
+  "format_status": {
+    "svg": "implemented",
+    "eps": "implemented",
+    "pdf": "implemented",
+    "ai": "implemented",
+    "dxf": "implemented",
+    "emf": "implemented"
+  },
+  "eps_package": {
+    "verified": true,
+    "files": 31,
+    "entrypoints": 12,
+    "bytes": 76909,
+    "sha256": "d40d618be1011653c6c320009fdf352e8dbffa6d114eee6ae09f1296c64dd97d",
+    "proof": "../evidence/eps-package-archive-verification.json",
+    "installation_directory": "D:\\migracion\\ambivalence-verification\\eps",
+    "source_suite": {
+      "tests": 153,
+      "failures": 0,
+      "skipped": 0,
+      "duration_ms": 538618.6313,
+      "report": "../evidence/eps-full-test-run.txt"
+    },
+    "strict_installed_working_directory_verified": true
+  },
+  "pdf_recovery": {
+    "status": "Implemented and verified: native repeat bytes, complete source suite and strict standalone package checks pass.",
+    "wrapper": "0x47cd80",
+    "constructor": "0x476370",
+    "vtable": "0x8dd18c",
+    "vtable_evidence": "../evidence/pdf-confirmed-vtable.json",
+    "methods": {
+      "initialize": "0x476b40",
+      "accept-color": "0x475b40",
+      "group-begin": "0x476410",
+      "group-end": "0x476430",
+      "shape-begin": "0x477020",
+      "shape-end": "0x476490",
+      "line": "0x476da0",
+      "cubic": "0x476f10",
+      "finish": "0x4764f0"
+    },
+    "known_output": "PDF 1.4 with a four-byte binary comment, uncompressed content stream, separate stream-length object, page/catalog/resources objects, byte-offset xref and producer metadata. Existing 15 default PDF files repeat byte-for-byte.",
+    "shape_behavior": "0x477020 emits RGB stroke/fill colors with precision three, changes /Vmt<alpha> gs only when alpha differs from the stored current alpha, and records used alpha bytes. Accept-color 0x475b40 uses alpha >10. Group/shape endings choose b for thin-stroke policy zero or f otherwise.",
+    "finish_behavior": "0x4764f0 emits objects in native order, used alpha resource definitions in byte order, stream length and xref/trailer bytes. Do not infer valid offset/length rules solely from decompiler types; compare raw captured bytes.",
+    "initialization_evidence": "../evidence/pdf-initialize-header-assembly.txt",
+    "unrecognized_methods": "446, 447, 448 and 452 evidence requests did not expose the tiny PDF methods as Ghidra procedures. Use exact objdump bytes instead of retrying those same unsupported addresses.",
+    "label_corrections": {
+      "498-pdf-coordinate-transform": "0x476e60 is initial move emission with a coordinate transform, not a pure coordinate-return helper.",
+      "499-pdf-alpha-resource": "0x476ae0 declares any PDF object and records its byte offset; it is not alpha-specific."
+    },
+    "coordinate_observation": "PDF and EPS use one shared 53-bit register transform and fixed/general RGB state. All prior SVG/EPS byte comparisons remain exact.",
+    "evidence_bundle": "../evidence/rea-eps-complete-pdf-recovery-evidence-bundle.json",
+    "evidence_bundle_records": 335,
+    "capture_contract": "Mode 53 shares original fitted-graph assembly and closed-file capture, dispatching .pdf. Retain each raw byte through Latin-1 JSON encoding and deterministic gzip fixture storage. Capture exact objects, stream length, xref offsets, opacity resources and source/output dimensions; never strip metadata or binary-header bytes.",
+    "cases": 22014,
+    "geometries": 3264,
+    "fixture": "../test/fixtures/pdf-reference.json.gz",
+    "driver": "../tools/record-pdf.py",
+    "binary_header_hex": "255044462d312e340d0a25c7ec8fa20d0a",
+    "stream_length": "Includes the CR of the extra terminating CRLF. Exactly one LF remains between the declared content boundary and endstream.",
+    "page_box": "Confirmed by controlled dimension captures: MediaBox retains source width/height even when paths scale to output dimensions.",
+    "alpha_resource_coverage": "All accepted alpha bytes 11..255 appear in captured resources. Initial alpha is 255; opaque resources are emitted only after returning to 255 from another alpha."
+  },
+  "public_pdf": {
+    "entrypoint": "openvector/pdf",
+    "function": "exportPdf",
+    "input": "{ geometry, width, height, layout?, thinStroke?, outputWidth?, outputHeight?, hiddenRegions? }",
+    "boundary": "Reuse the same fitted graph and export-option validation as SVG/EPS. One canonical traversal emits ordered outer/hole lines and cubics. PDF/EPS share the original scaled coordinate and formatting-state implementation.",
+    "defaults": {
+      "layout": "stacked",
+      "thinStroke": false,
+      "hiddenRegions": [],
+      "outputDimensions": "Source dimensions when both output dimensions are omitted."
+    },
+    "output": "Owned Uint8Array of exact PDF bytes, including the binary comment, CRLF, content, objects, xref offsets and reference producer metadata. No timestamp differences are permitted.",
+    "cli": "openvector export-pdf <document.json|->. Same input as exportPdf, raw bytes on stdout, diagnostic on stderr and exit 1 with no partial PDF on failure.",
+    "verification": "Compare every raw native byte across layouts, strokes, visibility, colors, alpha transitions, dimensions and finite extremes. Verify API ownership/options, binary CLI file/stdin transport, and public prepared pipelines through PDF."
+  },
+  "pdf_package": {
+    "verified": true,
+    "files": 32,
+    "entrypoints": 13,
+    "bytes": 78990,
+    "sha256": "64f1ae585837a8038d44d754c1b3d586e2062392cf443dfb7c138331416567f3",
+    "proof": "../evidence/pdf-package-archive-verification.json",
+    "installation_directory": "D:\\migracion\\ambivalence-verification\\pdf",
+    "strict_installed_working_directory_verified": true,
+    "source_suite": {
+      "tests": 159,
+      "failures": 0,
+      "skipped": 0,
+      "duration_ms": 540328.9411,
+      "report": "../evidence/pdf-full-test-run.txt"
+    }
+  },
+  "ai_recovery": {
+    "status": "Implemented and verified: full native byte corpus, fresh repeat, complete source suite, coupled public pipeline and strict standalone package checks pass.",
+    "wrapper": "0x47cbd0",
+    "constructor": "0x477180",
+    "vtable": "0x8dd3c0",
+    "methods": {
+      "initialize": "0x477390",
+      "accept-color": "0x477380",
+      "group-begin": "0x477220",
+      "group-end": "0x477250",
+      "shape-begin": "0x477b20",
+      "shape-end": "0x477280",
+      "line": "0x477820",
+      "cubic": "0x477970",
+      "finish": "0x4772e0"
+    },
+    "vtable_evidence": "../evidence/ai-confirmed-vtable.json",
+    "color_acceptance": "Shares 0x477380 with EPS; retained exact assembly proves alpha >50. Do not requery this known unrecognized tiny method.",
+    "capture_contract": "Mode 54 shares exact original fitting, assembly and closed-file export capture. Reuse all PDF cases, including exhaustive alpha/color bytes, transitions, visibility and scaled finite extremes. Keep complete ASCII/CRLF AI output, including all header/prolog metadata.",
+    "observations": "Color groups emit u/U. Compound paths open u/*u and close *U/U. Every hole start paints the previous subpath with b or f; every shape ending paints before compound closure. Cubics retain the extra space before uppercase C. Path scaling uses the shared EPS/PDF arithmetic.",
+    "cases": 22014,
+    "geometries": 3264,
+    "compound_cases": 708,
+    "scaled_cases": 90,
+    "fixture": "../test/fixtures/ai-reference.json.gz",
+    "driver": "../tools/record-ai.py",
+    "header": "Retain all original ASCII metadata, empty CreationDate/DocumentFonts trailing spaces, source bounds/art size, numeric precision and missing separator in AI3_PaperRect.",
+    "compound_flag": "Exact export-controller assembly stores has-holes at stack offset 0x1c and passes the same byte to beginShape/endShape. A Ghidra row-counter expression is not authoritative.",
+    "color_conversion": "0x477c50 normalizes each RGB byte with float32(byte * float32(1/255)); no unpremultiplication. Header fixed width/height fields set the persistent stream flag before all RGB operands.",
+    "native_repeat": "../evidence/ai-native-repeatability.json",
+    "evidence_bundle": "../evidence/rea-ai-complete-dxf-recovery-evidence-bundle.json",
+    "evidence_bundle_records": 344
+  },
+  "public_ai": {
+    "entrypoint": "openvector/ai",
+    "function": "exportAi",
+    "input": "{ geometry, width, height, layout?, thinStroke?, outputWidth?, outputHeight?, hiddenRegions? }",
+    "defaults": "Same common fitted-graph export options as SVG/EPS/PDF. Stacked layout, no thin stroke, source output dimensions and no hidden regions.",
+    "output": "Owned ASCII string with exact native CRLF, header/prolog metadata, fixed field widths, group/compound delimiters and path operands. No timestamp replacement is permitted.",
+    "semantics": "Alpha >50 is accepted. Header bounds/art size use source dimensions; path coordinates scale/flip to output dimensions. Hole starts paint the preceding subpath; compounds open u/*u and close *U/U. Color groups use u/U independently. Header numeric formatting sets fixed mode before every RGB field.",
+    "cli": "openvector export-ai <document.json|->. Raw AI text on stdout; diagnostics on stderr, exit 1 and no partial file on errors.",
+    "verification": "Compare all 22014 original files, every layout/stroke/visibility/alpha/color/dimension and finite-extreme probe. Preserve all previous export comparisons and coupled public pipelines."
+  },
+  "ai_package": {
+    "verified": true,
+    "files": 33,
+    "entrypoints": 14,
+    "bytes": 80553,
+    "sha256": "1bd5a348878d8e02996846f339aa2093a73fed114edd6669060bcb8d04fb2d33",
+    "proof": "../evidence/ai-package-archive-verification.json",
+    "installation_directory": "D:\\migracion\\ambivalence-verification\\ai",
+    "strict_installed_working_directory_verified": true,
+    "source_suite": {
+      "tests": 164,
+      "failures": 0,
+      "skipped": 0,
+      "duration_ms": 540098.4663,
+      "report": "../evidence/ai-full-test-run.txt"
+    }
+  },
+  "dxf_recovery": {
+    "status": "Implemented and verified: all 65934 native file bytes, 144 explicit overlong diagnostics, public API/CLI, coupled pipelines, complete source suite and strict fresh offline package checks pass.",
+    "wrapper": "0x47cb00",
+    "constructor": "0x479240",
+    "vtable": "0x8ddd40",
+    "vtable_evidence": "../evidence/dxf-confirmed-vtable.json",
+    "methods": {
+      "initialize": "0x479f40",
+      "accept-color": "0x477380",
+      "group-begin": "0x4792e0",
+      "group-end": "0x4792e0",
+      "shape-begin": "0x4795b0",
+      "shape-end": "0x4792f0",
+      "line": "0x479370",
+      "cubic": "0x479800",
+      "finish": "0x479300"
+    },
+    "unrecognized_methods": "518/519/520/521 are absent from the Ghidra procedure table. Retained exact initialize/group/shape bytes are authoritative; do not requery those addresses.",
+    "observations": [
+      "The writer shares the EPS alpha >50 acceptance method. Color groups and shape-end are no-ops.",
+      "Coordinate transform is independently verified against 126984 original pairs, including signed int32 denominator wrapping, x87 register precision/exponents and nonfinite storage.",
+      "Writer field +0x2c values 1/2 sample cubics at 30 positions and reduce line emission with squared-second-difference thresholds 0.002/0.0005. Mode 0 emits a degree-three SPLINE with eight knots and four control points. All three independent modes match the complete native corpus.",
+      "Grouped cutouts name layers from RRGGBBAA bytes; other layouts use padded sequential shape names. Full palette layers, fixed records, relative handles, sampled direction and exact fields are implemented."
+    ],
+    "pending": "EMF and the remaining application boundaries are unfinished. Application preference loading remains distinct from the observed output-settings constructor.",
+    "field_writer": {
+      "vtable": "0x8dec38",
+      "constructor": "0x4a2bd0",
+      "evidence": "../evidence/dxf-field-writer-vtable.json",
+      "double": "0x4a6a10 calls original sprintf with %.16lf, replaces commas with periods, then removes trailing fractional zeros while retaining at least one. Exact bytes and 28700 native precision-sixteen strings verify conversion; 126984 coordinate pairs verify actual trimmed fields.",
+      "group_code": "CString field writer chooses two spaces for codes below 10, one below 100 and none otherwise.",
+      "handle": "0x4a6910 formats handles with %0X.",
+      "unknown_procedures": "540/541/543/544 were not recognized as Ghidra procedures; exact field-writer bytes were retained without retry.",
+      "raw_decimal_cases": 28700,
+      "raw_decimal_fixture": "../test/fixtures/cpp-fixed-sixteen-reference.json"
+    },
+    "evidence_bundle": "../evidence/rea-dxf-coordinate-complete-evidence-bundle.json",
+    "evidence_bundle_records": 365,
+    "capture_contract": "Mode 55 shares original fitting/assembly and closed-file capture with explicit curveMode 0/1/2 at copied exporter settings +12. Retain every original ASCII file byte plus actual native palette state. Portable storage is an indexed stream of gzip NDJSON parts below 64 MiB: metadata, unique indexed geometry/palette records, cases, final exact counts. Mode 56 separately captures %.16lf; mode 57 captures coordinate bits, raw fields and actual trimmed file-stream values.",
+    "coordinates": {
+      "reference": "0x479560",
+      "cases": 126984,
+      "raw_overlong_fields": 98,
+      "nonfinite_fields": 109,
+      "fixture": "../test/fixtures/dxf-coordinates-reference.ndjson.gz",
+      "driver": "../tools/record-dxf-coordinates.py",
+      "arithmetic": "x=(outputWidth*x)/int32(sourceWidth*72); y=((sourceHeight-y)*outputHeight)/int32(sourceHeight*72). Retain native 53-bit x87 significands, extended register exponents, final double storage, signed zeros, negative divisors, infinities and x87 negative indefinite NaN.",
+      "formatter": "Original %.16lf conversion then actual original 0x4a6a10 trimmed field values and CRLF/group codes for every raw field below 256 bytes. The original 256-byte buffer overflows before trimming on longer fields; independent formatting must reject such a field with a clear DXF diagnostic when it is emitted, without rejecting unrelated hidden geometry.",
+      "special_labels": "Native CRT inf, quiet/signaling NaN and negative indefinite labels are pinned separately at precisions two, three and sixteen.",
+      "status": "Independent transform bits, raw fields and actual trimmed emitted fields match all 126984 original pairs. All previous SVG/EPS/PDF/AI byte comparisons still pass.",
+      "special_inputs": {
+        "cases": 30,
+        "nonfiniteFields": 60,
+        "fixture": "../test/fixtures/dxf-special-coordinates-reference.ndjson.gz",
+        "contract": "Original infinities and NaN input bit patterns pass through the coordinate arithmetic, including sign changes, NaN quieting/payloads and zero/negative divisors. These derived-value states cannot be interpreted as finite dyadic numbers."
+      }
+    },
+    "overlong_fields": {
+      "cases": 144,
+      "fixture": "../test/fixtures/dxf-overlong-reference.json",
+      "observed_extreme_process": "One original full-file extreme test timed out after 30 seconds and was terminated; authoritative subsequent process inventory confirmed no helper remained. Partial DXF was 10959 bytes.",
+      "classification": "Each diagnostic has an actual accepted visible line-end witness whose original isolated %.16lf field exceeds the 256-byte stack buffer. Raw length is checked before native trimming. These are not successful native output comparisons or claims that all 144 were run to the same timeout.",
+      "hidden_extremes": "Thirty-six full files use the same two extreme geometries with every region hidden; they remain in the successful native output capture."
+    },
+    "palette_state": {
+      "required": "The new DXF API must receive the original normalized float32 BGRA palette alongside fitted geometry. No reconstruction from region bytes or fallback palette is permitted.",
+      "reason": "Header preparation copies the full palette, including unused or byte-collapsed entries. Native source-561 has 24 palette entries, one distinct region byte color, and 25 DXF layers including the default. The fitted byte graph cannot recover this state.",
+      "evidence": "../evidence/dxf-palette-state-requirement.json",
+      "retention": "Each DXF geometry reference now includes the actually captured native segmentation palette; CLI and overlong diagnostics carry it too. Existing SVG/EPS/PDF/AI inputs remain unchanged."
+    },
+    "cases": 65934,
+    "geometries": 3264,
+    "fixture": "../test/fixtures/dxf-reference/index.json",
+    "driver": "../tools/record-dxf.py",
+    "native_repeat": "../evidence/dxf-native-repeatability.json",
+    "fixture_integrity": "../evidence/dxf-fixture-integrity.json",
+    "default_constructor": {
+      "reference": "0x42d7c0",
+      "fields": [
+        "shape mode 2",
+        "PostScript style 1",
+        "stroke policy 1",
+        "DXF curve mode 2"
+      ],
+      "note": "Constructor observations only. Application preference/configuration loading is not established by this capture."
+    },
+    "implementation": {
+      "source": [
+        "../src/dxf.mjs",
+        "../src/dxf-container.mjs"
+      ],
+      "native_direction_contract": "The controller first orients cubic controls and separately passes a combined direction flag. Sampling reverses that oriented array for evaluation when flagged and traverses sample indices backwards, retaining oriented endpoints. Shared SVG/EPS/PDF/AI callbacks consume already oriented controls.",
+      "evidence": "../evidence/dxf-edge-dispatch-assembly.txt",
+      "initial_failure": "../evidence/dxf-initial-conformance-test-run.txt",
+      "corrected_corpus": "../evidence/dxf-oriented-dispatch-test-run.txt",
+      "scoped_tests": 49,
+      "scoped_duration_ms": 54187.3112,
+      "scoped_report": "../evidence/dxf-public-scoped-test-run.txt",
+      "review": "../evidence/dxf-simplification-review.json"
+    },
+    "native_repeat_reuse": "The retained fresh-process whole-response repeat remains applicable: the original executable, native helper, request stream and successful full-file fixture did not change during independent serializer implementation. The new 30 special-input coordinate probes are captured separately."
+  },
+  "dxf_coordinate_package": {
+    "verified": true,
+    "files": 33,
+    "entrypoints": 14,
+    "bytes": 81178,
+    "sha256": "0c50d67a7583ac57d32089ecb704583f32c3d019375da067541a9a9bc3099ccb",
+    "proof": "../evidence/dxf-coordinates-package-archive-verification.json",
+    "installation_directory": "D:\\migracion\\ambivalence-verification\\dxf-coordinates",
+    "strict_installed_working_directory_verified": true,
+    "source_suite": {
+      "tests": 167,
+      "failures": 0,
+      "skipped": 0,
+      "duration_ms": 542746.0044,
+      "report": "../evidence/dxf-coordinates-full-test-run.txt"
+    }
+  },
+  "public_dxf": {
+    "entrypoint": "openvector/dxf",
+    "function": "exportDxf",
+    "input": "{ geometry, palette, width, height, layout?, thinStroke?, outputWidth?, outputHeight?, hiddenRegions?, curveMode? }",
+    "palette": "Required owned copy of original normalized float32 BGRA values. Accept Number arrays or Float32Array; finite channels in [0,1], at least one color and four channels per color. Do not reconstruct missing entries from region bytes.",
+    "defaults": {
+      "layout": "stacked, matching the current common export API contract",
+      "thinStroke": false,
+      "hiddenRegions": [],
+      "curveMode": "dense-lines (native constructor mode 2)",
+      "outputDimensions": "Source dimensions when both omitted."
+    },
+    "curve_modes": {
+      "splines": 0,
+      "sparse-lines": 1,
+      "dense-lines": 2
+    },
+    "semantics": "Same shared accepted/visible outer/hole traversal. Alpha >50. Thin stroke has no effect. Layers retain original counts/names and full palette. Paths use verified DXF transform/field kernels. Preserve original entity ordering, curve direction behavior, fixed records, dynamic handles and CRLF.",
+    "output": "Owned ASCII string of exact native file bytes. If an actually emitted numeric field exceeds the reference stack-buffer capacity, throw a clear DXF diagnostic; hidden unrelated geometry does not trigger that limit.",
+    "verification": "Every byte of all 65934 native files, 144 overlong diagnostics, 36 hidden extreme files, defaults/options/ownership, stdin/file CLI, fresh package and all coupled pipelines.",
+    "cli": "openvector export-dxf <document.json|->. Required palette, same common export options, explicit splines/sparse-lines/dense-lines. Raw ASCII on stdout; diagnostic on stderr, exit 1 and no partial file on failure."
+  },
+  "dxf_package": {
+    "verified": true,
+    "files": 35,
+    "entrypoints": 15,
+    "bytes": 87158,
+    "sha256": "bd24ebc0ed467d2d2742828cdf5737ff401030fd544d7a5e60300b8bae438d0b",
+    "proof": "../evidence/dxf-package-archive-verification.json",
+    "installation_directory": "D:\\migracion\\ambivalence-verification\\dxf",
+    "strict_installed_working_directory_verified": true,
+    "windows_command_shim_verified": true,
+    "source_suite": {
+      "tests": 175,
+      "failures": 0,
+      "skipped": 0,
+      "duration_ms": 612262.484,
+      "report": "../evidence/dxf-full-test-run.txt"
+    }
+  },
+  "emf_recovery": {
+    "status": "Implemented and verified for the documented graph/device contract: all 22014+402 native file bytes, 277909 integer pairs, 93880 device/frame pairs, all public transports and pipelines, full source suite and fresh package checks pass.",
+    "wrapper": "0x47cc90",
+    "constructor": "0x477cb0",
+    "vtable": "0x8ddae4",
+    "vtable_evidence": "../evidence/emf-confirmed-vtable.json",
+    "assembly_evidence": "../evidence/emf-writer-assembly.txt",
+    "import_evidence": "../evidence/emf-import-calls.json",
+    "methods": {
+      "initialize": "0x477e00",
+      "accept-color": "0x477380",
+      "group-begin": "0x477d70",
+      "group-end": "0x477d20",
+      "shape-begin": "0x477f80",
+      "shape-end": "0x478060",
+      "line": "0x478080",
+      "cubic": "0x478160",
+      "finish": "0x477d50"
+    },
+    "color_acceptance": "Shares the already verified 0x477380 alpha >50 method; exact shared assembly remains authoritative.",
+    "observations": [
+      "Original GDI creation uses a null reference DC and no explicit frame. The independent serializer requires the captured source-device measurements explicitly.",
+      "The coordinate scale constant at 0x8ddb08 is binary double 35.27777778; exact assembly truncates x87 products via signed 64-bit integer stores and keeps their low 32 bits.",
+      "Shape begin creates/selects a brush and pen then calls BeginPath. Shape end calls EndPath and FillPath. Group callbacks emit GDIC binary comments. Exact imports resolve the otherwise anonymous call targets.",
+      "All 90 captured output-size changes preserve native EMF bytes. Source dimensions still control the recorded window/viewport extents.",
+      "Captured headers retain a 64-character UTF-16 description: the original label is followed by adjacent static data because the passed string has only one terminating null. All bytes repeat exactly; an independent serializer must preserve this observed metadata.",
+      "The captured source device is 1920x1080 pixels, 527x296 millimeters and 527000x296000 micrometers. Application layers must supply environment state; the serializer has no machine-profile fallback.",
+      "All 402 expanded source-dimension/wide-curve outputs also match. Full application preference and environment acquisition remain unfinished."
+    ],
+    "pending": "Application acquisition of reference-device measurements, complete application behavior and unsupported system-resource failure domains remain separate recovery boundaries.",
+    "evidence_bundle": "../evidence/rea-emf-complete-classification-recovery-evidence-bundle.json",
+    "evidence_bundle_records": 378,
+    "capture_contract": "Development operation 58 shares original fitting, assembly, settings and exact closed-file export capture. Decode raw file bytes bijectively through Latin-1 for portable fixtures. Start with controlled small batches to establish GDI record/header repeatability and resource behavior, then cover all previous geometry/settings/visibility/alpha/dimension domains without altering original calls. Operation 58 appends two u32 GetGuiResources GDI object counts after each export PRNG value. These are read-only observations; original GDI calls and objects remain untouched. The initial uninstrumented capture is retained separately.",
+    "initial_capture": {
+      "cases": 60,
+      "geometries": 9,
+      "fixture": "../evidence/emf-initial-reference.json.gz",
+      "repeat": "../evidence/emf-initial-repeatability.json",
+      "whole_response_byte_identical": true,
+      "native_response_bytes": 75212
+    },
+    "resource_lifetime": {
+      "observation": "All 60 exact file bytes are unchanged by read-only GetGuiResources instrumentation. Counts grow from 0 to 54 across that capture. The original retains created brush/pen objects after closing its EMF files.",
+      "capture_design": "New reference capture batches predict at most two new objects per region, at most 2048 objects and 128 files per process. Every batch runs twice in fresh processes. Original calls remain unchanged. Single files exceeding the budget fail explicitly rather than being partially captured.",
+      "driver": "../tools/record-emf.py",
+      "scope": "Development reference process lifetime; not an independent runtime compatibility path."
+    },
+    "coordinates": {
+      "reference": "0x4780f0",
+      "scale_reference": "0x8ddb08",
+      "scale": 35.27777778,
+      "native_operation": 59,
+      "request": "height u32, x/y IEEE binary64 bits",
+      "response": "x/y signed int32 low words, then retained PRNG u32",
+      "contract": "x=low32(truncateSigned64(x*scale)); y=low32(truncateSigned64((height-y)*scale)). Keep 53-bit x87 arithmetic with extended exponents. Signed 64-bit invalid/overflow conversions store indefinite, whose low word is zero. Reference covers all previously retained points, all finite exponents, adjacent integer-storage boundaries, zero and nonfinite bit patterns.",
+      "status": "Independent transform matches all 277909 original coordinate pairs; full native response repeats exactly.",
+      "driver": "../tools/record-emf-coordinates.py",
+      "cases": 277909,
+      "fixture": "../test/fixtures/emf-coordinates-reference.ndjson.gz",
+      "test_report": "../evidence/emf-coordinates-initial-test-run.txt"
+    },
+    "full_capture": {
+      "cases": 22014,
+      "geometries": 3264,
+      "batches": 656,
+      "every_batch_repeat_identical": true,
+      "fixture": "../test/fixtures/emf-reference.ndjson.gz",
+      "manifest": "../evidence/emf-native-batches/manifest.json",
+      "native_files_bytes": 105432740,
+      "compressed_fixture_bytes": 23476873,
+      "status": "All original file bytes match the independent serializer. Current helper preserves every complete raw native batch.",
+      "integrity": "../evidence/emf-streamed-fixture-integrity.json",
+      "ordered_raw_response_sha256": "6a4b5b3319e5094ccbb47c88bb214873e2eaeba6090e712734d0d0e8bbe20897",
+      "ordered_raw_response_bytes": 377026860,
+      "streamed_fixture_integrity": "../evidence/emf-streamed-fixture-integrity.json",
+      "archived_json_capture_integrity": "../evidence/emf-full-fixture-integrity.json",
+      "current_helper_repeat": "../evidence/emf-complete-native-repeatability.json",
+      "logical_ndjson_sha256": "722f6987eb737fc34537c2cc5b9546a947fcd0bf8fd25355fcb000b4e9e07d55"
+    },
+    "bounds_recovery": {
+      "initial_hypotheses": [
+        "../evidence/emf-bounds-analysis.json",
+        "../evidence/emf-floor-ceil-bounds-analysis.json"
+      ],
+      "fixed_point_analysis": "../evidence/emf-fixed-point-bounds-analysis.json",
+      "observed_fill_records": 490530,
+      "matching_fill_records": 490530,
+      "model": "Round logical inputs and scale/product to float32, convert to signed 28.4 with nearest ties away from zero, then round pixels using (fixed+8)>>4. All 490530 native filled-path bounds and all 93880 expanded pairs match.",
+      "cubic_records": "All 230892 captured PolyBezierTo16 records use bounds [0,0,-1,-1] and three points.",
+      "header_frames": "MulDiv(int32(bound*100), millimeters, pixels), nearest ties away from zero and -1 on int32 overflow. All 93880 expanded frames and all 22014 original headers match.",
+      "unresolved": "All 93880 expanded device/frame pairs now match. Device mappings outside signed 28.4 storage report an explicit diagnostic; application/system-resource behavior is not established by this serializer corpus.",
+      "expanded_confirmation": "../evidence/emf-device-arithmetic-confirmation.json"
+    },
+    "native_preservation": "../evidence/emf-native-preservation.json",
+    "review": "../evidence/emf-simplification-review.json",
+    "device_bounds_probe": {
+      "native_operation": 60,
+      "scope": "Read-only controlled GDI backend calls through the original resolved import slots, using MM_HIMETRIC, original description bytes and source extents. Stock solid brush, no created pen/brush objects. This isolates integer logical-to-device mapping; complete original-writer file captures remain the separate conformance source.",
+      "request": "Header includes one owned UTF-16 filename; each case carries 2..16 logical signed int32 coordinate pairs.",
+      "response": "Closed EMF length, every file byte and retained PRNG u32. Capture twice in fresh processes without masking any field.",
+      "verification": "Distinguish floating point scale/product and 28.4 fixed rounding at every 16-bit integer, large signed coordinates and constructed near-half boundaries; retain actual FillPath bounds, header frame and device fields.",
+      "cases": 93880,
+      "confirmation": "../evidence/emf-device-arithmetic-confirmation.json"
+    },
+    "expanded_writer_probe": {
+      "native_operation": 61,
+      "scope": "Same original fit/assembly/EMF dispatch as 58, with explicit positive int32 source dimensions substituted only after fitting. Prepared source pixels and fitting geometry remain unchanged. Shifted curved inputs exercise 32-bit cubic records, bounds and int32 source-extent wrapping.",
+      "request": "Mode 58 prepared case, visibility and four settings, then two u32 source-dimension overrides before the UTF-16 filename.",
+      "response": "Same original closed-file bytes and read-only GDI counts as mode 58. Native repeated-process output must match without masks."
+    },
+    "expanded_files": {
+      "cases": 402,
+      "geometries": 67,
+      "wide_cubic_records": 48,
+      "fixture": "../test/fixtures/emf-expanded-reference.json.gz",
+      "repeat": "../evidence/emf-expanded-native-repeatability.json"
+    }
+  },
+  "emf_coordinate_package": {
+    "verified": true,
+    "files": 35,
+    "entrypoints": 15,
+    "bytes": 87412,
+    "sha256": "8bfa28ed62dd809aa6b1af0730b8da7308da54a0d6e26c48f471479fa98d2299",
+    "proof": "../evidence/emf-coordinates-package-archive-verification.json",
+    "installation_directory": "D:\\migracion\\ambivalence-verification\\emf-coordinates",
+    "strict_installed_working_directory_verified": true,
+    "windows_command_shim_verified": true,
+    "source_suite": {
+      "tests": 176,
+      "failures": 0,
+      "skipped": 0,
+      "duration_ms": 604311.7603,
+      "report": "../evidence/emf-coordinates-full-test-run.txt"
+    }
+  },
+  "public_emf": {
+    "entrypoint": "openvector/emf",
+    "function": "exportEmf",
+    "input": "{ geometry, width, height, referenceDevice, layout?, thinStroke?, outputWidth?, outputHeight?, hiddenRegions? }",
+    "reference_device": "Required { pixels:[width,height], millimeters:[width,height], micrometers:[width,height] }, each pair of positive int32 integers. These are source-device measurements used by the native header and mapping; never silently substitute a captured machine profile. Application layers must obtain their own environment state.",
+    "defaults": "Same common export options: stacked layout, no thin stroke, source-sized output dimensions, no hidden regions.",
+    "output": "Owned Uint8Array containing exact EMF bytes. Preserve original description metadata, records, object IDs, curve direction, path/control bounds, header fields, source dimension semantics and no-op output size behavior.",
+    "semantics": "Shared accepted/visible outer/hole traversal; alpha >50, GDIC color-group comments, thin stroke affects pen records although shape end uses FillPath. GDI chooses compact 16-bit cubic records when every control coordinate fits; otherwise 32-bit records. Verify native invalid-coordinate outcomes rather than inventing clamps.",
+    "cli": "openvector export-emf <document.json|->. Same input, raw bytes on stdout. On failure diagnostic on stderr, exit 1 and no partial file.",
+    "verification": "All 22014 existing original full files, expanded device-bound and wide-cubic probes, ownership/defaults/options/errors, all layout/stroke/visibility/alpha/dimension cases, CLI file/stdin transport, all 15 coupled public pipelines, complete source suite and strict fresh offline package checks.",
+    "status": "Implemented and verified. Complete application parity remains unfinished.",
+    "limits": "Reference-device measurements are required; no host profile is assumed. Out-of-range signed 28.4 mappings and a drawing-object count that cannot fit the 16-bit header fail with clear EMF diagnostics. Native system-resource exhaustion behavior remains outside this component verification."
+  },
+  "emf_package": {
+    "verified": true,
+    "files": 36,
+    "entrypoints": 16,
+    "bytes": 90090,
+    "sha256": "694f9d149ba1412889e3c20ff06e4c8df3afc1ead74e30110e762a2185cc1b65",
+    "proof": "../evidence/emf-package-archive-verification.json",
+    "installation_directory": "D:\\migracion\\ambivalence-verification\\emf",
+    "strict_installed_working_directory_verified": true,
+    "windows_command_shim_verified": true,
+    "source_suite": {
+      "tests": 183,
+      "failures": 0,
+      "skipped": 0,
+      "duration_ms": 601318.8625,
+      "report": "../evidence/emf-full-test-run.txt"
+    }
+  }
+}

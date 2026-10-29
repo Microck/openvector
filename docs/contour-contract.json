@@ -1,0 +1,21 @@
+{
+  "component": "Independent contour extraction from completed segmentation",
+  "status": "Independent original node construction, region tracing, shared boundaries, plain-image pattern reduction and region containment match 2584 native states before smoothing.",
+  "api": "extractContours({ width, height, indices, counts, colorIndices, palette, antiAlias }) returns owned nodes and regions. Input identifiers must be dense in first row-major encounter order, each region must be four-connected, and counts must match the pixel map. antiAlias is an explicit boolean.",
+  "output": "nodes contain double x/y coordinates and initialized integer kind/flags fields. regions contain pixelCount, colorIndex, byte BGRA color, parent, ordered node identifiers in contour, boundary triples [flags, neighboringRegion, incomingOriginalSampleCount], and sorted unique nonnegative neighbors. Allocation padding and native pointers are excluded.",
+  "cli": "openvector trace-contours <image.json|-> consumes prepared BGRA pixels and explicit processing settings, plus optional supplied palette. It runs canonical segmentation followed by contour extraction. Emit only the nodes/regions JSON object on stdout; diagnostics go to stderr with exit status 1. Success exits 0. The command never prompts. -h/--help use existing global help behavior.",
+  "reference": "Original 0x499eb0, 0x498a50, 0x4999d0 and 0x4993e0. The native oracle imports completed segmentation states and invokes original contour extraction without rerunning segmentation or smoothing.",
+  "scope": "Prepared segmentation maps at least 2 by 2, with dense four-connected region identifiers and supplied palette/color identifiers. One-dimensional input preparation remains a separate recovery task.",
+  "node_order": "Number the left border top to bottom, right border top to bottom, top interior border left to right, bottom interior border left to right, then interior boundary grid points in row-major order. Coordinates initially equal integer pixel-grid corners.",
+  "junctions": "Initialize the four image corners as kind 3. At each grid node inspect its four adjacent region labels, using -1 outside the image. Also mark kind 3 when fewer than two of the six label pairs are equal.",
+  "tracing": "Visit pixels row-major; trace a region only when its contour is empty. Start at its first available corner in constructor order. Follow oriented boundary edges, preserve native ordering and collect the adjacent region identifier for every segment.",
+  "reduction": "Original 0x4993e0 marks removable border nodes and, for plain images, matches six constructor patterns against long non-junction staircase runs. Compact nodes and per-region contours while preserving original sample lengths.",
+  "containment": "Choose a region's first neighboring region that does not list it as a neighbor, otherwise parent is -1. Do not replace this with bounding-box containment.",
+  "precision": "The six constructor staircase patterns are [5,0,33], [9,170,585], [9,146,585], [13,4369,8481], [10,132,1057], [10,330,1057]. Match the low run bits of either axis in this order. Direction order is left, down, right, up; quadrants are upper-left, lower-left, lower-right, upper-right. Preserve the native closing edge's adjacent label without repeating its endpoint.",
+  "cases": 2584,
+  "exhaustive_binary_topology_cases": 1312,
+  "long_staircase_cases": 112,
+  "nested_ring_cases": 4,
+  "recording": "../evidence/engine-contour-extraction-native-reference.json",
+  "completion": "Exact comparison of coordinates, node kinds/flags, ordered region contours, neighboring regions, boundary records and parents. Smoothing, fitting and export remain separate stages."
+}

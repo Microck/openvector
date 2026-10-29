@@ -1,0 +1,19 @@
+[package]
+name = "openvector-node"
+description = "Node-API bindings for the shared OpenVector Rust engine."
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+openvector = { path = "../openvector" }
+napi = { version = "3.12.4", features = ["napi8", "serde-json"] }
+napi-derive = "3.6.5"
+serde_json = { version = "1", features = ["float_roundtrip"] }
+
+[build-dependencies]
+napi-build = "2.4.2"

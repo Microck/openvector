@@ -1,0 +1,59 @@
+Usage: openvector vectorize <image|-> [options]
+
+Automatically convert a PNG, BMP, JPEG, GIF or TIFF image to vector paths.
+
+  -o, --output <path|->  Write a file, or - for stdout (default).
+      --format <format> SVG, EPS, PDF, AI, DXF, EMF, BMP, JPEG, PNG or TIFF. Inferred from the output
+                        extension, or SVG when writing to stdout.
+      --filename <name> Source filename for binary stdin only (required).
+      --edits <path>    Apply JSON processing/edit commands before exporting.
+      --scale <factor>  Bitmap output scale (default: 1; positive and finite).
+      --shrink-source   Reduce sources above 1.6 megapixels before processing.
+                        Full-size input is the default; source files are unchanged.
+      --flatten         Acknowledge the non-PNG transparency warning.
+      --layout <mode>   stacked, cutouts or grouped-cutouts (default).
+      --thin-stroke     Add native thin strokes to vector output.
+      --compact         Compact EPS output.
+      --dxf-mode <mode> splines, sparse-lines or dense-lines (default).
+      --profile <name>  Use saved advanced Fast Forward instead of automatic mode.
+      --profiles-file <path>  Explicit profile storage (required with --profile).
+      --recent-file <path>  Record each fitting that does work in recent basic
+                        settings storage; its parent must exist.
+      --recent-index <n>  Replay visible recent entry n (zero-based) instead of
+                        automatic mode. Needs --recent-file; not with --profile.
+  -f, --force           Replace an existing output file.
+  -h, --help            Show this help.
+
+Edit actions: undo, redo, revert, begin, commit, restore-committed, leave,
+finish and process. Commit retains a checkpoint without refitting;
+restore-committed restores it, and leave selects Pan without discarding edits.
+
+Examples:
+  openvector vectorize logo.png > logo.svg
+  openvector vectorize logo.bmp --output logo.pdf
+  openvector vectorize logo.png --edits edits.json --output edited.svg
+  cat logo.png | openvector vectorize - --filename logo.png
+  openvector vectorize logo.png --profile Logo --profiles-file profiles.json
+  openvector vectorize logo.png --recent-file recent.json --recent-index 0
+  openvector vectorize logo.png --output traced.png --scale 2
+
+Errors go to stderr with exit status 1. Conversion finishes before writing.
+EMF uses the current display's pixel and physical dimensions. Without a display,
+use export-emf with explicit referenceDevice metrics in its JSON input.
+An edits file is an array such as [{"tool":"fill","x":8,"y":8,"color":[0,0,1,1]}].
+Colors use normalized BGRA. History commands use {"action":"undo"}, "redo" or "revert".
+Use {"action":"finish"} to refit and {"action":"begin"} to re-enter editing.
+Use {"gesture":{...}} entries for tool selection and press/move/release events.
+Use {"background":{"action":"toggle","point":[1,1]}} to hide or restore a region.
+Use {"settings":{...}} to select controls; {"action":"process","stage":"smoothing"}
+or "fitting" applies them. "commit" only commits pixels before processing.
+Use {"source":"next.png"} to open another image relative to the plan directory.
+Profiles use exact names and persist selection order after successful image load.
+Fast Forward uses stored palette metadata, skips classification, and does not
+process palette mode 3. Edit plans keep their existing explicit command behavior.
+Recent storage is read before the image and written after each fitting that
+does work: automatic conversion, profile and recent replays, edit finishes,
+{"action":"process","stage":"fitting"} and replaced sources record the settings
+that fitting used. Cached or failed fittings record nothing. Replay applies the
+stored basic settings with advanced mode off; fixed colors search exactly the
+stored count.
