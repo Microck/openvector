@@ -50,6 +50,6 @@ materials. Those links are provenance references, not downloadable repository fi
 The test fixture corpus contains the reference inputs and expected observations
 needed by the differential suites. See [test fixtures](test-fixtures.md).
 
-Repository CI runs only the lightweight reference checks named in `test:smoke` and
-checks package contents. The [release runbook](release-runbook.md) requires native
+[Raft source CI](ci.md) runs only the lightweight reference checks named in
+`test:smoke`, JavaScript syntax checks, and package inventory checks. The [release runbook](release-runbook.md) requires native
 build and real workflow evidence before attaching binaries to a release.

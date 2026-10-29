@@ -84,8 +84,8 @@ npm run test:smoke
 ```
 
 That command runs the small reference checks included in the default checkout.
-It is also the scope of repository CI, not a claim that the full native or desktop
-suite passed. See [development](docs/development.md) and [test fixtures](docs/test-fixtures.md)
+It is also the test scope of [Raft source CI](docs/ci.md), not a claim that the full
+native or desktop suite passed. See [development](docs/development.md) and [test fixtures](docs/test-fixtures.md)
 for the full suite and its external fixture corpus.
 
 | Directory | Contents |

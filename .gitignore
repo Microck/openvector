@@ -21,6 +21,7 @@ __pycache__/
 
 # Only standalone build tools belong in the source repository.
 /tools/*
+!/tools/check-source.sh
 !/tools/build-native.mjs
 !/tools/native-notices.mjs
 !/tools/package-gui.mjs

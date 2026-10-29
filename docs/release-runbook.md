@@ -20,6 +20,10 @@ GitHub repository private unless a separate request explicitly changes that scop
 
 ## Validate the candidate
 
+Use [Raft source CI](ci.md) for the lightweight repository checks. GitHub-hosted
+Actions are not used while the account billing block remains. Source CI does not
+replace the native and desktop checks below.
+
 Use the locked dependencies and the target toolchain's `rust-docs` component:
 
 ```sh
