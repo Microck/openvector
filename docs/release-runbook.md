@@ -1,8 +1,15 @@
 # Release runbook
 
-OpenVector is private and unpublished. Creating this repository does not publish
-an npm package or an application release. Keep `package.json` private and the
-GitHub repository private unless a separate request explicitly changes that scope.
+OpenVector ships private GitHub application releases. The npm package remains
+unpublished. Keep `package.json` private and the GitHub repository private unless
+a separate request explicitly changes that scope.
+
+The first release, `v0.0.0`, retains the version embedded in the verified desktop
+builds. Its Windows x64 ZIP preserves all 17 files from the tested package; its
+Linux ARM64 archive preserves the tested bytes. `build-provenance.json` records
+binary hashes and source correspondence. Documentation and repository presentation
+changes do not require rebuilding identical application source. Future product
+changes need a new version and fresh build/runtime evidence.
 
 ## Prepare a version
 
