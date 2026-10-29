@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <g fill="#000000">
+    <!-- Stepped modular raster blocks forming the left half of O (aligned to 64px grid) -->
+    <rect x="320" y="128" width="192" height="144"/>
+    <rect x="192" y="256" width="160" height="160"/>
+    <rect x="96"  y="384" width="160" height="256"/>
+    <rect x="192" y="608" width="160" height="160"/>
+    <rect x="320" y="752" width="192" height="144"/>
+    <!-- Razor-sharp continuous vector V chevron emerging on the right -->
+    <polygon points="384,352 544,352 672,656 800,352 944,352 672,912"/>
+  </g>
+</svg>

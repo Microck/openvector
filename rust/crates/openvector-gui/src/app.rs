@@ -2,7 +2,7 @@ use std::{collections::VecDeque, path::PathBuf, sync::Arc, time::{Duration, Inst
 use gpui::{prelude::*, App, Bounds, Context, Div, ExternalPaths, FocusHandle, Focusable, KeyDownEvent, KeyUpEvent, MouseButton, PathPromptOptions, RenderImage, Role, Stateful, Window, canvas, div, img, px, rgb};
 use openvector::{batch_queue::{BatchQueue, BatchSnapshot, OverwriteDecision}, document_controls::DocumentSettings};
 use serde_json::{Value, json};
-use crate::{controls::{button, row, section}, jobs::{Bitmap, Command, DocumentView, Event, SourceOrigin, Worker}, preferences::Preferences, theme, viewer::{geometry::{Axis, Point, Size, ViewerView}, input::{self, LayerAvailability, ViewerInput, ViewerKey, KeyPhase, tool}, zoom}, wizard::{Page, Wizard, AdvancedControls, AutoUpdate, page_controls_changed, page_needs_update}};
+use crate::{controls::{button, icon_button, unfilled_button, primary_button, group, segmented, hint, row, section}, jobs::{Bitmap, Command, DocumentView, Event, SourceOrigin, Worker}, preferences::Preferences, theme, viewer::{geometry::{Axis, Point, Size, ViewerView}, input::{self, LayerAvailability, ViewerInput, ViewerKey, KeyPhase, tool}, zoom}, wizard::{Page, Wizard, AdvancedControls, AutoUpdate, page_controls_changed, page_needs_update}};
 #[path = "app_workflows.rs"]
 mod workflows;
 use workflows::{Form, WorkflowAction, Workflows};
@@ -26,6 +26,13 @@ enum Action {
 }
 #[derive(Clone)]
 enum Dialog { About, PasteImage(Arc<Vec<u8>>), BatchOverwrite(Vec<String>), Form(Form) }
+/// Export shape layouts: stored preference value, button label, hint for the
+/// selected choice. Values are the CLI/API names and stay unchanged.
+const SHAPE_LAYOUTS: [(&str, &str, &str); 3] = [
+    ("stacked", "Overlapping shapes", "Each color is one solid shape stacked on the ones below. Easiest to edit."),
+    ("cutouts", "Cut-out shapes", "Shapes have holes where other colors sit, so nothing overlaps. Best for cutters."),
+    ("grouped-cutouts", "Cut-out, grouped by color", "No overlaps, and each color is grouped into its own layer."),
+];
 
 #[derive(Clone, Copy, PartialEq, Eq)]
 enum WorkKind { Gesture, Processing }
@@ -63,7 +70,12 @@ enum ScrollbarInteraction {
 const SCROLLBAR_REPEAT_DELAY: Duration = Duration::from_millis(500);
 const SCROLLBAR_REPEAT_INTERVAL: Duration = Duration::from_millis(50);
 
+/// How long a worker command may run before the UI shows it as busy.
+const BUSY_GRACE: Duration = Duration::from_millis(250);
+
 pub struct OpenVectorApp {
+    /// When the current busy period began, and the status shown before it.
+    busy_since: Option<(Instant, String)>,
     pub wizard: Wizard,
     pub settings: DocumentSettings,
     pub document: Option<DocumentView>,
@@ -116,6 +128,7 @@ pub struct OpenVectorApp {
     smoke: Option<PathBuf>,
     smoke_exported: bool,
     _poll: gpui::Task<()>,
+    activation: Option<gpui::Subscription>,
 }
 
 impl OpenVectorApp {
@@ -146,7 +159,7 @@ impl OpenVectorApp {
         let app = Self { wizard, settings: selected.settings, document: None, view: ViewerView::default(),
             input: ViewerInput::default(), status: initial_error.clone().unwrap_or_else(|| "Ready".into()),
             error: initial_error.is_some(), busy: false, batch: None, batch_log: Vec::new(),
-            preferences, workflows, worker, pending: VecDeque::new(), pending_processing: 0, in_flight: None, destination: None,
+            preferences, workflows, worker, pending: VecDeque::new(), pending_processing: 0, in_flight: None, destination: None, busy_since: None,
             automatic: AutoUpdate::default(), automatic_task: None,
             drag_result: drag_result::DragResult::default(),
             source_image: None, focus: cx.focus_handle(), dialog_focus: cx.focus_handle(),
@@ -155,12 +168,25 @@ impl OpenVectorApp {
             zoom_bounds: Bounds::default(), zoom_dragging: false,
             scrollbar_interaction: None,
             show_paths: false, color_count: selected.color_count, progress: 0.0,
-            batch_queue, loading_source: false, source_sizing: None, source_sizing_consumed: false, source_recommendations: None, transparency_initialized: [false; 2], source_directory, smoke: None, smoke_exported: false, _poll: poll };
+            batch_queue, loading_source: false, source_sizing: None, source_sizing_consumed: false, source_recommendations: None, transparency_initialized: [false; 2], source_directory, smoke: None, smoke_exported: false, _poll: poll, activation: None };
         Ok(app)
     }
     pub fn open(&mut self, path: PathBuf, cx: &mut Context<Self>) {
         if self.busy || self.dialog.is_some() { return; }
         let path = match std::path::absolute(path) { Ok(path) => path, Err(error) => { self.fail(format!("Cannot resolve the source path: {error}"), cx); return; } };
+        if self.has_manual_edits() {
+            self.dialog = Some(Dialog::Form(Form::Confirm(
+                "Opening another image will discard your palette, segmentation and background edits. Cancel to keep the current image.".into(),
+                WorkflowAction::OpenAccepted(path))));
+            cx.notify();
+        } else { self.open_accepted(path, cx); }
+    }
+    fn has_manual_edits(&self) -> bool {
+        (if self.batch.is_some() { self.workflows.inactive_palette.customized } else { self.workflows.palette.customized }) || self.document.as_ref().is_some_and(|document|
+            document.has_applied_edits || document.removed.is_some()
+            || document.editing_changed)
+    }
+    fn open_accepted(&mut self, path: PathBuf, cx: &mut Context<Self>) {
         self.enqueue(Command::Open { path, settings: self.task_input() }, Some(Page::Mode), cx);
     }
     fn paste_image(&mut self, cx: &mut Context<Self>) {
@@ -177,8 +203,7 @@ impl OpenVectorApp {
             self.fail("The clipboard image is empty. Copy the image again, then choose Paste image.", cx); return;
         }
         let bytes = Arc::new(image.bytes);
-        if self.document.as_ref().is_some_and(|document| document.has_applied_edits || document.removed.is_some()
-            || matches!(self.wizard.page, Page::Editing | Page::Background) && (document.undo || document.redo)) {
+        if self.has_manual_edits() {
             self.dialog = Some(Dialog::PasteImage(bytes)); cx.notify();
         } else {
             self.import_clipboard(bytes, cx);
@@ -232,7 +257,15 @@ impl OpenVectorApp {
         let Some(worker) = self.worker.as_ref() else { self.fail("The image worker is unavailable.", cx); return; };
         self.loading_source = matches!(&command, Command::Open { .. } | Command::PasteImage { .. });
         match worker.submit(command) {
-            Ok(()) => { self.in_flight = Some(kind); self.busy = true; self.error = false; self.progress = 0.0; self.status = "Processing".into(); self.destination = destination; }
+            Ok(()) => {
+                if !self.busy { self.busy_since = Some((Instant::now(), self.status.clone())); }
+                self.in_flight = Some(kind); self.busy = true; self.error = false; self.progress = 0.0; self.status = "Processing".into(); self.destination = destination;
+                // Repaint once the grace period ends, in case no worker event arrives first.
+                cx.spawn(async move |this, cx| {
+                    cx.background_executor().timer(BUSY_GRACE).await;
+                    let _ = this.update(cx, |_, cx| cx.notify());
+                }).detach();
+            }
             Err(error) => self.fail(error, cx),
         }
         cx.notify();
@@ -418,6 +451,7 @@ impl OpenVectorApp {
         self.workflows.released_images.extend(self.document.take().and_then(|document| document.segments));
     }
     fn page_changed(&mut self, cx: &mut Context<Self>) {
+        self.wizard.record();
         // Reset can retain this page after closing the source; that is not a new entry.
         if self.wizard.page == Page::Transparency && self.document.is_some() {
             let mode = usize::from(self.settings.advanced);
@@ -433,7 +467,10 @@ impl OpenVectorApp {
             }
         }
         let layer = match self.wizard.page { Page::Segmentation | Page::Editing => 1,
-            Page::Smoothing | Page::Background | Page::Review | Page::Export => 2, _ => 0 };
+            Page::Smoothing | Page::Background | Page::Review | Page::Export => 2,
+            // Basic palette choices segment immediately, so show their regions.
+            Page::Palette if !self.settings.advanced && self.document.as_ref().is_some_and(|doc| doc.segments.is_some()) => 1,
+            _ => 0 };
         self.set_layer(layer);
         self.input.set_tool(if matches!(self.wizard.page, Page::Editing | Page::Background) {
             self.document.as_ref().map_or(tool::PAN, |document| document.edit_tool)
@@ -559,6 +596,17 @@ impl OpenVectorApp {
             }
         }
     }
+    fn add_batch_files(&mut self, paths: &[String], cx: &mut Context<Self>) {
+        // The queue model follows reference source-folder defaults. The desktop
+        // export-folder choice is explicit and must survive adding more inputs.
+        let export_directory = self.batch_queue.export_directory.clone();
+        let duplicates = self.batch_queue.add_files(paths);
+        self.batch_queue.export_directory = export_directory;
+        self.batch = Some(self.batch_queue.snapshot());
+        self.load_previews(cx);
+        if !duplicates.is_empty() { self.fail(format!("Already in queue: {}", duplicates.join(", ")), cx); }
+        cx.notify();
+    }
     fn choose_files(&mut self, batch: bool, cx: &mut Context<Self>) {
         if self.busy { return; }
         self.automatic.cancel(); self.automatic_task = None;
@@ -568,11 +616,7 @@ impl OpenVectorApp {
             let _ = this.update(cx, |app, cx| match result {
                 Ok(Ok(Some(paths))) if batch => {
                     let paths = paths.iter().map(|path| path.to_string_lossy().into_owned()).collect::<Vec<_>>();
-                    let duplicates = app.batch_queue.add_files(&paths);
-                    app.batch = Some(app.batch_queue.snapshot());
-                    app.load_previews(cx);
-                    if !duplicates.is_empty() { app.fail(format!("Already in queue: {}", duplicates.join(", ")), cx); }
-                    cx.notify();
+                    app.add_batch_files(&paths, cx);
                 }
                 Ok(Ok(Some(paths))) => if let Some(path) = paths.into_iter().next() { app.open(path, cx); },
                 Ok(Ok(None)) => {}, Ok(Err(error)) => app.fail(error.to_string(), cx), Err(error) => app.fail(error.to_string(), cx),
@@ -599,8 +643,15 @@ impl OpenVectorApp {
         }
         cx.notify();
     }
+    fn start_batch(&mut self, cx: &mut Context<Self>) {
+        self.batch_queue.export_format = self.preferences.format.clone(); self.batch_log.clear();
+        self.workflows.batch_result = None; self.batch_queue.set_accepting_edits(false); self.batch = Some(self.batch_queue.snapshot());
+        self.enqueue(Command::Batch { queue: self.batch_queue.clone(), profile: self.current_profile(), options: self.export_options() }, None, cx);
+    }
     fn dispatch(&mut self, action: Action, window: &mut Window, cx: &mut Context<Self>) {
         if self.drag_result.active() { return; }
+        // The only busy gate. Controls paint as enabled during BUSY_GRACE, so
+        // clicks rely on this check; keep their handlers free of a second list.
         if self.busy && !matches!(action, Action::Cancel | Action::BatchDecision(_) | Action::Dismiss | Action::Layer(_) | Action::Zoom(_) | Action::Fit | Action::One | Action::Step(_, _) | Action::Paths) { return; }
         if matches!(action, Action::Start | Action::Batch | Action::Zoom(_) | Action::Fit | Action::One | Action::Step(_, _)) {
             self.scrollbar_interaction = None;
@@ -653,9 +704,11 @@ impl OpenVectorApp {
                 }).detach();
             }
             Action::BatchStart => {
-                self.batch_queue.export_format = self.preferences.format.clone(); self.batch_log.clear();
-                self.workflows.batch_result = None; self.batch_queue.set_accepting_edits(false); self.batch = Some(self.batch_queue.snapshot());
-                self.enqueue(Command::Batch { queue: self.batch_queue.clone(), profile: self.current_profile(), options: self.export_options() }, None, cx);
+                if self.has_manual_edits() {
+                    self.dialog = Some(Dialog::Form(Form::Confirm(
+                        "Starting this batch will replace the current image and discard its manual edits. Cancel to return and export the current result first.".into(),
+                        WorkflowAction::StartBatchAccepted)));
+                } else { self.start_batch(cx); }
             }
             Action::BatchDecision(decision) => {
                 if let Some(worker) = &self.worker { if let Err(error) = worker.decide(decision) { self.fail(error, cx); } }
@@ -833,6 +886,10 @@ impl OpenVectorApp {
             }
             return;
         }
+        if (key.modifiers.control || key.modifiers.platform) && !key.modifiers.alt {
+            let action = match key.key.as_str() { "o" => Some(Action::Open), "s" if self.batch.is_none() => Some(Action::Export), _ => None };
+            if let Some(action) = action { self.dispatch(action, window, cx); cx.stop_propagation(); return; }
+        }
         // The inline settings name owns its keys while it is on screen: Enter
         // saves, and typed text must reach neither the viewer's held-layer keys
         // nor wizard shortcuts. GPUI keeps focus on a field that a page change
@@ -923,13 +980,28 @@ impl OpenVectorApp {
         }
         cx.notify();
     }
+    /// While a dialog is open only its own actions stay enabled.
+    fn control_enabled(&self, enabled: bool, action: &Action) -> bool {
+        enabled && (self.dialog.is_none() || matches!(action, Action::Dismiss | Action::ConfirmPaste(_) | Action::BatchDecision(_)))
+    }
     fn control(&self, id: impl Into<gpui::ElementId>, label: impl Into<gpui::SharedString>, enabled: bool, selected: bool, action: Action, cx: &Context<Self>) -> Stateful<Div> {
-        let enabled = enabled && (self.dialog.is_none() || matches!(&action, Action::Dismiss | Action::ConfirmPaste(_) | Action::BatchDecision(_)));
-        button(id, label, enabled, selected).when(enabled, |d| d.on_click(cx.listener(move |app, _, window, cx| app.dispatch(action.clone(), window, cx))))
+        let enabled = self.control_enabled(enabled, &action);
+        // Text-only buttons: the user preferred the cleaner icon-free preview.
+        icon_button(id, label, enabled, selected, None).when(enabled, |d| d.on_click(cx.listener(move |app, _, window, cx| app.dispatch(action.clone(), window, cx))))
     }
     fn choice(&self, key: &'static str, options: &[(&'static str, i32)], cx: &Context<Self>) -> Div {
         let current = Value::Object(self.settings.to_json())[key].as_i64().unwrap_or(-1);
         div().flex().flex_col().gap_1().children(options.iter().map(|(label, value)| self.control(format!("{key}-{value}"), *label, !self.busy, current == *value as i64, Action::Set(key, json!(value)), cx)))
+    }
+    /// `choice` laid out horizontally, for short option sets (High / Medium / Low).
+    fn choice_row(&self, key: &'static str, options: &[(&'static str, i32)], cx: &Context<Self>) -> Div {
+        let current = Value::Object(self.settings.to_json())[key].as_i64().unwrap_or(-1);
+        segmented(options.iter().map(|(label, value)| self.control(format!("{key}-{value}"), *label, !self.busy, current == *value as i64, Action::Set(key, json!(value)), cx)))
+    }
+    /// The page's main action, filled with the accent colour.
+    fn primary(&self, id: &'static str, label: &'static str, enabled: bool, action: Action, cx: &Context<Self>) -> Stateful<Div> {
+        let enabled = self.control_enabled(enabled, &action);
+        primary_button(id, label, enabled).when(enabled, |d| d.on_click(cx.listener(move |app, _, window, cx| app.dispatch(action.clone(), window, cx))))
     }
     fn number(&self, key: &'static str, label: &'static str, value: i32, cx: &Context<Self>) -> Div {
         row(label, div().flex().items_center().gap_1()
@@ -938,7 +1010,17 @@ impl OpenVectorApp {
             .child(self.control(format!("{key}-up"), "+", !self.busy, false, Action::Number(key, 1), cx).aria_label(format!("Increase {label}"))))
     }
     fn check(&self, key: &'static str, label: &'static str, value: bool, cx: &Context<Self>) -> Stateful<Div> {
-        self.control(key, format!("{} {label}", if value { "✓" } else { "□" }), !self.busy, value, Action::Toggle(key), cx)
+        self.checkbox(key, label, value, Action::Toggle(key), cx)
+    }
+    /// A left-aligned row with a drawn 14px box. State lives in the box, not in
+    /// the selected-button tint, so a checked option never looks like a choice.
+    fn checkbox(&self, id: &'static str, label: &'static str, value: bool, action: Action, cx: &Context<Self>) -> Stateful<Div> {
+        self.control(id, "", !self.busy, false, action, cx).justify_start().gap_2().aria_label(label)
+            .aria_toggled(if value { gpui::Toggled::True } else { gpui::Toggled::False })
+            .child(div().size(px(14.0)).flex_none().rounded(px(3.0)).border_1().flex().items_center().justify_center()
+                .border_color(rgb(if value { theme::ACCENT } else { theme::MUTED })).bg(rgb(if value { theme::ACCENT } else { theme::CONTROL }))
+                .text_size(px(10.0)).text_color(rgb(0xffffff)).when(value, |d| d.child("✓")))
+            .child(label)
     }
     fn settings_panel(&self, cx: &Context<Self>) -> Div {
         div().flex().flex_col().gap_1()
@@ -946,7 +1028,7 @@ impl OpenVectorApp {
             .child(section("Input quality")).child(self.choice("quality", &[("High", 0), ("Medium", 1), ("Low", 2), ("Auto-detect", 3)], cx))
             .child(section("Color mode")).child(self.choice("paletteMode", &[("Two colors", 0), ("Fixed palette", 1), ("Flexible palette", 2), ("Auto-detect", 3)], cx))
             .child(self.number("colorCount", "Number of colors", self.color_count, cx))
-            .when(!self.settings.advanced, |body| body.child(self.control("batch-auto-colors", "Auto-detect number of colors", !self.busy, self.color_count == 0, Action::BatchAutoColors, cx)))
+            .when(!self.settings.advanced, |body| body.child(self.checkbox("batch-auto-colors", "Auto-detect number of colors", self.color_count == 0, Action::BatchAutoColors, cx)))
             .child(section("Transparency")).child(self.choice("backgroundMode", &[("Leave transparent", 0), ("White", 1), ("Auto-detect", 3)], cx))
             .when(self.settings.advanced, |d| d.child(self.processing_controls(cx)))
     }
@@ -972,15 +1054,22 @@ impl OpenVectorApp {
         }))
     }
     fn export_panel(&self, cx: &Context<Self>) -> Div {
-        div().flex().flex_col().gap_2()
-            .child(section("Format"))
-            .child(div().flex().flex_wrap().gap_1().children(["ai", "dxf", "emf", "eps", "pdf", "svg"].into_iter().filter(|format| self.batch.is_none() || *format != "emf").map(|format| self.control(format, format.to_uppercase(), !self.busy, self.preferences.format == format, Action::Format(format), cx))))
-            .child(section("Shape mode"))
-            .children([("stacked", "Stacked"), ("cutouts", "Cut out"), ("grouped-cutouts", "Grouped cutouts")].into_iter().map(|(value, label)| self.control(value, label, !self.busy, self.preferences.layout == value, Action::Layout(value), cx)))
-            .when(self.preferences.format == "dxf", |body| body.child(section("DXF curves"))
-                .children([("splines", "Splines"), ("sparse-lines", "Sparse lines"), ("dense-lines", "Dense lines")].into_iter().map(|(mode, label)| self.control(mode, label, !self.busy, self.preferences.curve_mode == mode, Action::CurveMode(mode), cx))))
-            .child(self.control("thin-stroke", "Thin outline", !self.busy, self.preferences.thin_stroke, Action::ThinStroke, cx))
-            .when(self.preferences.format == "eps", |d| d.child(self.control("compact-eps", "Compact EPS", !self.busy, self.preferences.compact_eps, Action::CompactEps, cx)))
+        let formats = ["ai", "dxf", "emf", "eps", "pdf", "svg"].into_iter().filter(|format| self.batch.is_none() || *format != "emf").collect::<Vec<_>>();
+        let format = |format: &'static str| self.control(format, format.to_uppercase(), !self.busy, self.preferences.format == format, Action::Format(format), cx);
+        div().flex().flex_col()
+            // Three per row keeps the formats in an even grid.
+            .child(group("Format", div().flex().flex_col().gap_1().children(formats.chunks(3).map(|row| segmented(row.iter().map(|name| format(name)))))))
+            // Plain-language names for stacked / cutouts / grouped-cutouts; one hint
+            // line explains the selected choice.
+            .child(group("Shape layout", div().flex().flex_col().gap_1()
+                .children(SHAPE_LAYOUTS.iter().map(|(value, label, _)| self.control(*value, *label, !self.busy, self.preferences.layout == *value, Action::Layout(*value), cx)))
+                .children(SHAPE_LAYOUTS.iter().find(|(value, _, _)| self.preferences.layout == *value)
+                    .map(|(_, _, hint)| div().text_color(rgb(theme::MUTED)).child(*hint)))))
+            .when(self.preferences.format == "dxf", |body| body.child(group("DXF curves", segmented(
+                [("splines", "Splines"), ("sparse-lines", "Sparse lines"), ("dense-lines", "Dense lines")].into_iter().map(|(mode, label)| self.control(mode, label, !self.busy, self.preferences.curve_mode == mode, Action::CurveMode(mode), cx))))))
+            .child(group("Options", div().flex().flex_col().gap_1()
+                .child(self.checkbox("thin-stroke", "Thin outline", self.preferences.thin_stroke, Action::ThinStroke, cx))
+                .when(self.preferences.format == "eps", |d| d.child(self.checkbox("compact-eps", "Compact EPS", self.preferences.compact_eps, Action::CompactEps, cx)))))
     }
     fn source_sizing_panel(&self, cx: &Context<Self>) -> Div {
         let mut panel = div().flex().flex_col().gap_1();
@@ -997,90 +1086,141 @@ impl OpenVectorApp {
         let mut body = div().flex().flex_col().gap_2();
         use Page::*;
         body = match self.wizard.page {
-            Load => body.child(self.control("browse", "Browse images", !self.busy, false, Action::Open, cx))
-                .child(self.recent_panel(cx)),
-            Mode => body.child(self.control("automatic", "Fully automatic", !self.busy, false, Action::Automatic, cx))
-                .child(self.control("basic", "Basic", !self.busy, false, Action::Basic, cx)).child(self.control("advanced", "Advanced", !self.busy, false, Action::Advanced, cx))
-                .child(self.source_sizing_panel(cx)).child(self.mode_settings_panel(cx)),
+            Load => body.child(self.primary("browse", "Open image", !self.busy, Action::Open, cx).w_full())
+                .child(div().text_color(rgb(theme::MUTED)).child("PNG, JPEG, BMP, GIF or TIFF"))
+                .child(div().mt_2().child(self.recent_panel(cx))),
+            Mode => body
+                .child(hint(self.control("automatic", "Fully automatic", !self.busy, false, Action::Automatic, cx), "Convert with recommended settings."))
+                .child(hint(self.control("basic", "Basic", !self.busy, false, Action::Basic, cx), "Answer a few questions about the image."))
+                .child(hint(self.control("advanced", "Advanced", !self.busy, false, Action::Advanced, cx), "Tune palette, regions and curves."))
+                .child(self.source_sizing_panel(cx)),
             ImageType => body.child(self.choice("category", &[("Photograph", 0), ("Artwork with blended edges", 1), ("Artwork without blending", 2)], cx)),
             Transparency => body.child(self.choice("backgroundMode", &[("Leave transparent", 0), ("White", 1), ("Custom color", 2)], cx))
                 .when(self.settings.background_mode == 2, |body| body.child(self.background_color(cx))),
-            Quality => body.child(self.choice("quality", &[("High", 0), ("Medium", 1), ("Low", 2)], cx)),
+            Quality => body.child(self.choice_row("quality", &[("High", 0), ("Medium", 1), ("Low", 2)], cx)),
             Colors => body.child(self.choice("paletteMode", &[("Two colors", 0), ("Fixed palette", 1), ("Flexible palette", 2)], cx)),
-            Palette => body.when(self.settings.advanced, |body| body.child(self.number("colorCount", "Number of colors", self.color_count, cx)))
-                .child(self.palette_candidates(cx))
+            Palette => body
+                .child(group("Number of colors", div().flex().flex_col().gap_2()
+                    .when(self.settings.advanced, |body| body.child(self.number("colorCount", "Count", self.color_count, cx)))
+                    .child(self.palette_candidates(cx))))
                 .when(self.settings.advanced, |body| body
-                    .child(self.choice("paletteMode", &[("Two colors", 0), ("Fixed palette", 1), ("Flexible palette", 2)], cx))
-                    .child(section("Color sensitivity"))
-                    .child(self.choice("sensitivity", &[("High", 0), ("Medium", 1), ("Low", 2)], cx))
-                    .child(self.check("antiAlias", "Blended edges", self.settings.anti_alias, cx)))
-                .child(self.control("analyze", "Analyze colors", !self.busy, false, Action::Process("palette"), cx))
-                .child(div().flex().flex_wrap().gap_1().children(self.settings.palette.chunks_exact(4).enumerate().map(|(index, color)| {
-                    let rgba = ((color[2] * 255.0).round() as u32) << 24 | ((color[1] * 255.0).round() as u32) << 16 | ((color[0] * 255.0).round() as u32) << 8 | 255;
-                    self.control(format!("swatch-{index}"), "", !self.busy, false, Action::Workflow(WorkflowAction::Color(index)), cx).w(px(28.0)).bg(gpui::rgba(rgba)).aria_label(format!("Edit palette color {}", index + 1))
-                })))
-                .child(div().flex().flex_wrap().gap_1()
+                    .child(group("Color mode", self.choice("paletteMode", &[("Two colors", 0), ("Fixed palette", 1), ("Flexible palette", 2)], cx)))
+                    .child(group("Color sensitivity", div().flex().flex_col().gap_1()
+                        .child(self.choice_row("sensitivity", &[("High", 0), ("Medium", 1), ("Low", 2)], cx))
+                        .child(self.check("antiAlias", "Blended edges", self.settings.anti_alias, cx)))))
+                .child(group("Palette", div().flex().flex_col().gap_2()
+                    .child(div().flex().flex_wrap().gap_1().children(self.settings.palette.chunks_exact(4).enumerate().map(|(index, color)| {
+                        let rgba = ((color[2] * 255.0).round() as u32) << 24 | ((color[1] * 255.0).round() as u32) << 16 | ((color[0] * 255.0).round() as u32) << 8 | 255;
+                        // Built without control()'s hover fill, which would cover the
+                        // colour: hovering keeps the colour and only lifts the border.
+                        let action = Action::Workflow(WorkflowAction::Color(index));
+                        let enabled = self.control_enabled(!self.busy, &action);
+                        unfilled_button(format!("swatch-{index}"), "", enabled, false, None).w(px(28.0)).bg(gpui::rgba(rgba))
+                            .aria_label(format!("Edit palette color {}", index + 1))
+                            .when(enabled, |d| d.hover(|s| s.border_color(rgb(theme::ACCENT)))
+                                .on_click(cx.listener(move |app, _, window, cx| app.dispatch(action.clone(), window, cx))))
+                    })))
                     // Public Add is disabled at 24; the direct slot separately caps at 25.
-                    .child(self.control("palette-add", "Add color", !self.busy && self.settings.palette.len() / 4 != 24, false, Action::Workflow(WorkflowAction::Palette(openvector::profile_palette::PaletteCommand::Add)), cx)
-                        .debug_selector(|| "palette-add".into()))
-                    .child(self.control("palette-delete", "Delete last", !self.busy && !self.settings.palette.is_empty(), false, Action::Workflow(WorkflowAction::Palette(openvector::profile_palette::PaletteCommand::Delete((self.settings.palette.len() / 4).saturating_sub(1) as f64))), cx))
-                    .child(self.control("palette-revert", "Revert palette", !self.busy, false, Action::Workflow(WorkflowAction::Palette(openvector::profile_palette::PaletteCommand::Revert)), cx))
-                    .child(self.control("palette-source", "Source colors", !self.busy, false, Action::Workflow(WorkflowAction::Palette(openvector::profile_palette::PaletteCommand::Source)), cx))),
-            Segmentation => body.child(self.number("complexity", "Complexity", self.settings.complexity, cx))
-                .child(self.number("minimumPixels", "Minimum pixels per region", self.settings.minimum_pixels, cx))
-                .child(self.choice("artifactRejection", &[("No artifact rejection", 0), ("Moderate rejection", 1), ("Aggressive rejection", 2)], cx))
-                .child(self.check("clusterColors", "Cluster colors", self.settings.cluster_colors, cx))
+                    .child(segmented([
+                        self.control("palette-add", "Add", !self.busy && self.settings.palette.len() / 4 != 24, false, Action::Workflow(WorkflowAction::Palette(openvector::profile_palette::PaletteCommand::Add)), cx)
+                            .debug_selector(|| "palette-add".into()),
+                        self.control("palette-delete", "Remove last", !self.busy && !self.settings.palette.is_empty(), false, Action::Workflow(WorkflowAction::Palette(openvector::profile_palette::PaletteCommand::Delete((self.settings.palette.len() / 4).saturating_sub(1) as f64))), cx),
+                    ]))
+                    .child(segmented([
+                        self.control("palette-source", "From image", !self.busy, false, Action::Workflow(WorkflowAction::Palette(openvector::profile_palette::PaletteCommand::Source)), cx),
+                        self.control("palette-revert", "Revert", !self.busy, false, Action::Workflow(WorkflowAction::Palette(openvector::profile_palette::PaletteCommand::Revert)), cx),
+                    ]))
+                    .child(self.control("analyze", "Analyze colors", !self.busy, false, Action::Process("palette"), cx)))),
+            Segmentation => body
+                .child(group("Regions", div().flex().flex_col()
+                    .child(self.number("complexity", "Complexity", self.settings.complexity, cx))
+                    .child(self.number("minimumPixels", "Minimum pixels per region", self.settings.minimum_pixels, cx))))
+                .child(group("Artifact rejection", self.choice_row("artifactRejection", &[("None", 0), ("Moderate", 1), ("Aggressive", 2)], cx)))
+                .child(group("Options", self.check("clusterColors", "Cluster colors", self.settings.cluster_colors, cx)))
                 .child(self.control("segment-update", "Update segmentation", !self.busy, false, Action::Process("segmentation"), cx)),
-            Smoothing => body.child(self.number("smoothness", "Smoothness", self.settings.smoothness, cx))
-                .child(self.number("curveComplexity", "Curve complexity", self.settings.curve_complexity, cx))
-                .child(self.check("detectCorners", "Detect sharp corners", self.settings.detect_corners, cx))
-                .child(self.check("smoothingAntiAlias", "Anti-alias contours", self.settings.smoothing_anti_alias, cx))
+            Smoothing => body
+                .child(group("Curves", div().flex().flex_col()
+                    .child(self.number("smoothness", "Smoothness", self.settings.smoothness, cx))
+                    .child(self.number("curveComplexity", "Curve complexity", self.settings.curve_complexity, cx))))
+                .child(group("Options", div().flex().flex_col().gap_1()
+                    .child(self.check("detectCorners", "Detect sharp corners", self.settings.detect_corners, cx))
+                    .child(self.check("smoothingAntiAlias", "Anti-alias contours", self.settings.smoothing_anti_alias, cx))))
                 .child(self.control("fitting-update", "Update vectorization", !self.busy, false, Action::Process("fitting"), cx)),
             Editing | Background => {
-                let tools: &[(i32, &str)] = if self.wizard.page == Editing { &[(tool::PAN, "Pan"), (tool::PENCIL, "Pencil"), (tool::FILL, "Fill"), (tool::ZAP, "Zap"), (tool::PICKER, "Pick color")] } else { &[(tool::PAN, "Pan"), (tool::BACKGROUND, "Erase")] };
-                body.children(tools.iter().map(|(tool, label)| self.control(format!("tool-{tool}"), label.to_string(), !self.busy, self.input.snapshot().tool == *tool, Action::Tool(*tool), cx)))
+                let tools: &[(i32, &str)] = if self.wizard.page == Editing { &[(tool::PAN, "Pan"), (tool::PENCIL, "Pencil"), (tool::FILL, "Fill"), (tool::ZAP, "Zap"), (tool::PICKER, "Pick")] } else { &[(tool::PAN, "Pan"), (tool::BACKGROUND, "Erase")] };
+                let active = self.input.snapshot().tool;
+                let help = |tool: i32| match tool {
+                    tool::PENCIL => "Draw with the paint color.",
+                    tool::FILL => "Replace a connected region with the paint color.",
+                    tool::ZAP => "Merge a region into its neighboring colors.",
+                    tool::PICKER => "Click the image to take its color.",
+                    tool::BACKGROUND => "Click a region to hide it. Click again to restore it.",
+                    // Pan keeps the image movable while editing; it paints nothing.
+                    _ => "Drag to move the image without changing it.",
+                };
+                body.child(group("Tool", div().flex().flex_col().gap_2()
+                    .child(segmented(tools.iter().map(|(selected_tool, label)|
+                        hint(self.control(format!("tool-{selected_tool}"), label.to_string(), !self.busy, active == *selected_tool, Action::Tool(*selected_tool), cx), help(*selected_tool)))))
+                    // The active tool's explanation stays visible, not only on hover.
+                    .child(div().text_color(rgb(theme::MUTED)).child(help(active)))))
                     .when(self.wizard.page == Editing, |body| {
                         let color = self.document.as_ref().map_or([0.0, 0.0, 0.0, 1.0], |document| document.edit_color);
                         let rgba = ((color[2] * 255.0).round() as u32) << 24 | ((color[1] * 255.0).round() as u32) << 16 | ((color[0] * 255.0).round() as u32) << 8 | 255;
-                        body.child(row("Paint color", self.control("edit-color", format!("#{:02X}{:02X}{:02X}", (color[2] * 255.0).round() as u8, (color[1] * 255.0).round() as u8, (color[0] * 255.0).round() as u8), !self.busy, false, Action::Workflow(WorkflowAction::PaintColor), cx)
-                            .child(div().w(px(18.0)).h(px(18.0)).bg(gpui::rgba(rgba)))))
-                            .child(row("Opacity", self.control("edit-opacity", color[3].to_string(), !self.busy, false, Action::Workflow(WorkflowAction::PaintOpacity), cx)))
+                        let hex = format!("#{:02X}{:02X}{:02X}", (color[2] * 255.0).round() as u8, (color[1] * 255.0).round() as u8, (color[0] * 255.0).round() as u8);
+                        body.child(group("Paint color", div().flex().gap_1()
+                            .child(self.control("edit-color", hex, !self.busy, false, Action::Workflow(WorkflowAction::PaintColor), cx).flex_1().justify_start()
+                                .child(div().ml_auto().size(px(16.0)).rounded(px(3.0)).border_1().border_color(rgb(theme::BORDER)).bg(gpui::rgba(rgba))))
+                            .child(self.control("edit-opacity", format!("{:.0}%", color[3] * 100.0), !self.busy, false, Action::Workflow(WorkflowAction::PaintColor), cx).w(px(64.0)).aria_label("Opacity"))))
                     })
-                    .child(div().flex().gap_1().child(self.control("undo", "Undo", !self.busy && self.document.as_ref().is_some_and(|doc| doc.undo), false, Action::Edit("undo"), cx))
-                        .child(self.control("redo", "Redo", !self.busy && self.document.as_ref().is_some_and(|doc| doc.redo), false, Action::Edit("redo"), cx))
-                        .child(self.control("revert", "Revert", !self.busy, false, Action::Edit("revert"), cx)))
+                    .child(group("History", segmented([
+                        self.control("undo", "Undo", !self.busy && self.document.as_ref().is_some_and(|doc| doc.undo), false, Action::Edit("undo"), cx),
+                        self.control("redo", "Redo", !self.busy && self.document.as_ref().is_some_and(|doc| doc.redo), false, Action::Edit("redo"), cx),
+                        self.control("revert", "Undo all", !self.busy, false, Action::Edit("revert"), cx),
+                    ])))
             }
-            Review => body.child(self.control("done-reviewing", "Done reviewing", !self.busy, false, Action::Next, cx))
-                .child(section("Input quality")).child(self.choice("quality", &[("High", 0), ("Medium", 1), ("Low", 2)], cx))
-                .child(section("Colors"))
-                .child(self.control("review-unlimited", "Unlimited", !self.busy, self.settings.palette_mode == 2, Action::Set("paletteMode", json!(2)), cx))
-                .child(self.control("review-custom", "Custom", !self.busy, matches!(self.settings.palette_mode, 0 | 1), Action::Set("paletteMode", json!(1)), cx))
-                .when(matches!(self.settings.palette_mode, 0 | 1), |body| body
-                    .child(div().flex().flex_wrap().gap_1().children(self.settings.palette.chunks_exact(4).map(|color| {
-                        let rgba = ((color[2] * 255.0).round() as u32) << 24 | ((color[1] * 255.0).round() as u32) << 16 | ((color[0] * 255.0).round() as u32) << 8 | (color[3] * 255.0).round() as u32;
-                        div().w(px(12.0)).h(px(18.0)).bg(gpui::rgba(rgba))
-                    }))))
-                .child(self.control("remove-background", "Remove background", !self.busy, false, Action::Background, cx))
-                .child(self.control("edit-result", "Edit result", !self.busy, false, Action::EditResult, cx))
-                .child(self.control("hand-pick", "Hand-pick settings", !self.busy, false, Action::Workflow(WorkflowAction::HandPick), cx))
-                .child(self.control("skip-review", "Skip this page next time", !self.busy, self.wizard.skip_review, Action::SkipReview, cx)),
-            Export => body.child(self.export_panel(cx)).child(self.control("save-export", "Save vector", !self.busy, false, Action::Export, cx))
+            // Done reviewing lives in the footer as the primary action.
+            Review => body
+                .child(group("Input quality", self.choice_row("quality", &[("High", 0), ("Medium", 1), ("Low", 2)], cx)))
+                .child(group("Colors", div().flex().flex_col().gap_2()
+                    .child(segmented([
+                        self.control("review-unlimited", "Unlimited", !self.busy, self.settings.palette_mode == 2, Action::Set("paletteMode", json!(2)), cx),
+                        self.control("review-custom", "Custom", !self.busy, matches!(self.settings.palette_mode, 0 | 1), Action::Set("paletteMode", json!(1)), cx),
+                    ]))
+                    .when(matches!(self.settings.palette_mode, 0 | 1), |body| body
+                        .child(div().flex().flex_wrap().gap_1().children(self.settings.palette.chunks_exact(4).map(|color| {
+                            let rgba = ((color[2] * 255.0).round() as u32) << 24 | ((color[1] * 255.0).round() as u32) << 16 | ((color[0] * 255.0).round() as u32) << 8 | (color[3] * 255.0).round() as u32;
+                            div().size(px(18.0)).rounded(px(3.0)).border_1().border_color(rgb(theme::BORDER)).bg(gpui::rgba(rgba))
+                        }))))))
+                .child(group("Refine", div().flex().flex_col().gap_1()
+                    .child(hint(self.control("remove-background", "Remove background", !self.busy, false, Action::Background, cx), "Hide the regions you click."))
+                    .child(hint(self.control("edit-result", "Edit result", !self.busy, false, Action::EditResult, cx), "Paint, fill or merge regions by hand."))
+                    .child(hint(self.control("hand-pick", "Hand-pick settings", !self.busy, false, Action::Workflow(WorkflowAction::HandPick), cx), "Go back and answer the Basic questions."))))
+                .child(self.checkbox("skip-review", "Skip this page next time", self.wizard.skip_review, Action::SkipReview, cx)),
+            Export => body.child(self.export_panel(cx)).child(self.primary("save-export", "Save vector", !self.busy, Action::Export, cx))
                 .child(self.save_disclosure(false, cx)).child(self.save_disclosure(true, cx)).child(self.drag_panel(cx))
                 .when(self.settings.advanced, |body| body.child(self.save_settings_panel(cx)))
                 .when(!self.settings.advanced, |body| body.child(self.control("improve-result", "Improve result", !self.busy, false, Action::ImproveResult, cx))),
         };
         let auto = match self.wizard.page { Palette => Some(("palette", self.wizard.auto_palette)), Segmentation => Some(("segmentation", self.wizard.auto_segmentation)), Smoothing => Some(("fitting", self.wizard.auto_vectorization)), _ => None };
         let dirty = self.dirty_page();
-        div().w(px(theme::WIZARD_WIDTH)).flex_none().h_full().flex().flex_col().border_l_1().border_color(rgb(theme::BORDER))
+        div().w(px(theme::WIZARD_WIDTH)).flex_none().h_full().flex().flex_col().border_l_1().border_color(rgb(theme::BORDER)).bg(rgb(theme::SURFACE))
             .child(div().p_4().border_b_1().border_color(rgb(theme::BORDER)).child(div().text_color(rgb(theme::MUTED)).child(if self.settings.advanced { "Advanced wizard" } else { "Basic wizard" }))
                 .child(div().mt_1().text_size(px(18.0)).child(self.wizard.page.title())))
             .child(div().id("wizard-body").flex_1().min_h_0().overflow_y_scroll().p_4().child(body))
-            .when(self.settings.advanced && auto.is_some(), |d| { let (stage, checked) = auto.expect("auto control"); d.child(div().px_4().pb_2().child(self.control("auto-update", "Auto-update", !self.busy, checked, Action::Auto(stage), cx))) })
+            // Saved-settings shortcuts sit at the bottom of Mode, apart from the three
+            // conversion modes. Their own scroll keeps expanded lists from crowding them.
+            .when(self.wizard.page == Mode, |d| d.child(div().id("mode-saved-settings").flex_none().max_h(px(240.0)).overflow_y_scroll()
+                .px_4().py_3().border_t_1().border_color(rgb(theme::BORDER)).child(self.mode_settings_panel(cx))))
+            .when(self.settings.advanced && auto.is_some(), |d| { let (stage, checked) = auto.expect("auto control"); d.child(div().px_4().pb_2().child(self.checkbox("auto-update", "Auto-update preview", checked, Action::Auto(stage), cx))) })
             .child(div().p_3().flex().gap_2().border_t_1().border_color(rgb(theme::BORDER))
-                .child(self.control("start", "Start", !self.busy, false, Action::Start, cx))
-                .child(self.control("back", if self.can_revert() { "Revert" } else { "Back" }, !self.busy && self.wizard.page != Load, false, Action::Back, cx))
+                .child(self.control("start", "Start over", !self.busy && self.document.is_some(), false, Action::Start, cx))
+                .child(self.control("back", if self.can_revert() { "Discard changes" } else { "Back" }, !self.busy && self.wizard.page != Load, false, Action::Back, cx))
                 .child(div().flex_1())
-                .child(self.control("next", if dirty { "Update" } else { "Next" }, !self.busy && self.document.is_some() && !matches!(self.wizard.page, Mode | Export), false, Action::Next, cx)))
+                // Mode picks a route and Export saves, so neither has a Next step.
+                .when(!matches!(self.wizard.page, Mode | Export), |footer| footer
+                    .child(self.primary(if self.wizard.page == Review && !dirty { "done-reviewing" } else { "next" },
+                        if dirty { "Update" } else if self.wizard.page == Review { "Done reviewing" } else { "Next" },
+                        !self.busy && self.document.is_some(), Action::Next, cx).px_4())))
     }
     fn batch_panel(&self, cx: &Context<Self>) -> Div {
         let snapshot = self.batch.as_ref().expect("batch page");
@@ -1127,10 +1267,13 @@ impl OpenVectorApp {
             .aria_orientation(gpui::Orientation::Vertical).aria_min_numeric_value(0.0)
             .aria_max_numeric_value(300.0).aria_numeric_value(self.view.slider as f64).aria_numeric_value_step(1.0)
             .tab_index(0).tab_stop(self.document.is_some() && self.dialog.is_none())
-            .relative().h(px(160.0)).w_full().flex_none().border_1().border_color(rgb(theme::BACKGROUND))
-            .focus_visible(|style| style.border_color(rgb(theme::ACCENT)))
-            .child(div().absolute().left(px(21.0)).top(px(4.0)).bottom(px(4.0)).w(px(2.0)).bg(rgb(theme::BORDER)))
-            .child(div().absolute().left(px(15.0)).top(px(4.0 + (300 - self.view.slider) as f32 / 300.0 * 144.0)).w(px(14.0)).h(px(8.0)).bg(rgb(theme::TEXT)))
+            .relative().h(px(160.0)).w_full().flex_none().border_1().border_color(rgb(theme::SURFACE))
+            .focus_visible(|style| style.border_color(rgb(theme::TEXT)))
+            // Track and thumb sit in full-width rows centred by flex, so they stay
+            // on the rail's centre line at any rail width.
+            .child(div().absolute().left_0().right_0().top(px(4.0)).bottom(px(4.0)).flex().justify_center().child(div().w(px(2.0)).h_full().bg(rgb(theme::BORDER))))
+            .child(div().absolute().left_0().right_0().top(px(4.0 + (300 - self.view.slider) as f32 / 300.0 * 144.0)).flex().justify_center()
+                .child(div().w(px(14.0)).h(px(8.0)).rounded(px(2.0)).bg(rgb(theme::TEXT))))
             .child(canvas(move |bounds, _, cx| { let _ = entity.update(cx, |app, _| app.zoom_bounds = bounds); }, |_, _, _, _| {}).absolute().size_full())
             .on_mouse_down(MouseButton::Left, cx.listener(|app, event: &gpui::MouseDownEvent, _, cx| {
                 if app.document.is_some() && app.dialog.is_none() { app.zoom_dragging = true; app.zoom_at(event.position.y); cx.notify(); }
@@ -1310,24 +1453,41 @@ impl OpenVectorApp {
                 if let Some(scene) = removed { scene.paint(bounds, &view, false, true, window); }
             }
         }).absolute().size_full();
+        // Compact navigator: a D-pad for panning, then zoom and fit rows, sized for
+        // the 84px rail (68px inside padding). Zero horizontal padding keeps the
+        // icons centred in 20px cells.
+        let enabled = self.document.is_some();
+        let pad = |id: &'static str, icon: &'static str, name: &'static str, action: Action| {
+            hint(self.control(id, "", enabled, false, action, cx).w(px(20.0)).h(px(20.0)).min_h(px(20.0)).px(px(0.0))
+                .aria_label(name).debug_selector(move || id.into()).child(gpui::svg().path(icon).size(px(14.0)).text_color(rgb(theme::TEXT))), name)
+        };
+        let wide = |id: &'static str, label: &'static str, name: &'static str, action: Action| {
+            hint(self.control(id, label, enabled, false, action, cx).flex_1().h(px(22.0)).min_h(px(22.0)).px(px(0.0))
+                .aria_label(name).debug_selector(move || id.into()), name)
+        };
+        let cell = || div().w(px(20.0)).h(px(20.0));
+        let navigator = div().w_full().flex().flex_col().items_center().gap(px(2.0))
+            .child(div().flex().gap(px(2.0)).child(cell()).child(pad("pan-up", "arrow-up", "Pan up", Action::Step(Axis::Vertical, -1.0))).child(cell()))
+            .child(div().flex().gap(px(2.0))
+                .child(pad("pan-left", "arrow-left", "Pan left", Action::Step(Axis::Horizontal, -1.0)))
+                .child(cell().flex().items_center().justify_center().child(div().size(px(4.0)).rounded_full().bg(rgb(theme::BORDER))))
+                .child(pad("pan-right", "arrow-right", "Pan right", Action::Step(Axis::Horizontal, 1.0))))
+            .child(div().flex().gap(px(2.0)).child(cell()).child(pad("pan-down", "arrow-down", "Pan down", Action::Step(Axis::Vertical, 1.0))).child(cell()))
+            .child(div().mt_2().w_full().flex().gap(px(2.0))
+                .child(wide("zoom-out", "−", "Zoom out", Action::Zoom(-10))).child(wide("zoom-in", "+", "Zoom in", Action::Zoom(10))))
+            .child(div().w_full().flex().gap(px(2.0))
+                // The zoom label is relative to Fit, so Fit is 100% and 1:1 is actual pixels.
+                .child(wide("fit", "Fit", "Fit to window (100%)", Action::Fit)).child(wide("one", "1:1", "Actual pixels (1:1)", Action::One)));
         div().flex().flex_1().min_w_0().h_full()
-            .child(div().id("viewer-tools").w(px(64.0)).flex_none().p_2().flex().flex_col().gap_1().overflow_y_scroll().border_r_1().border_color(rgb(theme::BORDER))
-                .children([("pan-up", "↑", Action::Step(Axis::Vertical, 1.0)), ("pan-left", "←", Action::Step(Axis::Horizontal, -1.0)), ("pan-right", "→", Action::Step(Axis::Horizontal, 1.0)), ("pan-down", "↓", Action::Step(Axis::Vertical, -1.0)),
-                    ("zoom-in", "+", Action::Zoom(10)), ("zoom-out", "−", Action::Zoom(-10)), ("one", "100%", Action::One), ("fit", "Fit", Action::Fit)]
-                    .into_iter().map(|(id, label, action)| {
-                        let icon = match id { "pan-up" => Some(("arrow-up", "Pan up")), "pan-down" => Some(("arrow-down", "Pan down")),
-                            "pan-left" => Some(("arrow-left", "Pan left")), "pan-right" => Some(("arrow-right", "Pan right")),
-                            "zoom-in" => Some(("zoom-in", "Zoom in")), "zoom-out" => Some(("zoom-out", "Zoom out")), _ => None };
-                        let control = self.control(id, if icon.is_some() { "" } else { label }, self.document.is_some(), false, action, cx);
-                        match icon { Some((path, name)) => control.aria_label(name).child(gpui::svg().path(path).size(px(16.0)).text_color(rgb(theme::TEXT))), None => control }
-                    }))
+            .child(div().id("viewer-tools").w(px(84.0)).flex_none().p_2().flex().flex_col().gap_1().overflow_y_scroll().border_r_1().border_color(rgb(theme::BORDER)).bg(rgb(theme::SURFACE))
+                .child(navigator)
                 .child(self.zoom_control(cx))
                 .child(div().flex_1())
-                .child(self.control("bitmap-layer", "B", self.document.is_some(), layer == 0, Action::Layer(0), cx).aria_label("Bitmap (hold B)"))
-                .child(self.control("segments-layer", "S", self.document.as_ref().is_some_and(|doc| doc.segments.is_some()), layer == 1, Action::Layer(1), cx).aria_label("Segmentation"))
-                .child(self.control("vector-layer", "V", self.document.as_ref().is_some_and(|doc| doc.display_vectors.is_some()), layer == 2, Action::Layer(2), cx).aria_label("Vector (hold V)"))
+                .child(hint(self.control("bitmap-layer", "Bitmap", self.document.is_some(), layer == 0, Action::Layer(0), cx).aria_label("Bitmap (hold B)"), "Show the source image. Hold B to compare."))
+                .child(hint(self.control("segments-layer", "Regions", self.document.as_ref().is_some_and(|doc| doc.segments.is_some()), layer == 1, Action::Layer(1), cx).aria_label("Segmentation"), "Show the colored regions used for tracing."))
+                .child(hint(self.control("vector-layer", "Vector", self.document.as_ref().is_some_and(|doc| doc.display_vectors.is_some()), layer == 2, Action::Layer(2), cx).aria_label("Vector (hold V)"), "Show the vector result. Hold V to compare."))
                 .child(self.control("paths", "Paths", self.document.as_ref().is_some_and(|doc| doc.display_vectors.is_some()), paths, Action::Paths, cx)))
-            .child(div().id("viewport").relative().flex_1().min_w_0().h_full().overflow_hidden().bg(rgb(theme::BACKGROUND))
+            .child(div().id("viewport").relative().flex_1().min_w_0().h_full().overflow_hidden().bg(rgb(theme::VIEWPORT))
                 // Image paint and input share the content bounds, not the scrollbar strips.
                 .child(div().id("image-viewport").absolute().inset_0().right(px(zoom::SCROLLBAR_EXTENT as f32)).bottom(px(zoom::SCROLLBAR_EXTENT as f32)).overflow_hidden()
                 .on_mouse_down(MouseButton::Left, cx.listener(|app, event: &gpui::MouseDownEvent, window, cx| { app.focus.focus(window, cx); app.pointer("press", event.position, 1, cx); }))
@@ -1351,26 +1511,37 @@ impl OpenVectorApp {
                 .when(layer != 2, |d| d.children(image.map(|image| img(image).absolute().left(px(self.view.origin.x as f32)).top(px(self.view.origin.y as f32))
                     .w(px((self.view.image.width * self.view.zoom) as f32)).h(px((self.view.image.height * self.view.zoom) as f32)))))
                 .child(paint)
-                .when(self.document.is_none(), |d| d.child(div().absolute().inset_0().flex().items_center().justify_center().text_color(rgb(theme::MUTED)).child("Open, paste or drop an image here"))))
+                .when(self.document.is_none(), |d| d.child(div().absolute().inset_0().flex().items_center().justify_center().text_color(rgb(theme::MUTED)).flex_col().gap_3().child(gpui::svg().path("image").size(px(40.0)).text_color(rgb(theme::MUTED)))
+                    .child("Turn an image into editable vectors")
+                    .child(self.control("empty-open", "Open image", !self.busy, false, Action::Open, cx))
+                    .child("or drop an image here · Ctrl+O to browse"))))
                 .child(self.scrollbar(false, cx)).child(self.scrollbar(true, cx))
-                .child(div().absolute().bottom(px(20.0)).right(px(20.0)).px_2().bg(rgb(theme::BACKGROUND)).text_color(rgb(theme::MUTED)).child(format!("{:.1}%", self.view.zoom * 100.0))))
+                // 100% means the image fills the view (Fit); actual pixels use 1:1.
+                .when(self.document.is_some(), |d| d.child(div().absolute().bottom(px(20.0)).right(px(20.0)).px_2().bg(rgb(theme::VIEWPORT)).text_color(rgb(theme::MUTED))
+                    .font_family("Geist Mono").child(format!("{:.0}%", self.fit_relative_zoom() * 100.0)))))
+    }
+    /// Displayed zoom divided by the scale Fit would use for the current view.
+    fn fit_relative_zoom(&self) -> f64 {
+        let fit = (self.view.area.width / self.view.image.width).min(self.view.area.height / self.view.image.height);
+        if fit.is_finite() && fit > 0.0 { self.view.zoom / fit } else { self.view.zoom }
     }
     fn modal(&self, cx: &Context<Self>) -> Option<Div> {
         let dialog = self.dialog.as_ref()?;
         if let Dialog::Form(form) = dialog { return Some(self.form_modal(form, cx)); }
         let (title, description) = match dialog {
-            Dialog::About => ("About OpenVector", "Independent bitmap-to-vector conversion. Rust engine · GPUI desktop. No Vector Magic installation required.".to_string()),
+            Dialog::About => ("About OpenVector", "OpenVector traces bitmap images into vector shapes you can edit, then saves them as SVG, PDF, EPS, AI, DXF or EMF.\n\nFree and open source under the MIT License.".to_string()),
             Dialog::PasteImage(_) => ("Replace image?", "Pasting a new image will discard your segmentation and background edits. Cancel to keep the current image.".to_string()),
             Dialog::BatchOverwrite(files) => ("Replace existing batch outputs?", files.join("\n")),
             Dialog::Form(_) => unreachable!("workflow dialogs return above"),
         };
         let actions = match dialog {
-            Dialog::About => div().child(self.control("dialog-close", "Close", true, false, Action::Dismiss, cx)),
-            Dialog::PasteImage(bytes) => div().flex().gap_2()
+            // Actions sit on the right, the confirming one filled with the accent.
+            Dialog::About => div().flex().justify_end().child(self.control("dialog-close", "Close", true, false, Action::Dismiss, cx).px_4()),
+            Dialog::PasteImage(bytes) => div().flex().justify_end().gap_2()
                 .child(self.control("paste-cancel", "Cancel", true, false, Action::Dismiss, cx).track_focus(&self.confirmation_cancel))
-                .child(self.control("paste-confirm", "Paste image", true, false, Action::ConfirmPaste(bytes.clone()), cx)),
-            Dialog::BatchOverwrite(_) => div().flex().gap_2().child(self.control("dialog-cancel", "Cancel", true, false, Action::BatchDecision(OverwriteDecision::Cancel), cx))
-                .child(self.control("dialog-skip", "Skip existing", true, false, Action::BatchDecision(OverwriteDecision::Skip), cx))
+                .child(self.primary("paste-confirm", "Paste image", true, Action::ConfirmPaste(bytes.clone()), cx).px_4()),
+            Dialog::BatchOverwrite(_) => div().flex().justify_end().gap_2().child(self.control("dialog-cancel", "Cancel", true, false, Action::BatchDecision(OverwriteDecision::Cancel), cx))
+                .child(self.control("dialog-skip", "Skip existing", true, false, Action::BatchDecision(OverwriteDecision::Skip), cx).debug_selector(|| "dialog-skip".into()))
                 .child(self.control("dialog-overwrite", "Overwrite", true, false, Action::BatchDecision(OverwriteDecision::Overwrite), cx)),
             Dialog::Form(_) => unreachable!("workflow dialogs return above"),
         };
@@ -1384,6 +1555,27 @@ impl OpenVectorApp {
 impl Focusable for OpenVectorApp { fn focus_handle(&self, _: &App) -> FocusHandle { self.focus.clone() } }
 impl Render for OpenVectorApp {
     fn render(&mut self, window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
+        // Quick operations (most option changes) finish well inside BUSY_GRACE.
+        // Painting them as idle avoids the whole UI dimming and the status line
+        // flashing "Processing" for one frame. Clicks are still refused while busy.
+        let grace = self.busy && self.busy_since.as_ref().is_some_and(|(since, _)| since.elapsed() < BUSY_GRACE);
+        let held = grace.then(|| {
+            let status = self.busy_since.as_ref().map(|(_, status)| status.clone()).unwrap_or_default();
+            self.busy = false;
+            std::mem::replace(&mut self.status, status)
+        });
+        let element = self.render_frame(window, cx);
+        if let Some(status) = held { self.busy = true; self.status = status; }
+        element
+    }
+}
+impl OpenVectorApp {
+    fn render_frame(&mut self, window: &mut Window, cx: &mut Context<Self>) -> Stateful<Div> {
+        if self.activation.is_none() {
+            self.activation = Some(cx.observe_window_activation(window, |app, window, cx| {
+                if !window.is_window_active() { app.input.release_keys(); cx.notify(); }
+            }));
+        }
         // Images removed since the last frame cannot be painted by this one.
         // Some(window) also reaches this window, which is leased during render.
         for image in self.workflows.released_images.drain(..) { cx.drop_image(image, Some(window)); }
@@ -1419,24 +1611,25 @@ impl Render for OpenVectorApp {
                 if app.busy { return; }
                 if app.batch.is_some() {
                     let paths = paths.0.iter().map(|path| path.to_string_lossy().into_owned()).collect::<Vec<_>>();
-                    let duplicates = app.batch_queue.add_files(&paths); app.batch = Some(app.batch_queue.snapshot());
-                    app.load_previews(cx);
-                    if !duplicates.is_empty() { app.fail(format!("Already in queue: {}", duplicates.join(", ")), cx); }
+                    app.add_batch_files(&paths, cx);
                 } else if let Some(path) = paths.0.first() { app.open(path.clone(), cx); }
                 cx.notify();
             }))
-            .child(div().h(px(theme::HEADER_HEIGHT)).flex_none().px_3().flex().items_center().gap_2().border_b_1().border_color(rgb(theme::BORDER))
-                .child(div().mr_4().child("openvector")).child(div().flex_1().min_w_0().truncate().text_color(rgb(theme::MUTED)).child(filename))
+            // The logo is the brand mark; file actions sit beside it. Paste stays on
+            // Ctrl+V and drag-and-drop, so it no longer needs a header button.
+            .child(div().h(px(theme::HEADER_HEIGHT)).flex_none().px_3().flex().items_center().gap_2().border_b_1().border_color(rgb(theme::BORDER)).bg(rgb(theme::SURFACE))
+                .child(gpui::svg().path("logo").size(px(20.0)).flex_none().mr_3().text_color(rgb(theme::TEXT)))
                 .child(self.control("open", "Open", !self.busy, false, Action::Open, cx))
-                .child(self.control("paste-image", "Paste image", !self.busy && self.batch.is_none(), false, Action::PasteImage, cx))
                 .child(self.control("batch", if self.batch.is_some() { "Single image" } else { "Batch" }, !self.busy, self.batch.is_some(), Action::Batch, cx))
                 .child(self.control("export", "Export", !self.busy && self.batch.is_none() && self.document.as_ref().is_some_and(|doc| doc.vectors.is_some()), false, Action::Export, cx))
+                .child(div().flex_1())
                 .child(self.control("reset-application", "Reset application", !self.busy, false, Action::Workflow(WorkflowAction::ResetApplication), cx))
                 .child(self.control("about", "About", !self.busy, false, Action::About, cx)))
             .child(div().flex_1().min_h_0().child(content))
-            .child(div().h(px(theme::FOOTER_HEIGHT)).flex_none().px_3().flex().items_center().gap_3().border_t_1().border_color(rgb(theme::BORDER))
-                .child(div().text_color(rgb(theme::MUTED)).child("Local"))
-                .child(div().id("status").role(if self.error { Role::Alert } else { Role::Status }).flex_1().text_color(rgb(if self.error { theme::DANGER } else { theme::TEXT })).child(self.status.clone()))
+            // Status bar: the open file, then what the app is doing.
+            .child(div().h(px(theme::FOOTER_HEIGHT)).flex_none().px_3().flex().items_center().gap_3().border_t_1().border_color(rgb(theme::BORDER)).bg(rgb(theme::SURFACE))
+                .when(!filename.is_empty(), |d| d.child(div().flex_none().max_w(px(360.0)).truncate().child(filename)).child(div().text_color(rgb(theme::MUTED)).child("·")))
+                .child(div().id("status").role(if self.error { Role::Alert } else { Role::Status }).aria_label(self.status.clone()).flex_1().min_w_0().truncate().text_color(rgb(if self.error { theme::DANGER } else { theme::MUTED })).child(self.status.clone()))
                 .when(self.busy, |d| d.child(div().w(px(120.0)).h(px(2.0)).bg(rgb(theme::BORDER)).child(div().w(px((self.progress.clamp(0.0, 100.0) * 1.2) as f32)).h_full().bg(rgb(theme::ACCENT))))
                     .child(self.control("cancel", "Cancel", true, false, Action::Cancel, cx))))
             .children(self.modal(cx))

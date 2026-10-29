@@ -2,7 +2,7 @@ use super::*;
 use std::collections::{HashMap, HashSet};
 use gpui::Entity;
 use openvector::{profile_palette::{PaletteCommand, PaletteProfile, PaletteRuntime, apply_palette_command}, saved_profiles::SavedAdvancedProfiles, settings_profile::{SettingsProfile, apply_advanced_profile, apply_basic_profile}};
-use crate::{bitmap_size::BitmapSize, numeric_text::NumericLocale, text_field::TextField};
+use crate::{bitmap_size::BitmapSize, color_picker::{Hsv, parse_hex, parse_percent, to_hex}, numeric_text::NumericLocale, text_field::TextField};
 
 #[derive(Clone)]
 pub(super) enum WorkflowAction {
@@ -14,13 +14,13 @@ pub(super) enum WorkflowAction {
     ReplayRecentBasic(usize),
     RunProcess(&'static str, Page, Value), ApplyProfileAccepted(String, bool),
     Candidate(usize),
-    PaintColor, PaintOpacity, CommitPaintColor, CommitPaintOpacity,
+    PaintColor, CommitPaintColor,
     BatchSelect(usize, bool), BatchRemoveSelected, BatchClear,
-    ResetApplication, ResetApplicationAccepted,
+    ResetApplication, ResetApplicationAccepted, OpenAccepted(PathBuf), StartBatchAccepted,
 }
 #[derive(Clone)]
 pub(super) enum Form {
-    Numeric(&'static str), Color(usize), PaintColor, PaintOpacity, Save(bool), Rename(String), Confirm(String, WorkflowAction), Preview(PathBuf),
+    Numeric(&'static str), Color(usize), PaintColor, Save(bool), Rename(String), Confirm(String, WorkflowAction), Preview(PathBuf),
     Directory(PathBuf, Vec<(PathBuf, bool)>),
 }
 /// Independent window disclosures, indexing `Workflows::disclosures`. Native
@@ -47,6 +47,12 @@ pub(super) struct Workflows {
     pub recommended_background_mode: i32,
     pub inactive_palette: PaletteRuntime,
     pub eyedropper: Option<usize>,
+    /// Colour being edited in the picker dialog, and the screen bounds of its
+    /// saturation/value square and hue strip (captured during paint).
+    pub picker: Hsv,
+    pub picker_bounds: [Bounds<gpui::Pixels>; 2],
+    /// Which picker surface is being dragged: 0 square, 1 hue strip.
+    pub picker_drag: Option<usize>,
     /// Session-only queue previews. A batch's newest read replaces its own
     /// preview, never the separately persisted recent-source thumbnail.
     /// Skipped batch files are not read, so they keep the earlier queue preview.
@@ -76,7 +82,8 @@ impl Workflows {
         let suggestion = suggested_profile_name(&profiles);
         Ok(Self { profiles, profile_path, profile_name: cx.new(|cx| TextField::new("Settings name", suggestion, cx)), fields: Vec::new(), bitmap,
             palette: PaletteRuntime::default(), palette_count: preferences.selected.palette_color_count as f64, recommended_background_mode: preferences.selected.recommended_background_mode,
-            inactive_palette: PaletteRuntime::default(), eyedropper: None, thumbnails: HashMap::new(), released_images: Vec::new(), batch_result: None, thumbnail_pending: HashMap::new(), thumbnail_request: 0, flatten: false, disclosures: [false; 5] })
+            inactive_palette: PaletteRuntime::default(), eyedropper: None, picker: Hsv { h: 0.0, s: 0.0, v: 0.0 }, picker_bounds: [Bounds::default(); 2], picker_drag: None,
+            thumbnails: HashMap::new(), released_images: Vec::new(), batch_result: None, thumbnail_pending: HashMap::new(), thumbnail_request: 0, flatten: false, disclosures: [false; 5] })
     }
     pub(super) fn expanded(&self, disclosure: Disclosure) -> bool { self.disclosures[disclosure as usize] }
     /// Each native full model reset (0x430ed0) emits mainModelReset, connected to
@@ -136,6 +143,42 @@ impl OpenVectorApp {
         cx.notify();
     }
     fn field(&self, index: usize, cx: &Context<Self>) -> String { self.workflows.fields[index].read(cx).text.clone() }
+    /// Opens the colour picker for a stored BGRA colour. Field 0 is hex,
+    /// field 1 opacity as a whole percentage.
+    fn open_picker(&mut self, form: Form, [b, g, r, a]: [f32; 4], window: &mut Window, cx: &mut Context<Self>) {
+        self.workflows.picker = Hsv::from_rgb([r, g, b]);
+        self.workflows.picker_drag = None;
+        self.form(form, &[("Hex", to_hex([r, g, b])), ("Opacity", format!("{:.0}", a * 100.0))], window, cx);
+        // Typing only repaints the field; repaint the swatch and square with it.
+        // The subscription ends when the dialog drops the field entity.
+        if let Some(field) = self.workflows.fields.first() { cx.observe(field, |_, _, cx| cx.notify()).detach(); }
+    }
+    /// The picker's colour as RGBA, validated from its two fields.
+    fn picked(&self, cx: &Context<Self>) -> Result<[f32; 4], String> {
+        let [r, g, b] = parse_hex(&self.field(0, cx)).ok_or("Enter a hex color such as #1C4FD8.")?;
+        let a = parse_percent(&self.field(1, cx)).ok_or("Enter an opacity from 0 to 100.")?;
+        Ok([r, g, b, a])
+    }
+    /// The colour the picker shows: the typed hex when valid, keeping the
+    /// dragged hue for greys (which have no hue of their own).
+    pub(super) fn picker_display(&self, cx: &Context<Self>) -> Hsv {
+        match self.workflows.fields.first().and_then(|field| parse_hex(&field.read(cx).text)) {
+            Some(rgb) => { let mut hsv = Hsv::from_rgb(rgb); if hsv.s == 0.0 { hsv.h = self.workflows.picker.h; } hsv }
+            None => self.workflows.picker,
+        }
+    }
+    /// Moves the picker to a pointer position on surface 0 (square) or 1 (hue).
+    pub(super) fn picker_drag(&mut self, surface: usize, position: gpui::Point<gpui::Pixels>, cx: &mut Context<Self>) {
+        let bounds = self.workflows.picker_bounds[surface];
+        let fraction = |offset: gpui::Pixels, extent: gpui::Pixels| (f32::from(offset) / f32::from(extent).max(1.0)).clamp(0.0, 1.0);
+        let x = fraction(position.x - bounds.origin.x, bounds.size.width);
+        let mut hsv = self.picker_display(cx);
+        if surface == 0 { hsv.s = x; hsv.v = 1.0 - fraction(position.y - bounds.origin.y, bounds.size.height); } else { hsv.h = x * 359.999; }
+        self.workflows.picker = hsv;
+        let hex = to_hex(hsv.to_rgb());
+        if let Some(field) = self.workflows.fields.first() { field.update(cx, |field, cx| field.set(hex, cx)); }
+        cx.notify();
+    }
     pub(super) fn current_profile(&self) -> SettingsProfile {
         let mut profile = if self.batch.is_some() { self.preferences.batch.clone() } else { self.preferences.selected.clone() };
         profile.settings = self.settings.clone();
@@ -325,13 +368,26 @@ impl OpenVectorApp {
     pub(super) fn palette_candidates(&self, cx: &Context<Self>) -> Div {
         let mut body = div().flex().flex_col().gap_1();
         if let Some(document) = &self.document {
+            // A candidate is only offered while it adds a colour: once the image
+            // runs out of distinct colours, larger counts repeat the same palette.
+            let mut shown = 0;
             for (count, palette) in document.palettes.iter().enumerate().skip(2).filter(|(_, palette)| !palette.is_empty()) {
+                // Candidate colours are ARGB. Near-identical shades (antialiasing
+                // leftovers) and transparent entries do not count as new colours:
+                // compare opaque entries at 16 levels per channel.
+                let mut distinct = palette.chunks_exact(4).filter(|color| color[0] > 0.5)
+                    .map(|color| color[1..].iter().map(|value| (*value as f64 * 15.0).round() as u8).collect::<Vec<_>>()).collect::<Vec<_>>();
+                distinct.sort_unstable(); distinct.dedup();
+                if distinct.len() <= shown { continue; }
+                shown = distinct.len();
                 let selected = self.settings.palette.iter().copied().eq(palette.chunks_exact(4).flat_map(|color| color.iter().rev().copied()).map(|value| ((value as f64 * 65535.0).round() / 65535.0) as f32));
-                body = body.child(div().flex().items_center().gap_1()
-                    .child(self.control(format!("candidate-{count}"), format!("{count} colors"), !self.busy, selected, Action::Workflow(WorkflowAction::Candidate(count)), cx))
+                // Fixed-width labels keep every swatch strip on one vertical line.
+                body = body.child(self.control(format!("candidate-{count}"), "", !self.busy, selected, Action::Workflow(WorkflowAction::Candidate(count)), cx)
+                    .justify_start().gap_2().aria_label(format!("{count} colors"))
+                    .child(div().w(px(64.0)).flex_none().child(format!("{count} colors")))
                     .children(palette.chunks_exact(4).map(|color| {
                         let rgba = ((color[1] * 255.0).round() as u32) << 24 | ((color[2] * 255.0).round() as u32) << 16 | ((color[3] * 255.0).round() as u32) << 8 | (color[0] * 255.0).round() as u32;
-                        div().w(px(12.0)).h(px(18.0)).bg(gpui::rgba(rgba))
+                        div().size(px(14.0)).rounded(px(2.0)).border_1().border_color(rgb(theme::BORDER)).bg(gpui::rgba(rgba))
                     })));
             }
         }
@@ -379,6 +435,8 @@ impl OpenVectorApp {
                 self.status.push_str("Ready");
             }
             match action {
+                WorkflowAction::OpenAccepted(path) => { self.close_dialog(window, cx); self.open_accepted(path, cx); },
+                WorkflowAction::StartBatchAccepted => { self.close_dialog(window, cx); self.start_batch(cx); },
                 WorkflowAction::ResetApplication => {
                     if self.busy || self.loading_source || !self.pending.is_empty() || self.dialog.is_some() { return Ok(()); }
                     self.form(Form::Confirm(
@@ -402,34 +460,24 @@ impl OpenVectorApp {
                     self.batch = Some(self.batch_queue.snapshot());
                     self.load_previews(cx);
                 },
-                WorkflowAction::PaintColor | WorkflowAction::PaintOpacity => {
+                // Colour and opacity share one picker dialog: hex, drag surfaces, opacity %.
+                WorkflowAction::PaintColor => {
                     let color = self.document.as_ref().ok_or("Load an image before editing.")?.edit_color;
-                    if matches!(action, WorkflowAction::PaintOpacity) {
-                        self.form(Form::PaintOpacity, &[("Opacity", color[3].to_string())], window, cx);
-                    } else {
-                        self.form(Form::PaintColor, &[("Red", format!("{:.0}", color[2] * 255.0)), ("Green", format!("{:.0}", color[1] * 255.0)), ("Blue", format!("{:.0}", color[0] * 255.0))], window, cx);
-                    }
+                    self.open_picker(Form::PaintColor, color, window, cx);
                 },
-                WorkflowAction::CommitPaintColor | WorkflowAction::CommitPaintOpacity => {
-                    let mut color = self.document.as_ref().ok_or("Load an image before editing.")?.edit_color;
-                    if matches!(action, WorkflowAction::CommitPaintOpacity) {
-                        if !matches!(self.dialog, Some(Dialog::Form(Form::PaintOpacity))) { return Ok(()); }
-                        let opacity = self.field(0, cx).trim().parse::<f64>().map_err(|_| "Enter an opacity from 0 to 1.")?;
-                        if !opacity.is_finite() || !(0.0..=1.0).contains(&opacity) { return Err("Enter an opacity from 0 to 1.".into()); }
-                        color[3] = opacity as f32;
-                    } else {
-                        if !matches!(self.dialog, Some(Dialog::Form(Form::PaintColor))) { return Ok(()); }
-                        for (field, channel) in [2, 1, 0].into_iter().enumerate() {
-                            color[channel] = self.field(field, cx).trim().parse::<u8>().map_err(|_| "Enter color channels from 0 to 255.")? as f32 / 255.0;
-                        }
-                    }
+                WorkflowAction::CommitPaintColor => {
+                    if !matches!(self.dialog, Some(Dialog::Form(Form::PaintColor))) { return Ok(()); }
+                    let [r, g, b, a] = self.picked(cx)?;
                     self.close_dialog(window, cx);
-                    self.enqueue(Command::Edit { action: "gesture", input: json!({"phase":"color","color":color}) }, None, cx);
+                    self.enqueue(Command::Edit { action: "gesture", input: json!({"phase":"color","color":[b, g, r, a]}) }, None, cx);
                 },
                 WorkflowAction::Candidate(count) => {
                     let palette = self.document.as_ref().and_then(|document| document.palettes.get(count)).filter(|palette| !palette.is_empty()).ok_or("Analyze the image before choosing a palette.")?;
                     let colors = palette.chunks_exact(4).flat_map(|color| color.iter().rev().map(|channel| *channel as f64)).collect();
                     self.palette_command(PaletteCommand::Choose(colors), cx)?;
+                    // Show the choice: segment with the new palette and stay here.
+                    // page_changed then displays the region layer for Palette.
+                    if self.batch.is_none() { self.process("segmentation", Page::Palette, cx); }
                 },
                 WorkflowAction::RunProcess(stage, destination, input) => {
                     self.close_dialog(window, cx);
@@ -520,12 +568,13 @@ impl OpenVectorApp {
                 },
                 WorkflowAction::Color(index) => {
                     let color = self.settings.palette.get(index * 4..index * 4 + 4).ok_or("Choose an existing palette color.")?;
-                    self.form(Form::Color(index), &[("Red", format!("{:.0}", color[2] * 255.0)), ("Green", format!("{:.0}", color[1] * 255.0)), ("Blue", format!("{:.0}", color[0] * 255.0)), ("Alpha", format!("{:.0}", color[3] * 255.0))], window, cx);
+                    let color = [color[0], color[1], color[2], color[3]];
+                    self.open_picker(Form::Color(index), color, window, cx);
                 },
                 WorkflowAction::CommitColor => {
                     let Some(Dialog::Form(Form::Color(index))) = self.dialog else { return Ok(()); };
-                    let values: Vec<f64> = (0..4).map(|i| self.field(i, cx).trim().parse::<u8>().map(|v| v as f64 / 255.0).map_err(|_| "Enter color channels from 0 to 255.".to_string())).collect::<Result<_, _>>()?;
-                    self.palette_command(PaletteCommand::Color { index: index as f64, color: vec![values[2], values[1], values[0], values[3]] }, cx)?;
+                    let [r, g, b, a] = self.picked(cx)?;
+                    self.palette_command(PaletteCommand::Color { index: index as f64, color: vec![b as f64, g as f64, r as f64, a as f64] }, cx)?;
                     self.close_dialog(window, cx);
                 },
                 WorkflowAction::DeleteColor(index) => { self.palette_command(PaletteCommand::Delete(index as f64), cx)?; self.close_dialog(window, cx); },
@@ -597,7 +646,7 @@ impl OpenVectorApp {
                     let command = if bitmap {
                         let document = self.document.as_ref().ok_or("Open and vectorize an image before saving.")?;
                         if format != "png" && document.source_alpha_type != 0 && self.settings.background_mode == 0 && !self.workflows.flatten { return Err("This format may discard transparency. Select Confirm flattening before saving, or choose PNG.".into()); }
-                        Command::BitmapExport { path: path.clone(), format: format.clone(), scale: self.workflows.bitmap.scale, flatten: format != "png" && self.workflows.flatten }
+                        Command::BitmapExport { path: path.clone(), format: format.clone(), scale: self.workflows.bitmap.pane_scales[mode], flatten: format != "png" && self.workflows.flatten }
                     } else { Command::Export { path: path.clone(), options: self.export_options() } };
                     self.persist(cx);
                     self.prepare_save(command, window, cx)?;
@@ -660,7 +709,6 @@ impl OpenVectorApp {
             Some(Dialog::Form(Form::Numeric(_))) => Some(WorkflowAction::CommitNumeric),
             Some(Dialog::Form(Form::Color(_))) => Some(WorkflowAction::CommitColor),
             Some(Dialog::Form(Form::PaintColor)) => Some(WorkflowAction::CommitPaintColor),
-            Some(Dialog::Form(Form::PaintOpacity)) => Some(WorkflowAction::CommitPaintOpacity),
             Some(Dialog::Form(Form::Rename(name))) => Some(WorkflowAction::RenameProfile(name.clone(), false)),
             Some(Dialog::Form(Form::Save(bitmap))) => {
                 let axis = self.workflows.fields.iter().enumerate().skip(2).find(|(_, field)| field.read(cx).focus_handle(cx).is_focused(window)).map(|(index, _)| index - 2);
@@ -670,9 +718,51 @@ impl OpenVectorApp {
         };
         if let Some(action) = action { self.workflow_action(action, window, cx); }
     }
+    /// The dialog's confirming action, in the accent colour.
+    fn workflow_primary(&self, id: &str, label: &'static str, action: WorkflowAction, cx: &Context<Self>) -> Stateful<Div> {
+        primary_button(format!("dialog-{id}"), label, !self.busy).px_4()
+            .when(!self.busy, |button| button.on_click(cx.listener(move |app, _, window, cx| app.dispatch(Action::Workflow(action.clone()), window, cx))))
+    }
     fn workflow_button(&self, id: impl Into<String>, label: impl Into<String>, action: WorkflowAction, cx: &Context<Self>) -> Stateful<Div> {
         let id = format!("dialog-{}", id.into());
         button(id, label.into(), !self.busy, false).when(!self.busy, |button| button.on_click(cx.listener(move |app, _, window, cx| app.dispatch(Action::Workflow(action.clone()), window, cx))))
+    }
+    /// Saturation/value square, hue strip, then hex and opacity inputs with a
+    /// preview swatch. Dragging either surface rewrites the hex field.
+    fn picker(&self, cx: &Context<Self>) -> Div {
+        use gpui::{linear_gradient, linear_color_stop};
+        let hsv = self.picker_display(cx);
+        let pack = |[r, g, b]: [f32; 3]| ((r * 255.0).round() as u32) << 16 | ((g * 255.0).round() as u32) << 8 | (b * 255.0).round() as u32;
+        let hue = pack(Hsv { h: hsv.h, s: 1.0, v: 1.0 }.to_rgb());
+        let current = pack(hsv.to_rgb());
+        let entity = cx.entity().downgrade();
+        let surface = |index: usize| {
+            let entity = entity.clone();
+            div().id(("picker-surface", index)).relative().w_full().cursor_pointer()
+                .child(canvas(move |bounds, _, cx| { let _ = entity.update(cx, |app, _| app.workflows.picker_bounds[index] = bounds); }, |_, _, _, _| {}).absolute().size_full())
+                .on_mouse_down(MouseButton::Left, cx.listener(move |app, event: &gpui::MouseDownEvent, _, cx| { app.workflows.picker_drag = Some(index); app.picker_drag(index, event.position, cx); }))
+                .on_mouse_move(cx.listener(move |app, event: &gpui::MouseMoveEvent, _, cx| { if app.workflows.picker_drag == Some(index) { app.picker_drag(index, event.position, cx); } }))
+                .on_mouse_up(MouseButton::Left, cx.listener(|app, _, _, _| app.workflows.picker_drag = None))
+                .on_mouse_up_out(MouseButton::Left, cx.listener(|app, _, _, _| app.workflows.picker_drag = None))
+        };
+        // Hue strip as six gradient segments, red through red.
+        let stops = [0xff0000, 0xffff00, 0x00ff00, 0x00ffff, 0x0000ff, 0xff00ff, 0xff0000];
+        // White ring inside a dark ring stays visible on both light and dark colours.
+        let marker = |left: f32, top: f32| div().absolute().left(gpui::relative(left)).top(gpui::relative(top)).ml(px(-7.0)).mt(px(-7.0))
+            .size(px(14.0)).rounded_full().border_1().border_color(rgb(0x000000))
+            .child(div().size_full().rounded_full().border_2().border_color(rgb(0xffffff)));
+        div().flex().flex_col().gap_3()
+            .child(surface(0).h(px(180.0)).rounded(px(6.0)).overflow_hidden().bg(rgb(hue))
+                .child(div().absolute().inset_0().bg(linear_gradient(90.0, linear_color_stop(rgb(0xffffff), 0.0), linear_color_stop(gpui::rgba(0xffffff00), 1.0))))
+                .child(div().absolute().inset_0().bg(linear_gradient(180.0, linear_color_stop(gpui::rgba(0x00000000), 0.0), linear_color_stop(rgb(0x000000), 1.0))))
+                .child(marker(hsv.s, 1.0 - hsv.v)))
+            .child(surface(1).h(px(14.0)).rounded(px(7.0)).flex()
+                .children(stops.windows(2).map(|pair| div().flex_1().h_full().bg(linear_gradient(90.0, linear_color_stop(rgb(pair[0]), 0.0), linear_color_stop(rgb(pair[1]), 1.0)))))
+                .child(marker(hsv.h / 360.0, 0.5)))
+            .child(div().flex().items_end().gap_2()
+                .child(div().size(px(32.0)).flex_none().rounded(px(6.0)).border_1().border_color(rgb(theme::BORDER)).bg(rgb(current)))
+                .child(div().flex_1().flex().flex_col().gap_1().child(div().text_color(rgb(theme::MUTED)).child("Hex")).child(self.workflows.fields[0].clone()))
+                .child(div().w(px(96.0)).flex().flex_col().gap_1().child(div().text_color(rgb(theme::MUTED)).child("Opacity %")).child(self.workflows.fields[1].clone())))
     }
     pub(super) fn form_modal(&self, form: &Form, cx: &Context<Self>) -> Div {
         let mut body = div().id("form-body").flex().flex_col().gap_3().max_h(px(600.0)).overflow_y_scroll();
@@ -683,21 +773,18 @@ impl OpenVectorApp {
                 "Change Settings Label".into()
             },
             Form::Color(index) => {
-                for (i, name) in ["Red", "Green", "Blue", "Alpha"].into_iter().enumerate() { body = body.child(row(name, self.workflows.fields[i].clone())); }
-                body = body.child(self.workflow_button("color-apply", "Apply color", WorkflowAction::CommitColor, cx))
-                    .child(self.workflow_button("color-pick", "Pick from source image", WorkflowAction::Eyedropper, cx))
-                    .child(self.workflow_button("color-delete", "Delete this color", WorkflowAction::DeleteColor(*index), cx));
+                body = body.child(self.picker(cx))
+                    .child(div().flex().gap_2()
+                        .child(self.workflow_button("color-pick", "Pick from image", WorkflowAction::Eyedropper, cx))
+                        .child(self.workflow_button("color-delete", "Delete color", WorkflowAction::DeleteColor(*index), cx))
+                        .child(div().flex_1())
+                        .child(self.workflow_primary("color-apply", "Apply", WorkflowAction::CommitColor, cx)));
                 format!("Palette color {}", index + 1)
             },
             Form::PaintColor => {
-                for (i, name) in ["Red", "Green", "Blue"].into_iter().enumerate() { body = body.child(row(name, self.workflows.fields[i].clone())); }
-                body = body.child(self.workflow_button("paint-color-apply", "Apply color", WorkflowAction::CommitPaintColor, cx));
+                body = body.child(self.picker(cx))
+                    .child(div().flex().child(div().flex_1()).child(self.workflow_primary("paint-color-apply", "Apply", WorkflowAction::CommitPaintColor, cx)));
                 "Paint color".into()
-            },
-            Form::PaintOpacity => {
-                body = body.child(row("Opacity (0–1)", self.workflows.fields[0].clone()))
-                    .child(self.workflow_button("paint-opacity-apply", "Apply opacity", WorkflowAction::CommitPaintOpacity, cx));
-                "Opacity".into()
             },
             Form::Save(bitmap) => {
                 let mode = usize::from(self.settings.advanced); let save = if *bitmap { &self.preferences.bitmap_save } else { &self.preferences.quick_save };
@@ -879,7 +966,7 @@ mod tests {
             app.settings.palette = vec![0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0];
             app.workflows.palette.backup = app.settings.palette.clone();
             app.workflow_action(WorkflowAction::Color(0), window, cx);
-            app.workflows.fields[0].update(cx, |field, cx| field.set("255", cx));
+            app.workflows.fields[0].update(cx, |field, cx| field.set("#FF0000", cx));
             app.workflow_action(WorkflowAction::CommitColor, window, cx);
             assert_eq!(&app.settings.palette[..4], &[0.0, 0.0, 1.0, 1.0]);
             app.workflow_action(WorkflowAction::Palette(PaletteCommand::Revert), window, cx);

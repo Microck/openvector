@@ -107,7 +107,7 @@ impl Render for TextField {
         let entity = cx.entity(); let focus = self.focus.clone();
         div().id("text-field").track_focus(&focus).role(Role::TextInput).aria_label(self.label.clone())
             .h(px(28.0)).min_h(px(28.0)).w_full().px_2().bg(rgb(theme::RAISED)).border_1().border_color(rgb(theme::BORDER)).rounded(px(theme::CONTROL_RADIUS))
-            .focus_visible(|style| style.border_color(rgb(theme::ACCENT))).overflow_hidden()
+            .focus_visible(|style| style.border_color(rgb(theme::TEXT))).overflow_hidden()
             .on_key_down(cx.listener(Self::key))
             .on_key_up(cx.listener(|_, _: &gpui::KeyUpEvent, _, cx| cx.stop_propagation()))
             .on_mouse_down(MouseButton::Left, cx.listener(|this, event: &gpui::MouseDownEvent, window, cx| {

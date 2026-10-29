@@ -93,7 +93,7 @@ impl BatchQueue {
             let base = filename.rfind('.').map_or(filename, |dot| &filename[..dot]);
             let mut stem = base.to_owned();
             let mut suffix = 0;
-            while !names.insert(stem.clone()) { suffix += 1; stem = format!("{base}_{suffix}"); }
+            while !names.insert(stem.to_uppercase()) { suffix += 1; stem = format!("{base}_{suffix}"); }
             record.output_filename = format!("{}/{stem}.{}", self.export_directory, self.export_format);
             record.should_process = !exists(&record.output_filename);
             if !record.should_process { overwrites.push(record.output_filename.clone()); }

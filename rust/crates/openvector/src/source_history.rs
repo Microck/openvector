@@ -104,7 +104,7 @@ impl SourceHistory {
         // Validate before mutating the prior history.
         let thumbnail_dimensions = Self::thumbnail_dimensions(width, height)?;
         let description = format!("{width}x{height}, {}", format_file_size(bytes)?);
-        self.files.retain(|file| file.filename != filename);
+        self.files.retain(|file| !same_path(&file.filename, filename));
         self.files.insert(0, RecentFile {
             filename: filename.to_owned(), description, thumbnail_dimensions,
         });
@@ -121,6 +121,15 @@ impl SourceHistory {
         self.files.clear();
         self.snapshot()
     }
+}
+
+/// The same file can arrive as `D:/a/b.png`, `D:\a\b.png` or `d:\A\B.png` on
+/// Windows. Treat those as one entry so Recent never lists a file twice; the
+/// newest spelling is the one kept.
+fn same_path(left: &str, right: &str) -> bool {
+    // Backslash is a legal filename byte elsewhere, so only Windows folds.
+    let fold = |path: &str| path.replace('\\', "/").to_lowercase();
+    left == right || (cfg!(windows) && fold(left) == fold(right))
 }
 
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
@@ -152,7 +161,7 @@ impl SourceDirectories {
         if directory.is_empty() {
             return Err("Choose a recent image directory.");
         }
-        self.directories.retain(|name| name != directory);
+        self.directories.retain(|name| !same_path(name, directory));
         self.directories.insert(0, directory.to_owned());
         self.directories.truncate(DIRECTORY_CAPACITY);
         Ok(self.snapshot())

@@ -20,11 +20,11 @@ fn bitmap_size_preserves_aspect_ratio_separate_panes_and_correction_rollback() {
 fn quick_save_normalizes_names_without_merging_basic_advanced_choices() {
     let directory = FixtureDirectory::new(); let source = directory.0.join("multi.part.bmp");
     let mut save = QuickSave::new(false); save.source_changed(&source);
-    assert_eq!(save.choices[0].filename, "multi");
+    assert_eq!(save.choices[0].filename, "multi.part");
     save.configure(0, "svg", directory.0.to_str().unwrap(), "new.output.eps").unwrap();
-    assert_eq!(save.choices[0].format, "eps"); assert_eq!(save.choices[0].filename, "new");
-    assert_eq!(save.choices[1].format, "ai"); assert_eq!(save.choices[1].filename, "multi");
-    assert_eq!(save.target(0).unwrap(), directory.0.canonicalize().unwrap().join("new.eps"));
+    assert_eq!(save.choices[0].format, "eps"); assert_eq!(save.choices[0].filename, "new.output");
+    assert_eq!(save.choices[1].format, "ai"); assert_eq!(save.choices[1].filename, "multi.part");
+    assert_eq!(save.target(0).unwrap(), directory.0.canonicalize().unwrap().join("new.output.eps"));
     save.configure(0, "svg", directory.0.to_str().unwrap(), "").unwrap(); assert!(save.target(0).is_err());
     assert!(save.configure(0, "svg", directory.0.to_str().unwrap(), "bad\0name").is_err());
 }

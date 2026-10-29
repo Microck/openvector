@@ -146,3 +146,21 @@ fn wizard_back_graph_keeps_alpha_and_review_policy() {
     assert_eq!(wizard.back_page(&settings, false), Page::Background);
     assert_eq!(wizard.completed_page(&settings), Page::Export);
 }
+
+#[test]
+fn wizard_back_returns_along_visited_path() {
+    let settings = DocumentSettings::default();
+    let mut wizard = Wizard::default();
+    // Automatic: Load -> Mode -> Export, skipping every wizard page.
+    for page in [Page::Mode, Page::Export] { wizard.page = page; wizard.record(); }
+    let back = wizard.back_page(&settings, false);
+    assert_eq!(back, Page::Mode);
+    wizard.page = back; wizard.record();
+    assert_eq!(wizard.back_page(&settings, false), Page::Load);
+    // A forward revisit trims the loop instead of growing history.
+    let mut wizard = Wizard::default();
+    for page in [Page::Mode, Page::ImageType, Page::Quality, Page::Colors, Page::Review, Page::Colors] {
+        wizard.page = page; wizard.record();
+    }
+    assert_eq!(wizard.back_page(&settings, false), Page::Quality);
+}

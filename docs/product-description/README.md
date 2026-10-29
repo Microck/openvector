@@ -38,12 +38,15 @@ owns persisted choices. `app-*-tests.rs` and `app_*tests.rs` exercise GUI workfl
 | [Document](foundations/document.md) | Source, result, edits and files | drafted |
 | [Navigation](foundations/navigation.md) | Wizard and batch transitions | drafted |
 | [Conversion](single-image/conversion.md) | Automatic, Basic and Advanced progression | drafted |
-| [Inspection](single-image/inspection.md) | Zoom, pan and result layers | not started |
-| [Editing](single-image/editing.md) | Palette, segmentation and background editing | not started |
-| [Export](single-image/export.md) | Vector/bitmap save, overwrite, drag result | not started |
-| [Batch](batch.md) | Queue, folder, conversion and conflict handling | not started |
-| [Settings](settings.md) | Profiles, recent files and reset | not started |
+| [Inspection](single-image/inspection.md) | Zoom, pan and result layers | drafted |
+| [Editing](single-image/editing.md) | Palette, segmentation and background editing | drafted |
+| [Export](single-image/export.md) | Vector/bitmap save, overwrite, drag result | drafted |
+| [Batch](batch.md) | Queue, folder, conversion and conflict handling | drafted |
+| [Settings](settings.md) | Profiles, recent files and reset | drafted |
 
 [Glossary](glossary.md) defines terms. [Verification](verification/README.md) records
 checks and their evidence. [Bug triage](bug-triage.md) distinguishes suspected issues
 from reproduced defects. Drafted does not mean runtime verified.
+
+[Observed QA results](verification/observed-results.md) records passing tests, native
+observations and remaining coverage for the current changes.

@@ -310,3 +310,113 @@ fn scrollbar_drag_stops_on_missing_button_and_view_transitions(cx: &mut gpui::Te
     visual.simulate_mouse_move(grab + point(px(70.0), px(0.0)), MouseButton::Left, Modifiers::default());
     app.read_with(visual, |app, _| assert_eq!(app.view.bar(Axis::Horizontal).value, 0.0));
 }
+
+#[gpui::test]
+fn pan_buttons_match_focused_arrow_keys(cx: &mut gpui::TestAppContext) {
+    let (_directory, app, visual) = loaded_viewer(cx);
+    app.update_in(visual, |app, window, cx| app.dispatch(Action::Zoom(100), window, cx));
+    visual.simulate_mouse_move(point(px(0.0), px(0.0)), None, Modifiers::default());
+    let before = app.read_with(visual, |app, _| app.view.clone());
+    let up = visual.debug_bounds("pan-up").unwrap().center();
+    visual.simulate_click(up, Modifiers::default());
+    let button_up = app.read_with(visual, |app, _| app.view.clone());
+    app.update_in(visual, |app, window, cx| { app.view = before.clone(); app.focus.focus(window, cx); });
+    key_down(visual, "up");
+    app.read_with(visual, |app, _| assert_eq!(app.view, button_up));
+    let down = visual.debug_bounds("pan-down").unwrap().center();
+    visual.simulate_click(down, Modifiers::default());
+    let button_down = app.read_with(visual, |app, _| app.view.clone());
+    app.update_in(visual, |app, window, cx| { app.view = button_up.clone(); app.focus.focus(window, cx); });
+    key_down(visual, "down");
+    app.read_with(visual, |app, _| {
+        assert_eq!(app.view, button_down);
+        assert_eq!(app.view.bar(Axis::Vertical).value, before.bar(Axis::Vertical).value);
+    });
+}
+
+#[gpui::test]
+fn replacing_manual_work_requires_confirmation_and_cancel_preserves_it(cx: &mut gpui::TestAppContext) {
+    let (directory, app, visual) = loaded_viewer(cx);
+    app.update_in(visual, |app, window, cx| {
+        let source = app.document.as_ref().unwrap().source.clone();
+        // Leaving the editor preserves its unapplied edits even on the Load page.
+        app.document.as_mut().unwrap().editing_changed = true;
+        app.wizard.page = Page::Load;
+        app.open(directory.0.join("missing.png"), cx);
+        assert!(matches!(app.dialog, Some(Dialog::Form(Form::Confirm(_, WorkflowAction::OpenAccepted(_))))));
+        app.dispatch(Action::Dismiss, window, cx);
+        app.document.as_mut().unwrap().editing_changed = false;
+        app.workflows.palette.customized = true;
+        app.open(directory.0.join("missing.png"), cx);
+        assert!(matches!(app.dialog, Some(Dialog::Form(Form::Confirm(_, WorkflowAction::OpenAccepted(_))))));
+        assert!(!app.busy);
+        app.dispatch(Action::Dismiss, window, cx);
+        assert!(Arc::ptr_eq(&source, &app.document.as_ref().unwrap().source));
+        assert!(app.workflows.palette.customized);
+        app.dispatch(Action::Batch, window, cx);
+        app.dispatch(Action::BatchStart, window, cx);
+        assert!(matches!(app.dialog, Some(Dialog::Form(Form::Confirm(_, WorkflowAction::StartBatchAccepted)))));
+        app.dispatch(Action::Dismiss, window, cx);
+        assert!(!app.busy);
+        assert!(Arc::ptr_eq(&source, &app.document.as_ref().unwrap().source));
+    });
+}
+
+#[gpui::test]
+fn adding_batch_inputs_preserves_the_explicit_export_folder(cx: &mut gpui::TestAppContext) {
+    let (directory, app, visual) = loaded_viewer(cx);
+    app.update_in(visual, |app, window, cx| {
+        app.dispatch(Action::Batch, window, cx);
+        let output = directory.0.join("chosen-output").to_string_lossy().into_owned();
+        app.batch_queue.export_directory = output.clone();
+        app.add_batch_files(&[directory.0.join("source.png").to_string_lossy().into_owned()], cx);
+        assert_eq!(app.batch.as_ref().unwrap().export_directory, output);
+        assert_eq!(app.batch.as_ref().unwrap().queue.len(), 1);
+    });
+}
+
+#[gpui::test]
+fn bitmap_save_uses_the_displayed_modes_scale(cx: &mut gpui::TestAppContext) {
+    let (directory, app, visual) = loaded_viewer(cx);
+    let output = directory.0.join("bitmap.png");
+    std::fs::write(&output, b"existing output").unwrap();
+    app.update_in(visual, |app, window, cx| {
+        app.workflows.bitmap.commit(0, 2, 0.5).unwrap();
+        app.workflows.bitmap.commit(1, 2, 2.0).unwrap();
+        for (mode, scale) in [(0, 0.5), (1, 2.0)] {
+            app.settings.advanced = mode == 1;
+            app.preferences.bitmap_save.configure(mode, "png", directory.0.to_str().unwrap(), "bitmap").unwrap();
+            app.dispatch(Action::Workflow(WorkflowAction::SaveDialog(true)), window, cx);
+            app.dispatch(Action::Workflow(WorkflowAction::Save(true)), window, cx);
+            match &app.dialog {
+                Some(Dialog::Form(Form::Confirm(_, WorkflowAction::Confirm(Command::BitmapExport { scale: selected, .. })))) => assert_eq!(*selected, scale),
+                _ => panic!("Expected overwrite confirmation: {}", app.status),
+            }
+            app.dispatch(Action::Dismiss, window, cx);
+        }
+    });
+    assert_eq!(std::fs::read(output).unwrap(), b"existing output");
+}
+
+#[gpui::test]
+fn comparison_keys_release_when_the_window_deactivates(cx: &mut gpui::TestAppContext) {
+    let (_directory, app, visual) = loaded_viewer(cx);
+    visual.update(|window, _| window.activate_window());
+    visual.run_until_parked();
+    for key in ["b", "v"] {
+        key_down(visual, key);
+        app.read_with(visual, |app, _| {
+            let held = app.input.snapshot();
+            assert!(held.held_bitmap || held.held_vector);
+        });
+        visual.deactivate_window();
+        visual.run_until_parked();
+        app.read_with(visual, |app, _| {
+            let released = app.input.snapshot();
+            assert!(!released.held_bitmap && !released.held_vector);
+            assert_eq!(released.current_layer, released.base_layer);
+        });
+        visual.update(|window, _| window.activate_window());
+        visual.run_until_parked();
+    }
+}

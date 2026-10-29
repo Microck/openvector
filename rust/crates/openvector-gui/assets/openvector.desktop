@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=OpenVector
+Comment=Convert bitmap images to editable vectors
+Exec=openvector-gui %f
+Icon=openvector
+Terminal=false
+Categories=Graphics;2DGraphics;VectorGraphics;
+MimeType=image/png;image/jpeg;image/bmp;image/gif;image/tiff;
+StartupWMClass=openvector

@@ -52,7 +52,11 @@ fn native_queue_actions_and_output_planning() {
             let records = expected["queue"].as_array().unwrap();
             assert_eq!(actual.queue.len(), records.len(), "{id}");
             for ((record, output), native) in actual.queue.iter().zip(outputs).zip(records) {
-                assert_eq!(record.output_filename, output[0].as_str().unwrap(), "{id}");
+                // Historical native planning reused a case alias. The approved contract reserves it.
+                let expected_output = if id == "planning-case-alias-outputs" {
+                    output[0].as_str().unwrap().replace("/A.svg", "/A_1.svg")
+                } else { output[0].as_str().unwrap().to_owned() };
+                assert_eq!(record.output_filename, expected_output, "{id}");
                 assert_eq!(record.should_process, native["initializedFlags"][0].as_i64().unwrap() != 0, "{id}");
             }
             let processable = records.iter().filter(|r| r["initializedFlags"][0] != Value::from(0)).count();

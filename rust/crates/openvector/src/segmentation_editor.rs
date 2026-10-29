@@ -103,7 +103,7 @@ impl SegmentationEditor{
         }
         if !self.in_bounds([record.x as f64,record.y as f64]){return Ok(false);}let seed=record.y as usize*self.width+record.x as usize;
         if record.kind==5{let bytes:[u8;4]=std::array::from_fn(|c|((record.argb[3-c]*65535.0).round() as u32>>8) as u8);let target=u32::from_le_bytes(bytes);if target==packed(&self.pixels,seed){return Ok(false);}for pixel in self.component(seed).0{self.write(pixel,target);}return Ok(true);}
-        let (pixels,neighbors)=self.component(seed);if neighbors.is_empty(){return Err("Zap has no neighboring color; native behavior for this case is not established.".into());}
+        let (pixels,neighbors)=self.component(seed);if neighbors.is_empty(){return Err("This region has no neighboring color. Use Fill to change its color.".into());}
         for pixel in pixels{let source=self.source_color(pixel);let mut chosen=neighbors[0];let mut minimum=store_float(&zap_distance(chosen,source));for &neighbor in &neighbors{let distance=zap_distance(neighbor,source);if distance<fixed_double(minimum){chosen=neighbor;minimum=store_float(&distance);}}self.write(pixel,chosen);}Ok(true)
     }
 }

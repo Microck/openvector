@@ -285,7 +285,10 @@ fn advanced_entry_checkbox_revert_and_confirmation_use_real_worker(cx: &mut gpui
         let (ticket, deadline) = app.automatic.scheduled().expect("busy pipeline defers one pending update");
         let source = app.document.as_ref().unwrap().filename.clone();
         let old_source = app.document.as_ref().unwrap().source.clone();
-        app.open(source, cx); app.automatic_due(ticket, deadline, cx); finish(app, cx);
+        app.open(source.clone(), cx);
+        assert!(matches!(app.dialog, Some(Dialog::Form(Form::Confirm(_, WorkflowAction::OpenAccepted(_))))));
+        app.dispatch(Action::Workflow(WorkflowAction::OpenAccepted(source)), window, cx);
+        app.automatic_due(ticket, deadline, cx); finish(app, cx);
         assert_eq!(app.wizard.page, Page::Mode); assert!(app.automatic.scheduled().is_none());
         assert!(!Arc::ptr_eq(&old_source, &app.document.as_ref().unwrap().source));
     });
@@ -421,7 +424,9 @@ fn held_moves_queue_behind_gestures_not_processing_or_cancelled_navigation(cx: &
         assert_eq!(app.status, "Cancelled");
         assert_eq!(app.wizard.page, Page::Editing);
         assert_eq!(edited_pixels(app), painted);
-        app.open(source, cx);
+        app.open(source.clone(), cx);
+        assert!(matches!(app.dialog, Some(Dialog::Form(Form::Confirm(_, WorkflowAction::OpenAccepted(_))))));
+        app.dispatch(Action::Workflow(WorkflowAction::OpenAccepted(source)), window, cx);
         movement(app, 2.0, 12.0, cx);
         finish(app, cx);
         assert_eq!(app.wizard.page, Page::Mode);

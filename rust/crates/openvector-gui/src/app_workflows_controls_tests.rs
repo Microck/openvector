@@ -137,19 +137,20 @@ fn paint_controls_round_trip_worker_color_and_picker(cx: &mut gpui::TestAppConte
         app.open(source, cx); finish(app, window, cx);
         app.dispatch(Action::Automatic, window, cx); finish(app, window, cx);
         app.enqueue(Command::Edit { action: "begin", input: Value::Null }, Some(Page::Editing), cx); finish(app, window, cx);
-        app.workflow_action(WorkflowAction::PaintOpacity, window, cx);
-        app.workflows.fields[0].update(cx, |field, cx| field.set("0.37", cx));
-        app.workflow_action(WorkflowAction::CommitPaintOpacity, window, cx); finish(app, window, cx);
+        // One picker edits colour (hex, field 0) and opacity (percent, field 1).
+        app.workflow_action(WorkflowAction::PaintColor, window, cx);
+        app.workflows.fields[1].update(cx, |field, cx| field.set("37", cx));
+        app.workflow_action(WorkflowAction::CommitPaintColor, window, cx); finish(app, window, cx);
         assert_eq!(app.document.as_ref().unwrap().edit_color[3], alpha);
         app.workflow_action(WorkflowAction::PaintColor, window, cx);
     });
-    cx.simulate_keystrokes("ctrl-a 2 5 5 tab ctrl-a 0 tab ctrl-a 0 enter");
+    cx.simulate_keystrokes("ctrl-a # f f 0 0 0 0 enter");
     app.update_in(cx, |app, window, cx| {
         finish(app, window, cx);
         assert_eq!(app.document.as_ref().unwrap().edit_color, [0.0, 0.0, 1.0, alpha]);
-        app.workflow_action(WorkflowAction::PaintOpacity, window, cx);
-        app.workflows.fields[0].update(cx, |field, cx| field.set("NaN", cx));
-        app.workflow_action(WorkflowAction::CommitPaintOpacity, window, cx);
+        app.workflow_action(WorkflowAction::PaintColor, window, cx);
+        app.workflows.fields[0].update(cx, |field, cx| field.set("#12", cx));
+        app.workflow_action(WorkflowAction::CommitPaintColor, window, cx);
         assert!(app.error); assert!(app.dialog.is_some()); assert!(!app.busy);
         app.dispatch(Action::Dismiss, window, cx);
         app.enqueue(Command::Edit { action: "gesture", input: json!({"phase":"select","tool":"picker"}) }, None, cx); finish(app, window, cx);
@@ -158,9 +159,7 @@ fn paint_controls_round_trip_worker_color_and_picker(cx: &mut gpui::TestAppConte
         let picked: [f32; 4] = std::array::from_fn(|index| (pixel[index] as f64 / 255.0) as f32);
         assert_eq!(app.document.as_ref().unwrap().edit_color, picked);
         app.workflow_action(WorkflowAction::PaintColor, window, cx);
-        assert_eq!(app.field(0, cx), pixel[2].to_string());
-        assert_eq!(app.field(1, cx), pixel[1].to_string());
-        assert_eq!(app.field(2, cx), pixel[0].to_string());
+        assert_eq!(app.field(0, cx), format!("#{:02X}{:02X}{:02X}", pixel[2], pixel[1], pixel[0]));
     });
 }
 
@@ -345,20 +344,22 @@ fn advanced_palette_candidates_keep_count_color_and_revert_ownership(cx: &mut gp
         assert_eq!(app.settings.palette, selected); assert!(!app.workflows.palette.customized);
 
         app.workflow_action(WorkflowAction::Color(0), window, cx);
-        app.workflows.fields[0].update(cx, |field, cx| field.set("256", cx));
+        app.workflows.fields[0].update(cx, |field, cx| field.set("#25", cx));
         app.workflow_action(WorkflowAction::CommitColor, window, cx);
         assert!(app.error);
         assert!(matches!(app.dialog, Some(Dialog::Form(Form::Color(0)))));
         assert_eq!(app.settings.palette, selected);
         let validation_message = app.status.clone();
-        for (field, value) in app.workflows.fields.iter().zip(["17", "84", "201", "128"]) {
+        for (field, value) in app.workflows.fields.iter().zip(["#1154C9", "50"]) {
             field.update(cx, |field, cx| field.set(value, cx));
         }
         app.workflow_action(WorkflowAction::CommitColor, window, cx);
         assert!(!app.error);
         assert!(app.dialog.is_none());
         assert_ne!(app.status, validation_message, "successful correction must remove the obsolete footer error");
-        assert_eq!(&app.settings.palette[..4], &[201.0 / 255.0, 84.0 / 255.0, 17.0 / 255.0, 128.0 / 255.0]);
+        // Opacity is typed in percent; storage keeps 16-bit colour channels.
+        assert_eq!(&app.settings.palette[..3], &[201.0 / 255.0, 84.0 / 255.0, 17.0 / 255.0]);
+        assert_eq!(app.settings.palette[3], openvector::pixel_input::quantize_qcolor_channels(&[0.5])[0]);
         assert!(app.workflows.palette.customized);
     });
 }
