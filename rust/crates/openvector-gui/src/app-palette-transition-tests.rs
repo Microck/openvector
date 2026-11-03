@@ -61,7 +61,8 @@ fn two_colors_after_fixed_palette_replaces_selection_and_export(cx: &mut gpui::T
             assert_eq!(app.wizard.page, Page::Colors);
             app.dispatch(Action::Set("paletteMode", json!(1)), window, cx); finish(app, cx);
             assert_eq!(app.wizard.page, Page::Palette);
-            app.dispatch(Action::Workflow(WorkflowAction::Candidate(4)), window, cx);
+            // Choosing a candidate now segments it for the preview; wait for that.
+            app.dispatch(Action::Workflow(WorkflowAction::Candidate(4)), window, cx); finish(app, cx);
             let fixed_colors = app.settings.palette.clone();
             assert_eq!(fixed_colors.len() / 4, 4);
             app.dispatch(Action::Next, window, cx); finish(app, cx);

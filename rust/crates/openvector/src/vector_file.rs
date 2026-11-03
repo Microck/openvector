@@ -90,7 +90,7 @@ mod native {
     use std::{fs::{File, OpenOptions}, io::{self, Write}, os::{fd::IntoRawFd, unix::fs::FileExt}, path::Path};
     pub struct NativeFile(File);
     impl NativeFile {
-        pub fn open(path: &Path, _share: u32) -> io::Result<Self> { OpenOptions::new().write(true).create(true).truncate(true).open(path).map(Self) }
+        pub fn open(path: &Path, _share: u32, overwrite: bool) -> io::Result<Self> { OpenOptions::new().write(true).create(overwrite).truncate(overwrite).create_new(!overwrite).open(path).map(Self) }
         pub fn write(&mut self, bytes: &[u8], position: Option<u64>) -> io::Result<()> {
             if let Some(position) = position { self.0.write_all_at(bytes, position) } else { self.0.write_all(bytes) }
         }
@@ -113,12 +113,13 @@ mod native {
     }
     pub struct NativeFile(isize);
     impl NativeFile {
-        pub fn open(path: &Path, share: u32) -> io::Result<Self> {
+        pub fn open(path: &Path, share: u32, overwrite: bool) -> io::Result<Self> {
             let mut path: Vec<u16> = path.as_os_str().encode_wide().collect();
             if path.contains(&0) { return Err(io::Error::new(io::ErrorKind::InvalidInput, "Export filename contains a null character.")); }
             path.push(0);
-            // GENERIC_WRITE | FILE_READ_ATTRIBUTES, CREATE_ALWAYS, normal file.
-            let handle = unsafe { CreateFileW(path.as_ptr(), 0x40000080, share, std::ptr::null(), 2, 0x80, 0) };
+            // GENERIC_WRITE | FILE_READ_ATTRIBUTES; CREATE_ALWAYS for approved
+            // replacement, otherwise CREATE_NEW; normal file.
+            let handle = unsafe { CreateFileW(path.as_ptr(), 0x40000080, share, std::ptr::null(), if overwrite { 2 } else { 1 }, 0x80, 0) };
             if handle == -1 { Err(io::Error::last_os_error()) } else { Ok(Self(handle)) }
         }
         pub fn write(&mut self, mut bytes: &[u8], mut position: Option<u64>) -> io::Result<()> {
@@ -191,6 +192,11 @@ extern "C" fn drain_interrupted() {
 /// write/close failures return 4. DXF/EMF failed opens still traverse and return
 /// 0. Serialization/progress errors escape and retain the physical handle.
 pub fn write_vector_file(filename: &Path, input: &VectorFileInput<'_>, progress: &mut dyn FnMut(i32) -> Result<(), VectorOutputError>) -> Result<VectorFileResult, VectorOutputError> {
+    write_vector_file_admitted(filename, input, true, progress)
+}
+
+/// Batch admission uses exclusive creation unless preflight explicitly approved replacement.
+pub fn write_vector_file_admitted(filename: &Path, input: &VectorFileInput<'_>, overwrite: bool, progress: &mut dyn FnMut(i32) -> Result<(), VectorOutputError>) -> Result<VectorFileResult, VectorOutputError> {
     let Some(format) = Format::from_path(filename) else { return Ok(VectorFileResult { status: 1, error: None }); };
     // Register before opening: there must never be a retained CRT stream whose
     // exit drain could not be installed.
@@ -198,9 +204,9 @@ pub fn write_vector_file(filename: &Path, input: &VectorFileInput<'_>, progress:
         return Err(VectorOutputError("Vector output could not register its interrupted-stream exit drain.".into()));
     }
     let binary = format == Format::Emf;
-    let (file, open_error) = match NativeFile::open(filename, if binary { 0 } else { 3 }) {
+    let (file, open_error) = match NativeFile::open(filename, if binary { 0 } else { 3 }, overwrite) {
         Ok(file) => (Some(file), None),
-        Err(error) if format == Format::Dxf || binary => (None, Some(error)),
+        Err(error) if overwrite && (format == Format::Dxf || binary) => (None, Some(error)),
         Err(error) => return Ok(VectorFileResult { status: 4, error: Some(error) }),
     };
     let mut stream = FileStream { file, pending: [0; 4096], used: 0, failure: None, binary };

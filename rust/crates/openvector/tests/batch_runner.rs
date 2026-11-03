@@ -48,24 +48,41 @@ fn native_batch_runner_files_logs_and_task_boundaries(){
         let status=if page==1{"empty"}else if page==2||reference["decision"]=="cancel"{"cancelled"}else if page==0{"no-files"}else{"complete"};
         assert_eq!(result.status,status,"{id}");assert_eq!(result.queue.processing_index as u32 as u64,native["processingIndex"].as_u64().unwrap(),"{id}");
         let expected_flags=native["queue"].as_array().unwrap().iter().map(|r|r["initializedFlags"][0].as_i64().unwrap()!=0).collect::<Vec<_>>();assert_eq!(result.queue.queue.iter().map(|r|r.should_process).collect::<Vec<_>>(),expected_flags,"{id}");
-        let expected_log=relocate(native["processing"]["log"].as_str().unwrap());assert_eq!(normalize_log(&result.log,Some(elapsed)),normalize_log(&expected_log,None),"{id}");
-        assert_eq!(result.failed,expected_log.lines().filter(|line|["Failed To Open File.","Failed To Save File."].contains(line)).count(),"{id}");assert_eq!(result.converted,reference["expectedConverted"].as_u64().unwrap() as usize,"{id}");assert_eq!(result.skipped,expected_flags.iter().filter(|flag|!**flag).count(),"{id}");
-        assert_eq!(result.files.iter().map(|f|f.output_filename.clone()).collect::<Vec<_>>(),native["processing"]["outputs"].as_array().unwrap().iter().map(|o|relocate(o[0].as_str().unwrap())).collect::<Vec<_>>(),"{id}");
+        // Only these two historical behaviors intentionally differ from the safety contract.
+        let case_alias = id == "case-alias-outputs";
+        let late_target = id == "post-preflight-file-appearance";
+        let mut expected_log=relocate(native["processing"]["log"].as_str().unwrap());
+        if case_alias { expected_log = expected_log.replace("'A.svg'", "'A_1.svg'"); }
+        if late_target {
+            let boundary = "\n\nConverting 'b.png'";
+            assert_eq!(expected_log.matches(boundary).count(), 1);
+            expected_log = expected_log.replacen(boundary, "\nFailed To Save File.\n\nConverting 'b.png'", 1);
+            assert_eq!(result.files.iter().map(|f|f.status.as_str()).collect::<Vec<_>>(), ["failed-save", "written"]);
+            assert!(result.files[0].error.is_some());
+            assert!(result.files[1].error.is_none());
+        }
+        if case_alias {
+            assert_eq!(result.files.iter().map(|f|f.status.as_str()).collect::<Vec<_>>(), ["written", "written", "written"]);
+            assert!(result.files.iter().all(|f| f.error.is_none()));
+        }
+        assert_eq!(normalize_log(&result.log,Some(elapsed)),normalize_log(&expected_log,None),"{id}");
+        assert_eq!(result.failed,expected_log.lines().filter(|line|["Failed To Open File.","Failed To Save File."].contains(line)).count(),"{id}");assert_eq!(result.converted,reference["expectedConverted"].as_u64().unwrap() as usize - usize::from(late_target),"{id}");assert_eq!(result.skipped,expected_flags.iter().filter(|flag|!**flag).count(),"{id}");
+        assert_eq!(result.files.iter().map(|f|f.output_filename.clone()).collect::<Vec<_>>(),native["processing"]["outputs"].as_array().unwrap().iter().map(|o|{let path=relocate(o[0].as_str().unwrap());if case_alias {path.replace("/A.svg", "/A_1.svg")}else{path}}).collect::<Vec<_>>(),"{id}");
         assert_eq!(result.files.iter().map(|f|f.filename.clone()).collect::<Vec<_>>(),native["queue"].as_array().unwrap().iter().map(|o|relocate(o["filename"].as_str().unwrap())).collect::<Vec<_>>(),"{id}");
         assert_eq!(decisions,usize::from(!reference["initialOutputs"].as_object().unwrap().is_empty()||!reference["priorSettings"].as_array().unwrap().is_empty()),"{id}");assert_eq!(appeared,!reference["filesystemAppearance"].is_null(),"{id}");
         if let Some(events)=reference["taskTrace"]["events"].as_array(){let expected=events.iter().filter(|e|e["kind"]==0).map(|e|json!([e["index"],e["task"],e["result"],e["progress"],e["cancelled"],e["randomState"]])).collect::<Vec<_>>();assert_eq!(stages,expected,"{id}");}
         if reference["directoryExists"]==true{
-            let processed=result.files.iter().filter(|f|f.status=="written").map(|f|Path::new(&f.output_filename).file_name().unwrap().to_str().unwrap().to_owned()).collect::<Vec<_>>();
             let expected_outputs=reference["expectedOutputs"].as_object().unwrap();
             let mut expected_listing=expected_outputs.keys().cloned().collect::<std::collections::BTreeSet<_>>();
-            // Case aliases share a physical file on Windows, but can remain
-            // separate outputs on a case-sensitive host filesystem.
-            for name in &processed {
-                let path=output.join(name).canonicalize().unwrap();
-                if !expected_outputs.keys().any(|native|output.join(native).canonicalize().unwrap()==path){expected_listing.insert(name.clone());}
+            if case_alias {
+                expected_listing.insert("A_1.svg".into());
+                assert_eq!(std::fs::read(output.join("A_1.svg")).unwrap(), common::b64(expected_outputs["a.svg"].as_str().unwrap()));
             }
             let actual_listing=std::fs::read_dir(&output).unwrap().map(|e|e.unwrap().file_name().into_string().unwrap()).collect::<std::collections::BTreeSet<_>>();assert_eq!(actual_listing,expected_listing,"{id}");
-            for (name,bytes) in expected_outputs{let holder=processed.iter().rev().find(|p|p.eq_ignore_ascii_case(name)).map(String::as_str).unwrap_or(name);let actual=std::fs::read(output.join(holder)).unwrap();let expected=common::b64(bytes.as_str().unwrap());if reference["format"]=="eps"{assert_eq!(normalize_eps(&actual),normalize_eps(&expected),"{id} {name}")}else{assert_eq!(actual,expected,"{id} {name}");}}
+            for (name,bytes) in expected_outputs{let actual=std::fs::read(output.join(name)).unwrap();
+                let expected=if late_target && name=="a.svg" {
+                    common::b64(reference["filesystemAppearance"]["bytes"].as_str().unwrap())
+                } else { common::b64(bytes.as_str().unwrap()) };if reference["format"]=="eps"{assert_eq!(normalize_eps(&actual),normalize_eps(&expected),"{id} {name}")}else{assert_eq!(actual,expected,"{id} {name}");}}
         }else{assert!(!output.exists(),"{id}");}
         if !native["document"].is_null(){editor_support::compare_document_state(last_export.as_ref().expect("missing final export state"),&native["document"]["state"],&rows[0]["parameters"]);}
     }
@@ -247,4 +264,30 @@ fn reserved_observer_cancellation_preserves_partial_report_and_retry() {
         assert_eq!(std::fs::read(pending_output).unwrap(),
             common::b64(reference["expectedOutputs"]["b.svg"].as_str().unwrap()));
     }
+}
+
+// Intentional product safety contract improvements over historical reference behavior.
+#[test]
+fn batch_case_names_and_late_target_are_safe() {
+    let reference=common::read_ndjson("batch-runner-reference.ndjson.gz").into_iter().find(|r|r["id"]=="uniform-pair").unwrap();
+    let directory=Directory::new();let root=&directory.0;let text=root.to_str().unwrap();
+    let mut queue=BatchQueue::new(text,text);
+    for (index,name) in ["Logo.png","logo.png"].iter().enumerate() {
+        let folder=root.join(index.to_string());std::fs::create_dir(&folder).unwrap();
+        let path=folder.join(name);
+        std::fs::write(&path,common::b64(reference["sources"][index]["bytes"].as_str().unwrap())).unwrap();
+        queue.add_files(&[path.to_str().unwrap().into()]);
+    }
+    let output=root.join("out");std::fs::create_dir(&output).unwrap();
+    queue.export_directory=output.to_str().unwrap().into();queue.export_format="svg".into();
+    queue.prepare(|p|Path::new(p).exists());let planned=queue.snapshot();
+    assert_ne!(planned.queue[0].output_filename.to_uppercase(),planned.queue[1].output_filename.to_uppercase());
+    let late=PathBuf::from(&planned.queue[1].output_filename);
+    let mut runner=BatchRunner::new(queue,CoreSession::default());let mut created=false;
+    let result=runner.run(&reference["settings"],&json!({}),|_|panic!("fresh targets"),Some(&mut |event:&BatchEvent| {
+        if !created && event.stage=="load" {std::fs::write(&late,b"external sentinel").unwrap();created=true;}Ok(())
+    })).unwrap();
+    assert!(created);assert_eq!(std::fs::read(&late).unwrap(),b"external sentinel");
+    assert_eq!((result.converted,result.failed,result.skipped),(1,1,0));
+    assert_eq!(result.files[1].status,"failed-save");assert!(result.files[1].error.is_some());
 }

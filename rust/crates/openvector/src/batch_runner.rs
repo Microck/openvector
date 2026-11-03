@@ -83,7 +83,13 @@ impl BatchRunner {
                     lines.borrow_mut().push(format!("Done {label}: {}",duration(previous.elapsed())));previous=Instant::now();Ok(())
                 };
                 self.document.run_batch_image_with_observers(&input,Some(&mut progress),Some(&mut stage))?;
-                let saved=self.document.save_vector_file(&absolute(&root,&file.output_filename),&options,Some(&mut |_|{
+                // Never admit a source alias as an output, even after an overwrite decision.
+                let target=absolute(&root,&file.output_filename);
+                if before.queue.iter().any(|source| crate::vector_file::same_file_identity(&target,&absolute(&root,&source.filename)).unwrap_or(false)) {
+                    file.status="failed-save".into();file.error=Some("Batch output refers to a queued source file. Choose another export folder.".into());
+                    lines.borrow_mut().push("Failed To Save File.".into());return Ok(())
+                }
+                let saved=self.document.save_vector_file_admitted(&target,&options,&Default::default(),decision==OverwriteDecision::Overwrite && plan.overwrites.contains(&file.output_filename),Some(&mut |_|{
                     if cancel.load(Ordering::Relaxed){document_cancel.store(true,Ordering::Relaxed);}Ok(())
                 }))?;
                 let save_error=saved.error.map(|e|e.to_string());

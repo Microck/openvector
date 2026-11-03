@@ -121,6 +121,17 @@ impl ViewerInput {
         self.state
     }
 
+    /// A key released in another window cannot deliver its release here.
+    pub fn release_keys(&mut self) {
+        self.state.held_bitmap = false;
+        self.state.held_vector = false;
+        self.state.current_layer = self.state.base_layer;
+        if self.state.shift_held && self.state.tool == tool::PAN {
+            self.state.tool = self.state.pan_restore;
+        }
+        self.state.shift_held = false;
+    }
+
     pub fn set_tool(&mut self, tool: i32) -> InputSnapshot {
         self.state.tool = tool;
         self.state

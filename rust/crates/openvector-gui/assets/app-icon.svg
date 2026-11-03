@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <!-- App icon: the pixel-to-blade mark (.github/assets/openvector-logo-reversed.svg)
+       on the app's charcoal surface. Source for app-icon.ico; see build.rs. -->
+  <rect width="1024" height="1024" rx="224" fill="#17181B"/>
+  <g fill="#FFFFFF" transform="translate(112 112) scale(0.78125)">
+    <rect x="320" y="128" width="192" height="144"/>
+    <rect x="192" y="256" width="160" height="160"/>
+    <rect x="96"  y="384" width="160" height="256"/>
+    <rect x="192" y="608" width="160" height="160"/>
+    <rect x="320" y="752" width="192" height="144"/>
+    <polygon points="384,352 544,352 672,656 800,352 944,352 672,912"/>
+  </g>
+</svg>

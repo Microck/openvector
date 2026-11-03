@@ -1,5 +1,6 @@
 pub mod theme;
 pub mod app;
+mod color_picker;
 mod controls;
 mod engine_worker;
 pub mod jobs;

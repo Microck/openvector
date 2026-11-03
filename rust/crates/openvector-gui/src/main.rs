@@ -28,6 +28,9 @@ fn main() {
         let window = cx.open_window(WindowOptions {
             window_bounds: Some(WindowBounds::Windowed(bounds)),
             window_min_size: Some(size(px(760.0), px(500.0))),
+            // Wayland compositors match this to openvector.desktop for the window
+            // and dock icon; Windows reads the exe's embedded icon instead (build.rs).
+            app_id: Some("openvector".into()),
             ..Default::default()
         }, |window, cx| {
             window.set_window_title("OpenVector");

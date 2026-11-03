@@ -127,10 +127,12 @@ impl OpenVectorApp {
     pub(super) fn drag_panel(&self, cx: &Context<Self>) -> Div {
         let owner = usize::from(self.settings.advanced);
         let choice = self.preferences.drag_result.choices[owner];
-        let mut panel = div().flex().flex_col().gap_2().child(section("Drag result"))
+        // Same title treatment as controls::group, so Export reads as one list of groups.
+        let mut panel = div().flex().flex_col().gap_2().pt_3().border_t_1().border_color(rgb(theme::BORDER))
+            .child(div().text_size(px(11.0)).text_color(rgb(theme::MUTED)).child("DRAG RESULT"))
             .child(div().flex().flex_wrap().gap_1().children(crate::quick_save::VECTOR_FORMATS.iter().map(|format|
                 self.control(format!("drag-format-{format}"), format.to_uppercase(), !self.busy, *format == choice.format, Action::DragFormat(format), cx))))
-            .child(self.control("drag-minimize", "Minimize on drag", !self.busy, choice.minimize, Action::DragMinimize, cx));
+            .child(self.checkbox("drag-minimize", "Minimize on drag", choice.minimize, Action::DragMinimize, cx));
         match &self.drag_result.preparation {
             Preparation::Ready { file, .. } if !self.busy && !self.drag_result.active() => {
                 let app = cx.entity().downgrade();

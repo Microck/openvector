@@ -169,7 +169,10 @@ impl ImageDocument{
     pub fn save_vector_file(&mut self,path:&std::path::Path,options:&crate::export_options::ExportOptions,on_progress:Option<&mut dyn FnMut(i32)->Result<(),String>>)->Result<crate::vector_file::VectorFileResult,String>{
         self.save_vector_file_with_environment(path,options,&DocumentExportEnvironment::default(),on_progress)
     }
-    pub fn save_vector_file_with_environment(&mut self,path:&std::path::Path,options:&crate::export_options::ExportOptions,environment:&DocumentExportEnvironment,mut on_progress:Option<&mut dyn FnMut(i32)->Result<(),String>>)->Result<crate::vector_file::VectorFileResult,String>{
+    pub fn save_vector_file_with_environment(&mut self,path:&std::path::Path,options:&crate::export_options::ExportOptions,environment:&DocumentExportEnvironment,on_progress:Option<&mut dyn FnMut(i32)->Result<(),String>>)->Result<crate::vector_file::VectorFileResult,String>{
+        self.save_vector_file_admitted(path,options,environment,true,on_progress)
+    }
+    pub fn save_vector_file_admitted(&mut self,path:&std::path::Path,options:&crate::export_options::ExportOptions,environment:&DocumentExportEnvironment,overwrite:bool,mut on_progress:Option<&mut dyn FnMut(i32)->Result<(),String>>)->Result<crate::vector_file::VectorFileResult,String>{
         if !self.state.fitting.as_ref().is_some_and(|f|f.complete){return Err("Document export needs completed fitted geometry.".into())}
         self.begin_task();
         let hidden:Vec<i64>=self.background.snapshot().hidden_regions.iter().map(|v|*v as i64).collect();
@@ -185,7 +188,7 @@ impl ImageDocument{
         input.palette=self.state.segmentation.as_ref().map_or(&[][..],|s|s.palette.as_slice());
         input.dxf_curve_mode=match options.curve_mode{crate::export_options::CurveMode::Splines=>crate::dxf::DxfCurveMode::Splines,crate::export_options::CurveMode::SparseLines=>crate::dxf::DxfCurveMode::SparseLines,crate::export_options::CurveMode::DenseLines=>crate::dxf::DxfCurveMode::DenseLines};
         let progress=&mut self.state.progress;let cancel=&self.cancel;
-        let result=crate::vector_file::write_vector_file(path,&input,&mut|percent|{
+        let result=crate::vector_file::write_vector_file_admitted(path,&input,overwrite,&mut|percent|{
             *progress=percent;
             if let Some(cb)=on_progress.as_deref_mut(){observer_result(cancel,cb(percent)).map_err(crate::vector_output::VectorOutputError)?}
             if cancel.load(Ordering::Relaxed){return Err(crate::vector_output::VectorOutputError(CANCEL_TASK.into()))}

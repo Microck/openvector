@@ -567,6 +567,37 @@ fn application_reset_rejects_pending_batch_and_preserves_completed_results(cx: &
     });
 }
 
+// The overwrite question arrives while the batch is still busy, and the worker
+// waits for the answer. A click on the rendered button must reach it.
+#[gpui::test]
+fn batch_overwrite_buttons_answer_while_busy(cx: &mut gpui::TestAppContext) {
+    let directory = Directory::new(); let paths = inputs(&directory); let source = paths.values().min().unwrap().clone();
+    let output = source.with_extension("svg"); std::fs::write(&output, b"existing output").unwrap();
+    let (app, visual) = cx.add_window_view(|_, cx| OpenVectorApp::with_preferences(directory.0.join("gui.json"), cx).unwrap());
+    app.update_in(visual, |app, window, cx| {
+        app.dispatch(Action::Batch, window, cx);
+        app.batch_queue.add_files(&[source.to_string_lossy().into_owned()]); app.batch = Some(app.batch_queue.snapshot());
+        app.dispatch(Action::BatchStart, window, cx);
+        let deadline = Instant::now() + Duration::from_secs(120);
+        while !matches!(app.dialog, Some(Dialog::BatchOverwrite(_))) {
+            app.poll(cx); assert!(Instant::now() < deadline, "overwrite dialog did not appear: {}", app.status);
+            std::thread::sleep(Duration::from_millis(1));
+        }
+        assert!(app.busy);
+        cx.notify();
+    });
+    visual.simulate_mouse_move(gpui::point(px(0.0), px(0.0)), None, gpui::Modifiers::default());
+    let skip = visual.debug_bounds("dialog-skip").expect("rendered Skip existing control").center();
+    visual.simulate_click(skip, gpui::Modifiers::default());
+    app.update_in(visual, |app, _, cx| {
+        assert!(app.dialog.is_none(), "the click must answer the dialog");
+        settle(app, cx); assert!(!app.error, "{}", app.status);
+        let outcome = app.workflows.batch_result.as_ref().unwrap();
+        assert_eq!((outcome.converted, outcome.failed, outcome.skipped), (0, 0, 1));
+        assert_eq!(std::fs::read(&output).unwrap(), b"existing output");
+    });
+}
+
 #[gpui::test]
 fn application_reset_window_owners_persist_across_restart(cx: &mut gpui::TestAppContext) {
     let directory = Directory::new(); let paths = inputs(&directory); let source = paths.values().min().unwrap().clone();

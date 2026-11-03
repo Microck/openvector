@@ -36,18 +36,55 @@ pub struct Wizard {
     pub auto_segmentation: bool,
     pub auto_vectorization: bool,
     pub edit_origin: Page,
+    /// Pages visited before the current one, oldest first. Back returns along
+    /// this path, so it always reaches the page the user actually came from.
+    /// Public only so `..Wizard::default()` works; change it through `record`.
+    pub history: Vec<Page>,
+    /// The page last acknowledged by `record`.
+    pub shown: Page,
+    /// Set by Back; the matching arrival pops history instead of pushing.
+    pub back_target: Option<Page>,
 }
 impl Default for Wizard {
     fn default() -> Self {
         Self { page: Page::Load, skip_review: false, auto_palette: true,
-            auto_segmentation: true, auto_vectorization: true, edit_origin: Page::Segmentation }
+            auto_segmentation: true, auto_vectorization: true, edit_origin: Page::Segmentation,
+            history: Vec::new(), shown: Page::Load, back_target: None }
     }
 }
 impl Wizard {
     pub fn completed_page(&self, settings: &DocumentSettings) -> Page {
         if settings.advanced || self.skip_review { Page::Export } else { Page::Review }
     }
-    pub fn back_page(&self, settings: &DocumentSettings, has_alpha: bool) -> Page {
+    /// Records an arrival on `self.page`. Call once after every page change.
+    pub fn record(&mut self) {
+        let target = self.back_target.take();
+        if self.page == self.shown { return; }
+        if self.page == Page::Load {
+            self.history.clear();
+        } else if let Some(index) = self.history.iter().position(|page| *page == self.page) {
+            // Back, or a forward route to an earlier page, trims the loop.
+            self.history.truncate(index);
+        } else if target != Some(self.page) {
+            self.history.push(self.shown);
+        }
+        self.shown = self.page;
+    }
+    /// Where Back goes. The native predecessor wins when the user actually
+    /// came through it (or nothing is recorded, e.g. right after a reset);
+    /// otherwise Back returns to the last page really visited, so skipped
+    /// pages (Automatic goes Mode -> Export) are never shown on the way back.
+    pub fn back_page(&mut self, settings: &DocumentSettings, has_alpha: bool) -> Page {
+        let fixed = self.fixed_back_page(settings, has_alpha);
+        let page = match self.history.last() {
+            // Editing records where it began (edit_origin); that is its history.
+            Some(last) if self.page != Page::Editing && !self.history.contains(&fixed) => *last,
+            _ => fixed,
+        };
+        self.back_target = Some(page);
+        page
+    }
+    fn fixed_back_page(&self, settings: &DocumentSettings, has_alpha: bool) -> Page {
         use Page::*;
         match self.page {
             Load | Mode => Load,
