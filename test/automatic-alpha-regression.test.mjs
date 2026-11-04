@@ -72,6 +72,11 @@ test('a local edit does not darken untouched automatic regions', () => {
     const svg = readFileSync(path, 'utf8');
     assert.match(svg, /fill="#ff0000"[^>]*opacity="0[.]5/i);
     assert.match(svg, /fill="#cc4000"[^>]*opacity="0[.]5/i);
+    const modified = {...settings, quality: (settings.quality + 1) % 3};
+    for (const stage of ['segmentation', 'smoothing', 'fitting']) document.runTask(stage, modified);
+    const reprocessed = join(dir, 'reprocessed.svg');
+    assert.equal(document.saveVector(reprocessed, {layout: 'stacked'}).status, 0);
+    assert.match(readFileSync(reprocessed, 'utf8'), /fill="#ff0000"[^>]*opacity="0[.]5/i);
   } finally { rmSync(dir, {recursive:true, force:true}); }
 });
 
