@@ -3,6 +3,34 @@ use gpui::{prelude::*, App, Bounds, ClipboardItem, Context, ElementInputHandler,
 use unicode_segmentation::UnicodeSegmentation;
 use crate::theme;
 
+// AccessKit lengths are byte-sized. Preserve normal grapheme clusters as
+// selectable units, splitting only exceptionally long clusters at UTF-8
+// boundaries so every encoded length remains representable.
+fn accessible_character_lengths(text: &str) -> Vec<u8> {
+    let mut lengths = Vec::new();
+    for grapheme in text.graphemes(true) {
+        let mut length = 0usize;
+        for character in grapheme.chars() {
+            let size = character.len_utf8();
+            if length + size > u8::MAX as usize {
+                lengths.push(length as u8);
+                length = 0;
+            }
+            length += size;
+        }
+        if length != 0 { lengths.push(length as u8); }
+    }
+    lengths
+}
+
+fn accessible_position(lengths: &[u8], byte: usize) -> usize {
+    let mut offset = 0usize;
+    lengths.iter().take_while(|length| {
+        offset += **length as usize;
+        offset <= byte
+    }).count()
+}
+
 pub struct TextField {
     pub text: String,
     label: String,
@@ -106,14 +134,15 @@ impl Render for TextField {
     fn render(&mut self, _: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
         let entity = cx.entity(); let focus = self.focus.clone();
         let accessible_text = self.text.clone();
-        let start = self.text[..self.selected.start].chars().count();
-        let end = self.text[..self.selected.end].chars().count();
+        let accessible_lengths = accessible_character_lengths(&self.text);
+        let start = accessible_position(&accessible_lengths, self.selected.start);
+        let end = accessible_position(&accessible_lengths, self.selected.end);
         let (anchor, active) = if self.reversed { (end, start) } else { (start, end) };
         div().id("text-field").track_focus(&focus).role(Role::TextInput).aria_label(self.label.clone())
             .a11y_synthetic_children(move |builder| {
                 let mut run = gpui::accesskit::Node::new(Role::TextRun);
                 run.set_value(accessible_text.clone());
-                run.set_character_lengths(accessible_text.chars().map(|c| c.len_utf8() as u8).collect::<Vec<_>>());
+                run.set_character_lengths(accessible_lengths);
                 let id = builder.synthetic_node_id("text");
                 builder.push_child(id, run);
                 builder.parent_node().set_text_selection(gpui::accesskit::TextSelection {
@@ -152,5 +181,35 @@ impl Render for TextField {
                     field.line = Some(line); field.bounds = Some(Bounds::new(point(bounds.left() - offset, bounds.top()), bounds.size));
                 });
             }).size_full())
+    }
+}
+
+#[cfg(test)]
+mod accessibility_tests {
+    use super::{accessible_character_lengths, accessible_position};
+
+    #[test]
+    fn text_runs_use_grapheme_boundaries_for_lengths_and_selection() {
+        let text = "a" .to_owned() + "e\u{301}" + "👩‍💻" + "z";
+        let lengths = accessible_character_lengths(&text);
+        assert_eq!(lengths, vec![1, 3, 11, 1]);
+        assert_eq!(accessible_position(&lengths, 0), 0);
+        assert_eq!(accessible_position(&lengths, 1), 1);
+        assert_eq!(accessible_position(&lengths, 4), 2);
+        assert_eq!(accessible_position(&lengths, 15), 3);
+        assert_eq!(accessible_position(&lengths, text.len()), 4);
+    }
+
+    #[test]
+    fn oversized_graphemes_split_only_at_utf8_boundaries() {
+        let text = "a".to_owned() + &"\u{301}".repeat(200);
+        let lengths = accessible_character_lengths(&text);
+        assert!(lengths.len() > 1);
+        assert_eq!(lengths.iter().map(|n| *n as usize).sum::<usize>(), text.len());
+        let mut offset = 0;
+        for length in lengths {
+            offset += length as usize;
+            assert!(text.is_char_boundary(offset));
+        }
     }
 }
