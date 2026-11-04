@@ -15,7 +15,8 @@ fn grouped_strokes_undo_and_redo_as_units() {
     e.grouped_gesture(&json!({"phase":"select","tool":"pencil"}), &mut p).unwrap();
     let empty=e.snapshot().bgra;
     event(&mut e,&mut p,"press",1.0,1.0,1);
-    event(&mut e,&mut p,"move",3.0,1.0,1);
+    let returned=e.grouped_gesture(&json!({"phase":"move","point":[3,1],"buttons":1}), &mut p).unwrap();
+    assert_eq!(returned, e.snapshot());
     event(&mut e,&mut p,"move",5.0,1.0,1);
     event(&mut e,&mut p,"release",5.0,1.0,0);
     let first=e.snapshot().bgra;
