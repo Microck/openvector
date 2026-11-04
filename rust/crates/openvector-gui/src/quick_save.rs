@@ -4,13 +4,13 @@ use serde_json::{Value, json};
 pub const VECTOR_FORMATS: [&str; 6] = ["ai", "dxf", "emf", "eps", "pdf", "svg"];
 pub const BITMAP_FORMATS: [&str; 4] = ["bmp", "jpg", "png", "tif"];
 #[derive(Clone, Debug)]
-pub struct SaveChoice { pub format: String, pub directory: PathBuf, pub expanded: bool, pub filename: String }
+pub struct SaveChoice { pub format: String, pub directory: PathBuf, pub expanded: bool, pub filename: String, auto_filename: bool, stale_source: bool }
 #[derive(Clone, Debug)]
 pub struct QuickSave { pub choices: [SaveChoice; 2], bitmap: bool, working_directory: PathBuf }
 impl QuickSave {
     pub fn new(bitmap: bool) -> Self {
         let working_directory = std::env::current_dir().unwrap_or_else(|_| PathBuf::from("."));
-        let choice = SaveChoice { format: if bitmap { "png" } else { "ai" }.into(), directory: working_directory.clone(), expanded: false, filename: String::new() };
+        let choice = SaveChoice { format: if bitmap { "png" } else { "ai" }.into(), directory: working_directory.clone(), expanded: false, filename: String::new(), auto_filename: true, stale_source: false };
         Self { choices: [choice.clone(), choice], bitmap, working_directory }
     }
     pub fn formats(&self) -> &[&'static str] { if self.bitmap { &BITMAP_FORMATS } else { &VECTOR_FORMATS } }
@@ -40,7 +40,11 @@ impl QuickSave {
         // An unchanged field is the stored stem, whose dots belong to the name
         // (`drawing.svg` from `drawing.svg.png`). Only a typed name may carry an
         // extension that selects the format.
-        if filename != self.choices[mode].filename { self.set_filename(mode, filename); }
+        if filename != self.choices[mode].filename {
+            self.set_filename(mode, filename);
+            self.choices[mode].auto_filename = false;
+            self.choices[mode].stale_source = false;
+        }
         Ok(())
     }
     fn set_filename(&mut self, mode: usize, filename: &str) {
@@ -68,9 +72,23 @@ impl QuickSave {
         let format = extension.filter(|extension| self.formats().contains(&extension.as_str()));
         for choice in &mut self.choices {
             choice.filename = stem.into();
+            choice.auto_filename = true; choice.stale_source = false;
             if let Some(format) = &format { choice.format = format.clone(); }
         }
     }
+    /// Batch processing can replace the current document without a normal load.
+    /// Refresh automatic names, but require confirmation before reusing a custom
+    /// name that belongs to a previous source.
+    pub fn batch_source_changed(&mut self, filename: &Path) {
+        let stem = filename.file_stem().and_then(|name| name.to_str()).unwrap_or("");
+        let suggested = format!("{stem}_vectorized");
+        for choice in &mut self.choices {
+            if choice.auto_filename { choice.filename = suggested.clone(); choice.stale_source = false; }
+            else { choice.stale_source = true; }
+        }
+    }
+    pub fn needs_source_confirmation(&self, mode: usize) -> bool { self.choices[mode].stale_source }
+    pub fn confirm_source(&mut self, mode: usize) { self.choices[mode].stale_source = false; }
     pub fn target(&self, mode: usize) -> Result<PathBuf, String> {
         let choice = &self.choices[mode]; if choice.filename.is_empty() { return Err("Enter a filename before saving.".into()); }
         Ok(self.working_directory.join(&choice.directory).join(format!("{}.{}", choice.filename, choice.format)))
@@ -90,6 +108,24 @@ mod tests {
         assert_eq!(save.target(0).unwrap().file_name().unwrap(), "logo.final.pdf");
         save.source_changed(Path::new("drawing.svg.png"));
         for mode in 0..2 { assert_eq!(save.choices[mode].filename, "drawing.svg"); }
+    }
+
+    #[test]
+    fn batch_source_refreshes_automatic_names_and_flags_custom_names() {
+        let mut save = QuickSave::new(true);
+        save.source_changed(Path::new("alpha_vectorized"));
+        save.configure(1, "png", ".", "custom-name").unwrap();
+        save.batch_source_changed(Path::new("tiny.png"));
+        assert_eq!(save.choices[0].filename, "tiny_vectorized");
+        assert_eq!(save.choices[1].filename, "custom-name");
+        assert!(!save.needs_source_confirmation(0));
+        assert!(save.needs_source_confirmation(1));
+        save.confirm_source(1);
+        assert!(!save.needs_source_confirmation(1));
+        save.batch_source_changed(Path::new("another.png"));
+        assert!(save.needs_source_confirmation(1));
+        save.configure(1, "png", ".", "another-name").unwrap();
+        assert!(!save.needs_source_confirmation(1));
     }
 
     // The dialog hands the suggested stem back unchanged. Its dots are part of
