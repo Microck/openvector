@@ -168,7 +168,7 @@ pub fn vectorize(args:&[String])->Result<()>{
     let bytes=if let Some(format)=bitmap{
         openvector::bitmap_export::export_bitmap(&BitmapExportInput{geometry:Some(&fitted),width:state.original.width as i64,height:state.original.height as i64,source_alpha_type:document.source_alpha_type(),background_mode:state.settings.background_mode,background_undo_count:background.undo.len(),hidden_regions:&hidden},&BitmapExportOptions{format,scale,flatten:args.flag("flatten")}).map_err(|e|match e{BitmapExportError::FlattenRequired=>"Non-PNG output may discard transparency. Use --flatten to continue, or --format png to preserve it.".into(),other=>other.to_string()})?
     }else{
-        let mut request=json!({"width":state.original.width,"height":state.original.height,"palette":state.segmentation.as_ref().ok_or("No segmentation.")?.palette,"hiddenRegions":hidden,"layout":export.layout.name(),"thinStroke":export.thin_stroke,"compact":export.compact,"curveMode":export.curve_mode.name()});
+        let mut request=json!({"width":state.original.width,"height":state.original.height,"palette":document.presentation_palette(),"hiddenRegions":hidden,"layout":export.layout.name(),"thinStroke":export.thin_stroke,"compact":export.compact,"curveMode":export.curve_mode.name()});
         if format=="emf"{
             let device=openvector::emf::EmfDevice::current_display().map_err(|error|error.to_string())?;
             request["referenceDevice"]=json!({"pixels":device.pixels,"millimeters":device.millimeters,"micrometers":device.micrometers});
