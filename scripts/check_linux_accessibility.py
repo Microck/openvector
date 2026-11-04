@@ -26,12 +26,16 @@ deadline = time.monotonic() + 15
 nodes = []
 found_app = False
 last_error = None
+desktop_names = []
 while time.monotonic() < deadline:
     try:
-        apps = [app for app in pyatspi.Registry.getDesktop(0)
-                if "openvector" in (app.name or "").lower()]
-        found_app |= bool(apps)
-        nodes = [entry for app in apps for entry in walk(app)]
+        apps = list(pyatspi.Registry.getDesktop(0))
+        desktop_names = [app.name or "<unnamed>" for app in apps]
+        trees = [list(walk(app)) for app in apps]
+        matches = [tree for tree in trees
+                   if any("openvector" in name.lower() for _, name, _ in tree)]
+        found_app |= bool(matches)
+        nodes = [entry for tree in matches for entry in tree]
         if any(role in ("push button", "toggle button", "button") and name
                for role, name, _ in nodes):
             break
@@ -41,7 +45,7 @@ while time.monotonic() < deadline:
 for _, _, line in nodes:
     print(line)
 if not found_app:
-    sys.exit(f"OpenVector was not found on the AT-SPI desktop. Check the session bus and accessibility activation. {last_error or ''}")
+    sys.exit(f"OpenVector was not found on the AT-SPI desktop. Applications: {desktop_names}. Check the session bus and accessibility activation. {last_error or ''}")
 if not any(role in ("push button", "toggle button", "button") and name for role, name, _ in nodes):
     sys.exit("No named buttons were exposed before the deadline. Check provider activation and the emitted tree.")
 print("At least one named button is exposed. Verify navigation, focus, text input, dialogs and Orca separately.")
