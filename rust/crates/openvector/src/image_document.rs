@@ -209,7 +209,13 @@ impl ImageDocument{
     pub fn save_vector_file_with_environment(&mut self,path:&std::path::Path,options:&crate::export_options::ExportOptions,environment:&DocumentExportEnvironment,on_progress:Option<&mut dyn FnMut(i32)->Result<(),String>>)->Result<crate::vector_file::VectorFileResult,String>{
         self.save_vector_file_admitted(path,options,environment,true,on_progress)
     }
-    pub fn save_vector_file_admitted(&mut self,path:&std::path::Path,options:&crate::export_options::ExportOptions,environment:&DocumentExportEnvironment,overwrite:bool,mut on_progress:Option<&mut dyn FnMut(i32)->Result<(),String>>)->Result<crate::vector_file::VectorFileResult,String>{
+    pub fn save_vector_file_admitted(&mut self,path:&std::path::Path,options:&crate::export_options::ExportOptions,environment:&DocumentExportEnvironment,overwrite:bool,on_progress:Option<&mut dyn FnMut(i32)->Result<(),String>>)->Result<crate::vector_file::VectorFileResult,String>{
+        self.save_vector_file_impl(path,options,environment,overwrite,false,on_progress)
+    }
+    pub fn save_vector_file_safely(&mut self,path:&std::path::Path,options:&crate::export_options::ExportOptions,on_progress:Option<&mut dyn FnMut(i32)->Result<(),String>>)->Result<crate::vector_file::VectorFileResult,String>{
+        self.save_vector_file_impl(path,options,&DocumentExportEnvironment::default(),false,true,on_progress)
+    }
+    fn save_vector_file_impl(&mut self,path:&std::path::Path,options:&crate::export_options::ExportOptions,environment:&DocumentExportEnvironment,overwrite:bool,safe:bool,mut on_progress:Option<&mut dyn FnMut(i32)->Result<(),String>>)->Result<crate::vector_file::VectorFileResult,String>{
         if !self.state.fitting.as_ref().is_some_and(|f|f.complete){return Err("Document export needs completed fitted geometry.".into())}
         self.begin_task();
         let hidden:Vec<i64>=self.background.snapshot().hidden_regions.iter().map(|v|*v as i64).collect();
@@ -226,12 +232,13 @@ impl ImageDocument{
         input.palette=&palette;
         input.dxf_curve_mode=match options.curve_mode{crate::export_options::CurveMode::Splines=>crate::dxf::DxfCurveMode::Splines,crate::export_options::CurveMode::SparseLines=>crate::dxf::DxfCurveMode::SparseLines,crate::export_options::CurveMode::DenseLines=>crate::dxf::DxfCurveMode::DenseLines};
         let progress=&mut self.state.progress;let cancel=&self.cancel;
-        let result=crate::vector_file::write_vector_file_admitted(path,&input,overwrite,&mut|percent|{
+        let mut observer=|percent|{
             *progress=percent;
             if let Some(cb)=on_progress.as_deref_mut(){observer_result(cancel,cb(percent)).map_err(crate::vector_output::VectorOutputError)?}
             if cancel.load(Ordering::Relaxed){return Err(crate::vector_output::VectorOutputError(CANCEL_TASK.into()))}
             Ok(())
-        }).map_err(|e|e.to_string())?;
+        };
+        let result=if safe { crate::vector_file::write_vector_file_safely(path,&input,&mut observer) } else { crate::vector_file::write_vector_file_admitted(path,&input,overwrite,&mut observer) }.map_err(|e|e.to_string())?;
         self.state.status=result.status as u32;Ok(result)
     }
     fn merged_settings(&self,input:&Value)->Result<DocumentSettings,String>{let mut s=self.state.settings.to_json();let values=input.as_object().ok_or("Automatic processing requires controls with an extension.")?;for(k,v)in values{s.insert(k.clone(),v.clone());}read_document_settings(&Value::Object(s)).map_err(|e|e.to_string())}
@@ -279,6 +286,9 @@ impl ImageDocument{
     pub fn leave_editing(&mut self)->Result<(),String>{self.editing_session()?.end_editing();Ok(())}
     pub fn restore_committed_editing(&mut self)->Result<Option<EditorSnapshot>,String>{match self.editor.as_mut(){None=>Ok(None),Some(editor)=>{let empty=EditorCheckpoint{undo:Vec::new(),redo:Vec::new()};Ok(Some(editor.restore_checkpoint(self.committed_editing.as_ref().unwrap_or(&empty))?))}}}
     pub fn gesture(&mut self,event:&Value)->Result<EditorSnapshot,String>{self.editor.as_mut().ok_or("Call beginEditing before editing the document.")?.gesture(event,&mut self.pointer)}
+    pub fn grouped_gesture(&mut self,event:&Value)->Result<EditorSnapshot,String>{self.editor.as_mut().ok_or("Call beginEditing before editing the document.")?.grouped_gesture(event,&mut self.pointer)}
+    pub fn grouped_undo_edit(&mut self)->Result<EditorSnapshot,String>{self.editing_session()?.grouped_undo()}
+    pub fn grouped_redo_edit(&mut self)->Result<EditorSnapshot,String>{self.editing_session()?.grouped_redo()}
     pub fn undo_edit(&mut self)->Result<EditorSnapshot,String>{self.editing_session()?.undo()}
     pub fn redo_edit(&mut self)->Result<EditorSnapshot,String>{self.editing_session()?.redo()}
     pub fn revert_edits(&mut self)->Result<EditorSnapshot,String>{self.editing_session()?.revert()}
@@ -356,3 +366,4 @@ mod checkpoint_tests{
         assert!(!document.editing_changed());
     }
 }
+

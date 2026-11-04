@@ -329,7 +329,7 @@ impl OpenVectorApp {
                     let retained_source = self.document.is_some();
                     if new_source {
                         self.drag_result.invalidate();
-                        if self.batch.is_some() { self.source_sizing = None; self.source_sizing_consumed = false; self.source_recommendations = None; self.transparency_initialized = [false; 2]; }
+                        if self.batch.is_some() { self.source_sizing = None; self.source_sizing_consumed = false; self.source_recommendations = None; self.transparency_initialized = [false; 2]; self.preferences.bitmap_save.batch_source_changed(&document.filename); }
                         if self.loading_source && document.origin == SourceOrigin::Path {
                             if let Some(directory) = document.filename.parent() { self.source_directory = directory.into(); }
                         }
@@ -1060,6 +1060,7 @@ impl OpenVectorApp {
         div().flex().flex_col()
             // Three per row keeps the formats in an even grid.
             .child(group("Format", div().flex().flex_col().gap_1().children(formats.chunks(3).map(|row| segmented(row.iter().map(|name| format(name)))))))
+            .when(self.preferences.format == "svg", |body| body.child(div().text_color(rgb(theme::MUTED)).child(workflows::SVG_SIZE_NOTICE)))
             // Plain-language names for stacked / cutouts / grouped-cutouts; one hint
             // line explains the selected choice.
             .child(group("Shape layout", div().flex().flex_col().gap_1()
@@ -1656,3 +1657,4 @@ mod palette_transition_tests;
 #[cfg(test)]
 #[path = "app-source-sizing-tests.rs"]
 mod source_sizing_tests;
+

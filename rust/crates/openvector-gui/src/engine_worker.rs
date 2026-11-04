@@ -88,9 +88,9 @@ pub fn run(mut document: ImageDocument, mut committed_count: i32, commands: mpsc
                 .and_then(|selection| events.send(Event::Selection { settings: selection.settings, color_count: Some(selection.count as usize),
                     recommended_background_mode: selection.recommended_background_mode, palette_ready: selection.palette_ready, classified: false }).map_err(|_| CANCEL_TASK.to_string())),
             Command::Edit { action, input } => match action {
-                "begin" => document.begin_editing_for_output().map(|_| ()), "gesture" => document.gesture(&input).map(|_| ()),
-                "apply" => document.edit(&input).map(|_| ()), "undo" => document.undo_edit().map(|_| ()),
-                "redo" => document.redo_edit().map(|_| ()), "revert" => document.revert_edits().map(|_| ()),
+                "begin" => document.begin_editing_for_output().map(|_| ()), "gesture" => document.grouped_gesture(&input).map(|_| ()),
+                "apply" => document.edit(&input).map(|_| ()), "undo" => document.grouped_undo_edit().map(|_| ()),
+                "redo" => document.grouped_redo_edit().map(|_| ()), "revert" => document.revert_edits().map(|_| ()),
                 "restore" => document.restore_committed_editing().map(|_| ()),
                 "leave" => document.leave_editing(),
                 "commit" => document.commit_editing().map(|_| ()),
@@ -596,3 +596,4 @@ mod cancellation_tests {
         std::fs::remove_dir_all(directory).unwrap();
     }
 }
+

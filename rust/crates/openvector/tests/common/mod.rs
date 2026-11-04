@@ -34,3 +34,16 @@ pub fn b64(text: &str) -> Vec<u8> {
     use base64::Engine;
     base64::engine::general_purpose::STANDARD.decode(text).unwrap()
 }
+
+/// Adapt only the producer field in original PDF captures. Padding keeps all
+/// original object offsets and startxref values unchanged.
+pub fn public_pdf_fixture(bytes: &[u8]) -> Vec<u8> {
+    const ORIGINAL: &[u8] = b"/Producer(VectorMagic.com)";
+    const PUBLIC: &[u8] = b"/Producer(OpenVector)     ";
+    assert_eq!(ORIGINAL.len(), PUBLIC.len());
+    let mut output = bytes.to_vec();
+    if let Some(index) = output.windows(ORIGINAL.len()).position(|window| window == ORIGINAL) {
+        output[index..index + ORIGINAL.len()].copy_from_slice(PUBLIC);
+    }
+    output
+}

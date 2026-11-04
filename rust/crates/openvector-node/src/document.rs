@@ -374,7 +374,7 @@ impl ImageDocument {
         let observer = if progress.is_some() {
             Some(&mut observer as &mut dyn FnMut(i32) -> std::result::Result<(), String>)
         } else { None };
-        let result = self.inner.save_vector_file(std::path::Path::new(&filename), &options, observer)
+        let result = self.inner.save_vector_file_safely(std::path::Path::new(&filename), &options, observer)
             .map_err(engine_error)?;
         Ok(json!({"status": result.status, "error": result.error.map(|error|
             json!({"message": error.to_string(), "osError": error.raw_os_error()}))}))
@@ -383,3 +383,4 @@ impl ImageDocument {
     #[napi]
     pub fn reset(&mut self) { self.inner.reset(); }
 }
+

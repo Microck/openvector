@@ -69,7 +69,7 @@ impl Format {
         [(b".svg".as_slice(), Self::Svg), (b".pdf", Self::Pdf), (b".eps", Self::Eps), (b".ai", Self::Ai), (b".dxf", Self::Dxf), (b".emf", Self::Emf)]
             .into_iter().find_map(|(suffix, format)| name.ends_with(suffix).then_some(format))
     }
-    fn serialize(self, input: &VectorFileInput<'_>, output: &mut FileCallbacks<'_>) -> Result<(), VectorOutputError> {
+    fn serialize<T: TextOutput + BinaryOutput>(self, input: &VectorFileInput<'_>, output: &mut T) -> Result<(), VectorOutputError> {
         match self {
             Self::Svg => serialize_svg(&input.vector, output), Self::Pdf => serialize_pdf(&input.vector, output),
             Self::Eps => serialize_eps(&input.vector, &input.eps, output), Self::Ai => serialize_ai(&input.vector, output),
@@ -193,6 +193,71 @@ extern "C" fn drain_interrupted() {
 /// 0. Serialization/progress errors escape and retain the physical handle.
 pub fn write_vector_file(filename: &Path, input: &VectorFileInput<'_>, progress: &mut dyn FnMut(i32) -> Result<(), VectorOutputError>) -> Result<VectorFileResult, VectorOutputError> {
     write_vector_file_admitted(filename, input, true, progress)
+}
+
+/// Write a complete Node API export to a sibling temporary file, then publish
+/// it only if the destination does not exist. Cancellation and failures never
+/// truncate a destination or expose a partially written final file.
+pub fn write_vector_file_safely(filename: &Path, input: &VectorFileInput<'_>, progress: &mut dyn FnMut(i32) -> Result<(), VectorOutputError>) -> Result<VectorFileResult, VectorOutputError> {
+    use std::io::{BufWriter, Seek, SeekFrom, Write};
+    let Some(format) = Format::from_path(filename) else { return Ok(VectorFileResult { status: 1, error: None }); };
+    let destination = if filename.is_absolute() { filename.to_path_buf() } else {
+        match std::env::current_dir() {
+            Ok(cwd) => cwd.join(filename),
+            Err(error) => return Ok(VectorFileResult { status: 4, error: Some(error) }),
+        }
+    };
+    let parent = destination.parent().unwrap_or_else(|| Path::new("."));
+    let mut builder = tempfile::Builder::new();
+    #[cfg(unix)] {
+        use std::os::unix::fs::PermissionsExt;
+        builder.permissions(std::fs::Permissions::from_mode(0o666));
+    }
+    let mut temporary = match builder.tempfile_in(parent) {
+        Ok(file) => file,
+        Err(error) => return Ok(VectorFileResult { status: 4, error: Some(error) }),
+    };
+    struct SafeCallbacks<'a> {
+        writer: BufWriter<&'a mut std::fs::File>,
+        progress: &'a mut dyn FnMut(i32) -> Result<(), VectorOutputError>,
+        failure: Option<io::Error>,
+    }
+    impl TextOutput for SafeCallbacks<'_> {
+        fn write(&mut self, text: &str, _: bool) -> Result<(), VectorOutputError> {
+            if self.failure.is_none() {
+                let mut bytes = Vec::with_capacity(text.len());
+                for character in text.chars() {
+                    if character == '\n' { bytes.push(b'\r'); }
+                    bytes.push(character as u8);
+                }
+                if let Err(error) = self.writer.write_all(&bytes) { self.failure = Some(error); }
+            }
+            Ok(())
+        }
+        fn progress(&mut self, percent: i32) -> Result<(), VectorOutputError> { (self.progress)(percent) }
+    }
+    impl BinaryOutput for SafeCallbacks<'_> {
+        fn write(&mut self, bytes: &[u8], position: u64) -> Result<(), VectorOutputError> {
+            if self.failure.is_none() {
+                if let Err(error) = self.writer.seek(SeekFrom::Start(position)).and_then(|_| self.writer.write_all(bytes)) {
+                    self.failure = Some(error);
+                }
+            }
+            Ok(())
+        }
+        fn progress(&mut self, percent: i32) -> Result<(), VectorOutputError> { (self.progress)(percent) }
+    }
+    let mut output = SafeCallbacks { writer: BufWriter::new(temporary.as_file_mut()), progress, failure: None };
+    format.serialize(input, &mut output)?;
+    if output.failure.is_none() {
+        if let Err(error) = output.writer.flush() { output.failure = Some(error); }
+    }
+    if let Some(error) = output.failure.take() { return Ok(VectorFileResult { status: 4, error: Some(error) }); }
+    drop(output);
+    match temporary.persist_noclobber(&destination) {
+        Ok(_) => Ok(VectorFileResult { status: 0, error: None }),
+        Err(error) => Ok(VectorFileResult { status: 4, error: Some(error.error) }),
+    }
 }
 
 /// Batch admission uses exclusive creation unless preflight explicitly approved replacement.

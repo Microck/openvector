@@ -113,6 +113,7 @@ fn export_corpus(command: &str, filename: &str, count: usize) {
     assert_eq!(cases.len(), count, "{filename}");
     for (index, case) in cases.iter().enumerate() {
         let expected = latin1(&case["expected"]);
+        let expected = if command == "export-pdf" { common::public_pdf_fixture(&expected) } else { expected };
         let mut input = case["input"].clone();
         if filename == "emf-expanded-cli-reference.json" {
             // This older dedicated capture omitted device metadata from input.
@@ -132,6 +133,15 @@ fn export_corpus(command: &str, filename: &str, count: usize) {
         let output = request(&directory.0, command, &input, index % 2 != 0);
         success(&output, &context);
         assert_bytes(&output.stdout, &expected, &context);
+        if command == "export-pdf" {
+            let bytes = &output.stdout;
+            assert!(bytes.windows(b"/Producer(OpenVector)".len()).any(|part| part == b"/Producer(OpenVector)"));
+            let marker = b"startxref\r\n";
+            let at = bytes.windows(marker.len()).rposition(|part| part == marker).unwrap() + marker.len();
+            let end = at + bytes[at..].windows(2).position(|part| part == b"\r\n").unwrap();
+            let offset: usize = std::str::from_utf8(&bytes[at..end]).unwrap().parse().unwrap();
+            assert!(bytes[offset..].starts_with(b"xref\r\n"));
+        }
     }
 }
 

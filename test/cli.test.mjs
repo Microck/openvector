@@ -106,7 +106,9 @@ test('CLI writes exact binary PDF bytes for all layouts and strokes from stdin o
       const run = spawnSync(process.execPath, [cli, 'export-pdf', index % 2 ? filename : '-'], {
         input:index % 2 ? undefined : JSON.stringify(fixture.input) });
       assert.equal(run.status, 0, run.stderr.toString()); assert.equal(run.stderr.length, 0);
-      assert.deepEqual(run.stdout, Buffer.from(fixture.expected, 'latin1'));
+      const expected = fixture.expected.replace('/Producer(VectorMagic.com)', '/Producer(OpenVector)     ');
+      assert.notEqual(expected, fixture.expected, 'PDF capture must include the producer');
+      assert.deepEqual(run.stdout, Buffer.from(expected, 'latin1'));
     }
   } finally { rmSync(directory, { recursive:true }); }
 });

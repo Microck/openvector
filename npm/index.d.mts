@@ -427,6 +427,7 @@ export declare class ImageDocument {
   finishBackgroundEditing(): BackgroundSummary;
   /** Errors carry a `code`, such as `BITMAP_FLATTEN_REQUIRED`. */
   exportBitmap(format: string, scale?: number, flatten?: boolean): Buffer;
+  /** Writes atomically only if the destination does not exist. Cancellation leaves no final file. */
   saveVector(filename: string, options: ExportOptions, progress?: (percent: number) => boolean): SaveVectorResult;
   reset(): void;
 }
@@ -543,3 +544,4 @@ declare const addon: {
   formatFileSize: typeof formatFileSize;
 };
 export default addon;
+
