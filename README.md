@@ -93,6 +93,7 @@ import { CoreSession } from 'openvector';
 const document = new CoreSession().createDocument();
 document.setSource(readFileSync('logo.png'), 'logo.png');
 document.runAutomatic({ extension: '.png' });
+// saveVector creates a new file and never overwrites an existing path.
 const saved = document.saveVector('logo.svg', { layout: 'cutouts' });
 if (saved.status !== 0 || saved.error) {
   throw new Error(saved.error?.message ?? `Export failed: ${saved.status}`);

@@ -21,6 +21,7 @@ const document = session.createDocument();
 document.setSource(readFileSync('logo.png'), 'logo.png');
 document.runAutomatic({ extension: '.png' });
 writeFileSync('traced.png', document.exportBitmap('png', 2));
+// saveVector creates a new file and never overwrites an existing path.
 const saved = document.saveVector('traced.svg', { layout: 'cutouts' });
 if (saved.status !== 0 || saved.error) throw new Error(saved.error?.message ?? `status ${saved.status}`);
 ```
