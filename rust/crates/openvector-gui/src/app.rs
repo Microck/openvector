@@ -1059,6 +1059,7 @@ impl OpenVectorApp {
         div().flex().flex_col()
             // Three per row keeps the formats in an even grid.
             .child(group("Format", div().flex().flex_col().gap_1().children(formats.chunks(3).map(|row| segmented(row.iter().map(|name| format(name)))))))
+            .when(self.preferences.format == "svg", |body| body.child(div().text_color(rgb(theme::MUTED)).child(workflows::SVG_SIZE_NOTICE)))
             // Plain-language names for stacked / cutouts / grouped-cutouts; one hint
             // line explains the selected choice.
             .child(group("Shape layout", div().flex().flex_col().gap_1()
