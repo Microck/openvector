@@ -63,7 +63,15 @@ test('a local edit does not darken untouched automatic regions', () => {
   document.setSource(fixture(), 'transparent-red.png');
   const {settings} = document.runAutomatic({extension: '.png'});
   document.beginEditing();
+  const before = document.editing();
+  const untouched = (20 * before.width + 20) * 4;
+  assert.deepEqual(Array.from(before.bgra.subarray(untouched, untouched + 4)), [0, 0, 255, 128]);
   document.edit({tool: 'pencil', from: [10, 10], to: [14, 10], color: [0, 0.25, 0.8, 0.5]});
+  const painted = document.editing().bgra;
+  document.undoEdit();
+  assert.deepEqual(document.editing().bgra, before.bgra);
+  document.redoEdit();
+  assert.deepEqual(document.editing().bgra, painted);
   document.finishEditing(settings);
   const dir = mkdtempSync(join(tmpdir(), 'openvector-alpha-edit-'));
   try {
