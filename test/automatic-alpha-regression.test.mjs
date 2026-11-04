@@ -202,3 +202,36 @@ test('a manually authored palette identical to a generated palette can stay stra
     assert.match(readFileSync(restored, 'utf8'), /fill="#ff0000"[^>]*opacity="0[.]5/i);
   } finally { rmSync(dir, {recursive:true, force:true}); }
 });
+
+
+test('explicit generated encoding preserves edits on a segmentation cache hit', () => {
+  const document = new native.CoreSession().createDocument();
+  document.setSource(fixture(), 'transparent-red.png');
+  const {settings} = document.runAutomatic({extension: '.png'});
+  document.beginEditing();
+  document.edit({tool: 'pencil', from: [10, 10], to: [14, 10], color: [0, 0.25, 0.8, 0.5]});
+  document.finishEditing(settings);
+  const before = document.snapshot({});
+  assert.ok(before.stageKeys.segmentationEdits);
+  const hit = document.runTask('segmentation', {...settings, paletteEncoding: 'premultiplied'});
+  assert.equal(hit.didWork, false);
+  assert.equal(document.snapshot({}).stageKeys.segmentationEdits, before.stageKeys.segmentationEdits);
+});
+
+test('explicit generated colors produce matching grouped DXF layers', () => {
+  const baseline = new native.CoreSession().createDocument();
+  baseline.setSource(fixture(), 'transparent-red.png');
+  const {settings} = baseline.runAutomatic({extension: '.png'});
+  const document = new native.CoreSession().createDocument();
+  document.setSource(fixture(), 'transparent-red.png');
+  const explicit = {...settings, paletteEncoding: 'premultiplied'};
+  for (const stage of ['segmentation', 'smoothing', 'fitting']) document.runTask(stage, explicit);
+  const dir = mkdtempSync(join(tmpdir(), 'openvector-alpha-explicit-dxf-'));
+  try {
+    const path = join(dir, 'output.dxf');
+    assert.equal(document.saveVector(path, {layout: 'grouped-cutouts'}).status, 0);
+    const dxf = readFileSync(path, 'utf8');
+    assert.match(dxf, /color#ff000080/i);
+    assert.doesNotMatch(dxf, /color#80000080/i);
+  } finally { rmSync(dir, {recursive:true, force:true}); }
+});
