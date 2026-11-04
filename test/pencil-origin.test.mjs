@@ -39,6 +39,6 @@ test('short Pencil crossing stays away from origin through SVG export', () => {
     const hex = [painted[2], painted[1], painted[0]].map(value => value.toString(16).padStart(2, '0')).join('');
     const paths = [...svg.matchAll(new RegExp('<path fill="#' + hex + '"[^>]*>', 'gi'))];
     assert.ok(paths.length > 0, 'edited color should survive export');
-    for (const [path] of paths) assert.doesNotMatch(path, /M\\s+0(?:\\.0+)?\\s+0(?:\\.0+)?(?:\\s|$)/);
+    for (const [path] of paths) assert.doesNotMatch(path, /M\s+0(?:\.0+)?\s+0(?:\.0+)?(?:\s|$)/);
   } finally { rmSync(directory, { recursive: true, force: true }); }
 });
