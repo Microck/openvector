@@ -136,11 +136,11 @@ fn export_corpus(command: &str, filename: &str, count: usize) {
         if command == "export-pdf" {
             let bytes = &output.stdout;
             assert!(bytes.windows(b"/Producer(OpenVector)".len()).any(|part| part == b"/Producer(OpenVector)"));
-            let marker = b"startxref\\r\\n";
+            let marker = b"startxref\r\n";
             let at = bytes.windows(marker.len()).rposition(|part| part == marker).unwrap() + marker.len();
-            let end = at + bytes[at..].windows(2).position(|part| part == b"\\r\\n").unwrap();
+            let end = at + bytes[at..].windows(2).position(|part| part == b"\r\n").unwrap();
             let offset: usize = std::str::from_utf8(&bytes[at..end]).unwrap().parse().unwrap();
-            assert!(bytes[offset..].starts_with(b"xref\\r\\n"));
+            assert!(bytes[offset..].starts_with(b"xref\r\n"));
         }
     }
 }
