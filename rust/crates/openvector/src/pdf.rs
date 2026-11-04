@@ -79,3 +79,22 @@ impl VectorWriter for PdfWriter<'_> {
         self.write("c\n")
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::contour_fitting::FittedGeometry;
+
+    #[test]
+    fn public_pdf_producer_and_xref_point_to_the_actual_table() {
+        let geometry = FittedGeometry { cubic_storage_slots: 0, cubics: vec![], nodes: vec![], regions: vec![] };
+        let bytes = export_pdf(&VectorOutputInput::new(&geometry, 4, 4)).unwrap();
+        assert!(bytes.windows(b"/Producer(OpenVector)".len()).any(|part| part == b"/Producer(OpenVector)"));
+        assert!(!bytes.windows(b"VectorMagic.com".len()).any(|part| part == b"VectorMagic.com"));
+        let marker = b"startxref\r\n";
+        let at = bytes.windows(marker.len()).rposition(|part| part == marker).unwrap() + marker.len();
+        let end = at + bytes[at..].windows(2).position(|part| part == b"\r\n").unwrap();
+        let offset: usize = std::str::from_utf8(&bytes[at..end]).unwrap().parse().unwrap();
+        assert!(bytes[offset..].starts_with(b"xref\r\n"));
+    }
+}
