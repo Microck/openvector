@@ -33,12 +33,12 @@ pub struct AutomaticSelection{pub settings:DocumentSettings,pub palette_count:Op
 pub type DocumentStageObserver<'a>=dyn FnMut(&str,&TaskResult,&AutomaticSelection)->Result<(),String>+'a;
 #[derive(Clone,Debug)]
 pub struct AutomaticResult{pub settings:DocumentSettings,pub palette_count:Option<usize>,pub source_alpha_type:u8,pub recommended_background_mode:i32,pub state:DocumentSnapshot}
-pub struct ImageDocument{session:CoreSession,state:DocumentSnapshot,candidates:Vec<Option<AnalyzedPalette>>,shadowing:bool,cluster_colors:bool,shadow_control:Option<i32>,source_alpha_type:Option<u8>,cancel:Arc<AtomicBool>,fitter:Option<ContourFitter>,region_identity:u64,fitter_identity:u64,region_palette:Option<Vec<f32>>,editor:Option<SegmentationEditor>,committed_editing:Option<EditorCheckpoint>,background:BackgroundEditor,pointer:EditorPointer}
+pub struct ImageDocument{session:CoreSession,state:DocumentSnapshot,candidates:Vec<Option<AnalyzedPalette>>,shadowing:bool,cluster_colors:bool,shadow_control:Option<i32>,source_alpha_type:Option<u8>,cancel:Arc<AtomicBool>,fitter:Option<ContourFitter>,region_identity:u64,fitter_identity:u64,region_palette:Option<Vec<f32>>,editor:Option<SegmentationEditor>,committed_editing:Option<EditorCheckpoint>,background:BackgroundEditor,pointer:EditorPointer,automatic_premultiplied_colors:bool}
 impl ImageDocument{
     pub fn new(session:CoreSession)->Self{
         let mut parameters=NUMERIC_DATA["constructor"].clone();parameters["usePalette"]=json!(false);parameters["shadowing"]=json!(true);parameters["clusterColors"]=json!(true);
         let state=DocumentSnapshot{original:OwnedImage::default(),source:OwnedImage::default(),working:OwnedImage::default(),settings:DocumentSettings::default(),classification:DocumentClassification{category:-1,..Default::default()},parameters,stage_keys:StageKeys::default(),completed:[0;25],scores:[1e10;25],palettes:vec![Vec::new();25],segmentation:None,contours:None,smoothing:None,fitting:None,processed:false,status:0,progress:0,cancelled:false,random_state:session.random_state()};
-        Self{session,state,candidates:vec![None;25],shadowing:true,cluster_colors:true,shadow_control:None,source_alpha_type:None,cancel:Arc::new(AtomicBool::new(false)),fitter:None,region_identity:0,fitter_identity:0,region_palette:None,editor:None,committed_editing:None,background:BackgroundEditor::default(),pointer:EditorPointer{previous_point:[-1.0,-1.0]}}
+        Self{session,state,candidates:vec![None;25],shadowing:true,cluster_colors:true,shadow_control:None,source_alpha_type:None,cancel:Arc::new(AtomicBool::new(false)),fitter:None,region_identity:0,fitter_identity:0,region_palette:None,editor:None,committed_editing:None,background:BackgroundEditor::default(),pointer:EditorPointer{previous_point:[-1.0,-1.0]},automatic_premultiplied_colors:false}
     }
     pub fn snapshot(&self)->DocumentSnapshot{self.refresh_snapshot(self.state.clone())}
     /// Stage observers can change shared cancellation or random state without
@@ -46,6 +46,21 @@ impl ImageDocument{
     pub(crate) fn refresh_snapshot(&self,mut state:DocumentSnapshot)->DocumentSnapshot{state.random_state=self.session.random_state();state.cancelled=self.cancel.load(Ordering::Relaxed);state}
     /// Read-only exporter view; unlike snapshot this does not clone raster or geometry storage.
     pub fn state(&self)->&DocumentSnapshot{&self.state}
+    /// Output projection for an unedited automatic trace. The numeric engine
+    /// retains reference-compatible premultiplied colors internally; formats
+    /// and the viewer consume straight RGB plus alpha.
+    pub fn presentation_geometry(&self)->Option<std::borrow::Cow<'_, FittedGeometry>>{
+        let geometry=&self.state.fitting.as_ref().filter(|f|f.complete)?.geometry;
+        if !self.automatic_premultiplied_colors { return Some(std::borrow::Cow::Borrowed(geometry)); }
+        let mut straight=geometry.clone();
+        for region in &mut straight.regions {
+            let alpha=region.bgra[3] as u32;
+            for channel in &mut region.bgra[..3] {
+                *channel=if alpha==0 {0} else {(((*channel as u32)*255+alpha/2)/alpha).min(255) as u8};
+            }
+        }
+        Some(std::borrow::Cow::Owned(straight))
+    }
     /// Explicit saved checkpoint presence, distinct from applied segmentation edits.
     pub fn has_committed_edits(&self)->bool{self.committed_editing.as_ref().is_some_and(|checkpoint|!checkpoint.undo.is_empty())}
     pub fn has_applied_edits(&self)->bool{!self.state.stage_keys.segmentation_edits.is_empty()}
@@ -132,7 +147,7 @@ impl ImageDocument{
     }
     pub fn segment(&mut self,input:&Value,observer:Option<&mut DocumentObserver>)->Result<DocumentSnapshot,String>{let settings=read_document_settings(input).map_err(|e|e.to_string())?;self.segment_settings(settings,observer)?;Ok(self.snapshot())}
     fn segment_settings(&mut self,settings:DocumentSettings,mut observer:Option<&mut DocumentObserver>)->Result<(),String>{if matches!(settings.palette_mode,0|1)&&settings.palette.is_empty(){return Err("Fixed document segmentation needs at least one palette color.".into())}let parameters=Self::parameters(&settings,"segmentation")?;if parameters["Shared::is_anti_aliased"].as_f64()!=Some(0.0)&&(self.state.original.width<2||self.state.original.height<2){return Err("Anti-alias document segmentation needs dimensions of at least 2 by 2.".into())}self.begin_task();self.apply_profile(&settings,parameters);let key=document_segmentation_key(&settings);let work=key!=self.state.stage_keys.segmentation;self.state.stage_keys.segmentation=key;
-        if work{self.prepare_source(&settings)?;self.state.working=self.state.source.clone();let pixels=self.state.working.clone();let palette=matches!(settings.palette_mode,0|1).then_some(settings.palette.as_slice());let mut owner=SegmentationState::new(self.state.segmentation.as_ref(),pixels.width,pixels.height,palette);self.region_palette=None;if let Some(f)=self.state.fitting.as_mut(){f.complete=false}let mut parameters=self.state.parameters.clone();let result=owner.run(Raster{width:pixels.width,height:pixels.height,bgra:&pixels.bgra},&mut parameters,palette,&mut|event,live|{self.state.segmentation=Some(live.clone());if let Some(minimum)=event.minimum_pixels{self.state.parameters["Segmenter::min_num_pixels"]=json!(minimum)}self.notify(DocumentProgress{stage:"segmentation",phase:event.phase,substep:event.substep,counter:event.counter,fraction:event.fraction,percent:event.percent,color_count:None,iteration:None},&mut observer)}).map(|_|());self.state.parameters=parameters;
+        if work{self.automatic_premultiplied_colors=false;self.prepare_source(&settings)?;self.state.working=self.state.source.clone();let pixels=self.state.working.clone();let palette=matches!(settings.palette_mode,0|1).then_some(settings.palette.as_slice());let mut owner=SegmentationState::new(self.state.segmentation.as_ref(),pixels.width,pixels.height,palette);self.region_palette=None;if let Some(f)=self.state.fitting.as_mut(){f.complete=false}let mut parameters=self.state.parameters.clone();let result=owner.run(Raster{width:pixels.width,height:pixels.height,bgra:&pixels.bgra},&mut parameters,palette,&mut|event,live|{self.state.segmentation=Some(live.clone());if let Some(minimum)=event.minimum_pixels{self.state.parameters["Segmenter::min_num_pixels"]=json!(minimum)}self.notify(DocumentProgress{stage:"segmentation",phase:event.phase,substep:event.substep,counter:event.counter,fraction:event.fraction,percent:event.percent,color_count:None,iteration:None},&mut observer)}).map(|_|());self.state.parameters=parameters;
             if let Err(error)=result{self.state.stage_keys.segmentation.clear();self.state.stage_keys.segmentation_edits.clear();self.state.stage_keys.smoothing.clear();self.state.stage_keys.fitting.clear();return self.interrupted(error)}
             let segmented=owner.into_snapshot();self.region_palette=Some(segmented.palette.clone());self.state.segmentation=Some(segmented);self.region_identity=self.region_identity.wrapping_add(1);self.editor=None;self.committed_editing=None;self.state.contours=None;self.state.smoothing=None;self.state.fitting=None;self.state.stage_keys.segmentation_edits.clear();self.state.stage_keys.smoothing.clear();self.state.stage_keys.fitting.clear();
         }self.finish_task(settings);Ok(())
@@ -176,8 +191,8 @@ impl ImageDocument{
         if !self.state.fitting.as_ref().is_some_and(|f|f.complete){return Err("Document export needs completed fitted geometry.".into())}
         self.begin_task();
         let hidden:Vec<i64>=self.background.snapshot().hidden_regions.iter().map(|v|*v as i64).collect();
-        let geometry=&self.state.fitting.as_ref().unwrap().geometry;
-        let vector=crate::vector_output::VectorOutputInput{geometry,width:self.state.source.width as i64,height:self.state.source.height as i64,output_size:environment.output_size,layout:options.layout,thin_stroke:options.thin_stroke,hidden_regions:&hidden};
+        let geometry=self.presentation_geometry().ok_or("Document export needs completed fitted geometry.")?.into_owned();
+        let vector=crate::vector_output::VectorOutputInput{geometry:&geometry,width:self.state.source.width as i64,height:self.state.source.height as i64,output_size:environment.output_size,layout:options.layout,thin_stroke:options.thin_stroke,hidden_regions:&hidden};
         let mut input=crate::vector_file::VectorFileInput::new(vector);
         input.eps.compact=options.compact;
         input.eps.creation_date=environment.creation_date.clone();
@@ -203,9 +218,11 @@ impl ImageDocument{
     pub fn run_automatic(&mut self,input:&Value)->Result<AutomaticResult,String>{self.run_automatic_with_observers(input,None,None)}
     pub fn run_automatic_with_observer(&mut self,input:&Value,observer:Option<&mut DocumentObserver>)->Result<AutomaticResult,String>{self.run_automatic_with_observers(input,observer,None)}
     pub fn run_automatic_with_observers(&mut self,input:&Value,mut observer:Option<&mut DocumentObserver>,mut on_stage:Option<&mut DocumentStageObserver>)->Result<AutomaticResult,String>{
+        self.automatic_premultiplied_colors=false;
         let extension=input["extension"].as_str().ok_or("Automatic processing requires an extension string.")?;let mut settings=self.merged_settings(input)?;settings.advanced=false;let alpha=self.source_alpha_type();let mut classify=Value::Object(settings.to_json());classify["extension"]=json!(extension);let result=self.run_task("classification",&classify,None)?;if result.state.status==2{return Err(CANCEL_TASK.into())}let c=&result.state.classification;let recommended=i32::from(c.category==1&&alpha==1);settings.category=c.category;settings.quality=c.quality;settings.palette_mode=c.palette_mode;settings.background_mode=recommended;settings.background=[1.0,1.0,1.0,recommended as f32];let mut selection=AutomaticSelection{settings,palette_count:None,recommended_background_mode:recommended};if let Some(cb)=on_stage.as_deref_mut(){cb("classification",&result,&selection)?}
         if matches!(selection.settings.palette_mode,0|1){let mut controls=Value::Object(selection.settings.to_json());controls["lower"]=json!(2);controls["upper"]=json!(12);let result=self.run_task("palette",&controls,observer.as_mut().map(|o|&mut **o as &mut DocumentObserver))?;let count=self.minimum_palette().ok_or("Automatic palette selection found no eligible candidate.")?;selection.palette_count=Some(count);selection.settings.palette=self.selected_palette(count);if let Some(cb)=on_stage.as_deref_mut(){cb("palette",&result,&selection)?}}
         for stage in ["segmentation","smoothing","fitting"]{let result=self.run_task(stage,&Value::Object(selection.settings.to_json()),observer.as_mut().map(|o|&mut **o as &mut DocumentObserver))?;if result.did_work&&result.state.status==2{return Err(CANCEL_TASK.into())}if let Some(cb)=on_stage.as_deref_mut(){cb(stage,&result,&selection)?}}
+        self.automatic_premultiplied_colors=true;
         Ok(AutomaticResult{settings:selection.settings,palette_count:selection.palette_count,source_alpha_type:alpha,recommended_background_mode:recommended,state:self.snapshot()})
     }
     pub fn run_batch_image(&mut self,input:&Value)->Result<AutomaticResult,String>{self.run_batch_image_with_observers(input,None,None)}
@@ -249,7 +266,7 @@ impl ImageDocument{
     /// Advanced Next applies pixels without advancing the document Back checkpoint.
     pub fn apply_editing(&mut self)->Result<DocumentSnapshot,String>{
         let editor=self.editing_session()?.snapshot();self.editor.as_mut().unwrap().end_editing();self.background.finish();
-        if editor.key!=self.state.stage_keys.segmentation_edits{let colors:Vec<[u8;4]>=editor.bgra.chunks_exact(4).map(|c|[c[0],c[1],c[2],c[3]]).collect();let (palette,labels)=crate::region_data::palette_from_byte_colors(&colors);let previous:Vec<_>=(0..palette.len()/4).map(|i|crate::region_data::RegionStatistic{count:0,sums:[0.0;4],color_index:i as i32}).collect();let(indices,statistics)=crate::region_data::rebuild_connected_regions(editor.width,&editor.bgra,&labels,Some(&previous));self.state.segmentation=Some(SegmentationSnapshot{width:editor.width,height:editor.height,indices:Some(indices),palette:palette.clone(),counts:statistics.iter().map(|r|r.count as i32).collect(),color_indices:statistics.iter().map(|r|r.color_index).collect()});self.region_palette=Some(palette);self.region_identity=self.region_identity.wrapping_add(1);self.state.stage_keys.segmentation_edits=editor.key;self.state.contours=None;self.state.smoothing=None;self.state.fitting=None}Ok(self.snapshot())
+        if editor.key!=self.state.stage_keys.segmentation_edits{self.automatic_premultiplied_colors=false;let colors:Vec<[u8;4]>=editor.bgra.chunks_exact(4).map(|c|[c[0],c[1],c[2],c[3]]).collect();let (palette,labels)=crate::region_data::palette_from_byte_colors(&colors);let previous:Vec<_>=(0..palette.len()/4).map(|i|crate::region_data::RegionStatistic{count:0,sums:[0.0;4],color_index:i as i32}).collect();let(indices,statistics)=crate::region_data::rebuild_connected_regions(editor.width,&editor.bgra,&labels,Some(&previous));self.state.segmentation=Some(SegmentationSnapshot{width:editor.width,height:editor.height,indices:Some(indices),palette:palette.clone(),counts:statistics.iter().map(|r|r.count as i32).collect(),color_indices:statistics.iter().map(|r|r.color_index).collect()});self.region_palette=Some(palette);self.region_identity=self.region_identity.wrapping_add(1);self.state.stage_keys.segmentation_edits=editor.key;self.state.contours=None;self.state.smoothing=None;self.state.fitting=None}Ok(self.snapshot())
     }
     pub fn finish_editing(&mut self,input:&Value,observer:Option<&mut DocumentObserver>)->Result<DocumentSnapshot,String>{self.finish_editing_with_observers(input,observer,None)}
     pub fn finish_editing_with_observers(&mut self,input:&Value,mut observer:Option<&mut DocumentObserver>,mut on_stage:Option<&mut dyn FnMut(&str,&TaskResult)->Result<(),String>>)->Result<DocumentSnapshot,String>{
