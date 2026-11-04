@@ -33,11 +33,12 @@ while time.monotonic() < deadline:
     try:
         apps = list(pyatspi.Registry.getDesktop(0))
         desktop_names = [app.name or "<unnamed>" for app in apps]
-        trees = [list(walk(app)) for app in apps]
-        matches = [tree for tree in trees
-                   if any("openvector" in name.lower() for _, _, name, _ in tree)]
+        matches = [(app, node) for app in apps
+                   if (app.name or "").lower() in ("openvector", "openvector-gui")
+                   for node, role, name, _ in walk(app)
+                   if role in ("frame", "window") and name == "OpenVector"]
         found_app |= bool(matches)
-        nodes = [entry for tree in matches for entry in tree]
+        nodes = [entry for _, frame in matches for entry in walk(frame)]
         if any(role in ("push button", "toggle button", "button") and name
                for _, role, name, _ in nodes):
             break
@@ -69,7 +70,7 @@ if "--test-about" in sys.argv[1:]:
     deadline = time.monotonic() + 10
     dialog_found = False
     while time.monotonic() < deadline:
-        trees = [list(walk(app)) for app in pyatspi.Registry.getDesktop(0)]
+        trees = [list(walk(app)) for app, _ in matches]
         if any(role == "dialog" and name == "About OpenVector"
                for tree in trees for _, role, name, _ in tree):
             dialog_found = True
