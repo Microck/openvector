@@ -72,3 +72,17 @@ test('a local edit does not darken untouched automatic regions', () => {
     assert.match(readFileSync(path, 'utf8'), /fill="#ff0000"[^>]*opacity="0[.]5/i);
   } finally { rmSync(dir, {recursive:true, force:true}); }
 });
+
+test('automatic colors survive segmentation reprocessing', () => {
+  const document = new native.CoreSession().createDocument();
+  document.setSource(fixture(), 'transparent-red.png');
+  const {settings} = document.runAutomatic({extension: '.png'});
+  const modified = {...settings, quality: (settings.quality + 1) % 3};
+  for (const stage of ['segmentation', 'smoothing', 'fitting']) document.runTask(stage, modified);
+  const dir = mkdtempSync(join(tmpdir(), 'openvector-alpha-reprocess-'));
+  try {
+    const path = join(dir, 'output.svg');
+    assert.equal(document.saveVector(path, {layout: 'stacked'}).status, 0);
+    assert.match(readFileSync(path, 'utf8'), /fill="#ff0000"[^>]*opacity="0[.]5/i);
+  } finally { rmSync(dir, {recursive:true, force:true}); }
+});
