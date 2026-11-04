@@ -80,6 +80,12 @@ test('a local edit does not darken untouched automatic regions', () => {
     const svg = readFileSync(path, 'utf8');
     assert.match(svg, /fill="#ff0000"[^>]*opacity="0[.]5/i);
     assert.match(svg, /fill="#cc4000"[^>]*opacity="0[.]5/i);
+    const editedDxf = join(dir, 'edited.dxf');
+    assert.equal(document.saveVector(editedDxf, {layout: 'grouped-cutouts'}).status, 0);
+    const dxf = readFileSync(editedDxf, 'utf8');
+    assert.match(dxf, /color#ff000080/i);
+    assert.match(dxf, /color#cc400080/i);
+    assert.doesNotMatch(dxf, /color#80000080/i);
     const modified = {...settings, quality: (settings.quality + 1) % 3};
     for (const stage of ['segmentation', 'smoothing', 'fitting']) document.runTask(stage, modified);
     const reprocessed = join(dir, 'reprocessed.svg');
@@ -92,6 +98,9 @@ test('automatic colors survive segmentation reprocessing', () => {
   const document = new native.CoreSession().createDocument();
   document.setSource(fixture(), 'transparent-red.png');
   const {settings} = document.runAutomatic({extension: '.png'});
+  const other = {...settings, palette: settings.palette.map((value, index) => index === 0 ? 1 - value : value)};
+  document.commitSettings(other);
+  document.commitSettings(settings);
   const modified = {...settings, quality: (settings.quality + 1) % 3};
   for (const stage of ['segmentation', 'smoothing', 'fitting']) document.runTask(stage, modified);
   const dir = mkdtempSync(join(tmpdir(), 'openvector-alpha-reprocess-'));
