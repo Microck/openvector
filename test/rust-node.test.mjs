@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createRequire } from 'node:module';
-import { readFileSync, mkdtempSync, writeFileSync, rmSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync, mkdtempSync, writeFileSync, rmSync } from 'node:fs';
 import { gunzipSync } from 'node:zlib';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -607,5 +607,39 @@ test('Node batch progress captures selected state and retains cancellation retry
     assertSummary(batch.snapshot().document);
     batch.clear();
     assert.deepEqual(checkpoint.original.bgra, pixels);
+  } finally { rmSync(directory, { recursive: true, force: true }); }
+});
+
+
+test('Node saveVector never replaces a destination or publishes cancelled output', () => {
+  const scene = fixture('bitmap-scenes-reference.ndjson.gz').find(row => row.id === 'opaque-four-plugins');
+  const document = new native.CoreSession().createDocument();
+  document.setSource(Buffer.from(scene.sourceBytes, 'base64'), scene.sourceFilename);
+  document.runAutomatic({ extension: '.bmp' });
+  const directory = mkdtempSync(join(tmpdir(), 'openvector-safe-save-'));
+  try {
+    const existing = join(directory, 'existing.svg');
+    writeFileSync(existing, 'keep existing');
+    const refused = document.saveVector(existing, {});
+    assert.equal(refused.status, 4);
+    assert.equal(readFileSync(existing, 'utf8'), 'keep existing');
+
+    const cancelled = join(directory, 'cancelled.svg');
+    assert.throws(() => document.saveVector(cancelled, {}, () => false), /cancelled/i);
+    assert.equal(existsSync(cancelled), false);
+
+    const raced = join(directory, 'raced.svg');
+    let created = false;
+    const result = document.saveVector(raced, {}, () => {
+      if (!created) { writeFileSync(raced, 'won the race', { flag: 'wx' }); created = true; }
+      return true;
+    });
+    assert.equal(result.status, 4);
+    assert.equal(readFileSync(raced, 'utf8'), 'won the race');
+
+    const fresh = join(directory, 'fresh.svg');
+    assert.equal(document.saveVector(fresh, {}).status, 0);
+    assert.match(readFileSync(fresh, 'utf8'), /<svg/);
+    assert.deepEqual(readdirSync(directory).sort(), ['existing.svg', 'fresh.svg', 'raced.svg']);
   } finally { rmSync(directory, { recursive: true, force: true }); }
 });
