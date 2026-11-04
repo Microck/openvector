@@ -229,6 +229,9 @@ impl ImageDocument{
     pub fn leave_editing(&mut self)->Result<(),String>{self.editing_session()?.end_editing();Ok(())}
     pub fn restore_committed_editing(&mut self)->Result<Option<EditorSnapshot>,String>{match self.editor.as_mut(){None=>Ok(None),Some(editor)=>{let empty=EditorCheckpoint{undo:Vec::new(),redo:Vec::new()};Ok(Some(editor.restore_checkpoint(self.committed_editing.as_ref().unwrap_or(&empty))?))}}}
     pub fn gesture(&mut self,event:&Value)->Result<EditorSnapshot,String>{self.editor.as_mut().ok_or("Call beginEditing before editing the document.")?.gesture(event,&mut self.pointer)}
+    pub fn grouped_gesture(&mut self,event:&Value)->Result<EditorSnapshot,String>{self.editor.as_mut().ok_or("Call beginEditing before editing the document.")?.grouped_gesture(event,&mut self.pointer)}
+    pub fn grouped_undo_edit(&mut self)->Result<EditorSnapshot,String>{self.editing_session()?.grouped_undo()}
+    pub fn grouped_redo_edit(&mut self)->Result<EditorSnapshot,String>{self.editing_session()?.grouped_redo()}
     pub fn undo_edit(&mut self)->Result<EditorSnapshot,String>{self.editing_session()?.undo()}
     pub fn redo_edit(&mut self)->Result<EditorSnapshot,String>{self.editing_session()?.redo()}
     pub fn revert_edits(&mut self)->Result<EditorSnapshot,String>{self.editing_session()?.revert()}

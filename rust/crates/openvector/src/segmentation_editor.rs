@@ -25,14 +25,14 @@ fn stroke_samples(from:[f64;2],to:[f64;2],mut paint:impl FnMut(i64,i64)->bool)->
     for sample in 0..samples{let ratio=extended(BigInt::from(sample)*unit()/BigInt::from(samples-1));let x_product=fixed_double(store_double(&multiply(&dx,&ratio)));let x=(extended(x_product+&x_origin)/unit()).to_i64().unwrap();let y=(extended(multiply(&dy,&ratio)+&y_origin)/unit()).to_i64().unwrap();if x!=previous_x||y!=previous_y{changed=paint(x,y)||changed;}previous_x=x;previous_y=y;}changed
 }
 #[derive(Debug,Clone,PartialEq,serde::Serialize)]
-pub struct ToolRecord{pub kind:i32,pub x:i32,pub y:i32,pub coordinates:[f64;4],pub argb:[f64;4],pub key:String}
-impl ToolRecord{fn new(kind:i32,x:i32,y:i32,coordinates:[f64;4],argb:[f64;4])->Self{let key=format!("{kind} {x} {y} {} [{}]",coordinates.map(stream_general_decimal).join(" "),argb.map(stream_general_decimal).join(", "));Self{kind,x,y,coordinates,argb,key}}}
+pub struct ToolRecord{pub kind:i32,pub x:i32,pub y:i32,pub coordinates:[f64;4],pub argb:[f64;4],pub key:String,#[serde(skip)] pub joins_previous:bool}
+impl ToolRecord{fn new(kind:i32,x:i32,y:i32,coordinates:[f64;4],argb:[f64;4])->Self{let key=format!("{kind} {x} {y} {} [{}]",coordinates.map(stream_general_decimal).join(" "),argb.map(stream_general_decimal).join(", "));Self{kind,x,y,coordinates,argb,key,joins_previous:false}}}
 #[derive(Debug,Clone,PartialEq,serde::Serialize)]
 pub struct EditorCheckpoint{pub undo:Vec<ToolRecord>,pub redo:Vec<ToolRecord>}
 #[derive(Debug,Clone,PartialEq,serde::Serialize)]
 pub struct EditorSnapshot{pub width:usize,pub height:usize,pub bgra:Vec<u8>,pub undo:Vec<ToolRecord>,pub redo:Vec<ToolRecord>,pub key:String,pub tool:String,pub color:[f32;4]}
 #[derive(Debug,Clone)]
-pub struct SegmentationEditor{width:usize,height:usize,base:Vec<u8>,pixels:Vec<u8>,source:Vec<u8>,background:[f64;4],background_mode:i32,undo:Vec<ToolRecord>,redo:Vec<ToolRecord>,tool:String,previous_tool:String,color:[f32;4]}
+pub struct SegmentationEditor{width:usize,height:usize,base:Vec<u8>,pixels:Vec<u8>,source:Vec<u8>,background:[f64;4],background_mode:i32,undo:Vec<ToolRecord>,redo:Vec<ToolRecord>,tool:String,previous_tool:String,color:[f32;4],grouped_stroke_active:bool,grouped_stroke_has_record:bool}
 fn read_command(input:&Value)->Result<(ToolRecord,bool),String>{
     let tool=input["tool"].as_str().unwrap_or("");if !["fill","pencil","zap"].contains(&tool){return Err("Edit tool must be fill, pencil or zap.".into());}
     let commit=match input.get("commit"){None=>true,Some(v)=>v.as_bool().ok_or("Edit commit must be boolean.")?};
@@ -54,7 +54,7 @@ impl SegmentationEditor{
         let background=crate::pixel_input::read_palette_colors(background).map_err(|e|e.0)?;if background.len()!=4{return Err("Editor background must contain four BGRA channels.".into());}
         let color=crate::pixel_input::read_palette_colors(color).map_err(|e|e.0)?;if color.len()!=4{return Err("Gesture color must contain four BGRA channels.".into());}
         let color=crate::pixel_input::quantize_qcolor_channels(&color).try_into().unwrap();
-        Ok(Self{width:raster.width,height:raster.height,base:bgra.to_vec(),pixels:bgra.to_vec(),source:source.to_vec(),background:std::array::from_fn(|c|(background[c] as f64*65535.0).round()/65535.0),background_mode,undo:Vec::new(),redo:Vec::new(),tool:"pan".into(),previous_tool:"pan".into(),color})
+        Ok(Self{width:raster.width,height:raster.height,base:bgra.to_vec(),pixels:bgra.to_vec(),source:source.to_vec(),background:std::array::from_fn(|c|(background[c] as f64*65535.0).round()/65535.0),background_mode,undo:Vec::new(),redo:Vec::new(),tool:"pan".into(),previous_tool:"pan".into(),color,grouped_stroke_active:false,grouped_stroke_has_record:false})
     }
     pub fn history_state(&self)->(usize,usize){(self.undo.len(),self.redo.len())}
     pub fn history_checkpoint(&self)->EditorCheckpoint{EditorCheckpoint{undo:self.undo.clone(),redo:self.redo.clone()}}
@@ -63,9 +63,9 @@ impl SegmentationEditor{
         let active=checkpoint.map_or(&[][..],|checkpoint|checkpoint.undo.as_slice());
         self.undo.len()==active.len()&&self.undo.iter().zip(active).all(|(current,saved)|current.key==saved.key)
     }
-    pub fn restore_checkpoint(&mut self,checkpoint:&EditorCheckpoint)->Result<EditorSnapshot,String>{self.undo=checkpoint.undo.clone();self.redo=checkpoint.redo.clone();self.replay()?;Ok(self.snapshot())}
+    pub fn restore_checkpoint(&mut self,checkpoint:&EditorCheckpoint)->Result<EditorSnapshot,String>{self.grouped_stroke_active=false;self.grouped_stroke_has_record=false;self.undo=checkpoint.undo.clone();self.redo=checkpoint.redo.clone();self.replay()?;Ok(self.snapshot())}
     pub fn snapshot(&self)->EditorSnapshot{EditorSnapshot{width:self.width,height:self.height,bgra:self.pixels.clone(),undo:self.undo.clone(),redo:self.redo.clone(),key:self.undo.iter().map(|r|r.key.as_str()).collect(),tool:self.tool.clone(),color:self.color}}
-    pub fn apply(&mut self,input:&Value)->Result<EditorSnapshot,String>{let (record,commit)=read_command(input)?;self.apply_record(record,commit)?;Ok(self.snapshot())}
+    pub fn apply(&mut self,input:&Value)->Result<EditorSnapshot,String>{self.grouped_stroke_active=false;self.grouped_stroke_has_record=false;let (record,commit)=read_command(input)?;self.apply_record(record,commit)?;Ok(self.snapshot())}
     fn apply_record(&mut self,record:ToolRecord,commit:bool)->Result<(),String>{if self.execute(&record)?&&commit{self.undo.push(record);self.redo.clear();}Ok(())}
     pub fn gesture(&mut self,input:&Value,pointer:&mut EditorPointer)->Result<EditorSnapshot,String>{
         match read_editor_gesture(input,&TOOLS)?{
@@ -80,10 +80,40 @@ impl SegmentationEditor{
             }
         }Ok(self.snapshot())
     }
-    pub fn end_editing(&mut self){self.tool="pan".into();}
+    /// GUI-only grouping preserves the engine's reference-compatible per-event API.
+    pub fn grouped_gesture(&mut self,input:&Value,pointer:&mut EditorPointer)->Result<EditorSnapshot,String>{
+        let phase=input["phase"].as_str().unwrap_or("");
+        let left=input["buttons"].as_u64().unwrap_or(0)&1!=0;
+        let painting=self.tool=="pencil"&&left&&(phase=="press"||phase=="move");
+        if phase=="press" || !painting { self.grouped_stroke_active=false; self.grouped_stroke_has_record=false; }
+        if painting && !self.grouped_stroke_active { self.grouped_stroke_active=true; self.grouped_stroke_has_record=false; }
+        let before=self.undo.len();
+        let result=self.gesture(input,pointer)?;
+        if painting && self.undo.len()>before {
+            self.undo.last_mut().unwrap().joins_previous=self.grouped_stroke_has_record;
+            self.grouped_stroke_has_record=true;
+        }
+        Ok(result)
+    }
+    pub fn grouped_undo(&mut self)->Result<EditorSnapshot,String>{
+        self.grouped_stroke_active=false;self.grouped_stroke_has_record=false;
+        while let Some(record)=self.undo.last(){
+            let more=record.joins_previous;
+            self.undo()?;
+            if !more { break; }
+        }
+        Ok(self.snapshot())
+    }
+    pub fn grouped_redo(&mut self)->Result<EditorSnapshot,String>{
+        self.grouped_stroke_active=false;self.grouped_stroke_has_record=false;
+        if !self.redo.is_empty(){self.redo()?;}
+        while self.redo.first().is_some_and(|record|record.joins_previous){self.redo()?;}
+        Ok(self.snapshot())
+    }
+    pub fn end_editing(&mut self){self.tool="pan".into();self.grouped_stroke_active=false;self.grouped_stroke_has_record=false;}
     pub fn undo(&mut self)->Result<EditorSnapshot,String>{if let Some(record)=self.undo.pop(){self.redo.insert(0,record);self.replay()?;}Ok(self.snapshot())}
     pub fn redo(&mut self)->Result<EditorSnapshot,String>{if !self.redo.is_empty(){let record=self.redo.remove(0);self.execute(&record)?;self.undo.push(record);}Ok(self.snapshot())}
-    pub fn revert(&mut self)->Result<EditorSnapshot,String>{self.pixels.copy_from_slice(&self.base);let mut records=std::mem::take(&mut self.undo);records.append(&mut self.redo);self.redo=records;Ok(self.snapshot())}
+    pub fn revert(&mut self)->Result<EditorSnapshot,String>{self.grouped_stroke_active=false;self.grouped_stroke_has_record=false;self.pixels.copy_from_slice(&self.base);let mut records=std::mem::take(&mut self.undo);records.append(&mut self.redo);self.redo=records;Ok(self.snapshot())}
     fn replay(&mut self)->Result<(),String>{self.pixels.copy_from_slice(&self.base);for i in 0..self.undo.len(){let record=self.undo[i].clone();self.execute(&record)?;}Ok(())}
     fn in_bounds(&self,[x,y]:[f64;2])->bool{x>=0.0&&y>=0.0&&x<self.width as f64&&y<self.height as f64}
     fn write(&mut self,pixel:usize,color:u32){self.pixels[pixel*4..pixel*4+4].copy_from_slice(&color.to_le_bytes());}
