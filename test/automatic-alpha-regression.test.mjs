@@ -45,6 +45,6 @@ test('automatic transparent red remains straight RGB in SVG', () => {
     const path = join(dir, 'output.svg');
     assert.equal(document.saveVector(path, {layout: 'stacked'}).status, 0);
     const svg = readFileSync(path, 'utf8');
-    assert.match(svg, /fill="#ff0000"[^>]*opacity="0\\.5/i);
+    assert.match(svg, /fill="#ff0000"[^>]*opacity="0[.]5/i);
   } finally { rmSync(dir, {recursive:true, force:true}); }
 });
