@@ -329,7 +329,7 @@ impl OpenVectorApp {
                     let retained_source = self.document.is_some();
                     if new_source {
                         self.drag_result.invalidate();
-                        if self.batch.is_some() { self.source_sizing = None; self.source_sizing_consumed = false; self.source_recommendations = None; self.transparency_initialized = [false; 2]; }
+                        if self.batch.is_some() { self.source_sizing = None; self.source_sizing_consumed = false; self.source_recommendations = None; self.transparency_initialized = [false; 2]; self.preferences.bitmap_save.batch_source_changed(&document.filename); }
                         if self.loading_source && document.origin == SourceOrigin::Path {
                             if let Some(directory) = document.filename.parent() { self.source_directory = directory.into(); }
                         }

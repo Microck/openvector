@@ -9,7 +9,7 @@ pub(super) enum WorkflowAction {
     Numeric(&'static str, i32), CommitNumeric, SaveProfile(bool), Rename(String), RenameProfile(String, bool), DeleteProfile(String, bool), ApplyProfile(String, bool),
     Color(usize), CommitColor, DeleteColor(usize), Palette(PaletteCommand), Eyedropper,
     ToggleSave(bool), DirectSave(bool), SaveDialog(bool), SaveFormat(String), SaveFolder, Save(bool), BitmapScale(f64), BitmapCommit(usize), BitmapStep(usize, i32, bool), Flatten,
-    Confirm(Command), CreateDirectory(Command), Preview(PathBuf),
+    Confirm(Command), ConfirmStaleBitmapName(Command, usize), CreateDirectory(Command), Preview(PathBuf),
     ToggleDisclosure(Disclosure), ClearSources, ClearDirectories, BrowseDirectory(PathBuf), OpenDirectory(PathBuf), OpenSource(PathBuf), HandPick,
     ReplayRecentBasic(usize),
     RunProcess(&'static str, Page, Value), ApplyProfileAccepted(String, bool),
@@ -649,6 +649,15 @@ impl OpenVectorApp {
                         Command::BitmapExport { path: path.clone(), format: format.clone(), scale: self.workflows.bitmap.pane_scales[mode], flatten: format != "png" && self.workflows.flatten }
                     } else { Command::Export { path: path.clone(), options: self.export_options() } };
                     self.persist(cx);
+                    if bitmap && self.preferences.bitmap_save.needs_source_confirmation(mode) {
+                        self.dialog = Some(Dialog::Form(Form::Confirm(
+                            format!("This filename was chosen for an earlier image. Save the current image as {}?", path.display()),
+                            WorkflowAction::ConfirmStaleBitmapName(command, mode),
+                        )));
+                    } else { self.prepare_save(command, window, cx)?; }
+                },
+                WorkflowAction::ConfirmStaleBitmapName(command, mode) => {
+                    self.preferences.bitmap_save.confirm_source(mode);
                     self.prepare_save(command, window, cx)?;
                 },
                 WorkflowAction::Confirm(command) => { self.close_dialog(window, cx); self.enqueue(command, None, cx); },
