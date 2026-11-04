@@ -13,7 +13,7 @@ test('public PDF identifies OpenVector and preserves exact reference bytes and x
     assert.notEqual(expected, fixture.expected);
     assert.deepEqual(run.stdout, Buffer.from(expected, 'latin1'));
     const pdf = run.stdout.toString('latin1');
-    const match = /startxref\\r\\n(\\d+)\\r\\n%%EOF/.exec(pdf);
+    const match = /startxref\r\n(\d+)\r\n%%EOF/.exec(pdf);
     assert.ok(match);
     assert.equal(pdf.slice(Number(match[1]), Number(match[1]) + 4), 'xref');
   }
