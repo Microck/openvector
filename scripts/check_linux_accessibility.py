@@ -3,7 +3,7 @@
 
 Run with the system Python and pyatspi installed while OpenVector is open:
     /usr/bin/python3 scripts/check_linux_accessibility.py
-This is a diagnostic for issue #10, not a substitute for an Orca test.
+Enable accessibility through the desktop or a screen reader first. AccessKit's\nUnix adapter may stay inactive when the AT-SPI session is not enabled; an\ninspector alone may not enable it. This is not a substitute for an Orca test.
 """
 import sys
 import time
