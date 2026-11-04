@@ -19,8 +19,9 @@ fn stroke_samples(from:[f64;2],to:[f64;2],mut paint:impl FnMut(i64,i64)->bool)->
     let square=extended(multiply(&dx,&dx)+multiply(&dy,&dy));let radicand=square*unit();
     let mut root=BigInt::one()<<((radicand.magnitude().bits()+1)/2) as usize;
     loop{let next=(&root+&radicand/&root)/2;if next>=root{break;}root=next;}
-    let samples=(extended(extended(root)*4)/unit()).to_usize().expect("bounded image stroke");
-    if samples==1{return paint(0,0);}
+    // A subpixel segment can cross a pixel boundary with fewer than two
+    // samples. Include both endpoints instead of painting an unrelated origin.
+    let samples=(extended(extended(root)*4)/unit()).to_usize().expect("bounded image stroke").max(2);
     let mut changed=false;let (mut previous_x,mut previous_y)=(-1,-1);
     for sample in 0..samples{let ratio=extended(BigInt::from(sample)*unit()/BigInt::from(samples-1));let x_product=fixed_double(store_double(&multiply(&dx,&ratio)));let x=(extended(x_product+&x_origin)/unit()).to_i64().unwrap();let y=(extended(multiply(&dy,&ratio)+&y_origin)/unit()).to_i64().unwrap();if x!=previous_x||y!=previous_y{changed=paint(x,y)||changed;}previous_x=x;previous_y=y;}changed
 }
@@ -105,5 +106,25 @@ impl SegmentationEditor{
         if record.kind==5{let bytes:[u8;4]=std::array::from_fn(|c|((record.argb[3-c]*65535.0).round() as u32>>8) as u8);let target=u32::from_le_bytes(bytes);if target==packed(&self.pixels,seed){return Ok(false);}for pixel in self.component(seed).0{self.write(pixel,target);}return Ok(true);}
         let (pixels,neighbors)=self.component(seed);if neighbors.is_empty(){return Err("This region has no neighboring color. Use Fill to change its color.".into());}
         for pixel in pixels{let source=self.source_color(pixel);let mut chosen=neighbors[0];let mut minimum=store_float(&zap_distance(chosen,source));for &neighbor in &neighbors{let distance=zap_distance(neighbor,source);if distance<fixed_double(minimum){chosen=neighbor;minimum=store_float(&distance);}}self.write(pixel,chosen);}Ok(true)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use serde_json::json;
+
+    #[test]
+    fn short_pencil_segments_only_change_pixels_near_the_stroke() {
+        let mut original = vec![0u8; 48 * 48 * 4];
+        for pixel in original.chunks_exact_mut(4) { pixel[3] = 255; }
+        for (from, to) in [([19.99, 20.1], [20.01, 20.1]), ([19.8, 20.1], [20.1, 20.1])] {
+            let mut editor = SegmentationEditor::new(48, 48, &original, &original, &[0.0, 0.0, 0.0, 1.0], &[0.0, 0.0, 1.0, 1.0], 0).unwrap();
+            let result = editor.apply(&json!({"tool":"pencil","from":from,"to":to,"color":[0.0,0.0,1.0,1.0]})).unwrap();
+            assert_eq!(&result.bgra[..4], &original[..4], "origin changed");
+            let changed: Vec<_> = result.bgra.chunks_exact(4).zip(original.chunks_exact(4)).enumerate()
+                .filter_map(|(index, (after, before))| (after != before).then_some((index % 48, index / 48))).collect();
+            assert_eq!(changed, vec![(19, 20), (20, 20)]);
+        }
     }
 }
