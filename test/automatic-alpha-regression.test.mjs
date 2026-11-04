@@ -110,3 +110,28 @@ test('automatic colors survive segmentation reprocessing', () => {
     assert.match(readFileSync(path, 'utf8'), /fill="#ff0000"[^>]*opacity="0[.]5/i);
   } finally { rmSync(dir, {recursive:true, force:true}); }
 });
+
+test('resuming after smoothing cancellation keeps automatic color encoding', () => {
+  const document = new native.CoreSession().createDocument();
+  document.setSource(fixture(), 'transparent-red.png');
+  let controls;
+  assert.throws(() => document.runAutomatic({extension: '.png'}, {
+    callback(event, state) {
+      if (event.stage === 'smoothing') { controls = state.settings; return false; }
+      return true;
+    }
+  }), /cancel/i);
+  assert.ok(controls, 'smoothing must have started');
+  document.runTask('smoothing', controls);
+  document.runTask('fitting', controls);
+  const dir = mkdtempSync(join(tmpdir(), 'openvector-alpha-resume-'));
+  try {
+    const path = join(dir, 'resumed.svg');
+    assert.equal(document.saveVector(path, {layout: 'stacked'}).status, 0);
+    assert.match(readFileSync(path, 'utf8'), /fill="#ff0000"[^>]*opacity="0[.]5/i);
+    document.beginEditing();
+    const editor = document.editing();
+    const offset = (20 * editor.width + 20) * 4;
+    assert.deepEqual(Array.from(editor.bgra.subarray(offset, offset + 4)), [0, 0, 255, 128]);
+  } finally { rmSync(dir, {recursive:true, force:true}); }
+});
