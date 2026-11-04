@@ -63,7 +63,7 @@ test('a local edit does not darken untouched automatic regions', () => {
   document.setSource(fixture(), 'transparent-red.png');
   const {settings} = document.runAutomatic({extension: '.png'});
   document.beginEditing();
-  document.edit({tool: 'pencil', from: [10, 10], to: [14, 10], color: [0, 0.3, 0.8, 0.5]});
+  document.edit({tool: 'pencil', from: [10, 10], to: [14, 10], color: [0, 0.25, 0.8, 0.5]});
   document.finishEditing(settings);
   const dir = mkdtempSync(join(tmpdir(), 'openvector-alpha-edit-'));
   try {
@@ -71,7 +71,7 @@ test('a local edit does not darken untouched automatic regions', () => {
     assert.equal(document.saveVector(path, {layout: 'stacked'}).status, 0);
     const svg = readFileSync(path, 'utf8');
     assert.match(svg, /fill="#ff0000"[^>]*opacity="0[.]5/i);
-    assert.match(svg, /fill="#cc4d00"[^>]*opacity="0[.]5/i);
+    assert.match(svg, /fill="#cc4000"[^>]*opacity="0[.]5/i);
   } finally { rmSync(dir, {recursive:true, force:true}); }
 });
 
