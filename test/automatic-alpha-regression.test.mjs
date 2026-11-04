@@ -135,3 +135,22 @@ test('resuming after smoothing cancellation keeps automatic color encoding', () 
     assert.deepEqual(Array.from(editor.bgra.subarray(offset, offset + 4)), [0, 0, 255, 128]);
   } finally { rmSync(dir, {recursive:true, force:true}); }
 });
+
+test('a committed custom translucent palette remains straight alpha', () => {
+  const document = new native.CoreSession().createDocument();
+  document.setSource(fixture(), 'transparent-red.png');
+  const {settings} = document.runAutomatic({extension: '.png'});
+  const palette = [...settings.palette];
+  for (let index = 0; index < palette.length; index += 4) {
+    if (palette[index + 3] > 0) palette[index + 2] = 0.8;
+  }
+  const custom = {...settings, palette};
+  document.commitSettings(custom);
+  for (const stage of ['segmentation', 'smoothing', 'fitting']) document.runTask(stage, custom);
+  const dir = mkdtempSync(join(tmpdir(), 'openvector-alpha-custom-'));
+  try {
+    const path = join(dir, 'custom.svg');
+    assert.equal(document.saveVector(path, {layout: 'stacked'}).status, 0);
+    assert.match(readFileSync(path, 'utf8'), /fill="#cc0000"[^>]*opacity="0[.]5/i);
+  } finally { rmSync(dir, {recursive:true, force:true}); }
+});
