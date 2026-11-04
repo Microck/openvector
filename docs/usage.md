@@ -72,6 +72,13 @@ in `state.classification` without applying them. `commitSettings(settings)`,
 returns the default document settings. See the
 [image state contract](image-state-contract.json).
 
+For segmentation, `paletteEncoding: 'straight'` explicitly identifies manually
+supplied colors, including a palette numerically identical to a generated one.
+Use `'premultiplied'` for engine-generated colors when their origin must be
+specified explicitly. An explicit encoding change causes segmentation to rerun
+even when the other settings are unchanged. Omit it to use the document's
+recorded palette provenance.
+
 The optional progress argument is `{ callback(event, checkpoint), capture? }`.
 The callback runs at Rust checkpoints and returns `true` to continue or `false`
 to cancel. `capture` uses the same `SnapshotSelection` as `snapshot(selection)`.
@@ -647,3 +654,4 @@ does not join regions.
 ### SVG dimensions and display units
 
 SVG export writes dimensions in points, with 72 points per inch, to preserve the reference format's physical print size. A 48 by 48 source therefore produces 48 pt dimensions; at 96 DPI, browsers and many editors render that as 64 by 64 CSS pixels. The 1× bitmap export instead uses the source pixel dimensions. To get 48 CSS pixels on the web, set the SVG's CSS width and height to 48 px, or adjust the dimensions in an editor; this changes its displayed size without changing the viewBox.
+

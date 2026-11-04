@@ -33,7 +33,7 @@ pub struct EditorCheckpoint{pub undo:Vec<ToolRecord>,pub redo:Vec<ToolRecord>}
 #[derive(Debug,Clone,PartialEq,serde::Serialize)]
 pub struct EditorSnapshot{pub width:usize,pub height:usize,pub bgra:Vec<u8>,pub undo:Vec<ToolRecord>,pub redo:Vec<ToolRecord>,pub key:String,pub tool:String,pub color:[f32;4]}
 #[derive(Debug,Clone)]
-pub struct SegmentationEditor{width:usize,height:usize,base:Vec<u8>,pixels:Vec<u8>,source:Vec<u8>,background:[f64;4],background_mode:i32,undo:Vec<ToolRecord>,redo:Vec<ToolRecord>,tool:String,previous_tool:String,color:[f32;4],grouped_stroke_active:bool,grouped_stroke_has_record:bool}
+pub struct SegmentationEditor{width:usize,height:usize,base:Vec<u8>,pixels:Vec<u8>,source:Vec<u8>,background:[f64;4],background_mode:i32,undo:Vec<ToolRecord>,redo:Vec<ToolRecord>,tool:String,previous_tool:String,color:[f32;4],straight_mode:bool,grouped_stroke_active:bool,grouped_stroke_has_record:bool}
 fn read_command(input:&Value)->Result<(ToolRecord,bool),String>{
     let tool=input["tool"].as_str().unwrap_or("");if !["fill","pencil","zap"].contains(&tool){return Err("Edit tool must be fill, pencil or zap.".into());}
     let commit=match input.get("commit"){None=>true,Some(v)=>v.as_bool().ok_or("Edit commit must be boolean.")?};
@@ -55,7 +55,26 @@ impl SegmentationEditor{
         let background=crate::pixel_input::read_palette_colors(background).map_err(|e|e.0)?;if background.len()!=4{return Err("Editor background must contain four BGRA channels.".into());}
         let color=crate::pixel_input::read_palette_colors(color).map_err(|e|e.0)?;if color.len()!=4{return Err("Gesture color must contain four BGRA channels.".into());}
         let color=crate::pixel_input::quantize_qcolor_channels(&color).try_into().unwrap();
-        Ok(Self{width:raster.width,height:raster.height,base:bgra.to_vec(),pixels:bgra.to_vec(),source:source.to_vec(),background:std::array::from_fn(|c|(background[c] as f64*65535.0).round()/65535.0),background_mode,undo:Vec::new(),redo:Vec::new(),tool:"pan".into(),previous_tool:"pan".into(),color,grouped_stroke_active:false,grouped_stroke_has_record:false})
+        Ok(Self{width:raster.width,height:raster.height,base:bgra.to_vec(),pixels:bgra.to_vec(),source:source.to_vec(),background:std::array::from_fn(|c|(background[c] as f64*65535.0).round()/65535.0),background_mode,undo:Vec::new(),redo:Vec::new(),tool:"pan".into(),previous_tool:"pan".into(),color,straight_mode:false,grouped_stroke_active:false,grouped_stroke_has_record:false})
+    }
+    /// Convert a fresh automatic editor to straight alpha before user colors
+    /// enter it. The legacy editor API keeps its reference-compatible bytes.
+    pub fn enable_straight_colors(&mut self)->Result<(),String>{
+        if self.straight_mode{return Ok(());}
+        if !self.undo.is_empty()||!self.redo.is_empty(){return Err("Cannot change color representation after editing has begun.".into());}
+        fn convert(bytes:&mut [u8]){
+            let alpha=bytes[3] as u32;
+            for channel in &mut bytes[..3]{
+                *channel=if alpha==0{0}else{(((*channel as u32)*255+alpha/2)/alpha).min(255) as u8};
+            }
+        }
+        for pixel in self.base.chunks_exact_mut(4){convert(pixel);}
+        for pixel in self.pixels.chunks_exact_mut(4){convert(pixel);}
+        let mut color=self.color.map(|v|(v as f64*255.0+0.5).floor() as u8);
+        convert(&mut color);
+        self.color=color.map(|v|v as f32/255.0);
+        self.straight_mode=true;
+        Ok(())
     }
     pub fn history_state(&self)->(usize,usize){(self.undo.len(),self.redo.len())}
     pub fn history_checkpoint(&self)->EditorCheckpoint{EditorCheckpoint{undo:self.undo.clone(),redo:self.redo.clone()}}
@@ -132,6 +151,19 @@ impl SegmentationEditor{
         (queue,neighbors.into_iter().collect())
     }
     fn source_color(&self,pixel:usize)->u32{
+        if self.straight_mode{
+            let source=&self.source[pixel*4..pixel*4+4];
+            let alpha=source[3] as f64/255.0;
+            let (out_alpha,remaining)=if self.background_mode==1||self.background_mode==2{
+                (alpha+(1.0-alpha)*self.background[3],(1.0-alpha)*self.background[3])
+            }else{(alpha,0.0)};
+            let mut bytes=[0u8;4];
+            bytes[3]=(out_alpha*255.0).round().clamp(0.0,255.0) as u8;
+            if out_alpha>0.0{for c in 0..3{
+                bytes[c]=(((source[c] as f64/255.0+remaining*self.background[c])/out_alpha)*255.0).round().clamp(0.0,255.0) as u8;
+            }}
+            return u32::from_le_bytes(bytes);
+        }
         if self.background_mode!=1&&self.background_mode!=2{return packed(&self.source,pixel);}
         let alpha=self.source[pixel*4+3] as f64/255.0;let remaining=1.0-alpha;let background_alpha=self.background[3];let mut bytes=[0u8;4];bytes[3]=((remaining*background_alpha+alpha)*255.0).trunc() as u8;
         for c in 0..3{bytes[c]=(((self.source[pixel*4+c] as f64/255.0)*alpha+remaining*self.background[c]*background_alpha)*255.0).trunc() as u8;}u32::from_le_bytes(bytes)
@@ -167,3 +199,4 @@ mod tests {
         }
     }
 }
+
