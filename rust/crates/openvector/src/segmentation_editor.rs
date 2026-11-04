@@ -88,26 +88,35 @@ impl SegmentationEditor{
         if phase=="press" || !painting { self.grouped_stroke_active=false; self.grouped_stroke_has_record=false; }
         if painting && !self.grouped_stroke_active { self.grouped_stroke_active=true; self.grouped_stroke_has_record=false; }
         let before=self.undo.len();
-        let result=self.gesture(input,pointer)?;
+        self.gesture(input,pointer)?;
         if painting && self.undo.len()>before {
             self.undo.last_mut().unwrap().joins_previous=self.grouped_stroke_has_record;
             self.grouped_stroke_has_record=true;
         }
-        Ok(result)
+        Ok(self.snapshot())
     }
     pub fn grouped_undo(&mut self)->Result<EditorSnapshot,String>{
         self.grouped_stroke_active=false;self.grouped_stroke_has_record=false;
-        while let Some(record)=self.undo.last(){
-            let more=record.joins_previous;
-            self.undo()?;
-            if !more { break; }
+        if !self.undo.is_empty(){
+            let mut start=self.undo.len()-1;
+            while start>0 && self.undo[start].joins_previous {start-=1;}
+            let records=self.undo.split_off(start);
+            self.redo.splice(0..0,records);
+            self.replay()?;
         }
         Ok(self.snapshot())
     }
     pub fn grouped_redo(&mut self)->Result<EditorSnapshot,String>{
         self.grouped_stroke_active=false;self.grouped_stroke_has_record=false;
-        if !self.redo.is_empty(){self.redo()?;}
-        while self.redo.first().is_some_and(|record|record.joins_previous){self.redo()?;}
+        if !self.redo.is_empty(){
+            let mut count=1;
+            while count<self.redo.len() && self.redo[count].joins_previous {count+=1;}
+            for _ in 0..count {
+                let record=self.redo.remove(0);
+                self.execute(&record)?;
+                self.undo.push(record);
+            }
+        }
         Ok(self.snapshot())
     }
     pub fn end_editing(&mut self){self.tool="pan".into();self.grouped_stroke_active=false;self.grouped_stroke_has_record=false;}
