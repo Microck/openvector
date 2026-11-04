@@ -16,27 +16,32 @@ except ImportError:
 def walk(node, depth=0):
     try:
         role, name = node.getRoleName(), node.name or ""
-        print(f"{'  ' * depth}{role}: {name}")
-        yield role, name
+        yield role, name, f"{'  ' * depth}{role}: {name}"
         for child in node:
             yield from walk(child, depth + 1)
     except Exception as exc:
-        print(f"{'  ' * depth}[unavailable: {exc}]", file=sys.stderr)
+        yield "", "", f"{'  ' * depth}[unavailable: {exc}]"
 
 deadline = time.monotonic() + 15
-apps = []
+nodes = []
+found_app = False
+last_error = None
 while time.monotonic() < deadline:
     try:
         apps = [app for app in pyatspi.Registry.getDesktop(0)
                 if "openvector" in (app.name or "").lower()]
+        found_app |= bool(apps)
+        nodes = [entry for app in apps for entry in walk(app)]
+        if any(role in ("push button", "toggle button", "button") and name
+               for role, name, _ in nodes):
+            break
     except Exception as exc:
-        print(f"AT-SPI bus unavailable: {exc}", file=sys.stderr)
-    if apps:
-        break
+        last_error = exc
     time.sleep(1)
-if not apps:
-    sys.exit("OpenVector was not found on the AT-SPI desktop. Check the session bus and accessibility activation.")
-nodes = [entry for app in apps for entry in walk(app)]
-if not any(role in ("push button", "toggle button", "button") and name for role, name in nodes):
-    sys.exit("No named buttons were exposed. Check the provider activation and emitted tree.")
+for _, _, line in nodes:
+    print(line)
+if not found_app:
+    sys.exit(f"OpenVector was not found on the AT-SPI desktop. Check the session bus and accessibility activation. {last_error or ''}")
+if not any(role in ("push button", "toggle button", "button") and name for role, name, _ in nodes):
+    sys.exit("No named buttons were exposed before the deadline. Check provider activation and the emitted tree.")
 print("At least one named button is exposed. Verify navigation, focus, text input, dialogs and Orca separately.")
