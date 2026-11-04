@@ -224,7 +224,7 @@ impl ImageDocument {
 
     #[napi]
     pub fn begin_editing(&mut self) -> Result<Value> {
-        self.inner.begin_editing().map(|editor| snapshot::editor_summary(&editor)).map_err(engine_error)
+        self.inner.begin_editing_for_output().map(|editor| snapshot::editor_summary(&editor)).map_err(engine_error)
     }
 
     #[napi]
