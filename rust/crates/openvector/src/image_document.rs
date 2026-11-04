@@ -65,7 +65,7 @@ impl ImageDocument{
     /// from the palette (notably DXF layer tables).
     pub fn presentation_palette(&self)->Vec<f32>{
         let palette=self.state.segmentation.as_ref().map_or(&[][..],|s|s.palette.as_slice());
-        if self.automatic_palettes.is_empty()&&!self.automatic_premultiplied_colors{return palette.to_vec();}
+        if self.automatic_palettes.is_empty()&&!self.segmentation_palette_premultiplied{return palette.to_vec();}
         // The mutable settings palette can differ from fitted edited regions.
         // DXF layer names must correspond to the exact colors it draws.
         let Some(geometry)=self.presentation_geometry() else{return palette.to_vec()};
