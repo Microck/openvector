@@ -3,7 +3,9 @@
 
 Run with the system Python and pyatspi installed while OpenVector is open:
     /usr/bin/python3 scripts/check_linux_accessibility.py
-Enable accessibility through the desktop or a screen reader first. AccessKit's\nUnix adapter may stay inactive when the AT-SPI session is not enabled; an\ninspector alone may not enable it. This is not a substitute for an Orca test.
+Enable accessibility through the desktop or a screen reader first. AccessKit's
+Unix adapter may stay inactive when the AT-SPI session is not enabled; an
+inspector alone may not enable it. This is not a substitute for an Orca test.
 """
 import sys
 import time
@@ -46,7 +48,7 @@ for _, _, _, line in nodes:
     print(line)
 if not found_app:
     sys.exit(f"OpenVector was not found on the AT-SPI desktop. Applications: {desktop_names}. Check the session bus and accessibility activation. {last_error or ''}")
-if not any(role in ("push button", "toggle button", "button") and name for role, name, _ in nodes):
+if not any(role in ("push button", "toggle button", "button") and name for _, role, name, _ in nodes):
     sys.exit("No named buttons were exposed before the deadline. Check provider activation and the emitted tree.")
 print("At least one named button is exposed. Verify navigation, focus, text input, dialogs and Orca separately.")
 
