@@ -13,8 +13,10 @@ fn safe_vector_output_matches_existing_serializer_bytes() {
     let vector = VectorOutputInput::new(&geometry, row["width"].as_i64().unwrap(), row["height"].as_i64().unwrap());
     let mut input = VectorFileInput::new(vector);
     input.eps.creation_date = Some("Tue Oct 20 12:34:56 2026".into());
+    input.palette = &[0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0];
+    input.reference_device = Some(openvector::emf::EmfDevice { pixels: [1920, 1080], millimeters: [508, 286], micrometers: [508000, 286000] });
     let directory = tempfile::tempdir().unwrap();
-    for format in ["svg", "pdf", "eps", "ai"] {
+    for format in ["svg", "pdf", "eps", "ai", "dxf", "emf"] {
         let legacy = directory.path().join(format!("legacy.{format}"));
         let safe = directory.path().join(format!("safe.{format}"));
         let mut progress = |_| Ok(());
