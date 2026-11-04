@@ -24,7 +24,8 @@ test('short Pencil crossing stays away from origin through SVG export', () => {
   assert.ok(x >= 2 && y >= 2 && x + 3 < before.width);
   const color = [0.8, 0.1, 0.9, 1];
   document.edit({ tool: 'pencil', from: [x - 0.2, y + 0.1], to: [x + 0.1, y + 0.1], color });
-  const edited = document.edit({ tool: 'pencil', from: [x + 0.1, y + 0.1], to: [x + 3.1, y + 0.1], color });
+  document.edit({ tool: 'pencil', from: [x + 0.1, y + 0.1], to: [x + 3.1, y + 0.1], color });
+  const edited = document.editing();
   assert.deepEqual(Array.from(edited.bgra.subarray(0, 4)), Array.from(before.bgra.subarray(0, 4)));
   const offset = (y * before.width + x) * 4;
   const painted = Array.from(edited.bgra.subarray(offset, offset + 4));
