@@ -61,6 +61,21 @@ impl ImageDocument{
         }
         Some(std::borrow::Cow::Owned(straight))
     }
+    /// Match the output geometry's color space in serializers that name colors
+    /// from the palette (notably DXF layer tables).
+    pub fn presentation_palette(&self)->Vec<f32>{
+        let palette=self.state.segmentation.as_ref().map_or(&[][..],|s|s.palette.as_slice());
+        if !self.automatic_premultiplied_colors{return palette.to_vec();}
+        let mut output=palette.to_vec();
+        for color in output.chunks_exact_mut(4){
+            let alpha=(color[3] as f64*255.0+0.5).floor() as u32;
+            for channel in &mut color[..3]{
+                let byte=(*channel as f64*255.0+0.5).floor() as u32;
+                *channel=if alpha==0 {0.0} else {(((byte*255+alpha/2)/alpha).min(255) as f32)/255.0};
+            }
+        }
+        output
+    }
     /// Explicit saved checkpoint presence, distinct from applied segmentation edits.
     pub fn has_committed_edits(&self)->bool{self.committed_editing.as_ref().is_some_and(|checkpoint|!checkpoint.undo.is_empty())}
     pub fn has_applied_edits(&self)->bool{!self.state.stage_keys.segmentation_edits.is_empty()}
@@ -200,7 +215,8 @@ impl ImageDocument{
         if input.reference_device.is_none()&&path.as_os_str().as_encoded_bytes().ends_with(b".emf"){
             input.reference_device=Some(crate::emf::EmfDevice::current_display().map_err(|e|e.to_string())?);
         }
-        input.palette=self.state.segmentation.as_ref().map_or(&[][..],|s|s.palette.as_slice());
+        let palette=self.presentation_palette();
+        input.palette=&palette;
         input.dxf_curve_mode=match options.curve_mode{crate::export_options::CurveMode::Splines=>crate::dxf::DxfCurveMode::Splines,crate::export_options::CurveMode::SparseLines=>crate::dxf::DxfCurveMode::SparseLines,crate::export_options::CurveMode::DenseLines=>crate::dxf::DxfCurveMode::DenseLines};
         let progress=&mut self.state.progress;let cancel=&self.cancel;
         let result=crate::vector_file::write_vector_file_admitted(path,&input,overwrite,&mut|percent|{
@@ -218,7 +234,6 @@ impl ImageDocument{
     pub fn run_automatic(&mut self,input:&Value)->Result<AutomaticResult,String>{self.run_automatic_with_observers(input,None,None)}
     pub fn run_automatic_with_observer(&mut self,input:&Value,observer:Option<&mut DocumentObserver>)->Result<AutomaticResult,String>{self.run_automatic_with_observers(input,observer,None)}
     pub fn run_automatic_with_observers(&mut self,input:&Value,mut observer:Option<&mut DocumentObserver>,mut on_stage:Option<&mut DocumentStageObserver>)->Result<AutomaticResult,String>{
-        self.automatic_premultiplied_colors=false;
         let extension=input["extension"].as_str().ok_or("Automatic processing requires an extension string.")?;let mut settings=self.merged_settings(input)?;settings.advanced=false;let alpha=self.source_alpha_type();let mut classify=Value::Object(settings.to_json());classify["extension"]=json!(extension);let result=self.run_task("classification",&classify,None)?;if result.state.status==2{return Err(CANCEL_TASK.into())}let c=&result.state.classification;let recommended=i32::from(c.category==1&&alpha==1);settings.category=c.category;settings.quality=c.quality;settings.palette_mode=c.palette_mode;settings.background_mode=recommended;settings.background=[1.0,1.0,1.0,recommended as f32];let mut selection=AutomaticSelection{settings,palette_count:None,recommended_background_mode:recommended};if let Some(cb)=on_stage.as_deref_mut(){cb("classification",&result,&selection)?}
         if matches!(selection.settings.palette_mode,0|1){let mut controls=Value::Object(selection.settings.to_json());controls["lower"]=json!(2);controls["upper"]=json!(12);let result=self.run_task("palette",&controls,observer.as_mut().map(|o|&mut **o as &mut DocumentObserver))?;let count=self.minimum_palette().ok_or("Automatic palette selection found no eligible candidate.")?;selection.palette_count=Some(count);selection.settings.palette=self.selected_palette(count);if let Some(cb)=on_stage.as_deref_mut(){cb("palette",&result,&selection)?}}
         for stage in ["segmentation","smoothing","fitting"]{let result=self.run_task(stage,&Value::Object(selection.settings.to_json()),observer.as_mut().map(|o|&mut **o as &mut DocumentObserver))?;if result.did_work&&result.state.status==2{return Err(CANCEL_TASK.into())}if let Some(cb)=on_stage.as_deref_mut(){cb(stage,&result,&selection)?}}
