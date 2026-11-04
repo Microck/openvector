@@ -1,6 +1,6 @@
 use super::*;
 
-const SVG_SIZE_NOTICE: &str = "SVG dimensions use points (72 per inch). At 96 DPI, 48 pt displays as 64 pixels; physical print size is preserved.";
+pub(super) const SVG_SIZE_NOTICE: &str = "SVG dimensions use points (72 per inch). At 96 DPI, 48 pt displays as 64 pixels; physical print size is preserved.";
 use std::collections::{HashMap, HashSet};
 use gpui::Entity;
 use openvector::{profile_palette::{PaletteCommand, PaletteProfile, PaletteRuntime, apply_palette_command}, saved_profiles::SavedAdvancedProfiles, settings_profile::{SettingsProfile, apply_advanced_profile, apply_basic_profile}};
