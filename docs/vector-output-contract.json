@@ -297,7 +297,7 @@
       "hiddenRegions": [],
       "outputDimensions": "Source dimensions when both output dimensions are omitted."
     },
-    "output": "Owned Uint8Array of exact PDF bytes, including the binary comment, CRLF, content, objects, xref offsets and reference producer metadata. No timestamp differences are permitted.",
+    "output": "Owned Uint8Array of exact PDF bytes, including the binary comment, CRLF, content, objects, xref offsets and OpenVector producer metadata. Historical reference captures retain their original producer; public output replaces only that field with equal-length padding. No timestamp differences are permitted.",
     "cli": "openvector export-pdf <document.json|->. Same input as exportPdf, raw bytes on stdout, diagnostic on stderr and exit 1 with no partial PDF on failure.",
     "verification": "Compare every raw native byte across layouts, strokes, visibility, colors, alpha transitions, dimensions and finite extremes. Verify API ownership/options, binary CLI file/stdin transport, and public prepared pipelines through PDF."
   },

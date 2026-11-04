@@ -180,6 +180,17 @@ test('vectorize supports binary stdin with explicit filename metadata',()=>{
   failure(invoke(['vectorize',input,'--filename','square.bmp']),/only.*stdin|only.*-/i);
 });
 
+function publicPdfBytes(value) {
+  const bytes = Buffer.from(value);
+  const original = Buffer.from('/Producer(VectorMagic.com)');
+  const replacement = Buffer.from('/Producer(OpenVector)     ');
+  const offset = bytes.indexOf(original);
+  assert.notEqual(offset, -1, 'PDF reference must contain its producer');
+  assert.equal(original.length, replacement.length);
+  replacement.copy(bytes, offset);
+  return bytes;
+}
+
 for(const [format,writer] of Object.entries({svg:exportSvg,eps:exportEps,pdf:exportPdf,ai:exportAi,dxf:exportDxf})){
   test(`vectorize writes complete ${format.toUpperCase()} bytes to stdout`,()=>{
     const started = Date.now();
@@ -193,7 +204,7 @@ for(const [format,writer] of Object.entries({svg:exportSvg,eps:exportEps,pdf:exp
       const creationDate = observedEpsCreationDate(result.stdout,started,Date.now());
       writerOptions = { ...options, creationDate };
     }
-    assert.deepEqual(result.stdout,Buffer.from(writer(writerOptions)));
+    assert.deepEqual(result.stdout,format === 'pdf' ? publicPdfBytes(writer(writerOptions)) : Buffer.from(writer(writerOptions)));
   });
 }
 
@@ -315,6 +326,6 @@ for (const codec of ['jpeg','gif','tiff','tiff-jpeg','jpeg-alpha','bmp-expanded'
     const expected=writer({width:native.sourceDimensions[0],height:native.sourceDimensions[1],
       geometry:native.fittedGeometry,palette:native.segmentation.palette,
       ...(format==='eps' ? {creationDate:observedEpsCreationDate(converted.stdout,started,finished)} : {})});
-    assert.deepEqual(converted.stdout,Buffer.from(expected),reference.id+' '+format+' native geometry export');
+    assert.deepEqual(converted.stdout,format === 'pdf' ? publicPdfBytes(expected) : Buffer.from(expected),reference.id+' '+format+' native geometry export');
   }
 });
