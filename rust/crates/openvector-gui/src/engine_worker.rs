@@ -325,7 +325,7 @@ impl DisplayScene {
         let fitting = state.fitting.as_ref().filter(|fitting| fitting.complete);
         let replace = fitting.is_some() && (refresh || !self.current_available);
         if replace {
-            self.geometry = fitting.map(|fitting| fitting.geometry.clone());
+            self.geometry = document.presentation_geometry().map(|geometry| geometry.into_owned());
         }
         self.current_available = fitting.is_some();
         let hidden: Vec<i64> = hidden_regions.iter().map(|&region| region as i64).collect();
@@ -407,7 +407,8 @@ fn bitmap_export(document: &mut ImageDocument, path: &Path, format: &str, scale:
     let background = document.background_state();
     let hidden_regions: Vec<i64> = background.hidden_regions.iter().map(|&region| region as i64).collect();
     let state = document.state();
-    let input = BitmapExportInput { geometry: state.fitting.as_ref().filter(|fitting| fitting.complete).map(|fitting| &fitting.geometry),
+    let geometry = document.presentation_geometry();
+    let input = BitmapExportInput { geometry: geometry.as_deref(),
         width: state.original.width as i64, height: state.original.height as i64, source_alpha_type: alpha,
         background_mode: state.settings.background_mode, background_undo_count: background.undo.len(), hidden_regions: &hidden_regions };
     if cancelled.load(Ordering::Acquire) { return Err(CANCEL_TASK.into()); }

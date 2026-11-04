@@ -163,17 +163,17 @@ pub fn vectorize(args:&[String])->Result<()>{
         // The closing refit processes the last committed settings, so it records those.
         if document.editing_state().is_some_and(|e|e.key!=document.state().stage_keys.segmentation_edits){selected.settings=document.state().settings.clone();finish(&mut document,&selected,&mut recent)?}else{document.snapshot()}
     }else{processed};
-    let fitted=state.fitting.as_ref().ok_or("Vector paths are unavailable. Update processing settings and run smoothing and fitting before exporting.")?;
+    let fitted=document.presentation_geometry().ok_or("Vector paths are unavailable. Update processing settings and run smoothing and fitting before exporting.")?.into_owned();
     let background=document.background_state();let hidden=background.hidden_regions.iter().map(|n|*n as i64).collect::<Vec<_>>();
     let bytes=if let Some(format)=bitmap{
-        openvector::bitmap_export::export_bitmap(&BitmapExportInput{geometry:Some(&fitted.geometry),width:state.original.width as i64,height:state.original.height as i64,source_alpha_type:document.source_alpha_type(),background_mode:state.settings.background_mode,background_undo_count:background.undo.len(),hidden_regions:&hidden},&BitmapExportOptions{format,scale,flatten:args.flag("flatten")}).map_err(|e|match e{BitmapExportError::FlattenRequired=>"Non-PNG output may discard transparency. Use --flatten to continue, or --format png to preserve it.".into(),other=>other.to_string()})?
+        openvector::bitmap_export::export_bitmap(&BitmapExportInput{geometry:Some(&fitted),width:state.original.width as i64,height:state.original.height as i64,source_alpha_type:document.source_alpha_type(),background_mode:state.settings.background_mode,background_undo_count:background.undo.len(),hidden_regions:&hidden},&BitmapExportOptions{format,scale,flatten:args.flag("flatten")}).map_err(|e|match e{BitmapExportError::FlattenRequired=>"Non-PNG output may discard transparency. Use --flatten to continue, or --format png to preserve it.".into(),other=>other.to_string()})?
     }else{
         let mut request=json!({"width":state.original.width,"height":state.original.height,"palette":state.segmentation.as_ref().ok_or("No segmentation.")?.palette,"hiddenRegions":hidden,"layout":export.layout.name(),"thinStroke":export.thin_stroke,"compact":export.compact,"curveMode":export.curve_mode.name()});
         if format=="emf"{
             let device=openvector::emf::EmfDevice::current_display().map_err(|error|error.to_string())?;
             request["referenceDevice"]=json!({"pixels":device.pixels,"millimeters":device.millimeters,"micrometers":device.micrometers});
         }
-        crate::numeric::export(&format,&fitted.geometry,&request)?
+        crate::numeric::export(&format,&fitted,&request)?
     };
     if let Some(output)=output{let mut options=OpenOptions::new();options.write(true);if args.flag("force"){options.create(true).truncate(true);}else{options.create_new(true);}options.open(output).and_then(|mut f|f.write_all(&bytes)).map_err(|e|e.to_string())?;}else{std::io::stdout().write_all(&bytes).map_err(|e|e.to_string())?;}Ok(())
 }
