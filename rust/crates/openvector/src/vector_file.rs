@@ -227,7 +227,7 @@ pub fn write_vector_file_safely(filename: &Path, input: &VectorFileInput<'_>, pr
             if self.failure.is_none() {
                 let mut bytes = Vec::with_capacity(text.len());
                 for character in text.chars() {
-                    if character == '\\n' { bytes.push(b'\\r'); }
+                    if character == '\n' { bytes.push(b'\r'); }
                     bytes.push(character as u8);
                 }
                 if let Err(error) = self.writer.write_all(&bytes) { self.failure = Some(error); }
