@@ -1,4 +1,6 @@
 use super::*;
+
+const SVG_SIZE_NOTICE: &str = "SVG dimensions use points (72 per inch). At 96 DPI, 48 pt displays as 64 pixels; physical print size is preserved.";
 use std::collections::{HashMap, HashSet};
 use gpui::Entity;
 use openvector::{profile_palette::{PaletteCommand, PaletteProfile, PaletteRuntime, apply_palette_command}, saved_profiles::SavedAdvancedProfiles, settings_profile::{SettingsProfile, apply_advanced_profile, apply_basic_profile}};
@@ -700,6 +702,7 @@ impl OpenVectorApp {
             .when(choice.expanded, |body| body
                 .child(div().text_color(rgb(theme::MUTED)).child(choice.directory.display().to_string()))
                 .child(div().child(format!("{}.{}", choice.filename, choice.format)))
+                .when(!bitmap && choice.format == "svg", |body| body.child(div().text_color(rgb(theme::MUTED)).child(SVG_SIZE_NOTICE)))
                 .child(div().flex().gap_1()
                     .child(self.control(format!("{id}-configure"), "Configure", !self.busy, false, Action::Workflow(WorkflowAction::SaveDialog(bitmap)), cx))
                     .child(self.control(format!("{id}-save"), "Save", !self.busy, false, Action::Workflow(WorkflowAction::DirectSave(bitmap)), cx))))
@@ -791,6 +794,7 @@ impl OpenVectorApp {
                 body = body.child(div().flex().flex_wrap().gap_1().children(save.formats().iter().map(|format| self.workflow_button(format!("save-format-{format}"), format.to_uppercase(), WorkflowAction::SaveFormat((*format).into()), cx).bg(rgb(if save.choices[mode].format == *format { theme::ACCENT } else { theme::BACKGROUND })))))
                     .child(section("Directory")).child(self.workflows.fields[0].clone()).child(self.workflow_button("save-folder", "Choose folder", WorkflowAction::SaveFolder, cx))
                     .child(section("Filename")).child(self.workflows.fields[1].clone());
+                if !*bitmap && save.choices[mode].format == "svg" { body = body.child(div().text_color(rgb(theme::MUTED)).child(SVG_SIZE_NOTICE)); }
                 if *bitmap {
                     // The text canvas has no intrinsic width; size its input/button group.
                     for (axis, name) in ["Width", "Height", "Percent"].into_iter().enumerate() {
