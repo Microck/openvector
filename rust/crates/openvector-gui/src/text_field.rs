@@ -105,7 +105,22 @@ impl EntityInputHandler for TextField {
 impl Render for TextField {
     fn render(&mut self, _: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
         let entity = cx.entity(); let focus = self.focus.clone();
+        let accessible_text = self.text.clone();
+        let start = self.text[..self.selected.start].chars().count();
+        let end = self.text[..self.selected.end].chars().count();
+        let (anchor, active) = if self.reversed { (end, start) } else { (start, end) };
         div().id("text-field").track_focus(&focus).role(Role::TextInput).aria_label(self.label.clone())
+            .a11y_synthetic_children(move |builder| {
+                let mut run = gpui::accesskit::Node::new(Role::TextRun);
+                run.set_value(accessible_text.clone());
+                run.set_character_lengths(accessible_text.chars().map(|c| c.len_utf8() as u8).collect::<Vec<_>>());
+                let id = builder.synthetic_node_id("text");
+                builder.push_child(id, run);
+                builder.parent_node().set_text_selection(gpui::accesskit::TextSelection {
+                    anchor: gpui::accesskit::TextPosition { node: id, character_index: anchor },
+                    focus: gpui::accesskit::TextPosition { node: id, character_index: active },
+                });
+            })
             .h(px(28.0)).min_h(px(28.0)).w_full().px_2().bg(rgb(theme::RAISED)).border_1().border_color(rgb(theme::BORDER)).rounded(px(theme::CONTROL_RADIUS))
             .focus_visible(|style| style.border_color(rgb(theme::TEXT))).overflow_hidden()
             .on_key_down(cx.listener(Self::key))
