@@ -254,6 +254,15 @@ impl ImageDocument{
         let map=self.state.segmentation.as_ref().ok_or("Document editing needs completed segmentation.")?;let palette=self.region_palette.as_ref().ok_or("Document editing needs completed segmentation.")?;self.background.finish();
         if self.editor.is_none(){let indices=map.indices.as_ref().ok_or("Document editing needs completed segmentation.")?;let mut bgra=vec![0;map.width*map.height*4];for(pixel,&index)in indices.iter().enumerate(){let color=map.color_indices[index as usize] as usize;for c in 0..4{bgra[pixel*4+c]=(palette[color*4+c] as f64*255.0+0.5).floor() as u8}}let background=self.state.settings.background.map(|v|v as f64);let color:Vec<f64>=palette[..4].iter().map(|v|*v as f64).collect();self.editor=Some(SegmentationEditor::new(map.width as i64,map.height as i64,&bgra,&self.state.original.bgra,&background,&color,self.state.settings.background_mode)?)}Ok(self.editor.as_ref().unwrap().snapshot())
     }
+    /// Product-facing editing uses straight colors for a fresh automatic trace.
+    /// The original begin_editing method remains available for reference replay.
+    pub fn begin_editing_for_output(&mut self)->Result<EditorSnapshot,String>{
+        self.begin_editing()?;
+        if self.automatic_premultiplied_colors{
+            self.editor.as_mut().unwrap().enable_straight_colors()?;
+        }
+        Ok(self.editor.as_ref().unwrap().snapshot())
+    }
     fn editing_session(&mut self)->Result<&mut SegmentationEditor,String>{self.editor.as_mut().ok_or_else(||"Call beginEditing before editing the document.".into())}
     pub fn edit(&mut self,command:&Value)->Result<EditorSnapshot,String>{self.editing_session()?.apply(command)}
     pub fn editing_state(&self)->Option<EditorSnapshot>{self.editor.as_ref().map(|e|e.snapshot())}
