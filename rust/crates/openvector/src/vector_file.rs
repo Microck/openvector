@@ -199,15 +199,26 @@ pub fn write_vector_file(filename: &Path, input: &VectorFileInput<'_>, progress:
 /// it only if the destination does not exist. Cancellation and failures never
 /// truncate a destination or expose a partially written final file.
 pub fn write_vector_file_safely(filename: &Path, input: &VectorFileInput<'_>, progress: &mut dyn FnMut(i32) -> Result<(), VectorOutputError>) -> Result<VectorFileResult, VectorOutputError> {
-    use std::io::{Seek, SeekFrom, Write};
+    use std::io::{BufWriter, Seek, SeekFrom, Write};
     let Some(format) = Format::from_path(filename) else { return Ok(VectorFileResult { status: 1, error: None }); };
-    let parent = filename.parent().filter(|path| !path.as_os_str().is_empty()).unwrap_or_else(|| Path::new("."));
-    let mut temporary = match tempfile::NamedTempFile::new_in(parent) {
+    let destination = if filename.is_absolute() { filename.to_path_buf() } else {
+        match std::env::current_dir() {
+            Ok(cwd) => cwd.join(filename),
+            Err(error) => return Ok(VectorFileResult { status: 4, error: Some(error) }),
+        }
+    };
+    let parent = destination.parent().unwrap_or_else(|| Path::new("."));
+    let mut builder = tempfile::Builder::new();
+    #[cfg(unix)] {
+        use std::os::unix::fs::PermissionsExt;
+        builder.permissions(std::fs::Permissions::from_mode(0o666));
+    }
+    let mut temporary = match builder.tempfile_in(parent) {
         Ok(file) => file,
         Err(error) => return Ok(VectorFileResult { status: 4, error: Some(error) }),
     };
     struct SafeCallbacks<'a> {
-        file: &'a mut std::fs::File,
+        writer: BufWriter<&'a mut std::fs::File>,
         progress: &'a mut dyn FnMut(i32) -> Result<(), VectorOutputError>,
         failure: Option<io::Error>,
     }
@@ -219,7 +230,7 @@ pub fn write_vector_file_safely(filename: &Path, input: &VectorFileInput<'_>, pr
                     if character == '\\n' { bytes.push(b'\\r'); }
                     bytes.push(character as u8);
                 }
-                if let Err(error) = self.file.write_all(&bytes) { self.failure = Some(error); }
+                if let Err(error) = self.writer.write_all(&bytes) { self.failure = Some(error); }
             }
             Ok(())
         }
@@ -228,7 +239,7 @@ pub fn write_vector_file_safely(filename: &Path, input: &VectorFileInput<'_>, pr
     impl BinaryOutput for SafeCallbacks<'_> {
         fn write(&mut self, bytes: &[u8], position: u64) -> Result<(), VectorOutputError> {
             if self.failure.is_none() {
-                if let Err(error) = self.file.seek(SeekFrom::Start(position)).and_then(|_| self.file.write_all(bytes)) {
+                if let Err(error) = self.writer.seek(SeekFrom::Start(position)).and_then(|_| self.writer.write_all(bytes)) {
                     self.failure = Some(error);
                 }
             }
@@ -236,13 +247,14 @@ pub fn write_vector_file_safely(filename: &Path, input: &VectorFileInput<'_>, pr
         }
         fn progress(&mut self, percent: i32) -> Result<(), VectorOutputError> { (self.progress)(percent) }
     }
-    let mut output = SafeCallbacks { file: temporary.as_file_mut(), progress, failure: None };
+    let mut output = SafeCallbacks { writer: BufWriter::new(temporary.as_file_mut()), progress, failure: None };
     format.serialize(input, &mut output)?;
     if output.failure.is_none() {
-        if let Err(error) = output.file.flush() { output.failure = Some(error); }
+        if let Err(error) = output.writer.flush() { output.failure = Some(error); }
     }
-    if let Some(error) = output.failure { return Ok(VectorFileResult { status: 4, error: Some(error) }); }
-    match temporary.persist_noclobber(filename) {
+    if let Some(error) = output.failure.take() { return Ok(VectorFileResult { status: 4, error: Some(error) }); }
+    drop(output);
+    match temporary.persist_noclobber(&destination) {
         Ok(_) => Ok(VectorFileResult { status: 0, error: None }),
         Err(error) => Ok(VectorFileResult { status: 4, error: Some(error.error) }),
     }

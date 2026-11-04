@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createRequire } from 'node:module';
-import { existsSync, readFileSync, readdirSync, mkdtempSync, writeFileSync, rmSync } from 'node:fs';
+import { existsSync, readFileSync, readdirSync, mkdtempSync, mkdirSync, statSync, writeFileSync, rmSync } from 'node:fs';
 import { gunzipSync } from 'node:zlib';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -641,5 +641,24 @@ test('Node saveVector never replaces a destination or publishes cancelled output
     assert.equal(document.saveVector(fresh, {}).status, 0);
     assert.match(readFileSync(fresh, 'utf8'), /<svg/);
     assert.deepEqual(readdirSync(directory).sort(), ['existing.svg', 'fresh.svg', 'raced.svg']);
+    if (process.platform !== 'win32') {
+      const ordinary = join(directory, 'ordinary');
+      writeFileSync(ordinary, 'mode comparison');
+      assert.equal(statSync(fresh).mode & 0o777, statSync(ordinary).mode & 0o777);
+    }
+    const other = join(directory, 'other');
+    mkdirSync(other);
+    const originalCwd = process.cwd();
+    try {
+      process.chdir(directory);
+      let changed = false;
+      const saved = document.saveVector('relative.svg', {}, () => {
+        if (!changed) { process.chdir(other); changed = true; }
+        return true;
+      });
+      assert.equal(saved.status, 0);
+      assert.equal(existsSync(join(directory, 'relative.svg')), true);
+      assert.equal(existsSync(join(other, 'relative.svg')), false);
+    } finally { process.chdir(originalCwd); }
   } finally { rmSync(directory, { recursive: true, force: true }); }
 });
