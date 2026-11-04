@@ -133,7 +133,7 @@ pub fn vectorize(args:&[String])->Result<()>{
     let state=if let Some(plan)=args.get("edits"){
         drop(processed);
         let commands=read_json(plan)?;let commands=commands.as_array().ok_or("--edits must contain a JSON array of processing/edit commands.")?;
-        document.begin_editing()?;
+        document.begin_editing_for_output()?;
         for command in commands{
             let object=command.as_object().ok_or("Each edit command must be an object.")?;
             let kinds=["tool","gesture","action","background","settings","source"].into_iter().filter(|k|object.contains_key(*k)).collect::<Vec<_>>();
@@ -149,10 +149,10 @@ pub fn vectorize(args:&[String])->Result<()>{
                     extension=source(&mut document,&path,&read_bytes(&path)?,args.flag("shrink-source"))?;
                     // A replaced source drops the palette, transparency and recommendation, like the GUI.
                     selected.settings.palette.clear();selected.settings.background_mode=-1;selected.settings.background=[1.0,1.0,1.0,0.0];selected.palette_color_count=2;selected.recommended_background_mode=-1;
-                    let mut input=Value::Object(selected.settings.to_json());input["extension"]=json!(extension);automatic(&mut document,&input,&mut selected,&mut recent)?;document.begin_editing()?;
+                    let mut input=Value::Object(selected.settings.to_json());input["extension"]=json!(extension);automatic(&mut document,&input,&mut selected,&mut recent)?;document.begin_editing_for_output()?;
                 },
                 "action"=>match command["action"].as_str(){
-                    Some("undo")=>{document.undo_edit()?;},Some("redo")=>{document.redo_edit()?;},Some("revert")=>{document.revert_edits()?;},Some("commit")=>{document.commit_editing()?;},Some("finish")=>{finish(&mut document,&selected,&mut recent)?;},Some("begin")=>{document.begin_editing()?;},
+                    Some("undo")=>{document.undo_edit()?;},Some("redo")=>{document.redo_edit()?;},Some("revert")=>{document.revert_edits()?;},Some("commit")=>{document.commit_editing()?;},Some("finish")=>{finish(&mut document,&selected,&mut recent)?;},Some("begin")=>{document.begin_editing_for_output()?;},
                     Some("restore-committed")=>{document.restore_committed_editing()?;},Some("leave")=>{document.leave_editing()?;},
                     Some("process")=>{let mut input=Value::Object(selected.settings.to_json());input["extension"]=json!(extension);input["lower"]=command["lower"].clone();input["upper"]=command["upper"].clone();let stage=command["stage"].as_str().unwrap_or("");let task=document.run_task(stage,&input,None)?;if stage=="fitting"{record(&mut recent,&selected,task.state.status,task.did_work)?;}},
                     _=>return Err("Edit action must be undo, redo, revert, begin, commit, restore-committed, leave, finish or process.".into())
