@@ -258,3 +258,19 @@ test('edited explicitly generated colors keep grouped DXF layers aligned', () =>
     assert.doesNotMatch(dxf, /color#80000080/i);
   } finally { rmSync(dir, {recursive:true, force:true}); }
 });
+
+
+test('automatic transparent red uses straight RGB and alpha in PDF output', () => {
+  const document = new native.CoreSession().createDocument();
+  document.setSource(fixture(), 'transparent-red.png');
+  document.runAutomatic({extension: '.png'});
+  const dir = mkdtempSync(join(tmpdir(), 'openvector-alpha-pdf-'));
+  try {
+    const path = join(dir, 'output.pdf');
+    assert.equal(document.saveVector(path, {layout: 'stacked'}).status, 0);
+    const pdf = readFileSync(path, 'latin1');
+    assert.match(pdf, /(?:^|[\r\n])1(?:[.]0+)? 0(?:[.]0+)? 0(?:[.]0+)? rg[\r\n]/);
+    assert.match(pdf, /\/Vmt128 gs/);
+    assert.doesNotMatch(pdf, /(?:^|[\r\n])0[.]5\d* 0(?:[.]0+)? 0(?:[.]0+)? rg[\r\n]/);
+  } finally { rmSync(dir, {recursive:true, force:true}); }
+});
