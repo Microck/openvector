@@ -43,7 +43,7 @@ fn text_corpus(name: &str, count: usize, geometries_count: usize, format: &str) 
                 creation_date: Some(frame["creationDate"].as_str().unwrap().to_owned()) }).unwrap().into_bytes(), _ => unreachable!(),
         };
         let expected = frame["expected"].as_str().unwrap();
-        if format == "pdf" { assert_bytes(&actual, &latin1(expected), format, index); } else { assert_bytes(&actual, expected.as_bytes(), format, index); }
+        if format == "pdf" { assert_bytes(&actual, &common::public_pdf_fixture(&latin1(expected)), format, index); } else { assert_bytes(&actual, expected.as_bytes(), format, index); }
     }
 }
 #[test] fn svg_all_17436_native_files() { text_corpus("svg-reference.json", 17436, 2743, "svg"); }

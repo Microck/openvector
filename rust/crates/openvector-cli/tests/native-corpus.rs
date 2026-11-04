@@ -113,6 +113,7 @@ fn export_corpus(command: &str, filename: &str, count: usize) {
     assert_eq!(cases.len(), count, "{filename}");
     for (index, case) in cases.iter().enumerate() {
         let expected = latin1(&case["expected"]);
+        let expected = if command == "export-pdf" { common::public_pdf_fixture(&expected) } else { expected };
         let mut input = case["input"].clone();
         if filename == "emf-expanded-cli-reference.json" {
             // This older dedicated capture omitted device metadata from input.
