@@ -1,0 +1,30 @@
+use openvector::{image_document::ImageDocument, palette::CoreSession};
+use serde_json::{json, Value};
+
+#[test]
+fn regenerated_palette_is_marked_by_the_gui_selection_path() {
+    let mut pixels = vec![0u8; 48 * 48 * 4];
+    for y in 8..40 { for x in 8..40 {
+        let offset = (y * 48 + x) * 4;
+        pixels[offset + 2] = 255; pixels[offset + 3] = 128;
+    }}
+    let mut doc = ImageDocument::new(CoreSession::default());
+    doc.set_source(48, 48, &pixels, true, 0.0).unwrap();
+    let original = doc.run_automatic(&json!({"extension":".png"})).unwrap();
+    let mut controls = Value::Object(original.settings.to_json());
+    controls["lower"] = json!(3); controls["upper"] = json!(3);
+    doc.run_task("palette", &controls, None).unwrap();
+    let palette: Vec<f32> = doc.state().palettes[3].chunks_exact(4)
+        .flat_map(|color| color.iter().rev().map(|v| (((*v as f64 * 65535.0 + 0.5).floor()) / 65535.0) as f32))
+        .collect();
+    assert_ne!(palette, original.settings.palette);
+    controls["palette"] = json!(palette);
+    controls["paletteMode"] = json!(1);
+    doc.remember_generated_palette(1, &palette);
+    for stage in ["segmentation", "smoothing", "fitting"] {
+        doc.run_task(stage, &controls, None).unwrap();
+    }
+    let geometry = doc.presentation_geometry().unwrap();
+    assert!(geometry.regions.iter().any(|region| region.bgra[2] >= 250 && (120..=135).contains(&region.bgra[3])),
+        "generated translucent red should be straight in the output");
+}
