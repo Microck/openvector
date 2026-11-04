@@ -154,3 +154,31 @@ test('a committed custom translucent palette remains straight alpha', () => {
     assert.match(readFileSync(path, 'utf8'), /fill="#cc0000"[^>]*opacity="0[.]5/i);
   } finally { rmSync(dir, {recursive:true, force:true}); }
 });
+
+
+test('resuming after segmentation cancellation keeps automatic color encoding', () => {
+  const baseline = new native.CoreSession().createDocument();
+  baseline.setSource(fixture(), 'transparent-red.png');
+  const {settings} = baseline.runAutomatic({extension: '.png'});
+  const document = new native.CoreSession().createDocument();
+  document.setSource(fixture(), 'transparent-red.png');
+  let interrupted = false;
+  assert.throws(() => document.runAutomatic({extension: '.png'}, {
+    callback(event) {
+      if (event.stage === 'segmentation') { interrupted = true; return false; }
+      return true;
+    }
+  }), /cancel/i);
+  assert.ok(interrupted, 'segmentation must have started');
+  for (const stage of ['segmentation', 'smoothing', 'fitting']) document.runTask(stage, settings);
+  const dir = mkdtempSync(join(tmpdir(), 'openvector-alpha-seg-resume-'));
+  try {
+    const path = join(dir, 'resumed.svg');
+    assert.equal(document.saveVector(path, {layout: 'stacked'}).status, 0);
+    assert.match(readFileSync(path, 'utf8'), /fill="#ff0000"[^>]*opacity="0[.]5/i);
+    document.beginEditing();
+    const editor = document.editing();
+    const offset = (20 * editor.width + 20) * 4;
+    assert.deepEqual(Array.from(editor.bgra.subarray(offset, offset + 4)), [0, 0, 255, 128]);
+  } finally { rmSync(dir, {recursive:true, force:true}); }
+});
