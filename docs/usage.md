@@ -71,6 +71,13 @@ in `state.classification` without applying them. `commitSettings(settings)`,
 returns the default document settings. See the
 [image state contract](image-state-contract.json).
 
+For segmentation, `paletteEncoding: 'straight'` explicitly identifies manually
+supplied colors, including a palette numerically identical to a generated one.
+Use `'premultiplied'` for engine-generated colors when their origin must be
+specified explicitly. An explicit encoding change causes segmentation to rerun
+even when the other settings are unchanged. Omit it to use the document's
+recorded palette provenance.
+
 The optional progress argument is `{ callback(event, checkpoint), capture? }`.
 The callback runs at Rust checkpoints and returns `true` to continue or `false`
 to cancel. `capture` uses the same `SnapshotSelection` as `snapshot(selection)`.

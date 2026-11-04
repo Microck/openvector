@@ -385,7 +385,7 @@ export declare class ImageDocument {
   snapshot(selection?: SnapshotSelection): DocumentSnapshot;
   /** Palette tasks need `lower` and `upper`; classification needs `extension`. */
   runTask(stage: 'classification' | 'palette' | 'segmentation' | 'smoothing' | 'fitting',
-    settings: DocumentSettings & { lower?: number; upper?: number; extension?: string },
+    settings: DocumentSettings & { lower?: number; upper?: number; extension?: string; paletteEncoding?: "straight" | "premultiplied" },
     progress?: DocumentProgressOptions): TaskResult;
   runAutomatic(controls: Partial<DocumentSettings> & { extension: string },
     progress?: DocumentProgressOptions): AutomaticResult;

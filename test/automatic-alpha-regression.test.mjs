@@ -182,3 +182,23 @@ test('resuming after segmentation cancellation keeps automatic color encoding', 
     assert.deepEqual(Array.from(editor.bgra.subarray(offset, offset + 4)), [0, 0, 255, 128]);
   } finally { rmSync(dir, {recursive:true, force:true}); }
 });
+
+
+test('a manually authored palette identical to a generated palette can stay straight', () => {
+  const document = new native.CoreSession().createDocument();
+  document.setSource(fixture(), 'transparent-red.png');
+  const {settings} = document.runAutomatic({extension: '.png'});
+  const dir = mkdtempSync(join(tmpdir(), 'openvector-alpha-explicit-'));
+  try {
+    const straight = {...settings, paletteEncoding: 'straight'};
+    for (const stage of ['segmentation', 'smoothing', 'fitting']) document.runTask(stage, straight);
+    const path = join(dir, 'straight.svg');
+    assert.equal(document.saveVector(path, {layout: 'stacked'}).status, 0);
+    assert.match(readFileSync(path, 'utf8'), /fill="#800000"[^>]*opacity="0[.]5/i);
+    const generated = {...settings, paletteEncoding: 'premultiplied'};
+    for (const stage of ['segmentation', 'smoothing', 'fitting']) document.runTask(stage, generated);
+    const restored = join(dir, 'generated.svg');
+    assert.equal(document.saveVector(restored, {layout: 'stacked'}).status, 0);
+    assert.match(readFileSync(restored, 'utf8'), /fill="#ff0000"[^>]*opacity="0[.]5/i);
+  } finally { rmSync(dir, {recursive:true, force:true}); }
+});

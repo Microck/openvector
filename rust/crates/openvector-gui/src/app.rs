@@ -428,6 +428,7 @@ impl OpenVectorApp {
         let mut value = Value::Object(self.settings.to_json());
         value["lower"] = json!(self.color_count); value["upper"] = json!(self.color_count);
         value["count"] = json!(self.color_count);
+        if self.workflows.palette.customized { value["paletteEncoding"] = json!("straight"); }
         value["recommendedBackgroundMode"] = json!(self.workflows.recommended_background_mode);
         value["extension"] = json!(self.document.as_ref().and_then(|doc| doc.filename.extension()).and_then(|ext| ext.to_str()).unwrap_or(""));
         value

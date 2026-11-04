@@ -285,6 +285,7 @@ fn process(document: &mut ImageDocument, stage: &str, mut input: Value, committe
         let palette = document.state().palettes.get(count).filter(|palette| !palette.is_empty()).ok_or("Color analysis did not produce the selected palette.")?;
         let bgra: Vec<f32> = palette.chunks_exact(4).flat_map(|color| color.iter().rev().copied()).collect();
         input["palette"] = json!(quantize_qcolor_channels(&bgra));
+        input["paletteEncoding"] = json!("premultiplied");
         let generated = openvector::document_controls::read_document_settings(&input).map_err(|error| error.to_string())?;
         document.remember_generated_palette(generated.palette_mode, &generated.palette);
         if !advanced { selected_count = count as i32; }
