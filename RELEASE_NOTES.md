@@ -1,3 +1,9 @@
+# unreleased
+
+- emf exports identify openvector and contain no captured application metadata.
+- the javascript pdf writer now uses the same openvector producer field as the native engine.
+- development rebuilds verify bundled codec sources against retained upstream identity manifests.
+
 # 0.0.0
 
 first private desktop release of openvector.

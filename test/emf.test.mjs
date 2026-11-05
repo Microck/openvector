@@ -9,6 +9,7 @@ import { CoreSession } from '../src/palette.mjs';
 import { defaultDocumentSettings } from '../src/document-controls.mjs';
 import { CancelTaskException } from '../src/task-cancellation.mjs';
 import cliReference from './fixtures/emf-cli-reference.json' with { type:'json' };
+import { publicVectorFixture } from './helpers/native-vector-output.mjs';
 
 test('buffered EMF emission matches original cancellation bytes and successful header rewrites', async () => {
   const [metadata,...corpus]=gunzipSync(readFileSync(new URL('./fixtures/export-interruption-reference.ndjson.gz',import.meta.url)))
@@ -50,7 +51,7 @@ test('buffered EMF emission matches original cancellation bytes and successful h
     else {assert.equal((await operation).status,0,row.id);completed++;}
     const actual=new Uint8Array(length);
     for (const {bytes,position} of writes) actual.set(bytes,position);
-    const expected=Buffer.from(row.expected.afterProcessExit,'base64');
+    const expected=publicVectorFixture(Buffer.from(row.expected.afterProcessExit,'base64'));
     assert.ok(Buffer.from(actual).equals(expected),`${row.id}: ${length} actual bytes, ${expected.length} expected`);
     assert.equal(rewrites,cancelAt ? 0 : 1,row.id);
   }
@@ -71,7 +72,7 @@ function inputFor(reference, frame) {
       (frame.hiddenWords[region >>> 5] & 1 << (region & 31)) ? [region] : []) };
 }
 
-test('EMF serialization matches every byte of all 22014 original files', async () => {
+test('EMF serialization matches all 22014 reference files with OpenVector metadata', async () => {
   const path = new URL('./fixtures/emf-reference.ndjson.gz', import.meta.url);
   const rows = createInterface({ input:createReadStream(path).pipe(createGunzip()), crlfDelay:Infinity });
   const reference = { geometries:[] };
@@ -84,7 +85,7 @@ test('EMF serialization matches every byte of all 22014 original files', async (
     }
     if (frame.type === 'summary') { summary = frame; continue; }
     assert.equal(frame.type, 'case');
-    const actual = Buffer.from(exportEmf(inputFor(reference, frame))), expected = Buffer.from(frame.expected, 'latin1');
+    const actual = Buffer.from(exportEmf(inputFor(reference, frame))), expected = publicVectorFixture(Buffer.from(frame.expected, 'latin1'));
     if (!actual.equals(expected)) {
       let offset = 0;
       while (offset < Math.min(actual.length, expected.length) && actual[offset] === expected[offset]) offset++;
@@ -126,7 +127,7 @@ test('EMF wide cubic records and wrapped source extents match all 402 original f
     micrometers:[header.readInt32LE(100),header.readInt32LE(104)] };
   assert.equal(reference.cases.length, 402);
   for (const [index, frame] of reference.cases.entries()) {
-    const actual = Buffer.from(exportEmf(inputFor(reference, frame))), expected = Buffer.from(frame.expected, 'latin1');
+    const actual = Buffer.from(exportEmf(inputFor(reference, frame))), expected = publicVectorFixture(Buffer.from(frame.expected, 'latin1'));
     if (!actual.equals(expected)) {
       let offset = 0;
       while (offset < Math.min(actual.length,expected.length) && actual[offset] === expected[offset]) offset++;
@@ -139,13 +140,14 @@ test('EMF defaults preserve caller state and return independent binary buffers',
   const input = structuredClone(cliReference.cases[0].input), snapshot = structuredClone(input);
   const defaults = { ...input, layout:undefined, thinStroke:undefined, outputWidth:undefined,
     outputHeight:undefined, hiddenRegions:undefined };
+  const expected = publicVectorFixture(Buffer.from(cliReference.cases[0].expected, 'latin1')).toString('latin1');
   const first = exportEmf(defaults);
   assert.ok(first instanceof Uint8Array);
-  assert.equal(Buffer.from(first).toString('latin1'), cliReference.cases[0].expected);
+  assert.equal(Buffer.from(first).toString('latin1'), expected);
   first.fill(0);
-  assert.equal(Buffer.from(exportEmf(defaults)).toString('latin1'), cliReference.cases[0].expected);
+  assert.equal(Buffer.from(exportEmf(defaults)).toString('latin1'), expected);
   assert.deepEqual(input, snapshot);
-  assert.equal(Buffer.from(exportEmf({ ...input, outputWidth:79, outputHeight:61 })).toString('latin1'), cliReference.cases[0].expected);
+  assert.equal(Buffer.from(exportEmf({ ...input, outputWidth:79, outputHeight:61 })).toString('latin1'), expected);
 });
 
 test('EMF rejects invalid device measurements and incomplete graph/options', () => {

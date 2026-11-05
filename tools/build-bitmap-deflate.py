@@ -8,7 +8,7 @@ import sys
 root = Path(__file__).resolve().parents[1]
 llvm = Path(sys.argv[1]).resolve()
 vendor = root / 'src/vendor/zlib-1.2.3'
-identity = json.loads((root / 'evidence/bitmap-deflate-source-identity.json').read_text())
+identity = json.loads((vendor / 'source-identity.json').read_text())
 digest = lambda path: hashlib.sha256(path.read_bytes()).hexdigest()
 for filename, expected in identity['files'].items():
     assert digest(vendor / filename) == expected, filename
@@ -26,5 +26,6 @@ subprocess.run(command, check=True)
 proof = {'wasmSha256': digest(output), 'bytes': output.stat().st_size,
          'sourceArchiveSha256': identity['archiveSha256'], 'upstreamFilesUnmodified': True,
          'sources': {str(path.relative_to(root)): digest(path) for path in sources + headers}, 'command': command}
+(root / 'evidence').mkdir(exist_ok=True)
 (root / 'evidence/bitmap-deflate-build-verification.json').write_text(json.dumps(proof, indent=2) + '\n')
 print(json.dumps({'wasmSha256': proof['wasmSha256'], 'bytes': proof['bytes']}))

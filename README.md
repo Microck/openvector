@@ -110,10 +110,11 @@ binary or falls back to the javascript reference implementation on import.
 npm run test:smoke
 ```
 
-that command runs the small reference checks included in the default checkout.
-it is also the test scope of [raft source ci](docs/ci.md), not a claim that the full
-native or desktop suite passed. see [development](docs/development.md) and [test fixtures](docs/test-fixtures.md)
-for the full suite and its external fixture corpus.
+that command runs small reference checks and independently authored tests included
+in the default checkout. it is also the test scope of [raft source ci](docs/ci.md),
+not a claim that the full native or desktop suites pass. see
+[development](docs/development.md) and [test fixtures](docs/test-fixtures.md) for
+the broader checks and their private fixture corpus.
 
 | directory | contents |
 | --- | --- |

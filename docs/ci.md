@@ -11,9 +11,10 @@ GitHub-hosted Actions are disabled while the account billing block remains.
 bash tools/check-source.sh
 ```
 
-This installs the locked npm dependencies without lifecycle scripts, runs the eight
-small reference tests, checks JavaScript syntax, and inspects the npm source package
-inventory without building native binaries. It needs Node.js 22.19 or later and npm.
+This installs the locked npm dependencies without lifecycle scripts, runs the
+small-reference and independently authored smoke checks, checks JavaScript syntax,
+and inspects the npm source package inventory without building native binaries.
+It needs Node.js 22.19 or later and npm.
 A green status covers these checks only. Native, full differential, and graphical
 checks remain separate [release requirements](release-runbook.md).
 

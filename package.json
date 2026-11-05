@@ -64,7 +64,7 @@
     "build": "node tools/build-native.mjs",
     "prepack": "npm run build",
     "test": "node --test test/*.test.mjs",
-    "test:smoke": "node --test test/pixel-map.test.mjs test/decimal-format.test.mjs"
+    "test:smoke": "node --test test/pixel-map.test.mjs test/decimal-format.test.mjs test/pixel-input.test.mjs test/vector-primitives.test.mjs test/export-metadata.test.mjs test/bitmap-codecs-independent.node-check.mjs test/vector-file-clean.node-check.mjs gui/test/numeric-independent.node-check.mjs gui/test/auto-update-independent.node-check.mjs"
   },
   "repository": {
     "type": "git",

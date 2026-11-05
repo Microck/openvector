@@ -26,9 +26,9 @@ Native Rust translation changes:
 
 The native build does not compile qgrayraster.c or its two private headers.
 The headers remain unmodified in the development reference. No Qt application
-or widget code is included. Source provenance and hashes are recorded in
-evidence/bitmap-raster-source-identity.json in the development checkout;
-that investigation evidence is not part of the npm archive.
+or widget code is included. Verified upstream and modified source digests are
+recorded in src/vendor/freetype-raster/source-identity.json in the development
+checkout. The development C reference is not part of the npm archive.
 
 Cargo compiles this Rust module into the openvector engine used by the CLI,
 Node-API library and GPUI application. No FreeType or Qt installation is

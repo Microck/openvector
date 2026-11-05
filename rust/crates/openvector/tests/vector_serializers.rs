@@ -89,7 +89,7 @@ fn emf_all_22014_native_files() {
         "case" => {
             let id = frame["geometry"].as_u64().unwrap() as usize; let ids = hidden(&shapes[id], &frame);
             let input = input(&shapes[id], &frame, &geometries[id], &ids);
-            assert_bytes(&export_emf(&input, &reference_device.unwrap()).unwrap(), &latin1(frame["expected"].as_str().unwrap()), "emf", count); count += 1;
+            assert_bytes(&export_emf(&input, &reference_device.unwrap()).unwrap(), &common::public_emf_fixture(latin1(frame["expected"].as_str().unwrap())), "emf", count); count += 1;
         }
         kind => panic!("unexpected {kind}"),
     });
@@ -106,7 +106,7 @@ fn emf_all_402_expanded_native_files() {
     for (index, frame) in reference["cases"].as_array().unwrap().iter().enumerate() {
         let shape = &reference["geometries"][frame["geometry"].as_u64().unwrap() as usize]; let geometry = fitted_geometry::fitted_geometry(&shape["geometry"]);
         let ids = hidden(shape, frame); let input = input(shape, frame, &geometry, &ids);
-        assert_bytes(&export_emf(&input, &device).unwrap(), &latin1(frame["expected"].as_str().unwrap()), "expanded emf", index);
+        assert_bytes(&export_emf(&input, &device).unwrap(), &common::public_emf_fixture(latin1(frame["expected"].as_str().unwrap())), "expanded emf", index);
     }
 }
 #[test]

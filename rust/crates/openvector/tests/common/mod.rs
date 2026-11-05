@@ -47,3 +47,19 @@ pub fn public_pdf_fixture(bytes: &[u8]) -> Vec<u8> {
     }
     output
 }
+
+/// Adapt only the fixed UTF-16 description in original EMF captures, including
+/// cancelled outputs with a header. Preserve all record bytes and header fields.
+pub fn public_emf_fixture(mut output: Vec<u8>) -> Vec<u8> {
+    if output.len() >= 236 && output.starts_with(&1u32.to_le_bytes()) && &output[40..44] == b" EMF" {
+        assert_eq!(&output[4..8], &236u32.to_le_bytes());
+        assert_eq!(&output[60..64], &64u32.to_le_bytes());
+        assert_eq!(&output[64..68], &108u32.to_le_bytes());
+        let description = &mut output[108..236];
+        description.fill(0);
+        for (index, unit) in "OpenVector\0OpenVector\0\0".encode_utf16().enumerate() {
+            description[index * 2..index * 2 + 2].copy_from_slice(&unit.to_le_bytes());
+        }
+    }
+    output
+}

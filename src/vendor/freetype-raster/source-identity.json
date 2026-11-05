@@ -1,0 +1,27 @@
+{
+  "sourceUrl": "https://download.qt.io/archive/qt/4.4/qt-all-opensource-src-4.4.3.tar.gz",
+  "archiveSha256": "7b4c97e460d391787fb3406b7a36785f638fd70e5d56a73d980cf8a17d5a6b22",
+  "archivePrefix": "qt-all-opensource-src-4.4.3/",
+  "upstreamSha256": {
+    "FTL.TXT": "f4b133e25df1f86ad3ffea453aa0e613f0474f34778dbbb3e437e7b2724937d8",
+    "private/qgrayraster_p.h": "ae96c432ac0b5169d3debd7757dbce0b966ae0fea24a49cd6e730a8bdd40fbc6",
+    "private/qrasterdefs_p.h": "a33b2d9a32cb4211f3e8787c055a2f074eef21dde29a82f714e230a9f0ac7b11",
+    "qgrayraster.c": "70707c51439c1e6e873c37f2ef562b6b28bd886dc61ca95ef2f50cf48651c047"
+  },
+  "archiveMembers": {
+    "FTL.TXT": "src/3rdparty/freetype/docs/FTL.TXT",
+    "private/qgrayraster_p.h": "src/gui/painting/qgrayraster_p.h",
+    "private/qrasterdefs_p.h": "src/gui/painting/qrasterdefs_p.h",
+    "qgrayraster.c": "src/gui/painting/qgrayraster.c"
+  },
+  "vendoredSha256": {
+    "FTL.TXT": "f4b133e25df1f86ad3ffea453aa0e613f0474f34778dbbb3e437e7b2724937d8",
+    "private/qgrayraster_p.h": "ae96c432ac0b5169d3debd7757dbce0b966ae0fea24a49cd6e730a8bdd40fbc6",
+    "private/qrasterdefs_p.h": "a33b2d9a32cb4211f3e8787c055a2f074eef21dde29a82f714e230a9f0ac7b11",
+    "qgrayraster.c": "ccad7690c0e3cd7b33fd000ec00b3e3c3bfd130acf81aceccfaa316f61188509"
+  },
+  "modifiedFiles": [
+    "qgrayraster.c"
+  ],
+  "modifications": "modifications.txt"
+}

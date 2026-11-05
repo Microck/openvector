@@ -3,8 +3,12 @@ import { test } from 'node:test';
 import { readFileSync } from 'node:fs';
 import { gunzipSync } from 'node:zlib';
 import { exportPdf } from '../src/pdf.mjs';
+import { publicVectorFixture } from './helpers/native-vector-output.mjs';
 
 const reference = JSON.parse(gunzipSync(readFileSync(new URL('./fixtures/pdf-reference.json.gz', import.meta.url))));
+for (const fixture of reference.cases) {
+  fixture.expected = publicVectorFixture(Buffer.from(fixture.expected, 'latin1')).toString('latin1');
+}
 const layouts = ['stacked', 'cutouts', 'grouped-cutouts'];
 function inputFor(fixture) {
   const shape = reference.geometries[fixture.geometry];
@@ -14,7 +18,7 @@ function inputFor(fixture) {
     outputWidth:fixture.outputWidth, outputHeight:fixture.outputHeight, hiddenRegions };
 }
 
-test('PDF matches all 22014 original files, including binary header, opacity, stream lengths and xref bytes', () => {
+test('PDF matches all 22014 reference files with OpenVector metadata, opacity, stream lengths and xref bytes', () => {
   assert.equal(reference.cases.length, 22014);
   assert.equal(reference.geometries.length, 3264);
   const resources = new Set();

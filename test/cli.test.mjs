@@ -20,8 +20,9 @@ import { createInterface } from 'node:readline';
 import { createGunzip } from 'node:zlib';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
+import { publicVectorFixture } from './helpers/native-vector-output.mjs';
 
-test('CLI writes all 24 original EMF binary files from stdin and paths with spaces', () => {
+test('CLI writes all 24 EMF reference files with OpenVector metadata from stdin and paths with spaces', () => {
   const directory = mkdtempSync(join(tmpdir(), 'openvector-emf-'));
   try {
     assert.equal(emfReference.cases.length, 24);
@@ -33,7 +34,7 @@ test('CLI writes all 24 original EMF binary files from stdin and paths with spac
       const run = spawnSync(process.execPath, [cli,'export-emf',index % 2 ? filename : '-'], {
         input:index % 2 ? undefined : document });
       assert.equal(run.status, 0, run.stderr.toString()); assert.equal(run.stderr.length, 0);
-      assert.deepEqual(run.stdout, Buffer.from(frame.expected, 'latin1'));
+      assert.deepEqual(run.stdout, publicVectorFixture(Buffer.from(frame.expected, 'latin1')));
     }
   } finally { rmSync(directory, { recursive:true, force:true }); }
 });

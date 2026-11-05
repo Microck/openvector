@@ -1,0 +1,17 @@
+{
+  "sourceUrl": "https://zlib.net/fossils/zlib-1.2.3.tar.gz",
+  "archiveSha256": "1795c7d067a43174113fdf03447532f373e1c6c57c08d61d9e4e9be5e244b05e",
+  "archivePrefix": "zlib-1.2.3/",
+  "files": {
+    "README": "365db9b693fda6c66ddd97d81ae3eb17be32c890909553973a77439d85900494",
+    "adler32.c": "00c99977ac0c230d4a4e7a8e6ceea805a177d2c152f96d65b9120606ba568e59",
+    "deflate.c": "9a7b00ada17c00871dddfd5607e17de22ca22bf57fe16b4e3baae042669a44d6",
+    "deflate.h": "21b874a8ed5c2e0157e65d2290f5dd99398583c556466d693f38b2a18dd85194",
+    "trees.c": "1d42f8cb2cf319854d3acbb8e45c821107682fe065ab22c61432a849ecde8133",
+    "trees.h": "81579041310716219bbbf7c98849d91f5aeabdd7eadb1f8e9d7e2aa57724b58b",
+    "zconf.h": "dd6fc06ec36207bd5af7aa31557553665cc5d294e881a80052a108cff5dd303e",
+    "zlib.h": "ebceab9efa0d906fcc28dabb864ae63d99da8e5efe56e030cb9cb96578622245",
+    "zutil.c": "e779dcf163308a4565e53d6d462ae19e4896b6f1c759312105bce758404ae075",
+    "zutil.h": "5b3ffa91e57686861114a1da30a5ef8327acf2926535241f18de050249af9ac3"
+  }
+}

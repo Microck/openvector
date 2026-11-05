@@ -49,8 +49,7 @@ The default target is the Rust toolchain's host. Set `CARGO_BUILD_TARGET` or
 pass `--target` to select another target. The target parser recognizes x64
 and arm64 GNU/Linux, macOS and Windows targets. Packaging x64 macOS or MSVC
 Windows binaries stops before compilation because their C runtime notices
-are not implemented. ARM64 macOS CLI/addon builds and installed runtime checks
-pass in the [retained Darwin verification](../evidence/full-parity-program-20261022/macos/verification.json).
+are not implemented. ARM64 macOS CLI/addon builds and installed runtime checks passed previously; they have not been reverified for this cleaned source.
 This does not establish macOS GUI parity. Other recognized targets still need
 a working toolchain; recognition does not establish that they have been tested.
 The verified Linux ARM64 binaries import GNU libc symbols through
@@ -135,26 +134,23 @@ Wayland; live verification uses X11 with a Vulkan driver and a working
 desktop file-chooser portal. Wayland remains unverified. ARM64 macOS uses
 the pinned font-kit backend; native Open, Save, clipboard, export drag and
 viewer interactions pass, but one worker export test remains unresolved.
-Windows builds and earlier interactive-desktop workflows pass; current
-binary verification is tracked separately in the parity matrix. A
-non-interactive SSH window station cannot open the GPUI window.
+Windows builds and earlier interactive-desktop workflows passed previously. The cleaned source and current binary have not yet been reverified. A non-interactive SSH window station cannot open the GPUI window.
 
 The GUI stores its preferences, including recent basic settings, in
 `$XDG_CONFIG_HOME/openvector/gui.json`, or `$HOME/.config/openvector/gui.json`
 when `XDG_CONFIG_HOME` is unset. Saved advanced profiles live in
 `profiles.json` beside that file. For an isolated verification run, set
 `OPENVECTOR_PREFERENCES` to a separate JSON file.
-The headed smoke check opens a real window, processes a captured image and
-compares its exported SVG with the original reference:
+The headed smoke check uses the retained reference corpus. Install the fixtures
+described in [test fixtures](test-fixtures.md) before running:
 
 ```sh
 cargo test --manifest-path rust/Cargo.toml --locked -p openvector-gui \
   --profile dev --test headed_smoke -- --ignored --nocapture
 ```
 
-This check needs a display and Vulkan support. See the
-[parity matrix](parity-matrix.md) for exercised workflows, platform
-limits and known failing comparisons. A successful build is not full parity.
+This check needs a display and Vulkan support. See the [parity matrix](parity-matrix.md)
+for historical coverage and known gaps. A successful build does not verify every workflow.
 
 
 ## Package the desktop application
