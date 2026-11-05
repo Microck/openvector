@@ -14,11 +14,12 @@ the target's `libnode.dll` import/link input. The pinned `napi-build` requires
 that file even when cross-compiling; it also searches `LIBPATH` and `PATH`.
 
 The notice collector supports GNU/Linux and MinGW Windows targets on a
-Debian-based build host, plus ARM64 macOS. GNU targets require `dpkg-query`,
+Debian-based build host, plus ARM64 and x64 macOS. GNU targets require `dpkg-query`,
 the Debian copyright files and common license texts installed with the target
 C runtime packages, and a linker that can locate their runtime objects and
-archives. The retained ARM64 macOS link trace uses dynamic system libraries
-and ships no static C runtime object; Rust and dependency notices still apply. Set
+archives. The retained ARM64 trace and the [Intel GUI linker trace](https://github.com/Microck/openvector/actions/runs/42129483005/job/127604265369)
+use dynamic macOS system libraries and ship no static C runtime object;
+Rust and dependency notices still apply. Set
 `CARGO_TARGET_<TRIPLE>_LINKER` for a custom linker, with the triple uppercased
 and hyphens replaced by underscores. The collector does not read a linker
 set only in Cargo config. Its retained standard-library license supplements
@@ -47,9 +48,9 @@ CARGO_BUILD_TARGET=x86_64-pc-windows-gnu npm pack
 
 The default target is the Rust toolchain's host. Set `CARGO_BUILD_TARGET` or
 pass `--target` to select another target. The target parser recognizes x64
-and arm64 GNU/Linux, macOS and Windows targets. Packaging x64 macOS or MSVC
-Windows binaries stops before compilation because their C runtime notices
-are not implemented. ARM64 macOS CLI/addon builds and installed runtime checks passed previously; they have not been reverified for this cleaned source.
+and arm64 GNU/Linux, macOS and Windows targets. Packaging MSVC Windows binaries
+stops before compilation because their C runtime notices are not implemented.
+ARM64 macOS CLI/addon builds and installed runtime checks passed previously; they have not been reverified for this cleaned source.
 This does not establish macOS GUI parity. Other recognized targets still need
 a working toolchain; recognition does not establish that they have been tested.
 The verified Linux ARM64 binaries import GNU libc symbols through
