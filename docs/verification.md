@@ -58,6 +58,6 @@ private originals remain available in the investigation archive.
 This change does not clear the retained source, fixtures, Git history or remote
 pull-request refs for public distribution. Publication needs a separate review.
 
-[Raft source CI](ci.md) runs the small-reference and independently authored checks named in
+[GitHub Actions source CI](ci.md) runs the small-reference and independently authored checks named in
 `test:smoke`, JavaScript syntax checks, and package inventory checks. The [release runbook](release-runbook.md) requires native
 build and real workflow evidence before attaching binaries to a release.

@@ -111,7 +111,7 @@ npm run test:smoke
 ```
 
 that command runs small reference checks and independently authored tests included
-in the default checkout. it is also the test scope of [raft source ci](docs/ci.md),
+in the default checkout. it is also the test scope of [GitHub Actions source CI](docs/ci.md),
 not a claim that the full native or desktop suites pass. see
 [development](docs/development.md) and [test fixtures](docs/test-fixtures.md) for
 the broader checks and their private fixture corpus.

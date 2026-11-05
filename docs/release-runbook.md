@@ -27,9 +27,9 @@ changes need a new version and fresh build/runtime evidence.
 
 ## Validate the candidate
 
-Use [Raft source CI](ci.md) for the lightweight repository checks. GitHub-hosted
-Actions are not used while the account billing block remains. Source CI does not
-replace the native and desktop checks below.
+Use [GitHub Actions source CI](ci.md) for the lightweight repository checks.
+It runs on GitHub-hosted Ubuntu runners. Source CI does not replace the native
+and desktop checks below.
 
 Use the locked dependencies and the target toolchain's `rust-docs` component:
 
