@@ -25,6 +25,10 @@ __pycache__/
 !/tools/build-native.mjs
 !/tools/native-notices.mjs
 !/tools/package-gui.mjs
+!/tools/package-windows.mjs
+!/tools/windows-installer.nsi
+!/tools/package-release-source.sh
+!/tools/check-desktop-package.mjs
 !/tools/rust-std-licenses.json
 !/tools/rust-upstream-licenses.json
 !/tools/build-file-win32.py

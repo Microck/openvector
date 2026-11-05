@@ -163,4 +163,33 @@ node tools/package-gui.mjs --target x86_64-pc-windows-gnu dist/openvector-window
 
 Create `dist/` first. The packager builds the GUI and includes its application, font, icon, Rust and toolchain notices. It does not produce an installer or sign the executable. See the [release runbook](release-runbook.md) before distributing an archive.
 
+To wrap a staged Windows x64 directory in both a portable ZIP and a per-user
+installer, install NSIS and `zip` on the Linux cross-build host, then run:
+
+```sh
+node tools/package-windows.mjs dist/openvector-windows-x64 dist/windows-downloads
+```
+
+The output directory must be new. The installer adds Start menu shortcuts and
+an uninstall entry without requiring administrator rights. Its uninstaller
+removes only packaged files and preserves unrelated files and user preferences.
+Neither download is Authenticode-signed by this command.
+
+On macOS, license files are inside `OpenVector.app/Contents/Resources` so they
+remain with the app when it is copied out of a disk image. The staging command
+adds only an ad-hoc signature for local verification.
+
+The desktop candidate workflow builds from a corresponding-source archive,
+including the locked Cargo dependencies. To create that archive from a clean
+Git checkout:
+
+```sh
+mkdir -p dist
+bash tools/package-release-source.sh dist/openvector-source.tar.gz
+```
+
+Its `REBUILD.txt` identifies the editable LGPL component and the offline Cargo
+rebuild command. The archive does not include the compiler or operating-system
+SDK. Validate the rebuild and the distribution requirements before publishing.
+
 Windows builds embed the app icon and version information in `openvector-gui.exe`; the window, taskbar and Explorer all read that resource. GNU targets need MinGW `windres` (for example `x86_64-w64-mingw32-windres`, override with `WINDRES`) and MSVC targets need `rc.exe` (override with `RC`). The build fails if neither is found. Linux packages add `share/applications/openvector.desktop` and `share/icons/hicolor/256x256/apps/openvector.png`; copy `share/` into `~/.local/share` and put `openvector-gui` on `PATH` so Wayland desktops match the window (app id `openvector`) to its icon. macOS packages contain `OpenVector.app` (bundle id `dev.micr.openvector`) with the compiled icon catalog `Contents/Resources/Assets.car` and an `OpenVector.icns` fallback. Packaging on a Mac seals it with an ad-hoc `codesign` signature for local use; it is not Developer ID signed or notarized, so other Macs show a Gatekeeper warning. The icon sources are `rust/crates/openvector-gui/assets/app-icon.svg` and the Icon Composer document `assets/OpenVector.icon`; `build.rs` documents how to regenerate `app-icon.ico`, `app-icon-256.png` and the compiled macOS files in `assets/macos/`.

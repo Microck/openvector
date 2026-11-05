@@ -7,7 +7,7 @@
   <p>raster-to-vector conversion for the desktop, terminal, and node.js.</p>
   <p>
     <a href="https://github.com/Microck/openvector/releases/latest"><picture><source media="(prefers-color-scheme: dark)" srcset="https://shieldcn.dev/badge/release-0.0.0.svg?variant=secondary&amp;size=xs&amp;logo=false&amp;mode=dark"><img src="https://shieldcn.dev/badge/release-0.0.0.svg?variant=secondary&amp;size=xs&amp;logo=false&amp;mode=light" alt="release 0.0.0"></picture></a>
-    <a href="docs/ci.md"><picture><source media="(prefers-color-scheme: dark)" srcset="https://shieldcn.dev/badge/ci-raft.svg?variant=secondary&amp;size=xs&amp;logo=false&amp;mode=dark"><img src="https://shieldcn.dev/badge/ci-raft.svg?variant=secondary&amp;size=xs&amp;logo=false&amp;mode=light" alt="raft ci"></picture></a>
+    <a href="https://github.com/Microck/openvector/actions/workflows/source.yml"><img src="https://github.com/Microck/openvector/actions/workflows/source.yml/badge.svg" alt="Source CI"></a>
     <a href="LICENSE"><picture><source media="(prefers-color-scheme: dark)" srcset="https://shieldcn.dev/badge/license-MIT.svg?variant=secondary&amp;size=xs&amp;logo=false&amp;mode=dark"><img src="https://shieldcn.dev/badge/license-MIT.svg?variant=secondary&amp;size=xs&amp;logo=false&amp;mode=light" alt="MIT license"></picture></a>
   </p>
 </div>
