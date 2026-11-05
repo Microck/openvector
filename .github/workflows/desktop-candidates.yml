@@ -103,7 +103,7 @@ jobs:
         shell: bash
         run: |
           set -o pipefail
-          cargo rustc --locked --offline --manifest-path rust/Cargo.toml --release --target "$TARGET" -p openvector-gui -- -C link-arg=-Wl,-t 2>&1 | tee ../dist/linker-inputs.txt
+          cargo rustc --locked --offline --manifest-path rust/Cargo.toml --release --target "$TARGET" -p openvector-gui --bin openvector-gui -- -C link-arg=-Wl,-t 2>&1 | tee ../dist/linker-inputs.txt
       - name: Stage desktop application and verification CLI
         working-directory: source
         shell: bash
