@@ -56,6 +56,9 @@ see [verification and known limits](docs/verification.md).
 
 ## install the cli and node library
 
+npm publication is pending native package checks and review. the install commands
+below apply after publication; use the desktop downloads above in the meantime.
+
 the npm package includes native binaries for linux amd64 and arm64, and
 windows x64. use node.js 22.19 or later. windows arm64 machines need x64 node.js;
 native arm64 windows, macos and alpine/musl packages are not included.
@@ -74,7 +77,7 @@ or download additional native binaries.
 use node.js 22.19 or later, npm, rust with its `rust-docs` component, git, and a c
 compiler/linker. native packaging also needs platform-specific toolchain notices.
 the [build guide](docs/building.md) covers supported targets, cross-compilation,
-linux libraries, and the windows node-api linker input.
+linux libraries, and windows node-api linking.
 
 ```sh
 git clone https://github.com/Microck/openvector.git

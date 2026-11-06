@@ -7,7 +7,6 @@
   "engines": {
     "node": ">=22.19.0"
   },
-  "os": ["linux", "win32"],
   "cpu": ["x64", "arm64"],
   "publishConfig": {
     "access": "public",
