@@ -69,13 +69,12 @@ fn display_dimensions() -> Result<([i32; 2], [i32; 2]), VectorOutputError> {
     Err(VectorOutputError("EMF reference-display discovery is not implemented on this platform.".into()))
 }
 const EMPTY: [i32; 4] = [0, 0, -1, -1];
-const DESCRIPTION_HEX: &[u8] = b"430072006500610074006500640020007700690074006800200056006500630074006f00720020004d0061006700690063000000c086470080734700e0854700a089470000864700b08b4700d08d4700608f4700708647006e7000006e657770617468002f6c77207b207365746c696e657769647468207d2064656600000000";
 const fn description() -> [u8; 128] {
-    let mut bytes = [0; 128]; let mut i = 0;
-    while i < DESCRIPTION_HEX.len() / 2 {
-        let a = DESCRIPTION_HEX[i * 2]; let b = DESCRIPTION_HEX[i * 2 + 1];
-        bytes[i] = (if a <= b'9' { a - b'0' } else { a - b'a' + 10 }) * 16 + if b <= b'9' { b - b'0' } else { b - b'a' + 10 }; i += 1;
-    } bytes
+    let label = b"OpenVector\0OpenVector\0\0";
+    let mut bytes = [0; 128];
+    let mut i = 0;
+    while i < label.len() { bytes[i * 2] = label[i]; i += 1; }
+    bytes
 }
 fn header(device: &EmfDevice, bounds: [i32; 4], frame: [i32; 4], length: u32, records: u32, handles: u32) -> [u8; 236] {
     let mut bytes = [0; 236];
@@ -176,5 +175,20 @@ impl VectorWriter for EmfWriter<'_> {
         for (index, value) in [88i32, 40, 0, 0, -1, -1, 3].iter().enumerate() { bytes[index * 4..index * 4 + 4].copy_from_slice(&value.to_le_bytes()); }
         for (index, value) in points.iter().flatten().enumerate() { bytes[28 + index * 2..30 + index * 2].copy_from_slice(&(*value as i16).to_le_bytes()); }
         self.append(&bytes)?; self.record_count += 1; Ok(())
+    }
+}
+
+#[cfg(test)]
+mod description_tests {
+    use super::description;
+
+    #[test]
+    fn description_has_project_labels_and_zero_padding() {
+        let bytes = description();
+        let label: Vec<u16> = "OpenVector\0OpenVector\0\0".encode_utf16().collect();
+        for (index, expected) in label.iter().enumerate() {
+            assert_eq!(u16::from_le_bytes([bytes[index * 2], bytes[index * 2 + 1]]), *expected);
+        }
+        assert!(bytes[label.len() * 2..].iter().all(|byte| *byte == 0));
     }
 }

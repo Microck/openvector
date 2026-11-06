@@ -81,7 +81,8 @@ export function serializePdf(input, emit) {
   }
   write('>>endobj\n');
   beginObject(2);
-  write('<</Producer(VectorMagic.com)\n>>endobj\n');
+  // Match the native writer without shifting the retained reference's offsets.
+  write('<</Producer(OpenVector)     \n>>endobj\n');
   const xref = position;
   write('xref\n0 9\n0000000000 65535 f\n');
   for (let number = 1; number < offsets.length; number++) write(`${String(offsets[number]).padStart(10, '0')} 00000 n\n`);

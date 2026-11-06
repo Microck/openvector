@@ -8,7 +8,7 @@ import sys
 root = Path(__file__).resolve().parents[1]
 llvm = Path(sys.argv[1]).resolve()
 vendor = root / 'src/vendor/freetype-raster'
-identity = json.loads((root / 'evidence/bitmap-raster-source-identity.json').read_text())
+identity = json.loads((vendor / 'source-identity.json').read_text())
 digest = lambda path: hashlib.sha256(path.read_bytes()).hexdigest()
 for name, sha in identity['vendoredSha256'].items():
     assert digest(vendor / name) == sha, name
@@ -21,5 +21,6 @@ command = [str(llvm / 'clang.exe'), '--target=wasm32', '-std=gnu99', '-O2', '-ff
 subprocess.run(command, check=True)
 proof = {'wasmSha256': digest(output), 'bytes': output.stat().st_size, 'command': command,
          'wrapperSha256': digest(source), 'sourceIdentity': identity}
+(root / 'evidence').mkdir(exist_ok=True)
 (root / 'evidence/bitmap-raster-build-verification.json').write_text(json.dumps(proof, indent=2) + '\n')
 print(json.dumps({'wasmSha256': proof['wasmSha256'], 'bytes': proof['bytes']}))

@@ -37,7 +37,7 @@
     "cases": 994
   },
   "ownership": "Public operations preserve caller inputs and own their working storage. Public boundaries validate once; recursive and arithmetic internals trust those validated inputs.",
-  "full_pipeline": "The known-settings reference corpus is described in engine-reference-contract.json. The implemented segmentation branch does not establish complete image-output parity.",
+  "full_pipeline": "The known-settings reference corpus is described in the private investigation archive's engine-reference-contract.json. The implemented segmentation branch does not establish complete image-output parity.",
   "region_pass": {
     "api": "createRegionOptimizer({ width, height, bgra, regions, finalLambda, minimumPixels }) returns owned optimizer state. iterate({ lambda, mode }) advances one pass; labels() returns owned projected indices; snapshot() returns owned indices, counts, sums, colorIndices, and activeCount. rebuild() recomputes connected regions and float32 statistics. projectPalette() assigns quantized unique colors to dense nonempty regions.",
     "input": "Initial labels are nonnegative int32 values. Regions are rebuilt into four-connected components in first row-major encounter order. All settings are explicit.",

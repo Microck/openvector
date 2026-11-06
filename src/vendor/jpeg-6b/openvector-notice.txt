@@ -1,13 +1,14 @@
 OpenVector uses the Independent JPEG Group's jpeg-6b compressor.
 This software is based in part on the work of the Independent JPEG Group.
 
-The selected C sources and headers are unmodified copies of the IJG component
-distributed with Qt 4.4.3. Their copyright and license terms are retained in
+The selected C sources, headers and README match the IJG component distributed
+with Qt 4.4.3 byte for byte. source-identity.json records the official archive
+URL, archive digest and file digests. Copyright and license terms remain in
 README. No ansi2knr source is included.
 
 OpenVector's separate wrapper provides a memory destination, per-call arena,
 trap-based error reporting and top-down BGRA-to-RGB scanlines. The build uses
-NO_GETENV to avoid host environment access. Upstream codec files are unchanged.
+NO_GETENV to avoid host environment access.
 Default compression is quality 75, baseline JPEG, RGB input and 96-DPI density.
 
 The JavaScript caller, wrapper and build script are OpenVector application

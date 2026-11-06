@@ -4,7 +4,7 @@ The supported comparison goal was completed on 2026-10-29. This means the select
 native comparisons, necessary fixes, actual changed-path checks, and test resource
 cleanup were completed. It does not establish full exact parity or absence of bugs.
 
-## Recorded results
+## Historical results from 2026-10-29
 
 - The retained 30-action recent-settings and manual-palette history matched the
   corrected Rust GUI and numerical replay, including the exported AI bytes.
@@ -50,6 +50,14 @@ materials. Those links are provenance references, not downloadable repository fi
 The test fixture corpus contains the reference inputs and expected observations
 needed by the differential suites. See [test fixtures](test-fixtures.md).
 
-[Raft source CI](ci.md) runs only the lightweight reference checks named in
+The cleanup preserves the fixture corpus, regression tests, behavioral contracts
+and source provenance. Four investigation-only documents are excluded from the
+source tree: `reference-probes.md`, `reverse-engineering-report.md`,
+`native-gui-source-context.md` and `engine-reference-contract.json`. Their
+private originals remain available in the investigation archive.
+This change does not clear the retained source, fixtures, Git history or remote
+pull-request refs for public distribution. Publication needs a separate review.
+
+[GitHub Actions source CI](ci.md) runs the small-reference and independently authored checks named in
 `test:smoke`, JavaScript syntax checks, and package inventory checks. The [release runbook](release-runbook.md) requires native
 build and real workflow evidence before attaching binaries to a release.

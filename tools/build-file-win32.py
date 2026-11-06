@@ -4,10 +4,12 @@ Usage: python3 tools/build-file-win32.py
 Runs on Linux with mingw-w64 (x86_64-w64-mingw32-gcc, x86_64-w64-mingw32-dlltool).
 Node-API headers in tools/node-api come unmodified from node-v24.12.0-headers.
 The import library binds Node-API symbols to the host node.exe, as node-gyp does.
+The verification report is printed; set OPENVECTOR_BUILD_PROOF to also save it.
 """
 from pathlib import Path
 import hashlib
 import json
+import os
 import re
 import subprocess
 import tempfile
@@ -31,10 +33,13 @@ command = ['x86_64-w64-mingw32-gcc', '-std=c11', '-O2', '-Wall', '-Wextra', '-We
 run(*command)
 # The module must import only kernel32 and node.exe: no C runtime DLL.
 imports = sorted(set(re.findall(r'DLL Name: (\S+)', run('x86_64-w64-mingw32-objdump', '-p', output))))
-assert imports == ['KERNEL32.dll', 'node.exe'], imports
+if imports != ['KERNEL32.dll', 'node.exe']:
+    raise RuntimeError(f'Unexpected DLL imports: {imports}')
 proof = {'moduleSha256': digest(output), 'bytes': output.stat().st_size, 'sourceSha256': digest(source),
          'headersSha256': {path.name: digest(path) for path in sorted((tools / 'node-api').glob('*.h'))},
          'nodeApiImports': symbols, 'dllImports': imports, 'compiler': run('x86_64-w64-mingw32-gcc', '--version').splitlines()[0],
          'command': [str(part) if not str(part).startswith(str(build)) else Path(part).name for part in command]}
-(root / 'evidence/file-win32-build-verification.json').write_text(json.dumps(proof, indent=2) + '\n')
-print(json.dumps({'moduleSha256': proof['moduleSha256'], 'bytes': proof['bytes'], 'imports': imports}))
+encoded = json.dumps(proof, indent=2) + '\n'
+if proof_path := os.environ.get('OPENVECTOR_BUILD_PROOF'):
+    Path(proof_path).write_text(encoded)
+print(encoded, end='')
