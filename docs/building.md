@@ -83,7 +83,7 @@ paths:
 This is source for rebuilding the native CLI and Node library, with locked
 external Cargo dependencies available. It is not an offline dependency
 bundle. The archive excludes target caches, the JavaScript engine modules,
-browser preview, OpenVector's integration tests and fixture corpus,
+GUI reference host, OpenVector's integration tests and fixture corpus,
 investigation tools and evidence.
 There is no install hook, automatic download, build-on-import, or engine fallback.
 Install an archive containing your platform's artifacts. Missing artifacts

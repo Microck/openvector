@@ -1,6 +1,6 @@
 {
   "component": "OpenVector GUI",
-  "status": "Working modernized development preview. Computational and complete GUI parity remain unfinished.",
+  "status": "Historical browser-preview contract. The browser UI is retired; shared models and the HTTP host remain for reference tests. The native desktop implementation follows rust-port-contract.json.",
   "behavior": {
     "reference": "Vector Magic desktop at D:/VectorMagic/Vector Magic/vmde.exe",
     "targetSha256": "c491656b962debc215a8b6e757a9b2949ffe50a36b5f2db692706bcd4ebface1",

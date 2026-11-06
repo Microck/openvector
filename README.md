@@ -134,7 +134,7 @@ the broader checks and their private fixture corpus.
 | `rust/crates/openvector-gui` | native desktop app |
 | `rust/crates/openvector-cli` | cli |
 | `rust/crates/openvector-node`, `npm/` | node-api binding and public declarations |
-| `src/`, `gui/` | development reference implementation and browser preview |
+| `src/`, `gui/` | development reference implementation, models, and HTTP test host |
 | `test/`, `docs/` | tests, fixtures, usage guides, and behavioral contracts |
 
 ## license

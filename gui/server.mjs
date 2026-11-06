@@ -1,18 +1,16 @@
 import { createServer } from 'node:http';
-import { readFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
-import { resolve, extname, sep, dirname } from 'node:path';
+import { resolve, dirname } from 'node:path';
 import { homedir } from 'node:os';
 import { Worker } from 'node:worker_threads';
 import { pickPaths, revealFolder,readEmfDevice } from './native-paths.mjs';
 
 const root = fileURLToPath(new URL('.', import.meta.url));
-const contentTypes = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.svg': 'image/svg+xml' };
 const operations = new Set(['open', 'leavePalette', 'reset', 'resetApplicationModel', 'outputOptions', 'autoUpdatePreferences', 'reviewPreferences', 'quickSave', 'bitmapSave', 'bitmapSize', 'quickSaveFile', 'quickSaveDirectory', 'select', 'palette', 'palettes', 'process', 'vectors', 'automatic', 'review', 'edit', 'background', 'profiles', 'sources']);
 
-/** Local GUI host. CPU work belongs to a worker, keeping the viewer and host
+/** Loopback reference-test host. CPU work belongs to a worker, keeping API reads
  * responsive. Requests are serialized against a single owned document. */
-export async function startGui({ port = 3741, development = false, workingDirectory = process.cwd(),
+export async function startGui({ port = 3741, workingDirectory = process.cwd(),
   profileFilename = resolve(homedir(),'.openvector','profiles.json'),
   sourceFilename = resolve(dirname(profileFilename),'sources.json'),
   preferencesFilename = resolve(dirname(profileFilename),'processing-preferences.json') } = {}) {
@@ -57,14 +55,6 @@ export async function startGui({ port = 3741, development = false, workingDirect
     });
   };
 
-  let vite;
-  if (development) {
-    const { createServer: createViteServer } = await import('vite');
-    vite = await createViteServer({ root, server: { middlewareMode: true, hmr: false } });
-  } else {
-    try { await readFile(resolve(root, 'dist/index.html')); }
-    catch { await worker.terminate(); throw new Error('Build the GUI first: npm --prefix gui run build'); }
-  }
   let origin;
   const json = (response, status, value) => {
     response.writeHead(status, { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' });
@@ -217,37 +207,22 @@ export async function startGui({ port = 3741, development = false, workingDirect
     if (request.method !== 'GET' && request.method !== 'HEAD') {
       response.writeHead(405); response.end(); return;
     }
-    if (vite) { vite.middlewares(request, response); return; }
-    const directory = resolve(root, 'dist');
-    let path;
-    try { path = resolve(directory, '.' + decodeURIComponent(url.pathname === '/' ? '/index.html' : url.pathname)); }
-    catch { response.writeHead(400); response.end(); return; }
-    if (!path.startsWith(directory + sep)) { response.writeHead(403); response.end(); return; }
-    try {
-      const bytes = await readFile(path);
-      response.writeHead(200, { 'Content-Type': contentTypes[extname(path)] ?? 'application/octet-stream' });
-      response.end(request.method === 'HEAD' ? undefined : bytes);
-    } catch { response.writeHead(404); response.end('File not found.'); }
+    response.writeHead(404); response.end('Not found.');
   });
   // The worker publishes initial queue state before acknowledging enter/leave.
   // Readiness is explicit so HTTP requests never see a partial initialization.
-  await call('batch',{command:'leave'}).catch(async error => {await vite?.close();await worker.terminate();throw error;});
+  await call('batch',{command:'leave'}).catch(async error => {await worker.terminate();throw error;});
   await new Promise((resolveListen, reject) => {
     server.once('error', reject);
     server.listen(port, '127.0.0.1', resolveListen);
-  }).catch(async error => { await vite?.close(); await worker.terminate(); throw error; });
+  }).catch(async error => { await worker.terminate(); throw error; });
   origin = `http://127.0.0.1:${server.address().port}`;
   return { url: origin, close: async () => {
     picker.abort();
     server.closeAllConnections();
     await new Promise(resolveClose => server.close(resolveClose));
-    try {await vite?.close();await call('saveProcessingPreferences',null);}
+    try {await call('saveProcessingPreferences',null);}
     finally {await worker.terminate();}
   } };
 }
 
-if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
-  const application = await startGui({ development: process.argv.includes('--dev') });
-  console.log(`OpenVector: ${application.url}`);
-  for (const signal of ['SIGINT', 'SIGTERM']) process.once(signal, async () => { await application.close(); process.exit(0); });
-}

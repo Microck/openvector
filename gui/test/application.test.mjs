@@ -149,14 +149,12 @@ test('GUI palette candidate colors round-trip ARGB into document BGRA controls',
   assert.ok(gui.process({settings:advanced,through:'fitting'}).svg.includes('<path'));
 });
 
-test('loopback HTTP host serves the built GUI and calls its real processing worker', async t => {
+test('loopback HTTP host calls its real processing worker', async t => {
   const host = await startIsolatedGui({ port: 0 });
   t.after(() => host.close());
   const api = (action, input) => fetch(`${host.url}/api/${action}`, input === undefined ? undefined : {
     method: 'POST', headers: { 'Content-Type': 'application/json', Origin: host.url }, body: JSON.stringify(input),
   });
-  assert.equal((await fetch(host.url)).status, 200);
-  assert.match(await (await fetch(host.url)).text(), /OpenVector/);
   assert.equal((await fetch(`${host.url}/api/state`, { headers: { Origin: 'https://unrelated.example' } })).status, 403);
   assert.equal((await api('unknown', {})).status, 404);
   assert.equal(await (await api('state')).json(), null);
