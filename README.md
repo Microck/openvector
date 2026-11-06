@@ -50,10 +50,24 @@ but still saves preferences in the normal per-user location.
 linux packages target ubuntu 24.04 with glibc 2.39 and were tested with X11.
 the required desktop libraries are in the [build guide](docs/building.md).
 wayland remains unverified. the release includes matching source and SHA-256 checksums.
-there is no published npm package.
 
 these checks do not establish exact parity or coverage of every input.
 see [verification and known limits](docs/verification.md).
+
+## install the cli and node library
+
+the npm package includes native binaries for linux amd64 and arm64, and
+windows x64. use node.js 22.19 or later. windows arm64 machines need x64 node.js;
+native arm64 windows, macos and alpine/musl packages are not included.
+linux packages are built and tested on ubuntu 24.04.
+
+```sh
+npm install openvector
+npx openvector vectorize logo.png --output logo.svg
+```
+
+the desktop app is a separate download. npm installation does not need rust
+or download additional native binaries.
 
 ## build from source
 
@@ -94,7 +108,7 @@ replacement option. processing does not rewrite the source image.
 
 ## use it from node.js
 
-after building the native addon:
+after installing the npm package or building the native addon:
 
 ```js
 import { readFileSync } from 'node:fs';

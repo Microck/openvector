@@ -9,9 +9,10 @@ bundled zlib 1.2.3 and IJG jpeg-6b C sources. A cross-build also needs the
 selected Rust target, its C toolchain and linker, and any Node-API link
 configuration required by that target. Dependency resolution needs access
 to the locked crates and Git sources, including workspace GUI dependencies.
-For the GNU Windows Node binding, set `LIBNODE_PATH` to the directory containing
-the target's `libnode.dll` import/link input. The pinned `napi-build` requires
-that file even when cross-compiling; it also searches `LIBPATH` and `PATH`.
+The GNU Windows binding uses `napi/dyn-symbols` to load Node-API exports from the
+running Node process. The local `napi-build` 2.6.0 patch removes its obsolete
+`libnode.dll` link requirement. It is based on upstream commit
+`a94cef33f62e74682963dd085e283f52dcec2600`; the MIT license ships with the patch.
 
 The notice collector supports GNU/Linux and MinGW Windows targets on a
 Debian-based build host, plus ARM64 and x64 macOS. GNU targets require `dpkg-query`,
@@ -62,7 +63,7 @@ or `openvector.exe`. Previously staged targets remain available for a
 multi-platform archive; start with a clean staging directory when building
 a single-platform archive.
 
-The private archive includes those native artifacts and notices, the npm
+The npm archive includes those native artifacts and notices, the npm
 loader and declarations, CLI launcher, this README, the MIT license and
 package metadata. It also keeps the native build inputs at their existing
 paths:
@@ -91,7 +92,8 @@ require an explicit `npm run build` from the extracted package root in a
 supported build environment. No checkout or Vector Magic installation is
 needed for that rebuild. The archive does not contain the full development
 test suite; run those checks from the checkout.
-The package remains private and is not published.
+The public npm distribution targets Linux x64/arm64 and Windows x64. Its candidate
+workflow assembles all three targets before testing the installed archive.
 
 The build writes license notices for the compiled Rust crates and toolchain
 code beside each platform's binaries, in `rust-licenses.txt`,

@@ -1,7 +1,7 @@
 [workspace]
 resolver = "2"
 members = ["crates/openvector", "crates/openvector-cli", "crates/openvector-gui", "crates/openvector-node"]
-exclude = ["vendor/gpui", "vendor/gpui_linux", "vendor/gpui_macos", "vendor/gpui_wgpu", "vendor/gpui_windows", "vendor/gpui_apple"]
+exclude = ["vendor/gpui", "vendor/gpui_linux", "vendor/gpui_macos", "vendor/gpui_wgpu", "vendor/gpui_windows", "vendor/gpui_apple", "vendor/napi-build"]
 
 [workspace.package]
 version = "0.1.0"
@@ -21,6 +21,8 @@ gpui_platform = { git = "https://github.com/zed-industries/zed", rev = "b0f1e1cb
 [patch.crates-io]
 async-task = { git = "https://github.com/zed-industries/async-task.git", rev = "015845a19fc31752c02367567d3b8900a406f9da" }
 calloop = { git = "https://github.com/zed-industries/calloop", rev = "3759371fee14c40066d64777e2a36b6ffcc22590" }
+# napi uses dynamic Node-API symbols; its GNU Windows build helper must not link libnode.
+napi-build = { path = "vendor/napi-build" }
 
 # Maintained renderer and native export-drag fixes use the same pinned upstream sources.
 [patch."https://github.com/zed-industries/zed"]

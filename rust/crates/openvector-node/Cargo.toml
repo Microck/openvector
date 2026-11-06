@@ -11,7 +11,7 @@ crate-type = ["cdylib"]
 
 [dependencies]
 openvector = { path = "../openvector" }
-napi = { version = "3.12.4", features = ["napi8", "serde-json"] }
+napi = { version = "3.12.4", features = ["dyn-symbols", "napi8", "serde-json"] }
 napi-derive = "3.6.5"
 serde_json = { version = "1", features = ["float_roundtrip"] }
 
