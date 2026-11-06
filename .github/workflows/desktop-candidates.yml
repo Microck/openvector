@@ -200,6 +200,21 @@ jobs:
           Set-Content "$install/user-file.txt" 'preserve this file'
           $process = Start-Process "$install/Uninstall.exe" -ArgumentList "/S _?=$install" -Wait -PassThru
           if ($process.ExitCode) { throw "Uninstaller failed: $($process.ExitCode)" }
-          if (Test-Path "$install/openvector-gui.exe") { throw 'Uninstaller left the application installed' }
+          if (Test-Path "$install/openvector-gui.exe") {
+            [pscustomobject]@{UninstallerPid=$process.Id;ExitCode=$process.ExitCode;InstallPath=$install} | Format-List
+            Get-ChildItem $install -Recurse | Select-Object FullName, Length, Attributes | Format-Table -AutoSize
+            Get-CimInstance Win32_Process |
+              Where-Object { $_.CommandLine -like "*$install*" } |
+              Select-Object ProcessId, ParentProcessId, ExecutablePath, CommandLine | Format-List
+            if (Test-Path $registry) { Get-ItemProperty $registry | Format-List }
+            try {
+              $handle = [IO.File]::Open("$install/openvector-gui.exe", 'Open', 'ReadWrite', 'None')
+              $handle.Dispose()
+              Write-Output 'The remaining executable can be opened exclusively for writing.'
+            } catch {
+              Write-Output $_.Exception.ToString()
+            }
+            throw 'Uninstaller left the application installed'
+          }
           if (Test-Path $registry) { throw 'Uninstaller left its registry entry' }
           if ((Get-Content "$install/user-file.txt") -ne 'preserve this file') { throw 'Uninstaller removed unrelated user data' }
