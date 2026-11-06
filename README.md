@@ -7,7 +7,8 @@
   <p>raster-to-vector conversion for the desktop, terminal, and node.js.</p>
   <p>
     <a href="https://github.com/Microck/openvector/releases/latest"><picture><source media="(prefers-color-scheme: dark)" srcset="https://shieldcn.dev/badge/release-0.1.0.svg?variant=secondary&amp;size=xs&amp;logo=false&amp;mode=dark"><img src="https://shieldcn.dev/badge/release-0.1.0.svg?variant=secondary&amp;size=xs&amp;logo=false&amp;mode=light" alt="release 0.1.0"></picture></a>
-    <a href="https://github.com/Microck/openvector/actions/workflows/source.yml"><img src="https://github.com/Microck/openvector/actions/workflows/source.yml/badge.svg" alt="Source CI"></a>
+    <a href="https://github.com/Microck/openvector/releases"><picture><source media="(prefers-color-scheme: dark)" srcset="https://shieldcn.dev/github/downloads/Microck/openvector.svg?variant=secondary&amp;size=xs&amp;logo=false&amp;mode=dark"><img src="https://shieldcn.dev/github/downloads/Microck/openvector.svg?variant=secondary&amp;size=xs&amp;logo=false&amp;mode=light" alt="total release downloads"></picture></a>
+    <a href="https://github.com/Microck/openvector/actions/workflows/source.yml"><picture><source media="(prefers-color-scheme: dark)" srcset="https://shieldcn.dev/github/ci/Microck/openvector.svg?workflow=source.yml&amp;branch=main&amp;variant=secondary&amp;size=xs&amp;logo=false&amp;mode=dark"><img src="https://shieldcn.dev/github/ci/Microck/openvector.svg?workflow=source.yml&amp;branch=main&amp;variant=secondary&amp;size=xs&amp;logo=false&amp;mode=light" alt="source ci status"></picture></a>
     <a href="LICENSE"><picture><source media="(prefers-color-scheme: dark)" srcset="https://shieldcn.dev/badge/license-MIT.svg?variant=secondary&amp;size=xs&amp;logo=false&amp;mode=dark"><img src="https://shieldcn.dev/badge/license-MIT.svg?variant=secondary&amp;size=xs&amp;logo=false&amp;mode=light" alt="MIT license"></picture></a>
   </p>
 </div>
