@@ -1,6 +1,6 @@
 {
   "name": "openvector",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "private": true,
   "description": "Independent raster-to-vector Rust engine with Node-API bindings and a native CLI.",
   "type": "module",

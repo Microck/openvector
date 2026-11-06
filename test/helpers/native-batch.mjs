@@ -4,6 +4,7 @@ import { gunzipSync } from 'node:zlib';
 import { tmpdir } from 'node:os';
 import { join, dirname, basename, resolve, sep } from 'node:path';
 import { BatchQueue } from '../../src/batch-queue.mjs';
+import { publicVectorFixture } from './native-vector-output.mjs';
 
 export const [batchProvenance, ...batchReferences] = gunzipSync(readFileSync(new URL('../fixtures/batch-runner-reference.ndjson.gz', import.meta.url)))
   .toString().trim().split('\n').map(JSON.parse);
@@ -93,7 +94,7 @@ export function assertBatchResult(actual, { reference, directory, outputDirector
     assert.deepEqual(readdirSync(outputDirectory).sort(), [...listing].sort());
     for (const [name, bytes] of Object.entries(reference.expectedOutputs)) {
       const holder = aliases(name).at(-1) ?? name;
-      const observed = readFileSync(join(outputDirectory, holder)), expected = Buffer.from(bytes, 'base64');
+      const observed = readFileSync(join(outputDirectory, holder)), expected = publicVectorFixture(Buffer.from(bytes, 'base64'));
       if (reference.format === 'eps') assert.equal(epsWithoutClock(observed, began, ended), epsWithoutClock(expected));
       else assert.deepEqual(observed, expected, holder);
     }
