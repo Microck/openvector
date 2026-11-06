@@ -203,7 +203,9 @@ fn native_export_defaults_keep_exact_captured_bytes() {
         let command = format!("export-{format}");
         let output = request(&directory.0, &command, &input, false);
         success(&output, &command);
-        assert_bytes(&output.stdout, &latin1(&row["expected"]), &command);
+        let expected = latin1(&row["expected"]);
+        let expected = if format == "emf" { common::public_emf_fixture(expected) } else { expected };
+        assert_bytes(&output.stdout, &expected, &command);
     }
 }
 
