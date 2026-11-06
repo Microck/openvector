@@ -2,6 +2,12 @@
 
 Paths are relative to `vector-magic-re/` unless they are URLs. Line numbers read on 2026-10-20.
 
+The browser inventory below is historical. Its React source was retired after
+commit `9f8b1952b9df2a7e1275f758fb807813d56f7d28`; the cited paths and line
+numbers refer to that earlier implementation. Shared reference models remain
+in `gui/`. See [product descriptions](product-description/README.md) for the
+native desktop workflows.
+
 ## 1. Vector Magic GUI inventory (from the repo)
 
 Behavior source of truth: `docs/gui-contract.json:1-80` (reference vmde.exe SHA `c491656b...`; "preserve workflow, control grouping and feature set"; background `#000000`, white text; no cards/pills; no looping animation; viewer readout not selectable). Port requirement: `docs/rust-port-contract.json:2-25` (recreate the shadcn preview in GPUI; JS stays a development reference, never a fallback; pin a verified revision). Existing Rust workspace: `rust/Cargo.toml` (members `crates/openvector`, `crates/openvector-cli`, edition 2024, MIT).

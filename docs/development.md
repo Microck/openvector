@@ -1,8 +1,8 @@
 # Development
 
 The repository contains the Rust engine, CLI and desktop application, plus a
-JavaScript development implementation and browser preview. The Rust engine
-also compiles `src/parameter-data.json` and `src/segmentation-progress-data.json`;
+JavaScript reference implementation and HTTP test host. The browser preview is
+retired. The Rust engine also compiles `src/parameter-data.json` and `src/segmentation-progress-data.json`;
 the npm archive includes those tables and the JPEG/TIFF notices needed for
 native rebuilds.
 
@@ -18,9 +18,9 @@ corpus described in [test fixtures](test-fixtures.md). Missing fixtures remain
 errors, not skipped tests. The corpus is not part of the published package.
 
 `npm test` runs the JavaScript suite. Build the native CLI and addon with
-`npm run build` first. For the browser preview, install its locked dependencies,
-run `npm --prefix gui run build`, then `npm --prefix gui test`. Rust tests use
-`cargo test --manifest-path rust/Cargo.toml --locked`.
+`npm run build` first. Run `npm --prefix gui test` for the retained GUI reference
+models and HTTP integration tests; no frontend build or npm dependencies are
+needed for that test host. Rust tests use `cargo test --manifest-path rust/Cargo.toml --locked`.
 Do not treat smoke success as a release gate for the full product.
 
 The WebAssembly rebuild scripts read `source-identity.json` from their
@@ -34,10 +34,10 @@ checks the source hashes before compiling and writes a build receipt under
 the ignored `evidence/` directory. Compiler versions can change the resulting
 WebAssembly bytes; run the codec and raster tests after rebuilding.
 
-The JavaScript preview uses the dependencies in `gui/`; see the
-[GUI third-party notices](gui-third-party-notices.md). The package itself uses
-native binaries built as described in [building](building.md). Those binaries
-are not downloaded as a fallback on import.
+The [GUI third-party notices](gui-third-party-notices.md) preserve the retired
+browser preview's attribution. Native binaries use the build and licensing
+requirements in [building](building.md). They are not downloaded as a fallback
+on import.
 
 The MIT license covers the project's source. Third-party code retains its own
 notices and license obligations; see the notices included with each build.

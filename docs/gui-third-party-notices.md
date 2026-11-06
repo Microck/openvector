@@ -1,7 +1,8 @@
 # GUI third-party notices
 
-The GUI uses shadcn/ui source components and the following installed dependencies.
-Original Vector Magic icons, logos and help assets are not included in the GUI.
+These notices preserve attribution for the retired browser preview's shadcn/ui
+components and npm dependencies. They are historical, not the native desktop
+dependency list. See [building](building.md) for native package notices.
 
 The react-remove-scroll-bar notice comes from its [upstream license](https://github.com/theKashey/react-remove-scroll-bar/blob/master/LICENSE); the other notices come from the installed, locked npm packages.
 
