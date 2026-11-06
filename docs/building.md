@@ -111,14 +111,17 @@ also copies third-party notices into `native/licenses/`:
   `jpeg-decoder-licenses.txt`, and TIFF codec code derived from UTIF.js and
   libtiff, in `tiff-decoder-licenses.txt`.
 
-These notices do not by themselves satisfy the source and relinking terms
-for the statically linked LGPL code. The archive now includes the editable
-Qt-derived Rust module and the application source and build inputs listed
-above. Modifying that module requires rebuilding each affected native
-binary; it is not a runtime-replaceable library. The archive supplies no
-separate relinking kit or prebuilt application object files. Source
-inclusion does not establish legal compliance; the remaining distribution
-requirements are unresolved before any public binary release.
+These notices do not by themselves satisfy the source and relinking terms for
+the statically linked LGPL code. The release source archive includes the editable
+Qt-derived Rust module, application source, local GPUI patches and locked Cargo
+dependencies. Its `REBUILD.txt` explains how to change that module and rebuild
+the application offline. This is a whole-application rebuild, not a replaceable
+runtime library or a separate kit of prebuilt object files.
+
+An offline GUI and CLI rebuild with a modified module passed the
+[rebuild checks](verification.md). That verifies the procedure, not legal
+clearance for third-party material. Preserve the component licenses and
+modification notices when redistributing a build.
 
 ## Build and run the native GUI
 
@@ -132,10 +135,11 @@ cargo run --manifest-path rust/Cargo.toml --locked -p openvector-gui -- logo.png
 
 Run it in a graphical desktop session. The Linux build enables X11 and
 Wayland; live verification uses X11 with a Vulkan driver and a working
-desktop file-chooser portal. Wayland remains unverified. ARM64 macOS uses
-the pinned font-kit backend; native Open, Save, clipboard, export drag and
-viewer interactions pass, but one worker export test remains unresolved.
-Windows builds and earlier interactive-desktop workflows passed previously. The cleaned source and current binary have not yet been reverified. A non-interactive SSH window station cannot open the GPUI window.
+desktop file-chooser portal. Wayland remains unverified. Native conversion checks
+passed on Apple Silicon and Intel Macs. Windows packages passed on Windows 10
+x64 and on Windows 11 ARM64 through x64 emulation. A non-interactive SSH window
+station cannot open the Windows GPUI window. See [verification](verification.md)
+for the tested workflows and remaining gaps.
 
 The GUI stores its preferences, including recent basic settings, in
 `$XDG_CONFIG_HOME/openvector/gui.json`, or `$HOME/.config/openvector/gui.json`
