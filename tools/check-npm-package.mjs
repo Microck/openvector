@@ -15,7 +15,7 @@ const npm = (args) => execFileSync(process.execPath, [process.env.npm_execpath, 
 });
 // Authored 8x8 BMP: a blue 4x4 square inside a red border. Expected SVG was
 // independently checked with the native release packages on Linux and Windows.
-const bitmap = 'Qk32AAAAAAAAADYAAAAoAAAACAAAAAgAAAABABgAAAAAAMAAAADEDgAAxA4AAAAAAAAAAAAAAAD/AAD/AAD/AAD/AAD/AAD/AAD/AAD/AAD/AAD/AAD/AAD/AAD/AAD/AAD/AAD/AAD/AAD/AAD//wAA/wAA/wAA/wAAAAD/AAD/AAD/AAD//wAA/wAA/wAA/wAAAAD/AAD/AAD/AAD//wAA/wAA/wAA/wAAAAD/AAD/AAD/AAD//wAA/wAA/wAA/wAAAAD/AAD/AAD/AAD/AAD/AAD/AAD/AAD/AAD/AAD/AAD/AAD/AAD/AAD/AAD/AAD/AAD/AAD/AAD/AAD/';
+const bitmap = 'Qk32AAAAAAAAADYAAAAoAAAACAAAAAgAAAABABgAAAAAAMAAAADEDgAAxA4AAAAAAAAAAAAAAAD/AAD/AAD/AAD/AAD/AAD/AAD/AAD/AAD/AAD/AAD/AAD/AAD/AAD/AAD/AAD/AAD/AAD//wAA/wAA/wAA/wAAAAD/AAD/AAD/AAD//wAA/wAA/wAA/wAAAAD/AAD/AAD/AAD//wAA/wAA/wAA/wAAAAD/AAD/AAD/AAD//wAA/wAA/wAA/wAAAAD/AAD/AAD/AAD/AAD/AAD/AAD/AAD/AAD/AAD/AAD/AAD/AAD/AAD/AAD/AAD/AAD/AAD/';
 const expected = 'e762312fc6cb03bca38f557bc5b2c724653a3ea774d722a5ab2f9e3d34d2f952';
 try {
   npm(['install', '--ignore-scripts', '--no-audit', '--no-fund', archive]);
