@@ -186,7 +186,7 @@ jobs:
           Expand-Archive (Get-ChildItem packages/*-portable.zip).FullName portable
           node source/tools/check-desktop-package.mjs portable/openvector-gui.exe packages/verification-cli.exe
           if ($LASTEXITCODE) { throw 'Portable application smoke failed' }
-          $install = Join-Path $env:RUNNER_TEMP 'openvector-install-check'
+          $install = Join-Path $env:RUNNER_TEMP 'openvector install check'
           $registry = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall\OpenVector'
           if ((Test-Path $install) -or (Test-Path $registry)) { throw 'Installer test state is not disposable' }
           $setup = (Get-ChildItem packages/*-Setup.exe).FullName
@@ -195,6 +195,19 @@ jobs:
           $portableHash = (Get-FileHash portable/openvector-gui.exe).Hash
           if ((Get-FileHash "$install/openvector-gui.exe").Hash -ne $portableHash) { throw 'Installed executable differs from portable package' }
           if ((Get-ItemProperty $registry).InstallLocation -ne $install) { throw 'Uninstall registration has the wrong location' }
+          if ((Get-ItemProperty $registry).UninstallString -ne "`"$install\Uninstall.exe`"") { throw 'Registered uninstall command is not quoted correctly' }
+          $installedFiles = @(Get-ChildItem $install -File -Recurse)
+          $lockedApplication = [IO.File]::Open("$install/openvector-gui.exe", 'Open', 'Read', 'Read')
+          try {
+            $blocked = Start-Process "$install/Uninstall.exe" -ArgumentList "/S _?=$install" -Wait -PassThru
+            if ($blocked.ExitCode -eq 0) { throw 'Uninstaller reported success while the application was locked' }
+            foreach ($file in $installedFiles) {
+              if (-not (Test-Path -LiteralPath $file.FullName)) { throw "Blocked uninstall removed $($file.FullName)" }
+            }
+            if ((Get-ItemProperty $registry).InstallLocation -ne $install) { throw 'Blocked uninstall removed its registration' }
+          } finally {
+            $lockedApplication.Dispose()
+          }
           node source/tools/check-desktop-package.mjs "$install/openvector-gui.exe" packages/verification-cli.exe
           if ($LASTEXITCODE) { throw 'Installed application smoke failed' }
           Set-Content "$install/user-file.txt" 'preserve this file'

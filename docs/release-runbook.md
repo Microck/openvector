@@ -30,6 +30,13 @@ distribution, architecture and required GLIBC version rather than claiming
 compatibility with every distribution. Portable means no installation is
 required; preferences still use the normal per-user location.
 
+Windows uninstall must handle busy files without reporting success or removing
+the uninstall registration. Retry deletion for up to two seconds, then offer
+Retry/Cancel. Silent uninstall must return a failure code if deletion stays
+blocked. Check this with a real file lock before the installed application check,
+then verify normal uninstall immediately after the application exits. Preserve
+unrelated files in the installation directory.
+
 Publish matching source and rebuild instructions alongside the binaries.
 Preserve the Qt-derived module, its LGPL license and modification notices.
 Verify that changing that module and rebuilding produces a working executable;

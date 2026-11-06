@@ -48,10 +48,33 @@ Section "OpenVector"
   WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\OpenVector" "Publisher" "OpenVector contributors"
   WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\OpenVector" "InstallLocation" "$INSTDIR"
   WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\OpenVector" "DisplayIcon" "$INSTDIR\openvector-gui.exe"
-  WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\OpenVector" "UninstallString" '$"$INSTDIR\Uninstall.exe$"'
+  WriteRegStr HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\OpenVector" "UninstallString" '"$INSTDIR\Uninstall.exe"'
   WriteRegDWORD HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\OpenVector" "NoModify" 1
   WriteRegDWORD HKCU "Software\Microsoft\Windows\CurrentVersion\Uninstall\OpenVector" "NoRepair" 1
 SectionEnd
+
+Function un.DeletePackageFile
+  Exch $0
+  Push $1
+retry:
+  StrCpy $1 20
+attempt:
+  ClearErrors
+  Delete "$0"
+  IfErrors 0 removed
+  ; Allow brief file locks without hiding a persistent deletion failure.
+  IntOp $1 $1 - 1
+  IntCmp $1 0 blocked
+  Sleep 100
+  Goto attempt
+blocked:
+  MessageBox MB_RETRYCANCEL|MB_ICONEXCLAMATION "Could not remove this file:$\r$\n$0$\r$\n$\r$\nClose OpenVector or any program using the file, then choose Retry. Choose Cancel to stop uninstalling." /SD IDCANCEL IDRETRY retry
+  SetErrorLevel 1
+  Quit
+removed:
+  Pop $1
+  Pop $0
+FunctionEnd
 
 Section "Uninstall"
   SetShellVarContext current

@@ -18,8 +18,11 @@ try {
   if (entries.some(entry => !entry.isFile() && !entry.isDirectory())) throw new Error('Package entries must be regular files or directories.');
   const packagePath = entry => relative(stage, join(entry.parentPath, entry.name));
   const escape = value => value.replaceAll('$', '$$').replaceAll('"', '$\\"');
+  const files = entries.filter(entry => entry.isFile()).map(packagePath);
+  // A busy application must not leave an installation with its notices removed.
+  files.sort((a, b) => Number(b === 'openvector-gui.exe') - Number(a === 'openvector-gui.exe'));
   const uninstall = [
-    ...entries.filter(entry => entry.isFile()).map(entry => `Delete "$INSTDIR\\${escape(packagePath(entry).replaceAll('/', '\\'))}"`),
+    ...files.map(file => `Push "$INSTDIR\\${escape(file.replaceAll('/', '\\'))}"\nCall un.DeletePackageFile`),
     ...entries.filter(entry => entry.isDirectory()).map(packagePath).sort((a, b) => b.length - a.length)
       .map(directory => `RMDir "$INSTDIR\\${escape(directory.replaceAll('/', '\\'))}"`),
   ].join('\n');
