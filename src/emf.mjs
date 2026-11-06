@@ -1,11 +1,10 @@
 import { readVectorOutput, walkVectorOutput, transformEmfPoint, createEmfDeviceMapper } from './vector-output.mjs';
 
-// The original passes a singly terminated label to GDI. Its recorded UTF-16
-// description continues into adjacent static data. These are observed output
-// metadata bytes; the independent writer never reads the original executable.
-const description = Uint8Array.from(('430072006500610074006500640020007700690074006800200056006500630074006f00720020004d0061006700690063000000' +
-  'c086470080734700e0854700a089470000864700b08b4700d08d4700608f4700708647006e7000006e657770617468002f6c77207b207365746c696e657769647468207d2064656600000000')
-  .match(/../g), value => Number.parseInt(value, 16));
+// EMF description: application and document labels, terminated and padded.
+const description = new Uint8Array(128);
+const label = 'OpenVector\0OpenVector\0\0';
+const descriptionView = new DataView(description.buffer);
+for (let index = 0; index < label.length; index++) descriptionView.setUint16(index * 2, label.charCodeAt(index), true);
 const emptyBounds = [0, 0, -1, -1];
 
 function record(type, ...values) {

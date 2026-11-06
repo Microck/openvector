@@ -17,6 +17,7 @@ import { serializePdf, exportPdf } from '../src/pdf.mjs';
 import { serializeEps, exportEps } from '../src/eps.mjs';
 import { serializeAi, exportAi } from '../src/ai.mjs';
 import { serializeDxf, exportDxf } from '../src/dxf.mjs';
+import { publicVectorFixture } from './helpers/native-vector-output.mjs';
 
 test('text serializers retain original bytes at document cancellation and complete through the same collector', async () => {
   const rows=gunzipSync(readFileSync(new URL('./fixtures/export-interruption-reference.ndjson.gz',import.meta.url)))
@@ -60,10 +61,10 @@ test('text serializers retain original bytes at document cancellation and comple
       cancelled++;
     } else {
       assert.equal((await operation).status,0,row.id);
-      assert.deepEqual(Buffer.from(exporters[format](options)),Buffer.from(row.expected.afterProcessExit,'base64'),row.id);
+      assert.deepEqual(Buffer.from(exporters[format](options)),publicVectorFixture(Buffer.from(row.expected.afterProcessExit,'base64')),row.id);
       completed++;
     }
-    assert.deepEqual(Buffer.from(emitted.replaceAll('\n','\r\n'),'latin1'),Buffer.from(row.expected.afterProcessExit,'base64'),row.id);
+    assert.deepEqual(Buffer.from(emitted.replaceAll('\n','\r\n'),'latin1'),publicVectorFixture(Buffer.from(row.expected.afterProcessExit,'base64')),row.id);
   }
   assert.deepEqual({completed,cancelled},{completed:282,cancelled:188});
   for(const {state,before} of documents.values())assert.deepEqual(state.fitting.geometry,before);
@@ -129,7 +130,7 @@ function emfDevice(encoded) {
 }
 
 function assertFileBytes(actual, encoded, label) {
-  const expected = Buffer.from(encoded,'base64');
+  const expected = publicVectorFixture(Buffer.from(encoded,'base64'));
   assert.ok(actual.equals(expected),`${label}: file bytes differ (${actual.length} actual, ${expected.length} expected)`);
 }
 

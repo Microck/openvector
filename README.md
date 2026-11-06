@@ -1,10 +1,14 @@
 <div align="center">
-  <img src=".github/assets/openvector-logo.png" width="160" alt="openvector logo">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset=".github/assets/openvector-logo-reversed.png">
+    <img src=".github/assets/openvector-logo.png" width="160" height="160" alt="openvector logo">
+  </picture>
   <h1>openvector</h1>
   <p>raster-to-vector conversion for the desktop, terminal, and node.js.</p>
   <p>
-    <a href="https://github.com/Microck/openvector/releases/latest"><picture><source media="(prefers-color-scheme: dark)" srcset="https://shieldcn.dev/badge/release-0.0.0.svg?variant=secondary&amp;size=xs&amp;logo=false&amp;mode=dark"><img src="https://shieldcn.dev/badge/release-0.0.0.svg?variant=secondary&amp;size=xs&amp;logo=false&amp;mode=light" alt="release 0.0.0"></picture></a>
-    <a href="docs/ci.md"><picture><source media="(prefers-color-scheme: dark)" srcset="https://shieldcn.dev/badge/ci-raft.svg?variant=secondary&amp;size=xs&amp;logo=false&amp;mode=dark"><img src="https://shieldcn.dev/badge/ci-raft.svg?variant=secondary&amp;size=xs&amp;logo=false&amp;mode=light" alt="raft ci"></picture></a>
+    <a href="https://github.com/Microck/openvector/releases/latest"><picture><source media="(prefers-color-scheme: dark)" srcset="https://shieldcn.dev/badge/release-0.1.0.svg?variant=secondary&amp;size=xs&amp;logo=false&amp;mode=dark"><img src="https://shieldcn.dev/badge/release-0.1.0.svg?variant=secondary&amp;size=xs&amp;logo=false&amp;mode=light" alt="release 0.1.0"></picture></a>
+    <a href="https://github.com/Microck/openvector/releases"><picture><source media="(prefers-color-scheme: dark)" srcset="https://shieldcn.dev/github/downloads/Microck/openvector.svg?variant=secondary&amp;size=xs&amp;logo=false&amp;mode=dark"><img src="https://shieldcn.dev/github/downloads/Microck/openvector.svg?variant=secondary&amp;size=xs&amp;logo=false&amp;mode=light" alt="total release downloads"></picture></a>
+    <a href="https://github.com/Microck/openvector/actions/workflows/source.yml"><picture><source media="(prefers-color-scheme: dark)" srcset="https://shieldcn.dev/github/ci/Microck/openvector.svg?workflow=source.yml&amp;branch=main&amp;variant=secondary&amp;size=xs&amp;logo=false&amp;mode=dark"><img src="https://shieldcn.dev/github/ci/Microck/openvector.svg?workflow=source.yml&amp;branch=main&amp;variant=secondary&amp;size=xs&amp;logo=false&amp;mode=light" alt="source ci status"></picture></a>
     <a href="LICENSE"><picture><source media="(prefers-color-scheme: dark)" srcset="https://shieldcn.dev/badge/license-MIT.svg?variant=secondary&amp;size=xs&amp;logo=false&amp;mode=dark"><img src="https://shieldcn.dev/badge/license-MIT.svg?variant=secondary&amp;size=xs&amp;logo=false&amp;mode=light" alt="MIT license"></picture></a>
   </p>
 </div>
@@ -26,21 +30,30 @@ it runs independently and does not require vector magic or a network service.
 
 ## download
 
-[the latest private release](https://github.com/Microck/openvector/releases/latest)
-includes the desktop app and its third-party notices. sign in with an account that
-has access to this repository.
+download the desktop app from [github releases](https://github.com/Microck/openvector/releases/latest).
+each package includes its third-party notices.
+
+### v0.1.0
+
+linux and windows downloads are available below. macos downloads are withheld
+until manual macbook testing is complete.
 
 | platform | package | run |
 | --- | --- | --- |
-| windows 10, x64 | [zip](https://github.com/Microck/openvector/releases/download/v0.0.0/openvector-0.0.0-windows-x64.zip) | extract the whole archive, then open `openvector-gui.exe` |
-| linux, arm64 | [tar.gz](https://github.com/Microck/openvector/releases/download/v0.0.0/openvector-0.0.0-linux-arm64.tar.gz) | extract, then run `./openvector-gui-linux/openvector-gui` |
+| linux, amd64 | [tar.gz](https://github.com/Microck/openvector/releases/download/v0.1.0/openvector-0.1.0-linux-amd64.tar.gz) | extract, then run `./openvector-0.1.0-linux-amd64/openvector-gui` |
+| linux, arm64 | [tar.gz](https://github.com/Microck/openvector/releases/download/v0.1.0/openvector-0.1.0-linux-arm64.tar.gz) | extract, then run `./openvector-0.1.0-linux-arm64/openvector-gui` |
+| windows 10 and 11, x64 | [installer](https://github.com/Microck/openvector/releases/download/v0.1.0/openvector-0.1.0-windows-x64-Setup.exe) or [portable zip](https://github.com/Microck/openvector/releases/download/v0.1.0/openvector-0.1.0-windows-x64-portable.zip) | run the installer, or extract the whole zip and open `openvector-gui.exe` |
 
-linux needs glibc 2.39 or later and the desktop libraries listed in the
-[build guide](docs/building.md). the windows executable is unsigned. macos and
-other architectures currently require a source build. there is no published npm package.
+windows executables are unsigned; the portable package needs no installation
+but still saves preferences in the normal per-user location.
 
-these are the tested desktop builds, not a claim of full equivalence with vector
-magic or coverage of every input. see [verification and known limits](docs/verification.md).
+linux packages target ubuntu 24.04 with glibc 2.39 and were tested with X11.
+the required desktop libraries are in the [build guide](docs/building.md).
+wayland remains unverified. the release includes matching source and SHA-256 checksums.
+there is no published npm package.
+
+these checks do not establish exact parity or coverage of every input.
+see [verification and known limits](docs/verification.md).
 
 ## build from source
 
@@ -57,8 +70,8 @@ npm run build
 node bin/openvector.mjs --help
 ```
 
-repository access requires authentication. `npm run build` produces the cli and
-node addon for the selected platform. it does not build the desktop app.
+`npm run build` produces the cli and node addon for the selected platform.
+it does not build the desktop app.
 
 ```sh
 cargo run --manifest-path rust/Cargo.toml --locked -p openvector-gui -- logo.png
@@ -90,6 +103,7 @@ import { CoreSession } from 'openvector';
 const document = new CoreSession().createDocument();
 document.setSource(readFileSync('logo.png'), 'logo.png');
 document.runAutomatic({ extension: '.png' });
+// saveVector creates a new file and never overwrites an existing path.
 const saved = document.saveVector('logo.svg', { layout: 'cutouts' });
 if (saved.status !== 0 || saved.error) {
   throw new Error(saved.error?.message ?? `Export failed: ${saved.status}`);
@@ -106,10 +120,11 @@ binary or falls back to the javascript reference implementation on import.
 npm run test:smoke
 ```
 
-that command runs the small reference checks included in the default checkout.
-it is also the test scope of [raft source ci](docs/ci.md), not a claim that the full
-native or desktop suite passed. see [development](docs/development.md) and [test fixtures](docs/test-fixtures.md)
-for the full suite and its external fixture corpus.
+that command runs small reference checks and independently authored tests included
+in the default checkout. it is also the test scope of [GitHub Actions source CI](docs/ci.md),
+not a claim that the full native or desktop suites pass. see
+[development](docs/development.md) and [test fixtures](docs/test-fixtures.md) for
+the broader checks and their private fixture corpus.
 
 | directory | contents |
 | --- | --- |
@@ -117,7 +132,7 @@ for the full suite and its external fixture corpus.
 | `rust/crates/openvector-gui` | native desktop app |
 | `rust/crates/openvector-cli` | cli |
 | `rust/crates/openvector-node`, `npm/` | node-api binding and public declarations |
-| `src/`, `gui/` | development reference implementation and browser preview |
+| `src/`, `gui/` | development reference implementation, models, and HTTP test host |
 | `test/`, `docs/` | tests, fixtures, usage guides, and behavioral contracts |
 
 ## license

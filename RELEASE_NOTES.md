@@ -1,3 +1,15 @@
+# 0.1.1
+
+- windows setup uses the openvector icon and lets you choose the installation folder.
+- export screens no longer show the svg dimensions note. exported dimensions are unchanged.
+- changing drag formats no longer flashes the preparation label for fast exports.
+
+# 0.1.0
+
+- emf exports identify openvector and contain no captured application metadata.
+- the javascript pdf writer now uses the same openvector producer field as the native engine.
+- development rebuilds verify bundled codec sources against retained upstream identity manifests.
+
 # 0.0.0
 
 first private desktop release of openvector.

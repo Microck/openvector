@@ -329,7 +329,7 @@ impl OpenVectorApp {
                     let retained_source = self.document.is_some();
                     if new_source {
                         self.drag_result.invalidate();
-                        if self.batch.is_some() { self.source_sizing = None; self.source_sizing_consumed = false; self.source_recommendations = None; self.transparency_initialized = [false; 2]; }
+                        if self.batch.is_some() { self.source_sizing = None; self.source_sizing_consumed = false; self.source_recommendations = None; self.transparency_initialized = [false; 2]; self.preferences.bitmap_save.batch_source_changed(&document.filename); }
                         if self.loading_source && document.origin == SourceOrigin::Path {
                             if let Some(directory) = document.filename.parent() { self.source_directory = directory.into(); }
                         }
@@ -428,6 +428,7 @@ impl OpenVectorApp {
         let mut value = Value::Object(self.settings.to_json());
         value["lower"] = json!(self.color_count); value["upper"] = json!(self.color_count);
         value["count"] = json!(self.color_count);
+        if self.workflows.palette.customized { value["paletteEncoding"] = json!("straight"); }
         value["recommendedBackgroundMode"] = json!(self.workflows.recommended_background_mode);
         value["extension"] = json!(self.document.as_ref().and_then(|doc| doc.filename.extension()).and_then(|ext| ext.to_str()).unwrap_or(""));
         value
@@ -1655,3 +1656,4 @@ mod palette_transition_tests;
 #[cfg(test)]
 #[path = "app-source-sizing-tests.rs"]
 mod source_sizing_tests;
+

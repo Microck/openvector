@@ -33,12 +33,12 @@ pub struct AutomaticSelection{pub settings:DocumentSettings,pub palette_count:Op
 pub type DocumentStageObserver<'a>=dyn FnMut(&str,&TaskResult,&AutomaticSelection)->Result<(),String>+'a;
 #[derive(Clone,Debug)]
 pub struct AutomaticResult{pub settings:DocumentSettings,pub palette_count:Option<usize>,pub source_alpha_type:u8,pub recommended_background_mode:i32,pub state:DocumentSnapshot}
-pub struct ImageDocument{session:CoreSession,state:DocumentSnapshot,candidates:Vec<Option<AnalyzedPalette>>,shadowing:bool,cluster_colors:bool,shadow_control:Option<i32>,source_alpha_type:Option<u8>,cancel:Arc<AtomicBool>,fitter:Option<ContourFitter>,region_identity:u64,fitter_identity:u64,region_palette:Option<Vec<f32>>,editor:Option<SegmentationEditor>,committed_editing:Option<EditorCheckpoint>,background:BackgroundEditor,pointer:EditorPointer}
+pub struct ImageDocument{session:CoreSession,state:DocumentSnapshot,candidates:Vec<Option<AnalyzedPalette>>,shadowing:bool,cluster_colors:bool,shadow_control:Option<i32>,source_alpha_type:Option<u8>,cancel:Arc<AtomicBool>,fitter:Option<ContourFitter>,region_identity:u64,fitter_identity:u64,region_palette:Option<Vec<f32>>,editor:Option<SegmentationEditor>,committed_editing:Option<EditorCheckpoint>,background:BackgroundEditor,pointer:EditorPointer,automatic_premultiplied_colors:bool,segmentation_palette_premultiplied:bool,automatic_palettes:Vec<(i32,Vec<f32>)>}
 impl ImageDocument{
     pub fn new(session:CoreSession)->Self{
         let mut parameters=NUMERIC_DATA["constructor"].clone();parameters["usePalette"]=json!(false);parameters["shadowing"]=json!(true);parameters["clusterColors"]=json!(true);
         let state=DocumentSnapshot{original:OwnedImage::default(),source:OwnedImage::default(),working:OwnedImage::default(),settings:DocumentSettings::default(),classification:DocumentClassification{category:-1,..Default::default()},parameters,stage_keys:StageKeys::default(),completed:[0;25],scores:[1e10;25],palettes:vec![Vec::new();25],segmentation:None,contours:None,smoothing:None,fitting:None,processed:false,status:0,progress:0,cancelled:false,random_state:session.random_state()};
-        Self{session,state,candidates:vec![None;25],shadowing:true,cluster_colors:true,shadow_control:None,source_alpha_type:None,cancel:Arc::new(AtomicBool::new(false)),fitter:None,region_identity:0,fitter_identity:0,region_palette:None,editor:None,committed_editing:None,background:BackgroundEditor::default(),pointer:EditorPointer{previous_point:[-1.0,-1.0]}}
+        Self{session,state,candidates:vec![None;25],shadowing:true,cluster_colors:true,shadow_control:None,source_alpha_type:None,cancel:Arc::new(AtomicBool::new(false)),fitter:None,region_identity:0,fitter_identity:0,region_palette:None,editor:None,committed_editing:None,background:BackgroundEditor::default(),pointer:EditorPointer{previous_point:[-1.0,-1.0]},automatic_premultiplied_colors:false,segmentation_palette_premultiplied:false,automatic_palettes:Vec::new()}
     }
     pub fn snapshot(&self)->DocumentSnapshot{self.refresh_snapshot(self.state.clone())}
     /// Stage observers can change shared cancellation or random state without
@@ -46,6 +46,43 @@ impl ImageDocument{
     pub(crate) fn refresh_snapshot(&self,mut state:DocumentSnapshot)->DocumentSnapshot{state.random_state=self.session.random_state();state.cancelled=self.cancel.load(Ordering::Relaxed);state}
     /// Read-only exporter view; unlike snapshot this does not clone raster or geometry storage.
     pub fn state(&self)->&DocumentSnapshot{&self.state}
+    /// Output projection for an unedited automatic trace. The numeric engine
+    /// retains reference-compatible premultiplied colors internally; formats
+    /// and the viewer consume straight RGB plus alpha.
+    pub fn presentation_geometry(&self)->Option<std::borrow::Cow<'_, FittedGeometry>>{
+        let geometry=&self.state.fitting.as_ref().filter(|f|f.complete)?.geometry;
+        if !self.automatic_premultiplied_colors { return Some(std::borrow::Cow::Borrowed(geometry)); }
+        let mut straight=geometry.clone();
+        for region in &mut straight.regions {
+            let alpha=region.bgra[3] as u32;
+            for channel in &mut region.bgra[..3] {
+                *channel=if alpha==0 {0} else {(((*channel as u32)*255+alpha/2)/alpha).min(255) as u8};
+            }
+        }
+        Some(std::borrow::Cow::Owned(straight))
+    }
+    /// Match the output geometry's color space in serializers that name colors
+    /// from the palette (notably DXF layer tables).
+    pub fn presentation_palette(&self)->Vec<f32>{
+        let palette=self.state.segmentation.as_ref().map_or(&[][..],|s|s.palette.as_slice());
+        if self.automatic_palettes.is_empty()&&!self.segmentation_palette_premultiplied{return palette.to_vec();}
+        // The mutable settings palette can differ from fitted edited regions.
+        // DXF layer names must correspond to the exact colors it draws.
+        let Some(geometry)=self.presentation_geometry() else{return palette.to_vec()};
+        let mut seen=std::collections::HashSet::new();
+        let mut output=Vec::new();
+        for region in &geometry.regions{
+            if seen.insert(region.bgra){output.extend(region.bgra.map(|byte|byte as f32/255.0));}
+        }
+        output
+    }
+    /// Remember a palette selected directly from engine analysis, independently
+    /// of the current geometry. Call only for engine-produced colors.
+    pub fn remember_generated_palette(&mut self,mode:i32,palette:&[f32]){
+        if !self.automatic_palettes.iter().any(|(m,p)|*m==mode&&p==palette){
+            self.automatic_palettes.push((mode,palette.to_vec()));
+        }
+    }
     /// Explicit saved checkpoint presence, distinct from applied segmentation edits.
     pub fn has_committed_edits(&self)->bool{self.committed_editing.as_ref().is_some_and(|checkpoint|!checkpoint.undo.is_empty())}
     pub fn has_applied_edits(&self)->bool{!self.state.stage_keys.segmentation_edits.is_empty()}
@@ -130,9 +167,9 @@ impl ImageDocument{
         map.width=width;map.height=height;map.indices=Some(candidate.generated.indices.clone());map.palette=candidate.generated.palette.clone();
         let c=analysis.image_analysis.classification;let p=analysis.palette_analysis.classification;self.state.classification=DocumentClassification{category:c.image_type as i32,quality:c.quality as i32,palette_mode:p.mode as i32,color_count:p.color_count as i32};self.finish_cancellable_task(settings.clone());Ok(TaskResult{did_work:true,settings,state:self.snapshot(),analysis:Some(analysis)})
     }
-    pub fn segment(&mut self,input:&Value,observer:Option<&mut DocumentObserver>)->Result<DocumentSnapshot,String>{let settings=read_document_settings(input).map_err(|e|e.to_string())?;self.segment_settings(settings,observer)?;Ok(self.snapshot())}
-    fn segment_settings(&mut self,settings:DocumentSettings,mut observer:Option<&mut DocumentObserver>)->Result<(),String>{if matches!(settings.palette_mode,0|1)&&settings.palette.is_empty(){return Err("Fixed document segmentation needs at least one palette color.".into())}let parameters=Self::parameters(&settings,"segmentation")?;if parameters["Shared::is_anti_aliased"].as_f64()!=Some(0.0)&&(self.state.original.width<2||self.state.original.height<2){return Err("Anti-alias document segmentation needs dimensions of at least 2 by 2.".into())}self.begin_task();self.apply_profile(&settings,parameters);let key=document_segmentation_key(&settings);let work=key!=self.state.stage_keys.segmentation;self.state.stage_keys.segmentation=key;
-        if work{self.prepare_source(&settings)?;self.state.working=self.state.source.clone();let pixels=self.state.working.clone();let palette=matches!(settings.palette_mode,0|1).then_some(settings.palette.as_slice());let mut owner=SegmentationState::new(self.state.segmentation.as_ref(),pixels.width,pixels.height,palette);self.region_palette=None;if let Some(f)=self.state.fitting.as_mut(){f.complete=false}let mut parameters=self.state.parameters.clone();let result=owner.run(Raster{width:pixels.width,height:pixels.height,bgra:&pixels.bgra},&mut parameters,palette,&mut|event,live|{self.state.segmentation=Some(live.clone());if let Some(minimum)=event.minimum_pixels{self.state.parameters["Segmenter::min_num_pixels"]=json!(minimum)}self.notify(DocumentProgress{stage:"segmentation",phase:event.phase,substep:event.substep,counter:event.counter,fraction:event.fraction,percent:event.percent,color_count:None,iteration:None},&mut observer)}).map(|_|());self.state.parameters=parameters;
+    pub fn segment(&mut self,input:&Value,observer:Option<&mut DocumentObserver>)->Result<DocumentSnapshot,String>{let settings=read_document_settings(input).map_err(|e|e.to_string())?;self.segment_settings(settings,input["paletteEncoding"].as_str(),observer)?;Ok(self.snapshot())}
+    fn segment_settings(&mut self,settings:DocumentSettings,encoding:Option<&str>,mut observer:Option<&mut DocumentObserver>)->Result<(),String>{if matches!(settings.palette_mode,0|1)&&settings.palette.is_empty(){return Err("Fixed document segmentation needs at least one palette color.".into())}let retain_automatic_colors=match encoding{Some("straight")=>false,Some("premultiplied")=>true,Some(_)=>return Err("Palette encoding must be straight or premultiplied.".into()),None=>self.automatic_palettes.iter().any(|(mode,palette)|*mode==settings.palette_mode&&*palette==settings.palette)};let parameters=Self::parameters(&settings,"segmentation")?;if parameters["Shared::is_anti_aliased"].as_f64()!=Some(0.0)&&(self.state.original.width<2||self.state.original.height<2){return Err("Anti-alias document segmentation needs dimensions of at least 2 by 2.".into())}self.begin_task();self.apply_profile(&settings,parameters);let key=document_segmentation_key(&settings);let work=key!=self.state.stage_keys.segmentation||(encoding.is_some()&&retain_automatic_colors!=self.segmentation_palette_premultiplied);self.state.stage_keys.segmentation=key;
+        if work{self.segmentation_palette_premultiplied=retain_automatic_colors;self.automatic_premultiplied_colors=retain_automatic_colors;self.prepare_source(&settings)?;self.state.working=self.state.source.clone();let pixels=self.state.working.clone();let palette=matches!(settings.palette_mode,0|1).then_some(settings.palette.as_slice());let mut owner=SegmentationState::new(self.state.segmentation.as_ref(),pixels.width,pixels.height,palette);self.region_palette=None;if let Some(f)=self.state.fitting.as_mut(){f.complete=false}let mut parameters=self.state.parameters.clone();let result=owner.run(Raster{width:pixels.width,height:pixels.height,bgra:&pixels.bgra},&mut parameters,palette,&mut|event,live|{self.state.segmentation=Some(live.clone());if let Some(minimum)=event.minimum_pixels{self.state.parameters["Segmenter::min_num_pixels"]=json!(minimum)}self.notify(DocumentProgress{stage:"segmentation",phase:event.phase,substep:event.substep,counter:event.counter,fraction:event.fraction,percent:event.percent,color_count:None,iteration:None},&mut observer)}).map(|_|());self.state.parameters=parameters;
             if let Err(error)=result{self.state.stage_keys.segmentation.clear();self.state.stage_keys.segmentation_edits.clear();self.state.stage_keys.smoothing.clear();self.state.stage_keys.fitting.clear();return self.interrupted(error)}
             let segmented=owner.into_snapshot();self.region_palette=Some(segmented.palette.clone());self.state.segmentation=Some(segmented);self.region_identity=self.region_identity.wrapping_add(1);self.editor=None;self.committed_editing=None;self.state.contours=None;self.state.smoothing=None;self.state.fitting=None;self.state.stage_keys.segmentation_edits.clear();self.state.stage_keys.smoothing.clear();self.state.stage_keys.fitting.clear();
         }self.finish_task(settings);Ok(())
@@ -155,7 +192,7 @@ impl ImageDocument{
         if !self.finish_cancellable_task(settings){self.state.stage_keys.fitting.clear()}
         Ok(())
     }
-    pub fn run_task(&mut self,stage:&str,input:&Value,observer:Option<&mut DocumentObserver>)->Result<TaskResult,String>{if stage=="classification"{return self.classify(input)}let settings=read_document_settings(input).map_err(|e|e.to_string())?;let mut work=self.key(stage,&settings)?!=self.current_key(stage);let range=if stage=="palette"{Some(Self::palette_range(input)?)}else{None};if let Some((lower,last))=range{work|=(lower..=last).any(|n|self.state.completed[n]==0)}if !work{if stage=="palette"{self.state.settings=settings.clone();self.save_editing_checkpoint()}}else{match stage{"palette"=>{let (lower,last)=range.unwrap();self.analyze_settings(settings.clone(),lower,last,observer)?},"segmentation"=>self.segment_settings(settings.clone(),observer)?,"smoothing"=>self.smooth_settings(settings.clone(),observer)?,_=>self.fit_settings(settings.clone(),observer)?}}Ok(TaskResult{did_work:work,settings,state:self.snapshot(),analysis:None})}
+    pub fn run_task(&mut self,stage:&str,input:&Value,observer:Option<&mut DocumentObserver>)->Result<TaskResult,String>{if stage=="classification"{return self.classify(input)}let settings=read_document_settings(input).map_err(|e|e.to_string())?;let mut work=self.key(stage,&settings)?!=self.current_key(stage);if stage=="segmentation"{match input["paletteEncoding"].as_str(){Some("straight")=>work|=self.segmentation_palette_premultiplied,Some("premultiplied")=>work|=!self.segmentation_palette_premultiplied,Some(_)=>return Err("Palette encoding must be straight or premultiplied.".into()),None=>{}}}let range=if stage=="palette"{Some(Self::palette_range(input)?)}else{None};if let Some((lower,last))=range{work|=(lower..=last).any(|n|self.state.completed[n]==0)}if !work{if stage=="palette"{self.state.settings=settings.clone();self.save_editing_checkpoint()}}else{match stage{"palette"=>{let (lower,last)=range.unwrap();self.analyze_settings(settings.clone(),lower,last,observer)?},"segmentation"=>self.segment_settings(settings.clone(),input["paletteEncoding"].as_str(),observer)?,"smoothing"=>self.smooth_settings(settings.clone(),observer)?,_=>self.fit_settings(settings.clone(),observer)?}}Ok(TaskResult{did_work:work,settings,state:self.snapshot(),analysis:None})}
     pub fn source_alpha_type(&mut self)->u8{*self.source_alpha_type.get_or_insert_with(||{let mut kind=0;for p in self.state.original.bgra.chunks_exact(4){if p[3]>0&&p[3]<255{return 2}if p[3]==0{kind=1}}kind})}
     pub fn run_export(&mut self,save:impl FnOnce(&mut dyn FnMut(i32)->Result<(),String>)->Result<u32,String>)->Result<DocumentSnapshot,String>{
         if !self.state.fitting.as_ref().is_some_and(|f|f.complete){return Err("Document export needs completed fitted geometry.".into())}
@@ -172,12 +209,18 @@ impl ImageDocument{
     pub fn save_vector_file_with_environment(&mut self,path:&std::path::Path,options:&crate::export_options::ExportOptions,environment:&DocumentExportEnvironment,on_progress:Option<&mut dyn FnMut(i32)->Result<(),String>>)->Result<crate::vector_file::VectorFileResult,String>{
         self.save_vector_file_admitted(path,options,environment,true,on_progress)
     }
-    pub fn save_vector_file_admitted(&mut self,path:&std::path::Path,options:&crate::export_options::ExportOptions,environment:&DocumentExportEnvironment,overwrite:bool,mut on_progress:Option<&mut dyn FnMut(i32)->Result<(),String>>)->Result<crate::vector_file::VectorFileResult,String>{
+    pub fn save_vector_file_admitted(&mut self,path:&std::path::Path,options:&crate::export_options::ExportOptions,environment:&DocumentExportEnvironment,overwrite:bool,on_progress:Option<&mut dyn FnMut(i32)->Result<(),String>>)->Result<crate::vector_file::VectorFileResult,String>{
+        self.save_vector_file_impl(path,options,environment,overwrite,false,on_progress)
+    }
+    pub fn save_vector_file_safely(&mut self,path:&std::path::Path,options:&crate::export_options::ExportOptions,on_progress:Option<&mut dyn FnMut(i32)->Result<(),String>>)->Result<crate::vector_file::VectorFileResult,String>{
+        self.save_vector_file_impl(path,options,&DocumentExportEnvironment::default(),false,true,on_progress)
+    }
+    fn save_vector_file_impl(&mut self,path:&std::path::Path,options:&crate::export_options::ExportOptions,environment:&DocumentExportEnvironment,overwrite:bool,safe:bool,mut on_progress:Option<&mut dyn FnMut(i32)->Result<(),String>>)->Result<crate::vector_file::VectorFileResult,String>{
         if !self.state.fitting.as_ref().is_some_and(|f|f.complete){return Err("Document export needs completed fitted geometry.".into())}
         self.begin_task();
         let hidden:Vec<i64>=self.background.snapshot().hidden_regions.iter().map(|v|*v as i64).collect();
-        let geometry=&self.state.fitting.as_ref().unwrap().geometry;
-        let vector=crate::vector_output::VectorOutputInput{geometry,width:self.state.source.width as i64,height:self.state.source.height as i64,output_size:environment.output_size,layout:options.layout,thin_stroke:options.thin_stroke,hidden_regions:&hidden};
+        let geometry=self.presentation_geometry().ok_or("Document export needs completed fitted geometry.")?.into_owned();
+        let vector=crate::vector_output::VectorOutputInput{geometry:&geometry,width:self.state.source.width as i64,height:self.state.source.height as i64,output_size:environment.output_size,layout:options.layout,thin_stroke:options.thin_stroke,hidden_regions:&hidden};
         let mut input=crate::vector_file::VectorFileInput::new(vector);
         input.eps.compact=options.compact;
         input.eps.creation_date=environment.creation_date.clone();
@@ -185,15 +228,17 @@ impl ImageDocument{
         if input.reference_device.is_none()&&path.as_os_str().as_encoded_bytes().ends_with(b".emf"){
             input.reference_device=Some(crate::emf::EmfDevice::current_display().map_err(|e|e.to_string())?);
         }
-        input.palette=self.state.segmentation.as_ref().map_or(&[][..],|s|s.palette.as_slice());
+        let palette=self.presentation_palette();
+        input.palette=&palette;
         input.dxf_curve_mode=match options.curve_mode{crate::export_options::CurveMode::Splines=>crate::dxf::DxfCurveMode::Splines,crate::export_options::CurveMode::SparseLines=>crate::dxf::DxfCurveMode::SparseLines,crate::export_options::CurveMode::DenseLines=>crate::dxf::DxfCurveMode::DenseLines};
         let progress=&mut self.state.progress;let cancel=&self.cancel;
-        let result=crate::vector_file::write_vector_file_admitted(path,&input,overwrite,&mut|percent|{
+        let mut observer=|percent|{
             *progress=percent;
             if let Some(cb)=on_progress.as_deref_mut(){observer_result(cancel,cb(percent)).map_err(crate::vector_output::VectorOutputError)?}
             if cancel.load(Ordering::Relaxed){return Err(crate::vector_output::VectorOutputError(CANCEL_TASK.into()))}
             Ok(())
-        }).map_err(|e|e.to_string())?;
+        };
+        let result=if safe { crate::vector_file::write_vector_file_safely(path,&input,&mut observer) } else { crate::vector_file::write_vector_file_admitted(path,&input,overwrite,&mut observer) }.map_err(|e|e.to_string())?;
         self.state.status=result.status as u32;Ok(result)
     }
     fn merged_settings(&self,input:&Value)->Result<DocumentSettings,String>{let mut s=self.state.settings.to_json();let values=input.as_object().ok_or("Automatic processing requires controls with an extension.")?;for(k,v)in values{s.insert(k.clone(),v.clone());}read_document_settings(&Value::Object(s)).map_err(|e|e.to_string())}
@@ -205,7 +250,10 @@ impl ImageDocument{
     pub fn run_automatic_with_observers(&mut self,input:&Value,mut observer:Option<&mut DocumentObserver>,mut on_stage:Option<&mut DocumentStageObserver>)->Result<AutomaticResult,String>{
         let extension=input["extension"].as_str().ok_or("Automatic processing requires an extension string.")?;let mut settings=self.merged_settings(input)?;settings.advanced=false;let alpha=self.source_alpha_type();let mut classify=Value::Object(settings.to_json());classify["extension"]=json!(extension);let result=self.run_task("classification",&classify,None)?;if result.state.status==2{return Err(CANCEL_TASK.into())}let c=&result.state.classification;let recommended=i32::from(c.category==1&&alpha==1);settings.category=c.category;settings.quality=c.quality;settings.palette_mode=c.palette_mode;settings.background_mode=recommended;settings.background=[1.0,1.0,1.0,recommended as f32];let mut selection=AutomaticSelection{settings,palette_count:None,recommended_background_mode:recommended};if let Some(cb)=on_stage.as_deref_mut(){cb("classification",&result,&selection)?}
         if matches!(selection.settings.palette_mode,0|1){let mut controls=Value::Object(selection.settings.to_json());controls["lower"]=json!(2);controls["upper"]=json!(12);let result=self.run_task("palette",&controls,observer.as_mut().map(|o|&mut **o as &mut DocumentObserver))?;let count=self.minimum_palette().ok_or("Automatic palette selection found no eligible candidate.")?;selection.palette_count=Some(count);selection.settings.palette=self.selected_palette(count);if let Some(cb)=on_stage.as_deref_mut(){cb("palette",&result,&selection)?}}
-        for stage in ["segmentation","smoothing","fitting"]{let result=self.run_task(stage,&Value::Object(selection.settings.to_json()),observer.as_mut().map(|o|&mut **o as &mut DocumentObserver))?;if result.did_work&&result.state.status==2{return Err(CANCEL_TASK.into())}if let Some(cb)=on_stage.as_deref_mut(){cb(stage,&result,&selection)?}}
+        // Keep the selected palette provenance even if segmentation is interrupted.
+        // Current fitted geometry retains its own encoding until segmentation replaces it.
+        self.remember_generated_palette(selection.settings.palette_mode,&selection.settings.palette);
+        for stage in ["segmentation","smoothing","fitting"]{let result=self.run_task(stage,&Value::Object(selection.settings.to_json()),observer.as_mut().map(|o|&mut **o as &mut DocumentObserver))?;if result.did_work&&result.state.status==2{return Err(CANCEL_TASK.into())}if stage=="segmentation"{self.automatic_premultiplied_colors=self.state.stage_keys.segmentation_edits.is_empty();}if let Some(cb)=on_stage.as_deref_mut(){cb(stage,&result,&selection)?}}
         Ok(AutomaticResult{settings:selection.settings,palette_count:selection.palette_count,source_alpha_type:alpha,recommended_background_mode:recommended,state:self.snapshot()})
     }
     pub fn run_batch_image(&mut self,input:&Value)->Result<AutomaticResult,String>{self.run_batch_image_with_observers(input,None,None)}
@@ -214,13 +262,22 @@ impl ImageDocument{
         if classify{let mut controls=Value::Object(settings.to_json());controls["extension"]=json!(extension);let result=self.run_task("classification",&controls,None)?;if result.state.status==2{return Err(CANCEL_TASK.into())}if let Some(cb)=on_stage.as_deref_mut(){cb("classification",&result,&AutomaticSelection{settings:settings.clone(),palette_count:None,recommended_background_mode:0})?}}
         let c=&self.state.classification;if classify&&requested.category==3{settings.category=c.category}if classify&&requested.quality==3{settings.quality=c.quality}if classify&&requested.palette_mode==3{settings.palette_mode=c.palette_mode}let recommended=i32::from(settings.category==1&&alpha==1);if !requested.advanced&&requested.background_mode==3{settings.background_mode=recommended;settings.background=[1.0,1.0,1.0,recommended as f32]}
         let mut selection=AutomaticSelection{settings,palette_count:None,recommended_background_mode:recommended};
-        if if requested.advanced{requested.palette_mode==1}else{requested.palette_mode!=2}{let mut controls=Value::Object(selection.settings.to_json());controls["lower"]=json!(if requested.advanced{requested.color_count}else{2});controls["upper"]=json!(if requested.advanced{requested.color_count}else{12});let result=self.run_task("palette",&controls,observer.as_mut().map(|o|&mut **o as &mut DocumentObserver))?;if let Some(cb)=on_stage.as_deref_mut(){cb("palette",&result,&selection)?}let count=if requested.advanced{Some(requested.color_count as usize)}else if selection.settings.palette_mode==0{Some(2)}else if requested.palette_mode==1&&requested.color_count!=0{Some(requested.color_count as usize)}else{self.minimum_palette()}.ok_or("Batch palette selection found no eligible candidate.")?;selection.palette_count=Some(count);selection.settings.palette=self.selected_palette(count)}
+        if if requested.advanced{requested.palette_mode==1}else{requested.palette_mode!=2}{let mut controls=Value::Object(selection.settings.to_json());controls["lower"]=json!(if requested.advanced{requested.color_count}else{2});controls["upper"]=json!(if requested.advanced{requested.color_count}else{12});let result=self.run_task("palette",&controls,observer.as_mut().map(|o|&mut **o as &mut DocumentObserver))?;if let Some(cb)=on_stage.as_deref_mut(){cb("palette",&result,&selection)?}let count=if requested.advanced{Some(requested.color_count as usize)}else if selection.settings.palette_mode==0{Some(2)}else if requested.palette_mode==1&&requested.color_count!=0{Some(requested.color_count as usize)}else{self.minimum_palette()}.ok_or("Batch palette selection found no eligible candidate.")?;selection.palette_count=Some(count);selection.settings.palette=self.selected_palette(count);self.remember_generated_palette(selection.settings.palette_mode,&selection.settings.palette)}
         for stage in ["segmentation","smoothing","fitting"]{let result=self.run_task(stage,&Value::Object(selection.settings.to_json()),observer.as_mut().map(|o|&mut **o as &mut DocumentObserver))?;if result.state.status==2{return Err(CANCEL_TASK.into())}if let Some(cb)=on_stage.as_deref_mut(){cb(stage,&result,&selection)?}}
         Ok(AutomaticResult{settings:selection.settings,palette_count:selection.palette_count,source_alpha_type:alpha,recommended_background_mode:recommended,state:self.snapshot()})
     }
     pub fn begin_editing(&mut self)->Result<EditorSnapshot,String>{
         let map=self.state.segmentation.as_ref().ok_or("Document editing needs completed segmentation.")?;let palette=self.region_palette.as_ref().ok_or("Document editing needs completed segmentation.")?;self.background.finish();
         if self.editor.is_none(){let indices=map.indices.as_ref().ok_or("Document editing needs completed segmentation.")?;let mut bgra=vec![0;map.width*map.height*4];for(pixel,&index)in indices.iter().enumerate(){let color=map.color_indices[index as usize] as usize;for c in 0..4{bgra[pixel*4+c]=(palette[color*4+c] as f64*255.0+0.5).floor() as u8}}let background=self.state.settings.background.map(|v|v as f64);let color:Vec<f64>=palette[..4].iter().map(|v|*v as f64).collect();self.editor=Some(SegmentationEditor::new(map.width as i64,map.height as i64,&bgra,&self.state.original.bgra,&background,&color,self.state.settings.background_mode)?)}Ok(self.editor.as_ref().unwrap().snapshot())
+    }
+    /// Product-facing editing uses straight colors for a fresh automatic trace.
+    /// The original begin_editing method remains available for reference replay.
+    pub fn begin_editing_for_output(&mut self)->Result<EditorSnapshot,String>{
+        self.begin_editing()?;
+        if self.automatic_premultiplied_colors{
+            self.editor.as_mut().unwrap().enable_straight_colors()?;
+        }
+        Ok(self.editor.as_ref().unwrap().snapshot())
     }
     fn editing_session(&mut self)->Result<&mut SegmentationEditor,String>{self.editor.as_mut().ok_or_else(||"Call beginEditing before editing the document.".into())}
     pub fn edit(&mut self,command:&Value)->Result<EditorSnapshot,String>{self.editing_session()?.apply(command)}
@@ -229,6 +286,9 @@ impl ImageDocument{
     pub fn leave_editing(&mut self)->Result<(),String>{self.editing_session()?.end_editing();Ok(())}
     pub fn restore_committed_editing(&mut self)->Result<Option<EditorSnapshot>,String>{match self.editor.as_mut(){None=>Ok(None),Some(editor)=>{let empty=EditorCheckpoint{undo:Vec::new(),redo:Vec::new()};Ok(Some(editor.restore_checkpoint(self.committed_editing.as_ref().unwrap_or(&empty))?))}}}
     pub fn gesture(&mut self,event:&Value)->Result<EditorSnapshot,String>{self.editor.as_mut().ok_or("Call beginEditing before editing the document.")?.gesture(event,&mut self.pointer)}
+    pub fn grouped_gesture(&mut self,event:&Value)->Result<EditorSnapshot,String>{self.editor.as_mut().ok_or("Call beginEditing before editing the document.")?.grouped_gesture(event,&mut self.pointer)}
+    pub fn grouped_undo_edit(&mut self)->Result<EditorSnapshot,String>{self.editing_session()?.grouped_undo()}
+    pub fn grouped_redo_edit(&mut self)->Result<EditorSnapshot,String>{self.editing_session()?.grouped_redo()}
     pub fn undo_edit(&mut self)->Result<EditorSnapshot,String>{self.editing_session()?.undo()}
     pub fn redo_edit(&mut self)->Result<EditorSnapshot,String>{self.editing_session()?.redo()}
     pub fn revert_edits(&mut self)->Result<EditorSnapshot,String>{self.editing_session()?.revert()}
@@ -249,7 +309,7 @@ impl ImageDocument{
     /// Advanced Next applies pixels without advancing the document Back checkpoint.
     pub fn apply_editing(&mut self)->Result<DocumentSnapshot,String>{
         let editor=self.editing_session()?.snapshot();self.editor.as_mut().unwrap().end_editing();self.background.finish();
-        if editor.key!=self.state.stage_keys.segmentation_edits{let colors:Vec<[u8;4]>=editor.bgra.chunks_exact(4).map(|c|[c[0],c[1],c[2],c[3]]).collect();let (palette,labels)=crate::region_data::palette_from_byte_colors(&colors);let previous:Vec<_>=(0..palette.len()/4).map(|i|crate::region_data::RegionStatistic{count:0,sums:[0.0;4],color_index:i as i32}).collect();let(indices,statistics)=crate::region_data::rebuild_connected_regions(editor.width,&editor.bgra,&labels,Some(&previous));self.state.segmentation=Some(SegmentationSnapshot{width:editor.width,height:editor.height,indices:Some(indices),palette:palette.clone(),counts:statistics.iter().map(|r|r.count as i32).collect(),color_indices:statistics.iter().map(|r|r.color_index).collect()});self.region_palette=Some(palette);self.region_identity=self.region_identity.wrapping_add(1);self.state.stage_keys.segmentation_edits=editor.key;self.state.contours=None;self.state.smoothing=None;self.state.fitting=None}Ok(self.snapshot())
+        if editor.key!=self.state.stage_keys.segmentation_edits{self.automatic_premultiplied_colors=false;let colors:Vec<[u8;4]>=editor.bgra.chunks_exact(4).map(|c|[c[0],c[1],c[2],c[3]]).collect();let (palette,labels)=crate::region_data::palette_from_byte_colors(&colors);let previous:Vec<_>=(0..palette.len()/4).map(|i|crate::region_data::RegionStatistic{count:0,sums:[0.0;4],color_index:i as i32}).collect();let(indices,statistics)=crate::region_data::rebuild_connected_regions(editor.width,&editor.bgra,&labels,Some(&previous));self.state.segmentation=Some(SegmentationSnapshot{width:editor.width,height:editor.height,indices:Some(indices),palette:palette.clone(),counts:statistics.iter().map(|r|r.count as i32).collect(),color_indices:statistics.iter().map(|r|r.color_index).collect()});self.region_palette=Some(palette);self.region_identity=self.region_identity.wrapping_add(1);self.state.stage_keys.segmentation_edits=editor.key;self.state.contours=None;self.state.smoothing=None;self.state.fitting=None}Ok(self.snapshot())
     }
     pub fn finish_editing(&mut self,input:&Value,observer:Option<&mut DocumentObserver>)->Result<DocumentSnapshot,String>{self.finish_editing_with_observers(input,observer,None)}
     pub fn finish_editing_with_observers(&mut self,input:&Value,mut observer:Option<&mut DocumentObserver>,mut on_stage:Option<&mut dyn FnMut(&str,&TaskResult)->Result<(),String>>)->Result<DocumentSnapshot,String>{
@@ -306,3 +366,4 @@ mod checkpoint_tests{
         assert!(!document.editing_changed());
     }
 }
+

@@ -13,6 +13,7 @@ num-bigint = "0.4"
 num-traits = "0.2"
 flate2 = "1"
 libc = "0.2"
+tempfile = "3"
 
 [build-dependencies]
 cc = "1"
@@ -21,7 +22,6 @@ cc = "1"
 serde_json = { version = "1", features = ["float_roundtrip"] }
 flate2 = "1"
 base64 = "0.22"
-tempfile = "3"
 sha2 = "0.10"
 
 [target.'cfg(target_os = "linux")'.dependencies]

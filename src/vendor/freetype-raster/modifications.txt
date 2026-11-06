@@ -12,9 +12,10 @@ OpenVector changes to qgrayraster.c:
   retries and any pixels already composed before those retries.
 - Remove unused stdio/stdlib includes and nonlocal-jump declarations.
 
-The two private headers are unmodified. No Qt application or widget code is
-included. Source provenance and hashes are recorded in
-evidence/bitmap-raster-source-identity.json in the OpenVector repository.
+The two private headers and FTL.TXT match the official Qt 4.4.3 archive byte
+for byte. source-identity.json records the archive URL and digest, upstream
+member paths, and upstream and modified file digests. No Qt application or
+widget code is included.
 
 This software is based in part on the work of the FreeType Team.
 Portions are copyright 1996-2004 The FreeType Project (www.freetype.org).

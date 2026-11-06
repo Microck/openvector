@@ -3703,7 +3703,7 @@ dependencies = [
 
 [[package]]
 name = "openvector"
-version = "0.0.0"
+version = "0.1.1"
 dependencies = [
  "base64",
  "cc",
@@ -3721,7 +3721,7 @@ dependencies = [
 
 [[package]]
 name = "openvector-cli"
-version = "0.0.0"
+version = "0.1.1"
 dependencies = [
  "base64",
  "ctrlc",
@@ -3733,7 +3733,7 @@ dependencies = [
 
 [[package]]
 name = "openvector-gui"
-version = "0.0.0"
+version = "0.1.1"
 dependencies = [
  "base64",
  "core-foundation-sys",
@@ -3750,7 +3750,7 @@ dependencies = [
 
 [[package]]
 name = "openvector-node"
-version = "0.0.0"
+version = "0.1.1"
 dependencies = [
  "napi",
  "napi-build",

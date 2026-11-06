@@ -1,0 +1,233 @@
+name: Desktop candidates
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: desktop-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  source:
+    name: Corresponding source
+    if: startsWith(github.head_ref, 'release/')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      RUSTUP_TOOLCHAIN: 1.99.1
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '24'
+      - name: Prepare locked toolchain
+        run: rustup toolchain install 1.99.1 --profile minimal
+      - name: Package corresponding source
+        run: |
+          mkdir dist
+          version=$(node -p 'JSON.parse(require("fs").readFileSync("package.json")).version')
+          bash tools/package-release-source.sh "dist/openvector-$version-source.tar.gz"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: corresponding-source
+          path: dist/*.tar.gz
+          if-no-files-found: error
+
+  desktop:
+    needs: source
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: ubuntu-24.04
+            target: x86_64-unknown-linux-gnu
+            platform: linux
+            architecture: amd64
+          - runner: ubuntu-24.04-arm
+            target: aarch64-unknown-linux-gnu
+            platform: linux
+            architecture: arm64
+          - runner: ubuntu-24.04
+            target: x86_64-pc-windows-gnu
+            platform: windows
+            architecture: x64
+          - runner: macos-15
+            target: aarch64-apple-darwin
+            platform: macos
+            architecture: arm64
+          - runner: macos-15-intel
+            target: x86_64-apple-darwin
+            platform: macos
+            architecture: x64
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 180
+    env:
+      RUSTUP_TOOLCHAIN: 1.99.1
+      CARGO_NET_OFFLINE: 'true'
+      CARGO_BUILD_JOBS: '2'
+      CARGO_TARGET_DIR: ${{ github.workspace }}/target
+      TARGET: ${{ matrix.target }}
+    steps:
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: corresponding-source
+          path: input
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '24'
+      - name: Extract rebuildable sources
+        shell: bash
+        run: |
+          mkdir source dist
+          tar -xzf input/*.tar.gz --strip-components=1 -C source
+      - name: Install Linux build dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang cmake ninja-build pkg-config libssl-dev libfontconfig1-dev libfreetype6-dev libxkbcommon-dev libxkbcommon-x11-dev libwayland-dev libxcb1-dev libxcb-xkb-dev libx11-xcb-dev libxcb-cursor-dev libasound2-dev libvulkan-dev mesa-vulkan-drivers xvfb dbus-x11 protobuf-compiler zip
+      - name: Install Windows cross-build tools
+        if: matrix.platform == 'windows'
+        run: sudo apt-get install -y gcc-mingw-w64-x86-64 g++-mingw-w64-x86-64 nsis
+      - name: Prepare locked toolchain
+        shell: bash
+        run: rustup toolchain install 1.99.1 --profile minimal --component rust-docs --target "$TARGET"
+      - name: Record Intel macOS linker inputs
+        if: matrix.target == 'x86_64-apple-darwin'
+        working-directory: source
+        shell: bash
+        run: |
+          set -o pipefail
+          cargo rustc --locked --offline --manifest-path rust/Cargo.toml --release --target "$TARGET" -p openvector-gui --bin openvector-gui -- -C link-arg=-Wl,-t 2>&1 | tee ../dist/linker-inputs.txt
+      - name: Stage desktop application and verification CLI
+        working-directory: source
+        shell: bash
+        run: |
+          node tools/package-gui.mjs --target "$TARGET" ../stage
+          cargo build --locked --offline --manifest-path rust/Cargo.toml --release --target "$TARGET" -p openvector-cli
+      - name: Package Linux archive and test extracted application
+        if: matrix.platform == 'linux'
+        working-directory: source
+        shell: bash
+        env:
+          ARCHITECTURE: ${{ matrix.architecture }}
+        run: |
+          version=$(node -p 'JSON.parse(require("fs").readFileSync("package.json")).version')
+          name="openvector-$version-linux-$ARCHITECTURE"
+          mv ../stage "../$name"
+          tar -czf "../dist/$name.tar.gz" -C .. "$name"
+          mkdir ../extracted
+          tar -xzf "../dist/$name.tar.gz" -C ../extracted
+          export XDG_RUNTIME_DIR=$(mktemp -d)
+          trap 'rm -rf "$XDG_RUNTIME_DIR"' EXIT
+          dbus-run-session -- xvfb-run -a node tools/check-desktop-package.mjs "../extracted/$name/openvector-gui" "$CARGO_TARGET_DIR/$TARGET/release/openvector"
+          objdump -T "../extracted/$name/openvector-gui" | sort > "../dist/$name-symbols.txt"
+      - name: Package Windows installer and portable ZIP
+        if: matrix.platform == 'windows'
+        working-directory: source
+        run: node tools/package-windows.mjs ../stage ../windows-packages
+      - name: Collect Windows packages and verification CLI
+        if: matrix.platform == 'windows'
+        shell: bash
+        run: |
+          cp windows-packages/* dist/
+          cp "$CARGO_TARGET_DIR/$TARGET/release/openvector.exe" dist/verification-cli.exe
+      - name: Verify and archive macOS candidate
+        if: matrix.platform == 'macos'
+        working-directory: source
+        shell: bash
+        env:
+          ARCHITECTURE: ${{ matrix.architecture }}
+        run: |
+          version=$(node -p 'JSON.parse(require("fs").readFileSync("package.json")).version')
+          codesign --verify --deep --strict ../stage/OpenVector.app
+          tar -czf "../dist/openvector-$version-macos-$ARCHITECTURE-candidate.tar.gz" -C ../stage OpenVector.app
+          mkdir ../extracted
+          tar -xzf ../dist/*-candidate.tar.gz -C ../extracted
+          node tools/check-desktop-package.mjs ../extracted/OpenVector.app/Contents/MacOS/openvector-gui "$CARGO_TARGET_DIR/$TARGET/release/openvector"
+      - name: Preserve package and diagnostic artifacts
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: desktop-${{ matrix.platform }}-${{ matrix.architecture }}
+          path: dist/
+          if-no-files-found: warn
+
+  windows-install:
+    needs: desktop
+    # Windows verification is independent of a failed macOS/Linux matrix leg.
+    if: always() && needs.desktop.result != 'cancelled' && needs.desktop.result != 'skipped'
+    runs-on: windows-11-arm
+    timeout-minutes: 15
+    steps:
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: desktop-windows-x64
+          path: packages
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: corresponding-source
+          path: input
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '24'
+      - name: Verify portable conversion and installer lifecycle
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          New-Item -ItemType Directory source | Out-Null
+          tar -xzf (Get-ChildItem input/*.tar.gz).FullName --strip-components=1 -C source
+          if ($LASTEXITCODE) { throw 'Source extraction failed' }
+          Expand-Archive (Get-ChildItem packages/*-portable.zip).FullName portable
+          node source/tools/check-desktop-package.mjs portable/openvector-gui.exe packages/verification-cli.exe
+          if ($LASTEXITCODE) { throw 'Portable application smoke failed' }
+          $install = Join-Path $env:RUNNER_TEMP 'openvector install check'
+          $registry = 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Uninstall\OpenVector'
+          if ((Test-Path $install) -or (Test-Path $registry)) { throw 'Installer test state is not disposable' }
+          $setup = (Get-ChildItem packages/*-Setup.exe).FullName
+          $process = Start-Process $setup -ArgumentList "/S /D=$install" -Wait -PassThru
+          if ($process.ExitCode) { throw "Installer failed: $($process.ExitCode)" }
+          $portableHash = (Get-FileHash portable/openvector-gui.exe).Hash
+          if ((Get-FileHash "$install/openvector-gui.exe").Hash -ne $portableHash) { throw 'Installed executable differs from portable package' }
+          if ((Get-ItemProperty $registry).InstallLocation -ne $install) { throw 'Uninstall registration has the wrong location' }
+          if ((Get-ItemProperty $registry).UninstallString -ne "`"$install\Uninstall.exe`"") { throw 'Registered uninstall command is not quoted correctly' }
+          $installedFiles = @(Get-ChildItem $install -File -Recurse)
+          $lockedApplication = [IO.File]::Open("$install/openvector-gui.exe", 'Open', 'Read', 'Read')
+          try {
+            $blocked = Start-Process "$install/Uninstall.exe" -ArgumentList "/S _?=$install" -Wait -PassThru
+            if ($blocked.ExitCode -eq 0) { throw 'Uninstaller reported success while the application was locked' }
+            foreach ($file in $installedFiles) {
+              if (-not (Test-Path -LiteralPath $file.FullName)) { throw "Blocked uninstall removed $($file.FullName)" }
+            }
+            if ((Get-ItemProperty $registry).InstallLocation -ne $install) { throw 'Blocked uninstall removed its registration' }
+          } finally {
+            $lockedApplication.Dispose()
+          }
+          node source/tools/check-desktop-package.mjs "$install/openvector-gui.exe" packages/verification-cli.exe
+          if ($LASTEXITCODE) { throw 'Installed application smoke failed' }
+          Set-Content "$install/user-file.txt" 'preserve this file'
+          $process = Start-Process "$install/Uninstall.exe" -ArgumentList "/S _?=$install" -Wait -PassThru
+          if ($process.ExitCode) { throw "Uninstaller failed: $($process.ExitCode)" }
+          if (Test-Path "$install/openvector-gui.exe") {
+            [pscustomobject]@{UninstallerPid=$process.Id;ExitCode=$process.ExitCode;InstallPath=$install} | Format-List
+            Get-ChildItem $install -Recurse | Select-Object FullName, Length, Attributes | Format-Table -AutoSize
+            Get-CimInstance Win32_Process |
+              Where-Object { $_.CommandLine -like "*$install*" } |
+              Select-Object ProcessId, ParentProcessId, ExecutablePath, CommandLine | Format-List
+            if (Test-Path $registry) { Get-ItemProperty $registry | Format-List }
+            try {
+              $handle = [IO.File]::Open("$install/openvector-gui.exe", 'Open', 'ReadWrite', 'None')
+              $handle.Dispose()
+              Write-Output 'The remaining executable can be opened exclusively for writing.'
+            } catch {
+              Write-Output $_.Exception.ToString()
+            }
+            throw 'Uninstaller left the application installed'
+          }
+          if (Test-Path $registry) { throw 'Uninstaller left its registry entry' }
+          if ((Get-Content "$install/user-file.txt") -ne 'preserve this file') { throw 'Uninstaller removed unrelated user data' }

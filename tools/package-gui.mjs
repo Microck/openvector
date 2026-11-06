@@ -25,17 +25,19 @@ try {
 
   // A fresh directory guarantees no file from an earlier build or target ships.
   const destination = positionals[0];
-  const licenses = join(destination, 'licenses');
-  mkdirSync(destination);
-  mkdirSync(licenses);
-  // macOS shows an app's Dock and Finder icon only for a bundle, so Darwin
-  // targets get OpenVector.app with the executable under Contents/MacOS.
   const darwin = values.target.endsWith('-apple-darwin');
   const bundle = join(destination, 'OpenVector.app');
+  // Licenses must travel with the app when a macOS user drags it out of a DMG.
+  const packageRoot = darwin ? join(bundle, 'Contents', 'Resources') : destination;
+  const licenses = join(packageRoot, 'licenses');
+  mkdirSync(destination);
+  mkdirSync(licenses, { recursive: true });
+  // macOS shows an app's Dock and Finder icon only for a bundle, so Darwin
+  // targets get OpenVector.app with the executable under Contents/MacOS.
   const binaryDirectory = darwin ? join(bundle, 'Contents', 'MacOS') : destination;
   mkdirSync(binaryDirectory, { recursive: true });
   copyFileSync(executable, join(binaryDirectory, basename(executable)));
-  copyFileSync(join(root, 'LICENSE'), join(destination, 'LICENSE'));
+  copyFileSync(join(root, 'LICENSE'), join(packageRoot, 'LICENSE'));
   copyBundledNotices(licenses);
   const assets = join(workspace, 'crates', 'openvector-gui', 'assets');
   copyFileSync(join(assets, 'fonts', 'OFL.txt'), join(licenses, 'geist-fonts-OFL.txt'));
@@ -60,13 +62,15 @@ try {
     for (const file of ['Assets.car', 'OpenVector.icns']) copyFileSync(join(assets, 'macos', file), join(resources, file));
     const { version } = JSON.parse(readFileSync(join(root, 'package.json'), 'utf8'));
     writeFileSync(join(bundle, 'Contents', 'Info.plist'), infoPlist(basename(executable), version));
-    // Sealing the bundle needs Apple's codesign, so it only runs on a Mac.
-    // This is an ad-hoc signature for local use, not Developer ID signing.
-    if (process.platform === 'darwin') execFileSync('codesign', ['--force', '--sign', '-', bundle], { stdio: 'inherit' });
   }
   writeFileSync(join(licenses, 'rust-licenses.txt'), notices);
   writeFileSync(join(licenses, 'toolchain-licenses.txt'), toolchain.text);
   copyFileSync(toolchain.stdNotice, join(licenses, 'rust-std-COPYRIGHT-library.html'));
+  // Seal only after every bundled notice is written. This local-use signature
+  // is replaced by Developer ID signing during public macOS release packaging.
+  if (darwin && process.platform === 'darwin') {
+    execFileSync('codesign', ['--force', '--sign', '-', bundle], { stdio: 'inherit' });
+  }
   console.log(`Packaged ${basename(executable)} in ${destination}`);
 } catch (error) {
   console.error(error.message);

@@ -1,8 +1,8 @@
 # Release runbook
 
-OpenVector ships private GitHub application releases. The npm package remains
-unpublished. Keep `package.json` private and the GitHub repository private unless
-a separate request explicitly changes that scope.
+OpenVector ships public GitHub application releases. The npm package remains
+unpublished; keep `package.json` private. Publishing binaries requires a verified
+candidate and explicit release authorization.
 
 The first release, `v0.0.0`, retains the version embedded in the verified desktop
 builds. Its Windows x64 ZIP preserves all 17 files from the tested package; its
@@ -10,6 +10,41 @@ Linux ARM64 archive preserves the tested bytes. `build-provenance.json` records
 binary hashes and source correspondence. Documentation and repository presentation
 changes do not require rebuilding identical application source. Future product
 changes need a new version and fresh build/runtime evidence.
+
+## v0.1.0 candidate matrix
+
+Every row needs a fresh build, archive extraction check and native application
+workflow check before it is advertised as supported.
+
+| Target | Downloads |
+| --- | --- |
+| macOS Apple Silicon | Developer ID-signed and notarized `.dmg` |
+| macOS Intel | Developer ID-signed and notarized `.dmg` |
+| Linux amd64 | `.tar.gz` with executable, desktop entry and notices |
+| Linux arm64 | `.tar.gz` with executable, desktop entry and notices |
+| Windows x64 | `Setup.exe` installer and portable `.zip` |
+
+Test Windows 10 and Windows 11 separately. A Windows Server build or an x64
+cross-build does not establish desktop support. Record the tested Linux
+distribution, architecture and required GLIBC version rather than claiming
+compatibility with every distribution. Portable means no installation is
+required; preferences still use the normal per-user location.
+
+Windows uninstall must handle busy files without reporting success or removing
+the uninstall registration. Retry deletion for up to two seconds, then offer
+Retry/Cancel. Silent uninstall must return a failure code if deletion stays
+blocked. Check this with a real file lock before the installed application check,
+then verify normal uninstall immediately after the application exits. Preserve
+unrelated files in the installation directory.
+
+Publish matching source and rebuild instructions alongside the binaries.
+Preserve the Qt-derived module, its LGPL license and modification notices.
+Verify that changing that module and rebuilding produces a working executable;
+notices alone are not a substitute for source and relinking materials.
+
+Developer ID signing requires a Developer ID Application certificate and its
+private key. An Apple Development certificate is not a distribution identity.
+Do not describe ad-hoc signed macOS packages as signed for public distribution.
 
 ## Prepare a version
 
@@ -27,9 +62,9 @@ changes need a new version and fresh build/runtime evidence.
 
 ## Validate the candidate
 
-Use [Raft source CI](ci.md) for the lightweight repository checks. GitHub-hosted
-Actions are not used while the account billing block remains. Source CI does not
-replace the native and desktop checks below.
+Use [GitHub Actions source CI](ci.md) for the lightweight repository checks.
+It runs on GitHub-hosted Ubuntu runners. Source CI does not replace the native
+and desktop checks below.
 
 Use the locked dependencies and the target toolchain's `rust-docs` component:
 
@@ -73,8 +108,10 @@ for supported notice collectors and the Windows Node-API linker requirements.
 The GUI destination must be new. Archive the entire staged directory, including
 `LICENSE` and `licenses/`, rather than only the executable. Keep the editable source
 and exact build inputs available with the binary when required by its licenses.
-The current packager does not create installers, sign Windows executables, or
-notarize macOS applications. Do not advertise those properties.
+`tools/package-windows.mjs` creates the Windows installer and portable ZIP from
+a staged directory. Windows executables are not Authenticode-signed, and macOS
+staging adds only an ad-hoc signature. Do not advertise public macOS distribution
+signing until Developer ID signing and notarization have passed.
 
 Before publishing:
 
@@ -87,10 +124,10 @@ Before publishing:
 - Confirm the source archive includes both Cargo manifests/lockfile, vendored GPUI
   patches, bundled C sources/notices, required JSON tables, and the packaging tools.
 
-## Publish a private application release
+## Publish an application release
 
 Only after explicit release authorization, use the reviewed commit and notes.
-Confirm `gh repo view Microck/openvector --json visibility` returns `PRIVATE`.
+Confirm `gh repo view Microck/openvector --json visibility` returns `PUBLIC`.
 Keep the package's npm `private` flag; this workflow uses GitHub assets, not npm.
 
 Create an annotated `vX.Y.Z` tag at the validated commit with author identity
@@ -104,7 +141,7 @@ an unreleased version number. There is no automatic publication workflow.
 Download the published assets into a fresh directory using `gh release download`.
 Verify every checksum against the reviewed manifest, inspect the tag's commit, and
 repeat the packaged installation/conversion smoke. Confirm repository visibility
-is still private. An upload response alone is not completion evidence.
+is still public. An upload response alone is not completion evidence.
 
 If publication partly fails, inspect the existing tag, release, and assets first.
 Do not blindly retry, move a tag, delete a failed release, or overwrite an asset.

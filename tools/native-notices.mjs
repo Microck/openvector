@@ -168,9 +168,9 @@ const runtimes = [
     files: ['Scrt1.o', 'crti.o', 'crtn.o', 'crtbeginS.o', 'crtendS.o', 'libgcc.a', 'libc_nonshared.a'],
   },
   {
-    // Retained ARM64 Darwin CLI/addon linker traces contain no static C runtime
+    // ARM64 CLI/addon and x64 GUI linker traces contain no static C runtime
     // objects. SDK .tbd files describe dynamic system libraries, which do not ship.
-    target: /^aarch64-apple-darwin$/,
+    target: /^(aarch64|x86_64)-apple-darwin$/,
     linker: () => 'cc',
     files: [],
   },

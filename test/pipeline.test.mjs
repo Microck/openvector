@@ -11,6 +11,7 @@ import { exportPdf } from '../src/pdf.mjs';
 import { exportAi } from '../src/ai.mjs';
 import { exportDxf } from '../src/dxf.mjs';
 import { exportEmf } from '../src/emf.mjs';
+import { publicVectorFixture } from './helpers/native-vector-output.mjs';
 
 test('all public stages through all six vector formats match 15 original pipelines in one retained application session', () => {
   assert.equal(reference.cases.length, 15);
@@ -36,10 +37,10 @@ test('all public stages through all six vector formats match 15 original pipelin
     assert.equal(session.randomState, frame.randomStates.fitting);
     assert.equal(exportSvg({ geometry:fitted, width, height }), frame.svg, `${frame.id} SVG bytes`);
     assert.equal(exportEps({ geometry:fitted, width, height, creationDate:frame.epsCreationDate }), frame.eps, `${frame.id} EPS bytes`);
-    assert.equal(Buffer.from(exportPdf({ geometry:fitted, width, height })).toString('latin1'), frame.pdf, `${frame.id} PDF bytes`);
+    assert.deepEqual(Buffer.from(exportPdf({ geometry:fitted, width, height })), publicVectorFixture(Buffer.from(frame.pdf, 'latin1')), `${frame.id} PDF bytes`);
     assert.equal(exportAi({ geometry:fitted, width, height }), frame.ai, `${frame.id} AI bytes`);
     assert.equal(exportDxf({ geometry:fitted, palette:segmented.palette, width, height }), frame.dxf, `${frame.id} DXF bytes`);
-    assert.equal(Buffer.from(exportEmf({ geometry:fitted, width, height, referenceDevice:frame.emfReferenceDevice })).toString('latin1'), frame.emf, `${frame.id} EMF bytes`);
+    assert.deepEqual(Buffer.from(exportEmf({ geometry:fitted, width, height, referenceDevice:frame.emfReferenceDevice })), publicVectorFixture(Buffer.from(frame.emf, 'latin1')), `${frame.id} EMF bytes`);
     assert.equal(session.randomState, frame.randomStates.fitting);
   }
 });

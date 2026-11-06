@@ -21,6 +21,7 @@ const document = session.createDocument();
 document.setSource(readFileSync('logo.png'), 'logo.png');
 document.runAutomatic({ extension: '.png' });
 writeFileSync('traced.png', document.exportBitmap('png', 2));
+// saveVector creates a new file and never overwrites an existing path.
 const saved = document.saveVector('traced.svg', { layout: 'cutouts' });
 if (saved.status !== 0 || saved.error) throw new Error(saved.error?.message ?? `status ${saved.status}`);
 ```
@@ -70,6 +71,13 @@ in `state.classification` without applying them. `commitSettings(settings)`,
 `snapshot(selection?)` and `reset()` manage the document, and `defaultDocumentSettings()`
 returns the default document settings. See the
 [image state contract](image-state-contract.json).
+
+For segmentation, `paletteEncoding: 'straight'` explicitly identifies manually
+supplied colors, including a palette numerically identical to a generated one.
+Use `'premultiplied'` for engine-generated colors when their origin must be
+specified explicitly. An explicit encoding change causes segmentation to rerun
+even when the other settings are unchanged. Omit it to use the document's
+recorded palette provenance.
 
 The optional progress argument is `{ callback(event, checkpoint), capture? }`.
 The callback runs at Rust checkpoints and returns `true` to continue or `false`
@@ -641,4 +649,9 @@ as `map.json` and run `openvector fill map.json 0 7`. The seed is a row-major
 pixel index, and the replacement identifier must differ from the seed's
 current one. The result has segments `[7, 1, 1, 0]`, because diagonal contact
 does not join regions.
+
+
+### SVG dimensions and display units
+
+SVG export writes dimensions in points, with 72 points per inch, to preserve the reference format's physical print size. A 48 by 48 source therefore produces 48 pt dimensions; at 96 DPI, browsers and many editors render that as 64 by 64 CSS pixels. The 1× bitmap export instead uses the source pixel dimensions. To get 48 CSS pixels on the web, set the SVG's CSS width and height to 48 px, or adjust the dimensions in an editor; this changes its displayed size without changing the viewBox.
 

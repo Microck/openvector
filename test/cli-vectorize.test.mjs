@@ -180,6 +180,7 @@ test('vectorize supports binary stdin with explicit filename metadata',()=>{
   failure(invoke(['vectorize',input,'--filename','square.bmp']),/only.*stdin|only.*-/i);
 });
 
+
 for(const [format,writer] of Object.entries({svg:exportSvg,eps:exportEps,pdf:exportPdf,ai:exportAi,dxf:exportDxf})){
   test(`vectorize writes complete ${format.toUpperCase()} bytes to stdout`,()=>{
     const started = Date.now();

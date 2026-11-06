@@ -88,9 +88,9 @@ pub fn run(mut document: ImageDocument, mut committed_count: i32, commands: mpsc
                 .and_then(|selection| events.send(Event::Selection { settings: selection.settings, color_count: Some(selection.count as usize),
                     recommended_background_mode: selection.recommended_background_mode, palette_ready: selection.palette_ready, classified: false }).map_err(|_| CANCEL_TASK.to_string())),
             Command::Edit { action, input } => match action {
-                "begin" => document.begin_editing().map(|_| ()), "gesture" => document.gesture(&input).map(|_| ()),
-                "apply" => document.edit(&input).map(|_| ()), "undo" => document.undo_edit().map(|_| ()),
-                "redo" => document.redo_edit().map(|_| ()), "revert" => document.revert_edits().map(|_| ()),
+                "begin" => document.begin_editing_for_output().map(|_| ()), "gesture" => document.grouped_gesture(&input).map(|_| ()),
+                "apply" => document.edit(&input).map(|_| ()), "undo" => document.grouped_undo_edit().map(|_| ()),
+                "redo" => document.grouped_redo_edit().map(|_| ()), "revert" => document.revert_edits().map(|_| ()),
                 "restore" => document.restore_committed_editing().map(|_| ()),
                 "leave" => document.leave_editing(),
                 "commit" => document.commit_editing().map(|_| ()),
@@ -285,6 +285,9 @@ fn process(document: &mut ImageDocument, stage: &str, mut input: Value, committe
         let palette = document.state().palettes.get(count).filter(|palette| !palette.is_empty()).ok_or("Color analysis did not produce the selected palette.")?;
         let bgra: Vec<f32> = palette.chunks_exact(4).flat_map(|color| color.iter().rev().copied()).collect();
         input["palette"] = json!(quantize_qcolor_channels(&bgra));
+        input["paletteEncoding"] = json!("premultiplied");
+        let generated = openvector::document_controls::read_document_settings(&input).map_err(|error| error.to_string())?;
+        document.remember_generated_palette(generated.palette_mode, &generated.palette);
         if !advanced { selected_count = count as i32; }
         palette_ready = true;
     }
@@ -325,7 +328,7 @@ impl DisplayScene {
         let fitting = state.fitting.as_ref().filter(|fitting| fitting.complete);
         let replace = fitting.is_some() && (refresh || !self.current_available);
         if replace {
-            self.geometry = fitting.map(|fitting| fitting.geometry.clone());
+            self.geometry = document.presentation_geometry().map(|geometry| geometry.into_owned());
         }
         self.current_available = fitting.is_some();
         let hidden: Vec<i64> = hidden_regions.iter().map(|&region| region as i64).collect();
@@ -407,7 +410,8 @@ fn bitmap_export(document: &mut ImageDocument, path: &Path, format: &str, scale:
     let background = document.background_state();
     let hidden_regions: Vec<i64> = background.hidden_regions.iter().map(|&region| region as i64).collect();
     let state = document.state();
-    let input = BitmapExportInput { geometry: state.fitting.as_ref().filter(|fitting| fitting.complete).map(|fitting| &fitting.geometry),
+    let geometry = document.presentation_geometry();
+    let input = BitmapExportInput { geometry: geometry.as_deref(),
         width: state.original.width as i64, height: state.original.height as i64, source_alpha_type: alpha,
         background_mode: state.settings.background_mode, background_undo_count: background.undo.len(), hidden_regions: &hidden_regions };
     if cancelled.load(Ordering::Acquire) { return Err(CANCEL_TASK.into()); }
@@ -592,3 +596,4 @@ mod cancellation_tests {
         std::fs::remove_dir_all(directory).unwrap();
     }
 }
+

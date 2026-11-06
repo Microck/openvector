@@ -82,7 +82,13 @@ fn native_batch_runner_files_logs_and_task_boundaries(){
             for (name,bytes) in expected_outputs{let actual=std::fs::read(output.join(name)).unwrap();
                 let expected=if late_target && name=="a.svg" {
                     common::b64(reference["filesystemAppearance"]["bytes"].as_str().unwrap())
-                } else { common::b64(bytes.as_str().unwrap()) };if reference["format"]=="eps"{assert_eq!(normalize_eps(&actual),normalize_eps(&expected),"{id} {name}")}else{assert_eq!(actual,expected,"{id} {name}");}}
+                } else { common::b64(bytes.as_str().unwrap()) };
+                let expected = match reference["format"].as_str().unwrap() {
+                    "pdf" => common::public_pdf_fixture(&expected),
+                    "emf" => common::public_emf_fixture(expected),
+                    _ => expected,
+                };
+                if reference["format"]=="eps"{assert_eq!(normalize_eps(&actual),normalize_eps(&expected),"{id} {name}")}else{assert_eq!(actual,expected,"{id} {name}");}}
         }else{assert!(!output.exists(),"{id}");}
         if !native["document"].is_null(){editor_support::compare_document_state(last_export.as_ref().expect("missing final export state"),&native["document"]["state"],&rows[0]["parameters"]);}
     }

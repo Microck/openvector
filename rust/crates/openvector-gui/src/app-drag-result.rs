@@ -146,6 +146,12 @@ impl OpenVectorApp {
                         payload_app.update(cx, |app, _| app.result_drag_payload(file)).ok().flatten()
                     }));
             }
+            Preparation::Pending { .. } if !self.busy => {
+                // Use the same busy grace as the rest of the window. Fast exports
+                // keep a stable label; no drag handlers exist until the file is ready.
+                panel = panel.child(button("drag-result", format!("Drag {} file", choice.format.to_uppercase()), true, false)
+                    .tab_stop(false).aria_description("Preparing drag file"));
+            }
             Preparation::Failed { error, .. } => {
                 panel = panel.child(div().child(error.clone())).child(self.control("drag-retry", "Retry preparation", !self.busy, false, Action::DragRetry, cx));
             }

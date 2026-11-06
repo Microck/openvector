@@ -74,7 +74,9 @@ fn serialize(format: &str, input: &VectorFileInput<'_>, output: &mut Capture<'_>
         "dxf" => serialize_dxf(&input.vector, input.palette, input.dxf_curve_mode, output), "emf" => serialize_emf(&input.vector, &input.reference_device.unwrap(), output), _ => panic!("invalid format") }
 }
 fn compare_bytes(actual: &[u8], expected: &[u8], label: &str) {
-    let mismatch = actual.iter().zip(expected).position(|(a, b)| a != b);
+    let expected = common::public_pdf_fixture(expected);
+    let expected = common::public_emf_fixture(expected);
+    let mismatch = actual.iter().zip(&expected).position(|(a, b)| a != b);
     assert!(mismatch.is_none() && actual.len() == expected.len(), "{label}: byte {:?}, actual {} bytes, expected {} bytes", mismatch, actual.len(), expected.len());
 }
 #[test]

@@ -41,7 +41,7 @@ pub fn serialize_pdf(input: &VectorOutputInput<'_>, output: &mut dyn TextOutput)
         writer.write(&format!("/Vmt{alpha} <</CA {opacity}/ca {opacity}>>\n"))?;
     } }
     writer.write(">>endobj\n")?;
-    writer.object(2)?; writer.write("<</Producer(VectorMagic.com)\n>>endobj\n")?;
+    writer.object(2)?; writer.write("<</Producer(OpenVector)     \n>>endobj\n")?;
     let xref = writer.position;
     writer.write("xref\n0 9\n0000000000 65535 f\n")?;
     for number in 1..9 { writer.write(&format!("{:010} 00000 n\n", writer.offsets[number]))?; }
