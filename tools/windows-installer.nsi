@@ -8,8 +8,8 @@ OutFile "${OUTPUT}"
 InstallDir "$LOCALAPPDATA\Programs\OpenVector"
 RequestExecutionLevel user
 SetCompressor /SOLID lzma
-Icon "${APP_ICON}"
-UninstallIcon "${APP_ICON}"
+!define MUI_ICON "${APP_ICON}"
+!define MUI_UNICON "${APP_ICON}"
 VIProductVersion "${VERSION}.0"
 VIAddVersionKey /LANG=1033 "ProductName" "OpenVector"
 VIAddVersionKey /LANG=1033 "FileDescription" "OpenVector installer"
@@ -17,6 +17,7 @@ VIAddVersionKey /LANG=1033 "FileVersion" "${VERSION}"
 VIAddVersionKey /LANG=1033 "LegalCopyright" "OpenVector contributors"
 
 !insertmacro MUI_PAGE_WELCOME
+!insertmacro MUI_PAGE_DIRECTORY
 !insertmacro MUI_PAGE_INSTFILES
 !insertmacro MUI_PAGE_FINISH
 !insertmacro MUI_UNPAGE_CONFIRM

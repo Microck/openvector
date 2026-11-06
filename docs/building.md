@@ -184,8 +184,9 @@ installer, install NSIS and `zip` on the Linux cross-build host, then run:
 node tools/package-windows.mjs dist/openvector-windows-x64 dist/windows-downloads
 ```
 
-The output directory must be new. The installer adds Start menu shortcuts and
-an uninstall entry without requiring administrator rights. Its uninstaller
+The output directory must be new. The installer uses the OpenVector icon and lets
+users choose an installation directory, defaulting to `%LOCALAPPDATA%\Programs\OpenVector`.
+It adds Start menu shortcuts and an uninstall entry without requiring administrator rights. Its uninstaller
 removes only packaged files and preserves unrelated files and user preferences.
 Neither download is Authenticode-signed by this command.
 
