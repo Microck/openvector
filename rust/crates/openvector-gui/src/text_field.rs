@@ -4,15 +4,18 @@ use unicode_segmentation::UnicodeSegmentation;
 use crate::theme;
 
 // AccessKit lengths are byte-sized. Preserve normal grapheme clusters as
-// selectable units, splitting only exceptionally long clusters at UTF-8
-// boundaries so every encoded length remains representable.
-fn accessible_character_lengths(text: &str) -> Vec<u8> {
+// selectable units. Split at externally supplied selection endpoints inside a
+// cluster so the published caret stays exact, and at UTF-8 boundaries when a
+// cluster exceeds the encoded length limit.
+fn accessible_character_lengths(text: &str, selection: Range<usize>) -> Vec<u8> {
     let mut lengths = Vec::new();
-    for grapheme in text.graphemes(true) {
+    for (start, grapheme) in text.grapheme_indices(true) {
         let mut length = 0usize;
-        for character in grapheme.chars() {
+        for (index, character) in grapheme.char_indices() {
             let size = character.len_utf8();
-            if length + size > u8::MAX as usize {
+            let position = start + index;
+            if length != 0 && (length + size > u8::MAX as usize
+                || position == selection.start || position == selection.end) {
                 lengths.push(length as u8);
                 length = 0;
             }
@@ -134,7 +137,7 @@ impl Render for TextField {
     fn render(&mut self, _: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
         let entity = cx.entity(); let focus = self.focus.clone();
         let accessible_text = self.text.clone();
-        let accessible_lengths = accessible_character_lengths(&self.text);
+        let accessible_lengths = accessible_character_lengths(&self.text, self.selected.clone());
         let start = accessible_position(&accessible_lengths, self.selected.start);
         let end = accessible_position(&accessible_lengths, self.selected.end);
         let (anchor, active) = if self.reversed { (end, start) } else { (start, end) };
@@ -191,7 +194,7 @@ mod accessibility_tests {
     #[test]
     fn text_runs_use_grapheme_boundaries_for_lengths_and_selection() {
         let text = "a" .to_owned() + "e\u{301}" + "👩‍💻" + "z";
-        let lengths = accessible_character_lengths(&text);
+        let lengths = accessible_character_lengths(&text, 0..text.len());
         assert_eq!(lengths, vec![1, 3, 11, 1]);
         assert_eq!(accessible_position(&lengths, 0), 0);
         assert_eq!(accessible_position(&lengths, 1), 1);
@@ -201,9 +204,24 @@ mod accessibility_tests {
     }
 
     #[test]
+    fn selections_inside_graphemes_keep_their_actual_positions() {
+        let text = "e\u{301}";
+        let lengths = accessible_character_lengths(text, 1..1);
+        assert_eq!(lengths, vec![1, 2]);
+        assert_eq!(accessible_position(&lengths, 1), 1);
+        assert_eq!(accessible_position(&lengths, text.len()), 2);
+
+        let text = "👩‍💻";
+        let lengths = accessible_character_lengths(text, 4..7);
+        assert_eq!(lengths, vec![4, 3, 4]);
+        assert_eq!(accessible_position(&lengths, 4), 1);
+        assert_eq!(accessible_position(&lengths, 7), 2);
+    }
+
+    #[test]
     fn oversized_graphemes_split_only_at_utf8_boundaries() {
         let text = "a".to_owned() + &"\u{301}".repeat(200);
-        let lengths = accessible_character_lengths(&text);
+        let lengths = accessible_character_lengths(&text, 0..text.len());
         assert!(lengths.len() > 1);
         assert_eq!(lengths.iter().map(|n| *n as usize).sum::<usize>(), text.len());
         let mut offset = 0;
