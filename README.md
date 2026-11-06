@@ -33,22 +33,19 @@ it runs independently and does not require vector magic or a network service.
 download the desktop app from [github releases](https://github.com/Microck/openvector/releases/latest).
 each package includes its third-party notices.
 
-### v0.1.0 release candidate
+### v0.1.0
 
-v0.1.0 is not published yet. the package links below become available after
-publication; use the releases page above for existing downloads.
+linux and windows downloads are available below. macos downloads are withheld
+until manual macbook testing is complete.
 
 | platform | package | run |
 | --- | --- | --- |
-| macos, apple silicon | [dmg](https://github.com/Microck/openvector/releases/download/v0.1.0/openvector-0.1.0-macos-arm64.dmg) | open the image and drag `OpenVector.app` to Applications |
-| macos, intel | [dmg](https://github.com/Microck/openvector/releases/download/v0.1.0/openvector-0.1.0-macos-x64.dmg) | open the image and drag `OpenVector.app` to Applications |
 | linux, amd64 | [tar.gz](https://github.com/Microck/openvector/releases/download/v0.1.0/openvector-0.1.0-linux-amd64.tar.gz) | extract, then run `./openvector-0.1.0-linux-amd64/openvector-gui` |
 | linux, arm64 | [tar.gz](https://github.com/Microck/openvector/releases/download/v0.1.0/openvector-0.1.0-linux-arm64.tar.gz) | extract, then run `./openvector-0.1.0-linux-arm64/openvector-gui` |
 | windows 10 and 11, x64 | [installer](https://github.com/Microck/openvector/releases/download/v0.1.0/openvector-0.1.0-windows-x64-Setup.exe) or [portable zip](https://github.com/Microck/openvector/releases/download/v0.1.0/openvector-0.1.0-windows-x64-portable.zip) | run the installer, or extract the whole zip and open `openvector-gui.exe` |
 
-the macos downloads are developer id signed and notarized. macos 15 is the oldest
-version tested. windows executables are unsigned; the portable package needs no
-installation but still saves preferences in the normal per-user location.
+windows executables are unsigned; the portable package needs no installation
+but still saves preferences in the normal per-user location.
 
 linux packages target ubuntu 24.04 with glibc 2.39 and were tested with X11.
 the required desktop libraries are in the [build guide](docs/building.md).
