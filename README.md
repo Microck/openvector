@@ -32,6 +32,11 @@ it runs independently and does not require vector magic or a network service.
 download the desktop app from [github releases](https://github.com/Microck/openvector/releases/latest).
 each package includes its third-party notices.
 
+### v0.1.0 release candidate
+
+v0.1.0 is not published yet. the package links below become available after
+publication; use the releases page above for existing downloads.
+
 | platform | package | run |
 | --- | --- | --- |
 | macos, apple silicon | [dmg](https://github.com/Microck/openvector/releases/download/v0.1.0/openvector-0.1.0-macos-arm64.dmg) | open the image and drag `OpenVector.app` to Applications |

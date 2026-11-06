@@ -17,7 +17,7 @@ try {
   const entries = readdirSync(stage, { recursive: true, withFileTypes: true });
   if (entries.some(entry => !entry.isFile() && !entry.isDirectory())) throw new Error('Package entries must be regular files or directories.');
   const packagePath = entry => relative(stage, join(entry.parentPath, entry.name));
-  const escape = value => value.replaceAll('$', '$$').replaceAll('"', '$\\"');
+  const escape = value => value.replaceAll('$', () => '$$').replaceAll('"', '$\\"');
   const files = entries.filter(entry => entry.isFile()).map(packagePath);
   // A busy application must not leave an installation with its notices removed.
   files.sort((a, b) => Number(b === 'openvector-gui.exe') - Number(a === 'openvector-gui.exe'));

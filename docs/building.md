@@ -126,7 +126,16 @@ modification notices when redistributing a build.
 ## Build and run the native GUI
 
 The GPUI application links the same `openvector` Rust crate as the CLI and
-Node addon. Build it separately from the npm package:
+Node addon.
+
+On Ubuntu 24.04, install the packages from the candidate workflow's
+[Install Linux build dependencies step](../.github/workflows/desktop-candidates.yml#L89-L93)
+before building. That list includes the compiler tools, desktop development
+libraries and Vulkan/X11 runtime used for GUI checks. Install these system
+packages and Rust before disconnecting for an offline rebuild; the source
+archive vendors Cargo dependencies, not operating-system packages.
+
+Build the GUI separately from the npm package:
 
 ```sh
 cargo run --manifest-path rust/Cargo.toml --locked -p openvector-gui
@@ -185,8 +194,9 @@ remain with the app when it is copied out of a disk image. The staging command
 adds only an ad-hoc signature for local verification.
 
 The desktop candidate workflow builds from a corresponding-source archive,
-including the locked Cargo dependencies. To create that archive from a clean
-Git checkout:
+including the locked Cargo dependencies. Create that archive from a clean
+Git checkout on Linux. The packaging script requires GNU `realpath -m`;
+the macOS system `realpath` is not supported:
 
 ```sh
 mkdir -p dist
