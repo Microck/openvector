@@ -50,6 +50,40 @@ fn text_corpus(name: &str, count: usize, geometries_count: usize, format: &str) 
 #[test] fn eps_all_41010_native_files() { text_corpus("eps-reference.json.gz", 41010, 3005, "eps"); }
 #[test] fn pdf_all_22014_native_files() { text_corpus("pdf-reference.json.gz", 22014, 3264, "pdf"); }
 #[test] fn ai_all_22014_native_files() { text_corpus("ai-reference.json.gz", 22014, 3264, "ai"); }
+
+#[test]
+fn committed_cli_fixtures_preserve_all_export_bytes() {
+    // These small public native fixtures remain available even when the large
+    // recording corpora are not installed. Cover layout, scale and thin strokes.
+    for (format, count) in [("svg", 6), ("pdf", 6), ("eps", 12), ("ai", 6), ("emf", 24)] {
+        let reference = common::read_json(&format!("{format}-cli-reference.json"));
+        let cases = reference["cases"].as_array().unwrap();
+        assert_eq!(cases.len(), count);
+        for (index, frame) in cases.iter().enumerate() {
+            let shape = &frame["input"];
+            let geometry = fitted_geometry::fitted_geometry(&shape["geometry"]);
+            let ids = hidden(shape, shape);
+            let input = input(shape, shape, &geometry, &ids);
+            let actual = match format {
+                "svg" => export_svg(&input).unwrap().into_bytes(),
+                "pdf" => export_pdf(&input).unwrap(),
+                "eps" => export_eps(&input, &EpsOptions { compact: shape["compact"].as_bool().unwrap(),
+                    creation_date: Some(shape["creationDate"].as_str().unwrap().to_owned()) }).unwrap().into_bytes(),
+                "ai" => export_ai(&input).unwrap().into_bytes(),
+                "emf" => export_emf(&input, &device(&shape["referenceDevice"])).unwrap(),
+                _ => unreachable!(),
+            };
+            let expected = frame["expected"].as_str().unwrap();
+            let expected = match format {
+                "pdf" => common::public_pdf_fixture(&latin1(expected)),
+                "emf" => common::public_emf_fixture(latin1(expected)),
+                _ => expected.as_bytes().to_vec(),
+            };
+            assert_bytes(&actual, &expected, format, index);
+        }
+    }
+}
+
 fn rows(name: &str, mut consume: impl FnMut(Value)) {
     let file = std::fs::File::open(common::fixture_path(name)).unwrap();
     let reader = BufReader::new(flate2::read::MultiGzDecoder::new(file));
