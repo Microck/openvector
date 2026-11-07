@@ -54,8 +54,8 @@ pub fn prepare_fitting_samples(nodes: &mut [FitNode], contour: &[usize], start: 
     FittingSamples { parameters, points }
 }
 
-fn solve_normal_equations(matrix: &mut [Vec<f64>], right: &mut [f64]) {
-    let size = right.len();
+fn solve_normal_equations<const N: usize>(matrix: &mut [[f64; N]; N], right: &mut [f64; N]) {
+    let size = N;
     for column in 0..size {
         let mut pivot = column;
         for row in column + 1..size {
@@ -83,34 +83,36 @@ fn solve_normal_equations(matrix: &mut [Vec<f64>], right: &mut [f64]) {
 }
 
 fn fit_interior_controls(first: Point, last: Point, samples: &FittingSamples, quadratic: bool) -> Vec<Point> {
-    let size = if quadratic { 2 } else { 4 };
-    let mut design: Vec<[f64; 4]> = Vec::new();
-    let mut residuals = Vec::new();
+    if quadratic { fit_controls::<2>(first, last, samples) }
+    else { fit_controls::<4>(first, last, samples) }
+}
+
+fn fit_controls<const N: usize>(first: Point, last: Point, samples: &FittingSamples) -> Vec<Point> {
+    let quadratic = N == 2;
+    let mut matrix = [[0.0; N]; N];
+    let mut right = [0.0; N];
     for (sample, point) in samples.points.iter().enumerate() {
         let t = samples.parameters[sample]; let inverse = 1.0 - t;
         let first_weight = if quadratic { inverse * inverse } else { inverse * inverse * inverse };
         let last_weight = if quadratic { t * t } else { t * t * t };
         let left = if quadratic { inverse * t + inverse * t } else { inverse * inverse * t * 3.0 };
-        let right = t * t * inverse * 3.0;
+        let r = t * t * inverse * 3.0;
         for channel in 0..2 {
-            let mut row = [0.0; 4];
-            row[channel] = left;
-            if !quadratic { row[channel + 2] = right; }
-            design.push(row);
-            residuals.push(point[channel] - (last_weight * last[channel] + first_weight * first[channel]));
+            let mut d = [0.0; N];
+            d[channel] = left;
+            if !quadratic { d[channel + 2] = r; }
+            let residual = point[channel] - (last_weight * last[channel] + first_weight * first[channel]);
+            // Each accumulator still sees the original x/y design rows in the
+            // original order, including zero products. Only independent sums
+            // are interleaved: no regrouping, symmetry shortcut, or FMA.
+            for column in 0..N {
+                for row in 0..N { matrix[row][column] = d[row] * d[column] + matrix[row][column]; }
+                right[column] = d[column] * residual + right[column];
+            }
         }
     }
-    let mut matrix = vec![vec![0.0; size]; size];
-    let mut right = vec![0.0; size];
-    for column in 0..size {
-        for row in 0..size {
-            let mut sum = 0.0;
-            for d in &design { sum = d[row] * d[column] + sum; }
-            matrix[row][column] = sum + if row == column { 0.00001 } else { 0.0 };
-        }
-        let mut sum = 0.0;
-        for (d, r) in design.iter().zip(&residuals) { sum = d[column] * r + sum; }
-        right[column] = sum;
+    for column in 0..N {
+        for row in 0..N { matrix[row][column] += if row == column { 0.00001 } else { 0.0 }; }
     }
     solve_normal_equations(&mut matrix, &mut right);
     if quadratic { vec![first, [right[0], right[1]], last] }
@@ -181,6 +183,17 @@ pub fn fit_contour_interval(nodes: &mut [FitNode], contour: &[usize], start: i64
 #[allow(clippy::too_many_arguments)]
 pub fn partition_contour_interval(nodes: &mut [FitNode], contour: &[usize], start: i64, end: i64,
     initial_threshold: f64, final_threshold: f64, max_iterations: i64, fraction: f64) -> Result<KeeperPartition, String> {
+    partition_contour_interval_cached(nodes, contour, start, end, initial_threshold, final_threshold,
+        max_iterations, fraction, &mut None)
+}
+
+// One fitting run applies the same controls to every interval. Keep the cache in
+// the caller so separate runs (including retries with changed controls) cannot
+// reuse a multiplier from another parameter set. Compute it only when needed.
+#[allow(clippy::too_many_arguments)]
+pub(crate) fn partition_contour_interval_cached(nodes: &mut [FitNode], contour: &[usize], start: i64, end: i64,
+    initial_threshold: f64, final_threshold: f64, max_iterations: i64, fraction: f64,
+    multiplier: &mut Option<f64>) -> Result<KeeperPartition, String> {
     let mut end = end;
     while end < start { end += contour.len() as i64; }
     let slots = end - start + 1;
@@ -200,7 +213,8 @@ pub fn partition_contour_interval(nodes: &mut [FitNode], contour: &[usize], star
     }
     let mut threshold = initial_threshold;
     if max_iterations > 0 {
-        let multiplier = fitting_threshold_multiplier(initial_threshold, final_threshold, max_iterations as f64, fraction);
+        let multiplier = *multiplier.get_or_insert_with(||
+            fitting_threshold_multiplier(initial_threshold, final_threshold, max_iterations as f64, fraction));
         for iteration in 0..max_iterations {
             let mut slot = 0usize;
             while records[slot].next != -1 && records[records[slot].next as usize].next != -1 {
@@ -235,4 +249,151 @@ pub fn partition_contour_interval(nodes: &mut [FitNode], contour: &[usize], star
     let mut slot = 0i64;
     while slot != -1 { active.push(records[slot as usize].clone()); slot = records[slot as usize].next; }
     Ok(KeeperPartition { records: active, threshold })
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    // Original materialized-design implementation, retained as an independent
+    // oracle for operation order, pivoting, signed zero and non-finite results.
+    fn reference_solve_normal_equations(matrix: &mut [Vec<f64>], right: &mut [f64]) {
+        let size = right.len();
+        for column in 0..size {
+            let mut pivot = column;
+            for row in column + 1..size {
+                if matrix[row][column].abs() > matrix[pivot][column].abs() { pivot = row; }
+            }
+            if pivot != column { matrix.swap(pivot, column); right.swap(pivot, column); }
+            let inverse = 1.0 / matrix[column][column];
+            for row in column + 1..size { matrix[row][column] *= inverse; }
+            for next in column + 1..size {
+                let multiplier = -matrix[column][next];
+                for row in column + 1..size { let v = matrix[row][column] * multiplier; matrix[row][next] += v; }
+            }
+        }
+        for column in 0..size {
+            if right[column] != 0.0 {
+                for row in column + 1..size { let v = right[column] * matrix[row][column]; right[row] -= v; }
+            }
+        }
+        for column in (0..size).rev() {
+            if right[column] != 0.0 {
+                right[column] /= matrix[column][column];
+                for row in 0..column { let v = right[column] * matrix[row][column]; right[row] -= v; }
+            }
+        }
+    }
+
+    fn reference_fit_interior_controls(first: Point, last: Point, samples: &FittingSamples, quadratic: bool) -> Vec<Point> {
+        let size = if quadratic { 2 } else { 4 };
+        let mut design: Vec<[f64; 4]> = Vec::new();
+        let mut residuals = Vec::new();
+        for (sample, point) in samples.points.iter().enumerate() {
+            let t = samples.parameters[sample]; let inverse = 1.0 - t;
+            let first_weight = if quadratic { inverse * inverse } else { inverse * inverse * inverse };
+            let last_weight = if quadratic { t * t } else { t * t * t };
+            let left = if quadratic { inverse * t + inverse * t } else { inverse * inverse * t * 3.0 };
+            let right = t * t * inverse * 3.0;
+            for channel in 0..2 {
+                let mut row = [0.0; 4];
+                row[channel] = left;
+                if !quadratic { row[channel + 2] = right; }
+                design.push(row);
+                residuals.push(point[channel] - (last_weight * last[channel] + first_weight * first[channel]));
+            }
+        }
+        let mut matrix = vec![vec![0.0; size]; size];
+        let mut right = vec![0.0; size];
+        for column in 0..size {
+            for row in 0..size {
+                let mut sum = 0.0;
+                for d in &design { sum = d[row] * d[column] + sum; }
+                matrix[row][column] = sum + if row == column { 0.00001 } else { 0.0 };
+            }
+            let mut sum = 0.0;
+            for (d, r) in design.iter().zip(&residuals) { sum = d[column] * r + sum; }
+            right[column] = sum;
+        }
+        reference_solve_normal_equations(&mut matrix, &mut right);
+        if quadratic { vec![first, [right[0], right[1]], last] }
+        else { vec![first, [right[0], right[1]], [right[2], right[3]], last] }
+    }
+
+    fn assert_control_bits(first: Point, last: Point, samples: &FittingSamples, quadratic: bool) {
+        let actual = fit_interior_controls(first, last, samples, quadratic);
+        let expected = reference_fit_interior_controls(first, last, samples, quadratic);
+        assert_eq!(actual.len(), expected.len());
+        for (index, (a, b)) in actual.iter().zip(&expected).enumerate() {
+            for channel in 0..2 {
+                assert_eq!(a[channel].to_bits(), b[channel].to_bits(),
+                    "control {index}, channel {channel}, quadratic {quadratic}, samples {samples:?}");
+            }
+        }
+    }
+
+    #[test]
+    fn streamed_controls_match_original_for_degenerate_and_boundary_samples() {
+        let coordinates = [0.0, -0.0, f64::from_bits(1), -f64::from_bits(1), f64::MIN_POSITIVE,
+            -f64::MIN_POSITIVE, 1.0, -1.0, 1.0e150, -1.0e150, f64::MAX, -f64::MAX];
+        let parameters = [0.0, -0.0, f64::from_bits(1), 0.25, 0.5, 0.75,
+            f64::from_bits(1.0f64.to_bits() - 1), 1.0];
+        for quadratic in [true, false] {
+            for &x in &coordinates {
+                for &t in &parameters {
+                    for count in [3, 4, 17] {
+                        let samples = FittingSamples { parameters: vec![t; count], points: vec![[x, -x]; count] };
+                        assert_control_bits([x, -x], [-x, x], &samples, quadratic);
+                    }
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn streamed_controls_preserve_nonfinite_arithmetic() {
+        // Finite public input coordinates can overflow squared distances, which
+        // in turn can produce non-finite sample parameters. Keep zero products.
+        let values = [f64::NAN, -f64::NAN, f64::INFINITY, f64::NEG_INFINITY, 1.0e308, -1.0e308];
+        for quadratic in [true, false] {
+            for &t in &values {
+                let samples = FittingSamples { parameters: vec![0.0, t, 1.0, 0.5],
+                    points: vec![[0.0, -0.0], [1.0, -2.0], [0.0, 0.0], [3.0, 1.0]] };
+                assert_control_bits([1.0, -0.0], [0.0, 1.0], &samples, quadratic);
+            }
+        }
+    }
+
+    #[test]
+    fn streamed_controls_match_original_for_varied_sample_sequences() {
+        let mut state = 0x7521_d6e3_b12a_04f9u64;
+        let mut next = || { state = state.wrapping_mul(6364136223846793005).wrapping_add(1442695040888963407);
+            (state >> 11) as f64 * (1.0 / 9007199254740992.0) };
+        for quadratic in [true, false] {
+            for count in [3, 4, 5, 8, 17, 64, 257] {
+                for _ in 0..64 {
+                    let first = [next() * 2000.0 - 1000.0, next() * 2000.0 - 1000.0];
+                    let last = [next() * 2000.0 - 1000.0, next() * 2000.0 - 1000.0];
+                    let mut samples = FittingSamples { parameters: Vec::new(), points: Vec::new() };
+                    for sample in 0..count {
+                        samples.parameters.push((sample as f64 + next()) / count as f64);
+                        samples.points.push([next() * 2000.0 - 1000.0, next() * 2000.0 - 1000.0]);
+                    }
+                    assert_control_bits(first, last, &samples, quadratic);
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn zero_iterations_never_evaluate_or_cache_the_multiplier() {
+        let mut nodes = vec![FitNode { x: 0.0, y: 0.0, kind: 0, cubic: -1 }; 4];
+        let mut multiplier = None;
+        let result = partition_contour_interval_cached(&mut nodes, &[0, 1, 2, 3], 0, 3,
+            1.0, f64::from_bits(1), 0, 0.5, &mut multiplier).unwrap();
+        assert_eq!(multiplier, None);
+        assert_eq!(result.threshold.to_bits(), 1.0f64.to_bits());
+        assert_eq!(result.records.len(), 4);
+        assert!(result.records.iter().all(|r| r.dirty && r.count == 1 && r.cost == 0.0));
+    }
 }

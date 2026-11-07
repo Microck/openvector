@@ -1,6 +1,6 @@
 //! Port of `src/contour-fitting.mjs`.
 use crate::contours::Geometry;
-use crate::fitting::{fit_contour_interval, partition_contour_interval, FitNode, Point};
+use crate::fitting::{fit_contour_interval, partition_contour_interval_cached, FitNode, Point};
 use serde_json::Value;
 use serde::{Deserialize, Serialize};
 
@@ -77,6 +77,7 @@ fn marked_sample(nodes: &[FitNode], contour: &[usize], sample: usize, direction:
 fn select_intervals(fitter: &mut ContourFitter, p: &FittingParameters,
     checkpoint: &mut dyn FnMut(i32, i32, &ContourFitter) -> Result<(), String>) -> Result<usize, String> {
     let mut slots = 0usize;
+    let mut multiplier = None;
     for index in 0..fitter.regions.len() {
         if index % 4 == 0 { checkpoint(1, ((index * 50) as f64 / fitter.regions.len() as f64 + 0.5).floor() as i32, fitter)?; }
         let nodes = &mut fitter.nodes;
@@ -87,8 +88,8 @@ fn select_intervals(fitter: &mut ContourFitter, p: &FittingParameters,
             let start = marked_sample(nodes, contour, sample, -1, 0) as i64;
             let mut end = marked_sample(nodes, contour, sample, 1, 0) as i64;
             while end <= start { end += len; }
-            let records = partition_contour_interval(nodes, contour, start, end, p.stat_thresh_initial,
-                p.stat_thresh_final, p.max_iterations as i64, 0.5)?.records;
+            let records = partition_contour_interval_cached(nodes, contour, start, end, p.stat_thresh_initial,
+                p.stat_thresh_final, p.max_iterations as i64, 0.5, &mut multiplier)?.records;
             let mut current = start;
             for (i, record) in records.iter().enumerate() {
                 let next = if i + 1 < records.len() { records[i + 1].start } else { end - start + 1 };
