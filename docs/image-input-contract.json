@@ -1,7 +1,7 @@
 {
   "component": "Encoded image input and decoded source state",
   "targetSha256": "c491656b962debc215a8b6e757a9b2949ffe50a36b5f2db692706bcd4ebface1",
-  "status": "Independent BMP/PNG decoding matches645 of652 captured cases, including359 BMP cases; seven16-bit Adam7 comparisons remain strict failures. JPEG matches196 import/preparation cases and five complete conversions. GIF matches82 cases and three conversions. TIFF matches1663 cases and twenty conversions. Three GIF, 129 TIFF decode rejections and two TIFF generic-reader process failures are retained.",
+  "status": "Well-defined BMP/PNG native behavior retains strict captured comparisons. Interlaced 16-bit RGB/RGBA PNGs use standards-correct deterministic pixels instead of the original reader's undefined retained-scratch output. Runtime verification of this change is pending.",
   "reference": {
     "encodedEntry": "0x473e00",
     "blobConstructor": "0x4aee70",
@@ -23,7 +23,7 @@
   "decoder": {
     "api": "Named development exports decodeImage(encoded) and resolveImageFilename(filename) are available from the package root through src/settings.mjs and are shared by CLI, GUI and document controllers. Format-specific modules remain internal.",
     "input": "Uint8Array containing exact encoded image bytes. Return owned width/height/BGRA, intrinsic hasAlpha boolean (native decoded matte), and detected format. Do not mutate input or invoke original binaries or child processes.",
-    "png": "PNG color types 0/2/3/4/6 at legal depths, five row filters, Adam7 passes, palette/transparency keys and concatenated IDAT. Native Q8 direct-class 16-bit RGB/RGBA reading reduces retained row storage in place after every pass, including unchanged rows. RGB16 emits zero alpha before its legacy tRNS postscan. Transparency keys are cast to Q8 before comparison; the final tRNS scan resets opacity only at the first pixel of each row. Seven Adam7 cases still differ and must remain visible failures.",
+    "png": "PNG color types 0/2/3/4/6 at legal depths, five row filters, Adam7 passes, palette/transparency keys and concatenated IDAT. Interlaced 16-bit RGB/RGBA inputs decode each pass into its final pixel positions exactly once, take each channel's high byte, preserve RGBA alpha and use opaque alpha for RGB except exact full-16-bit tRNS sample matches. No Q8 transparency comparison or legacy opacity postscan applies to this class. Noninterlaced 16-bit RGB/RGBA retains native Q8 in-place row reduction and legacy transparency/opacity behavior; other PNG classes retain their well-defined native behavior.",
     "bmp": "Independent first-raster BMP import for packed1/4/8-bit palettes,16/24/32-bit pixels, core and extended headers, reduced palettes, native bitfield/Q8/opacity behavior, RLE4/RLE8 and BM/CI/BA wrappers. All359 BMP cases and six complete conversions match. See bmp-input-contract.json for exact scope and remaining work.",
     "sourceInvariant": "All 337 original source setters rebuild a matte-one source cache, including 138 decoded matte-zero inputs. Preparation requires intrinsic hasAlpha metadata. For matte-zero input, native GetImageType selects opaque palette type 4 only for nongray images with at most 256 colors; source setter promotes that type to truecolor matte type 7 and fills alpha. Other types retain decoder alpha. Setter 0x4aeaf0 selects RGB colorspace, not alpha. Fresh analysis derives resize matte=1; no user matte control or compatibility alias.",
     "sources": [
@@ -31,7 +31,7 @@
       "https://learn.microsoft.com/en-us/windows/win32/api/wingdi/ns-wingdi-bitmapinfoheader",
       "https://svn.dslinux.org/svn/tags/imagemagick/imagemagick-6.4.2/coders/png.c"
     ],
-    "authority": "Format specifications define structural parsing. Original executable byte observations govern legacy pixel behavior.",
+    "authority": "Format specifications define structural parsing. Original executable byte observations govern well-defined legacy pixel behavior. The approved product decision uses deterministic standards-correct decoding for interlaced 16-bit RGB/RGBA rather than emulating undefined scratch memory.",
     "proof": "../evidence/image-input-native-reference.json",
     "freshQuirkProof": "../evidence/image-input-fresh-quirk-verification.json",
     "fixture": "../test/fixtures/image-input-reference.ndjson.gz",
@@ -55,7 +55,9 @@
     "processRuns": 42,
     "contextsWithRepeatPixelDifferences": 13,
     "cause": "REA confirms 0x5fd120 allocates retained interlace row storage through 0x50e270, which directly calls malloc without initialization. Reader 0x69aed0 returns without writing the caller row on skipped Adam7 rows and merges only selected pass pixels otherwise. The image reader imports and reduces every row after every pass, including unchanged rows. Previously unwritten scratch bytes can enter pixels and vary with allocation history/process state. Exact source/working/prepared byte differences between repeated untouched whole-loader calls corroborate this.",
-    "decisionNeeded": "Define the intended behavior for native undefined pixels before claiming universal 1:1 parity. Do not hardcode observed heap bytes, inject captured intermediates, weaken comparisons or present deterministic zero-initialized output as an exact match. Other feature parity work remains unfinished independently of this issue."
+    "decision": "Approved: define standards-correct deterministic pixels for the structural class interlaced 16-bit RGB/RGBA PNGs, including exact sample-domain transparency before Q8 reduction. Historical captures and finite stable-byte masks remain evidence, not correctness oracles for that class. Compare every affected archived input against its recorded writer samples and every source/working pixel against the common preparation contract. Independently authored inputs cover all filters, odd/narrow dimensions, channel order, alpha, transparency and Adam7 merging. No fixture-ID exceptions, captured heap bytes, NaNs, ignored cases or blanket snapshot updates. Exact comparison remains strict outside this class.",
+    "correctnessFixture": "../test/fixtures/png-adam7-correctness.json",
+    "stablePropertyReplacement": "The seven adam7_*_stable tests asserted repeatable artifacts of the corrupt algorithm. Replace those masked native consensus assertions with complete-buffer sample-oracle decode and preparation assertions for all 16 structurally affected historical cases, including the nine cases whose captured bytes happened to agree."
   },
   "verification": {
     "fullSuite": {
@@ -68,7 +70,7 @@
       "durationMs": 634291.1176,
       "report": "../evidence/image-input-full-test-run.txt"
     },
-    "currentFailure": "test/image-input.test.mjs: strict native raw-decoding comparison; first reported case adam7-9x7-10. Independent all-case diagnostic attempts all 337 and retains seven mismatches.",
+    "historicalFailure": "Before the approved contract change, test/image-input.test.mjs and image::native_pixels/native_preparation failed at adam7-9x7-10; seven historical Adam7 outputs differed. These logs remain historical evidence, not current validation.",
     "published": false,
     "exported": true
   }

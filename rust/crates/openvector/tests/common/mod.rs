@@ -5,6 +5,10 @@
 use std::io::Read;
 use std::path::PathBuf;
 
+mod presentation;
+#[allow(unused_imports)]
+pub use presentation::{application_svg_fixture, assert_dxf_drawing};
+
 pub fn fixture_path(name: &str) -> PathBuf {
     let base = std::env::var_os("OPENVECTOR_FIXTURES").map(PathBuf::from)
         .unwrap_or_else(|| PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../../test/fixtures"));

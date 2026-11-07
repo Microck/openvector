@@ -76,6 +76,11 @@ cargo test --manifest-path rust/Cargo.toml --locked -p openvector -p openvector-
 cargo test --manifest-path rust/Cargo.toml --locked -p openvector-gui --lib
 ```
 
+Keep Node.js 22.19 or newer on `PATH` for the Rust CLI integration tests too.
+Edit-recipe tests compare complete SVG output against the independent JavaScript
+application model, including straight-color refitting. Raw numerical tests retain
+their separate native-reference comparisons.
+
 Record actual failures and skips. The known strict-suite exceptions remain visible;
 these commands are not an assertion that every test currently passes. Stop if a
 new failure appears, and investigate it before publication. A release decision must

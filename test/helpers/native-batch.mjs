@@ -4,7 +4,7 @@ import { gunzipSync } from 'node:zlib';
 import { tmpdir } from 'node:os';
 import { join, dirname, basename, resolve, sep } from 'node:path';
 import { BatchQueue } from '../../src/batch-queue.mjs';
-import { publicVectorFixture } from './native-vector-output.mjs';
+import { publicVectorFixture, applicationSvgFixture, assertDxfDrawing } from './native-vector-output.mjs';
 
 export const [batchProvenance, ...batchReferences] = gunzipSync(readFileSync(new URL('../fixtures/batch-runner-reference.ndjson.gz', import.meta.url)))
   .toString().trim().split('\n').map(JSON.parse);
@@ -54,7 +54,7 @@ function epsWithoutClock(bytes, began, ended) {
   return text.replace(/^%%CreationDate: .+\r$/m, '%%CreationDate: <clock>\r');
 }
 
-export function assertBatchResult(actual, { reference, directory, outputDirectory }, began, ended) {
+export function assertBatchResult(actual, { reference, directory, outputDirectory }, began, ended, compareFile) {
   const native = reference.expected, log = native.processing.log;
   const page = native.processing.wizardPage;
   assert.ok([0,1,2,3].includes(page), 'settled native batch page');
@@ -95,8 +95,44 @@ export function assertBatchResult(actual, { reference, directory, outputDirector
     for (const [name, bytes] of Object.entries(reference.expectedOutputs)) {
       const holder = aliases(name).at(-1) ?? name;
       const observed = readFileSync(join(outputDirectory, holder)), expected = publicVectorFixture(Buffer.from(bytes, 'base64'));
-      if (reference.format === 'eps') assert.equal(epsWithoutClock(observed, began, ended), epsWithoutClock(expected));
+      if (compareFile) compareFile(observed,expected,holder);
+      else if (reference.format === 'eps') assert.equal(epsWithoutClock(observed, began, ended), epsWithoutClock(expected));
       else assert.deepEqual(observed, expected, holder);
     }
   } else assert.equal(existsSync(outputDirectory), false, 'missing export directory remains missing');
+}
+
+/** The Rust application has straight-color output and collision-safe naming.
+ * Keep the independent numerical/reference runner's captured expectations above
+ * intact, and explicitly project only the application boundary here. */
+export function assertApplicationBatchResult(actual,context,began,ended,controls) {
+  const reference=structuredClone(context.reference),outputs=reference.expected.processing.outputs;
+  const reserved=new Set(),renamed=new Map();
+  for (let index=0;index<outputs.length;index++) {
+    const original=basename(outputs[index][0]),dot=original.lastIndexOf('.');
+    const stem=original.slice(0,dot),extension=original.slice(dot);
+    let name=original,suffix=0;
+    while (reserved.has(name.toUpperCase())) name=`${stem}_${++suffix}${extension}`;
+    reserved.add(name.toUpperCase());
+    if (name===original) continue;
+    // The retained alias capture uses identical source bytes. Its final alias
+    // therefore supplies an independent complete file expectation for both
+    // outputs, without reproducing the original's overwrite.
+    const prior=outputs.findIndex((output,i)=>i<index&&basename(output[0]).toUpperCase()===original.toUpperCase());
+    assert.ok(prior>=0,'captured source alias exists');
+    assert.equal(reference.sources[prior].bytes,reference.sources[index].bytes,'alias sources have identical content');
+    assert.equal(Object.keys(reference.initialOutputs).length,0,'alias fixture has no pre-existing outputs');
+    const captured=Object.keys(reference.expectedOutputs).find(key=>key.toUpperCase()===original.toUpperCase());
+    assert.notEqual(captured,undefined,'captured alias file exists');
+    reference.expectedOutputs[name]=reference.expectedOutputs[captured];
+    outputs[index][0]=outputs[index][0].slice(0,-original.length)+name;
+    renamed.set(original,name);
+  }
+  reference.expected.processing.log=reference.expected.processing.log.replace(/'([^']*)'/g,
+    (token,name)=>renamed.has(name) ? `'${renamed.get(name)}'` : token);
+  const generated=controls.advanced ? controls.paletteMode===1 : controls.paletteMode!==2;
+  if (reference.format==='svg'&&generated) for (const name of Object.keys(reference.expectedOutputs))
+    reference.expectedOutputs[name]=applicationSvgFixture(Buffer.from(reference.expectedOutputs[name],'base64')).toString('base64');
+  const compare=reference.format==='dxf' ? (observed,expected,name)=>assertDxfDrawing(observed,expected,name) : undefined;
+  assertBatchResult(actual,{...context,reference},began,ended,compare);
 }

@@ -46,9 +46,8 @@ function unfilterRow(encoded, offset, row, previous, bpp) {
   return offset + row.length;
 }
 
-/** Original Q8 direct-class reader reduces 16-bit rows in place after every
- * Adam7 pass, including rows unchanged by that pass. Retaining the row storage
- * reproduces that transformation order rather than decoding a modern PNG. */
+/** Preserve noninterlaced Q8 row reduction and opacity quirks. Interlaced
+ * 16-bit RGB/RGBA uses sample-domain decoding below instead of this import. */
 function importLegacyPngRows(storage, bgra, width, height, type, transparency) {
   const channels = type === 2 ? 3 : 4, stride = width * channels * 2;
   const keys = transparency ? [0,2,4].map(offset => transparency.readUInt16BE(offset) & 255) : null;
@@ -124,7 +123,10 @@ function decodePng(encoded) {
   const inflated = inflateSync(Buffer.concat(compressed), { maxOutputLength:expected });
   if (inflated.length !== expected) throw new Error('PNG decoded scanline size does not match its dimensions.');
   const bgra = new Uint8Array(width * height * 4), bpp = Math.max(1,Math.ceil(channels * depth / 8));
-  const legacyRows = depth === 16 && (type === 2 || type === 6) ? new Uint8Array(width * height * channels * 2) : null;
+  // Reduce Adam7 samples once, at their final pixel positions, rather than
+  // reimporting retained rows and corrupting pixels supplied by earlier passes.
+  const correctAdam7 = interlace === 1 && depth === 16 && (type === 2 || type === 6);
+  const legacyRows = depth === 16 && (type === 2 || type === 6) && !correctAdam7 ? new Uint8Array(width * height * channels * 2) : null;
   const scale = depth === 16 ? value => value >>> 8 : depth === 8 ? value => value : value => value * (255 / ((1 << depth) - 1));
   let offset = 0;
   for (const pass of passes) {
@@ -152,6 +154,8 @@ function decodePng(encoded) {
           const r = sampleAt(row,sample,depth), g = sampleAt(row,sample + 1,depth), b = sampleAt(row,sample + 2,depth);
           red = scale(r); green = scale(g); blue = scale(b);
           if (type === 6) alpha = scale(sampleAt(row,sample + 3,depth));
+          else if (correctAdam7 && transparency && r === transparency.readUInt16BE(0)
+            && g === transparency.readUInt16BE(2) && b === transparency.readUInt16BE(4)) alpha = 0;
         }
         const pixel = ((pass.y + y * pass.dy) * width + pass.x + x * pass.dx) * 4;
         bgra[pixel] = blue; bgra[pixel + 1] = green; bgra[pixel + 2] = red; bgra[pixel + 3] = alpha;
@@ -160,7 +164,7 @@ function decodePng(encoded) {
     }
     if (legacyRows) importLegacyPngRows(legacyRows,bgra,width,height,type,transparency);
   }
-  if (transparency && (type === 0 || type === 2)) {
+  if (!correctAdam7 && transparency && (type === 0 || type === 2)) {
     const keys = type === 0 ? Array(3).fill(depth < 8 ? transparency.readUInt16BE(0) * 255 / ((1 << depth) - 1)
       : transparency.readUInt16BE(0) & 255) : [0,2,4].map(offset => transparency.readUInt16BE(offset) & 255);
     for (let y = 0; y < height; y++) {

@@ -1,3 +1,12 @@
+# 0.1.3 (candidate, unreleased)
+
+- reduce repeated pixel work during image-based smoothing while preserving evaluation order.
+- accelerate exact 5×5 and 7×7 noise reduction, contour fitting, repeated-color palette assignment, and vector-export decimal formatting.
+- fix corrupted colors when loading 16-bit interlaced RGB and RGBA PNG images.
+- preserve painted colors when refitting segmentation edits on translucent images.
+- smoothing's residual cache adds eight bytes per image pixel. standalone benchmark results do not establish the combined release's speedup.
+- combined-code reference, native package and distribution checks remain release gates.
+
 # 0.1.2
 
 - the cli and node library are available on npm for linux amd64/arm64 and windows x64 with node.js 22.19 or later.

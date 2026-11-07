@@ -1,7 +1,14 @@
 {
   "component": "Independent vector shape assembly and export under reconstruction",
   "status": "All six fitted-graph serializers pass complete native byte corpora, 183 source tests and strict fresh offline package checks. Full image conversion and application parity remain unfinished.",
-  "boundary": "Completed fitted shared nodes, referenced cubic coordinates and region edge records from fitContours. Preserve nesting, colors, edge references and direction. DXF additionally requires the original normalized float32 BGRA palette, including entries absent from region byte colors. Document APIs must retain this state for the library, CLI and GUI.",
+  "boundary": "Low-level serializers consume completed fitted shared nodes, cubic coordinates, region edge records and literal BGRA colors. Preserve their exact reference comparisons, including DXF palette entries absent from region colors. Application exports consume the document's straight-color presentation projection instead of serializing associated internal colors as straight RGB.",
+  "applicationPresentation": {
+    "colors": "Application SVG/PDF/EPS/AI/DXF/EMF and bitmap exports use straight RGB with separate alpha. Associated internal channel P and alpha A project to the nearest representable byte for 255*P/A, saturating at 255; alpha zero has zero RGB. Explicit straight user colors must not be unassociated a second time.",
+    "palette": "Application DXF layer colors come from the presentation geometry. Raw document snapshots retain the complete numerical palette; low-level DXF keeps its explicit palette contract.",
+    "referenceBoundary": "Historical premultiplied file bytes are not application-color expectations. Application tests use independently projected captured geometry or captured SVG group alpha, preserve geometry and opacity comparisons, and separately check authored translucent-image output. Low-level serializer byte fixtures remain unchanged.",
+    "dxfVerification": "Preserve the preamble, complete header, blocks, objects, drawing entities and every used-layer field. Check unique object handles and resolved references, then compare their object identities and reference topology rather than allocated numbers. Only the next-handle seed, validated layer-count differences and unused palette declarations may differ. Changed units, bounds, dictionary metadata or reference targets must fail comparison.",
+    "standard": "https://www.w3.org/TR/SVG11/painting.html#SpecifyingPaint"
+  },
   "reference_executable_sha256": "c491656b962debc215a8b6e757a9b2949ffe50a36b5f2db692706bcd4ebface1",
   "assembly": {
     "reference": "0x47d4c0",

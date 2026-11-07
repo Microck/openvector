@@ -140,8 +140,8 @@ function readInitialization(input) {
     throw new Error('Contour initialization needs an anti-alias flag and finite nonnegative perturbation range.');
   }
   const colorIndices = Array.from(geometry.regions, region => {
-    // With anti-aliasing disabled the original skips color sampling entirely.
-    // Painted region IDs can then exceed a subsequently reloaded live palette.
+    // Disabled anti-aliasing skips sampling; enabled sampling requires each
+    // region ID in the caller-owned complete sampling table.
     if (!region || !Number.isInteger(region.colorIndex) || region.colorIndex < 0 ||
         (antiAlias && region.colorIndex >= palette.length / 4)) {
       throw new Error('Contour region colors must identify the completed palette.');

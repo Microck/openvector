@@ -8,7 +8,7 @@ import { gunzipSync } from 'node:zlib';
 import { CoreSession } from '../src/settings.mjs';
 import { decodeImage, resolveImageFilename } from '../src/image-input.mjs';
 import { defaultSelectedProfile, defaultBatchProfile, applyAdvancedProfile, batchProfileControls } from '../src/settings-profile.mjs';
-import { batchReferences, createBatchCase, assertBatchResult } from './helpers/native-batch.mjs';
+import { batchReferences, createBatchCase, assertApplicationBatchResult } from './helpers/native-batch.mjs';
 
 const cli = fileURLToPath(new URL('../bin/openvector.mjs', import.meta.url));
 const invoke = (args, cwd) => spawnSync(process.execPath, [cli, ...args], { cwd, encoding: 'utf8' });
@@ -24,7 +24,7 @@ for (const reference of batchReferences.filter(row => row.sources.length && !row
   const result = JSON.parse(run.stdout);
   assert.equal(run.status, result.status === 'cancelled' ? 130 : result.failed ? 1 : 0, run.stderr);
   assert.equal(run.stderr.split('\n').filter(line => line.includes('Failed To ')).length, result.failed);
-  assertBatchResult(result, context, began, ended);
+  assertApplicationBatchResult(result, context, began, ended, reference.settings);
 });
 
 test('batch CLI help ignores other arguments without processing inputs', () => {
@@ -86,9 +86,10 @@ for (const [id,paletteMode] of [['custom-two',0],['custom-fixed',1],['custom-fle
       colorCount:7,paletteColorCount:automatic.paletteCount};
     const requested = applyAdvancedProfile(defaultBatchProfile(),profile,{batch:true});
     const settings = join(context.directory,'profile-settings.json');
-    writeFileSync(settings,JSON.stringify(batchProfileControls(requested)));
+    const controls=batchProfileControls(requested);
+    writeFileSync(settings,JSON.stringify(controls));
     const began = Date.now();
     const run = invoke(['batch',...context.filenames,'--settings',settings,'--format','svg','--output-dir',context.outputDirectory],context.directory);
     assert.equal(run.status,0,run.stderr);assert.equal(run.stderr,'');
-    assertBatchResult(JSON.parse(run.stdout),context,began,Date.now());
+    assertApplicationBatchResult(JSON.parse(run.stdout),context,began,Date.now(),controls);
   });

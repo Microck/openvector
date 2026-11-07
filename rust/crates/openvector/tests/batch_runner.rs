@@ -76,7 +76,7 @@ fn native_batch_runner_files_logs_and_task_boundaries(){
             let mut expected_listing=expected_outputs.keys().cloned().collect::<std::collections::BTreeSet<_>>();
             if case_alias {
                 expected_listing.insert("A_1.svg".into());
-                assert_eq!(std::fs::read(output.join("A_1.svg")).unwrap(), common::b64(expected_outputs["a.svg"].as_str().unwrap()));
+                assert_eq!(std::fs::read(output.join("A_1.svg")).unwrap(), common::application_svg_fixture(&common::b64(expected_outputs["a.svg"].as_str().unwrap())));
             }
             let actual_listing=std::fs::read_dir(&output).unwrap().map(|e|e.unwrap().file_name().into_string().unwrap()).collect::<std::collections::BTreeSet<_>>();assert_eq!(actual_listing,expected_listing,"{id}");
             for (name,bytes) in expected_outputs{let actual=std::fs::read(output.join(name)).unwrap();
@@ -84,11 +84,14 @@ fn native_batch_runner_files_logs_and_task_boundaries(){
                     common::b64(reference["filesystemAppearance"]["bytes"].as_str().unwrap())
                 } else { common::b64(bytes.as_str().unwrap()) };
                 let expected = match reference["format"].as_str().unwrap() {
+                    "svg" => common::application_svg_fixture(&expected),
                     "pdf" => common::public_pdf_fixture(&expected),
                     "emf" => common::public_emf_fixture(expected),
                     _ => expected,
                 };
-                if reference["format"]=="eps"{assert_eq!(normalize_eps(&actual),normalize_eps(&expected),"{id} {name}")}else{assert_eq!(actual,expected,"{id} {name}");}}
+                if reference["format"]=="eps"{assert_eq!(normalize_eps(&actual),normalize_eps(&expected),"{id} {name}")}
+                else if reference["format"]=="dxf"{common::assert_dxf_drawing(&actual,&expected,&format!("{id} {name}"))}
+                else{assert_eq!(actual,expected,"{id} {name}");}}
         }else{assert!(!output.exists(),"{id}");}
         if !native["document"].is_null(){editor_support::compare_document_state(last_export.as_ref().expect("missing final export state"),&native["document"]["state"],&rows[0]["parameters"]);}
     }
@@ -121,7 +124,7 @@ fn fresh_native_batches_preserve_the_session_random_stream() {
         assert_eq!((result.converted, result.failed, result.skipped), (3, 0, 0));
         for (name, capture) in expected.as_object().unwrap() {
             assert_eq!(std::fs::read(output.join(name)).unwrap(),
-                common::b64(capture["bytes"].as_str().unwrap()), "batch {phase}: {name}");
+                common::application_svg_fixture(&common::b64(capture["bytes"].as_str().unwrap())), "batch {phase}: {name}");
         }
     }
 }
@@ -166,7 +169,7 @@ fn native_batch_cancellation_and_same_session_retries(){
             if reference["directoryExists"]==true{
                 let actual_names=std::fs::read_dir(&output).unwrap().map(|e|e.unwrap().file_name().into_string().unwrap()).collect::<std::collections::BTreeSet<_>>();
                 assert_eq!(actual_names,expected_outputs.keys().cloned().collect(),"{id}");
-                for (name,bytes) in expected_outputs{assert_eq!(std::fs::read(output.join(name)).unwrap(),common::b64(bytes.as_str().unwrap()),"{id} {name}");}
+                for (name,bytes) in expected_outputs{assert_eq!(std::fs::read(output.join(name)).unwrap(),common::application_svg_fixture(&common::b64(bytes.as_str().unwrap())),"{id} {name}");}
             }else{
                 assert!(expected_outputs.is_empty(),"{id}: absent export directory cannot have outputs");
                 assert!(!output.exists(),"{id}: missing export directory must remain absent");
@@ -239,7 +242,7 @@ fn reserved_observer_cancellation_preserves_partial_report_and_retry() {
         let first_output = Path::new(&queue.queue[0].output_filename);
         let pending_output = Path::new(&queue.queue[1].output_filename);
         let written = std::fs::read(first_output).unwrap();
-        assert_eq!(written, common::b64(reference["expectedOutputs"]["a.svg"].as_str().unwrap()));
+        assert_eq!(written, common::application_svg_fixture(&common::b64(reference["expectedOutputs"]["a.svg"].as_str().unwrap())));
         assert!(!pending_output.exists());
         if observer_error == CANCEL_TASK {
             let result = outcome.unwrap();
@@ -268,7 +271,7 @@ fn reserved_observer_cancellation_preserves_partial_report_and_retry() {
             ["skipped", "written"]);
         assert_eq!(std::fs::read(first_output).unwrap(), written);
         assert_eq!(std::fs::read(pending_output).unwrap(),
-            common::b64(reference["expectedOutputs"]["b.svg"].as_str().unwrap()));
+            common::application_svg_fixture(&common::b64(reference["expectedOutputs"]["b.svg"].as_str().unwrap())));
     }
 }
 

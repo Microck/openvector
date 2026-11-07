@@ -496,7 +496,7 @@ fn fresh_application_exports(id: &str) {
             assert_eq!(summary["failed"], 0);
             for (filename, expected) in row["exports"][0].as_object().unwrap() {
                 assert_eq!(std::fs::read(directory.0.join(filename)).unwrap(),
-                    common::b64(expected["bytes"].as_str().unwrap()), "{id}/{filename}");
+                    common::application_svg_fixture(&common::b64(expected["bytes"].as_str().unwrap())), "{id}/{filename}");
             }
             continue;
         }
@@ -559,7 +559,7 @@ fn fresh_single_image_svg(id: &str) {
     assert_eq!(reference["singleImageSvg"][0], reference["singleImageSvg"][1]);
     let source = reference["input"]["name"].as_str().unwrap();
     let pixels = common::b64(reference["input"]["bytes"].as_str().unwrap());
-    let expected = common::b64(reference["singleImageSvg"][0]["bytes"].as_str().unwrap());
+    let expected = common::application_svg_fixture(&common::b64(reference["singleImageSvg"][0]["bytes"].as_str().unwrap()));
     let directory = Directory::new();
     let output = invoke(&directory.0, &["vectorize", "-", "--filename", source], Some(&pixels));
     success(&output, id);
