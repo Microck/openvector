@@ -5,6 +5,25 @@ Validation compiler: `rustc 1.99.1 (58cf8f9c3 2026-10-13)`.
 The paired benchmark report records the exact candidate source ref, compiler,
 CPU, affinity, raw samples and output hashes used for its measurements.
 
+## Measured results
+
+Seven alternating paired release samples on AMD EPYC 9V74, Linux, CPU 0, using `rustc 1.99.1 (58cf8f9c3 2026-10-13)`. Candidate source: `fbcbfe060519883351097d2e47220c9be00b4ac7`. Both workloads are 8×8 translated mosaics of the committed fitted native graphs. Values are median milliseconds per call.
+
+| Operation | Alpha/profile-3 before → after, ms | Speedup | Ring/profile-6 before → after, ms | Speedup |
+| --- | ---: | ---: | ---: | ---: |
+| Coordinate formatting only | 189.047 → 20.112 | 9.40× | 125.983 → 13.236 | 9.52× |
+| SVG export | 4.819 → 1.493 | 3.23× | 2.244 → 0.601 | 3.73× |
+| PDF export | 4.554 → 2.018 | 2.26× | 2.514 → 0.978 | 2.57× |
+| EPS export | 3.958 → 1.788 | 2.21× | 2.523 → 1.023 | 2.47× |
+| AI export | 3.815 → 1.683 | 2.27× | 2.471 → 0.957 | 2.58× |
+| DXF spline export | 22.759 → 10.272 | 2.22× | 15.311 → 6.249 | 2.45× |
+| DXF dense-line export | 66.916 → 28.046 | 2.39× | 34.238 → 14.828 | 2.31× |
+| EMF control | 0.470 → 0.444 | 1.06× | 0.256 → 0.195 | 1.32× |
+
+The complete text exports improve 2.21–3.73× across these two workloads. Coordinate formatting in isolation improves 9.40–9.52×. EMF is an unchanged control and measures 1.06–1.32×; the shortest cases remain sensitive to shared-host timing variation. Final measurements ran with other project builds, tests and benchmarks stopped.
+
+All 16 operation/workload outputs match the baseline byte for byte, and every timed output matches its untimed reference. [export-formatting-results.json](export-formatting-results.json) records all raw samples, output hashes, workload sizes, executable hashes, exact source refs and environment metadata. These are formatting/export-stage timings; fitting and all other conversion stages are excluded.
+
 ## Change
 
 The native decimal conversion intentionally reproduces 80-bit intermediate
