@@ -1,9 +1,9 @@
-# 0.1.2 (candidate, unreleased)
+# 0.1.2
 
 - text fields expose content and selections to assistive technology, including unicode selection positions inside graphemes.
 - linux at-spi diagnostics check named controls, dialogs, focus and retained numeric edits in isolated sessions.
 - full screen-reader support, wayland and cross-platform screen readers remain unverified.
-- publication is gated on the complete reference corpus, native platform/package checks and corresponding-source rebuild verification.
+- released with documented coverage limits: two missing private captures, incomplete strict-suite validation, no fresh windows 10 check, and an incomplete manual native workflow matrix. see the [release verification details](https://github.com/Microck/openvector/releases/tag/v0.1.2).
 
 # 0.1.1
 
