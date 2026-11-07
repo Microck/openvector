@@ -1,0 +1,1385 @@
+{
+  "schema_version": 1,
+  "timed_operation": "reduce_prepared_noise (including output allocation and drop)",
+  "fixture_setup_and_hashing_excluded": true,
+  "all_exact_checks_passed": true,
+  "samples": 7,
+  "warmup_batches_per_case_per_process": 1,
+  "untimed_correctness_runs_per_case_per_process": 1,
+  "sample_orders": [
+    [
+      "before",
+      "after"
+    ],
+    [
+      "after",
+      "before"
+    ],
+    [
+      "before",
+      "after"
+    ],
+    [
+      "after",
+      "before"
+    ],
+    [
+      "before",
+      "after"
+    ],
+    [
+      "after",
+      "before"
+    ],
+    [
+      "before",
+      "after"
+    ]
+  ],
+  "case_filter": "",
+  "elapsed_seconds": 17.346242427825928,
+  "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+  "cpu": "AMD EPYC 9V74 80-Core Processor",
+  "compiler": "rustc 1.99.1 (58cf8f9c3 2026-10-13)",
+  "affinity": [
+    0
+  ],
+  "binaries": {
+    "before": {
+      "sha256": "c96d7f9e6d6f158b8a5d8575314a52be46d35387189dd993f7405a6d46344743",
+      "source_ref": "0efa9aad869e6b58cd7947f3172f44b8a6144215"
+    },
+    "after": {
+      "sha256": "ed8577aef3a097537552d3d052223686e7eea5f87652374fb9745263055b8947",
+      "source_ref": "b7b1ee4861c556b964229449eeade41bcf7540e3"
+    }
+  },
+  "cases": [
+    {
+      "amount": 1,
+      "height": 37,
+      "id": "fresh-representative-20261020-existing-15-transparent-31x37/amount-1",
+      "input_sha256": "e863c057324da1b509066d119569ad0d5e8585443dfba75820f1ed14abf09763",
+      "iterations": 14,
+      "output_sha256": "4fdb12bf40a86619d9ebd75eeafd92e60c96fef3053129590c644301eebbab3b",
+      "width": 31,
+      "before": {
+        "samples_ms": [
+          0.08330957142857143,
+          0.07260771428571429,
+          0.07018057142857144,
+          0.07453564285714286,
+          0.07172357142857143,
+          0.07042592857142857,
+          0.06946942857142857
+        ],
+        "median_ms": 0.07172357142857143
+      },
+      "after": {
+        "samples_ms": [
+          0.08226292857142858,
+          0.07012399999999999,
+          0.07145457142857141,
+          0.07016049999999999,
+          0.07314857142857142,
+          0.0743382142857143,
+          0.07191385714285715
+        ],
+        "median_ms": 0.07191385714285715
+      },
+      "speedup": 0.9973539770797202
+    },
+    {
+      "amount": 2,
+      "height": 37,
+      "id": "fresh-representative-20261020-existing-15-transparent-31x37/amount-2",
+      "input_sha256": "e863c057324da1b509066d119569ad0d5e8585443dfba75820f1ed14abf09763",
+      "iterations": 14,
+      "output_sha256": "502827e8fcca5767d37c77fa2f86a5ff526f2392d5897ae7103b1bb2f8d814ea",
+      "width": 31,
+      "before": {
+        "samples_ms": [
+          0.36182328571428574,
+          0.27642992857142856,
+          0.2980925,
+          0.32091678571428567,
+          0.27584185714285714,
+          0.30340614285714285,
+          0.2728045
+        ],
+        "median_ms": 0.2980925
+      },
+      "after": {
+        "samples_ms": [
+          0.05424657142857143,
+          0.05146457142857142,
+          0.051799285714285714,
+          0.050810714285714285,
+          0.056090714285714285,
+          0.06333235714285715,
+          0.05148457142857143
+        ],
+        "median_ms": 0.051799285714285714
+      },
+      "speedup": 5.754760821302003
+    },
+    {
+      "amount": 3,
+      "height": 37,
+      "id": "fresh-representative-20261020-existing-15-transparent-31x37/amount-3",
+      "input_sha256": "e863c057324da1b509066d119569ad0d5e8585443dfba75820f1ed14abf09763",
+      "iterations": 14,
+      "output_sha256": "78ac7fbc3cf7039c1bceeb569697c5e34a6cb5b8dbe99792c3d735433bc06a75",
+      "width": 31,
+      "before": {
+        "samples_ms": [
+          0.783586,
+          0.7052037857142857,
+          0.7768723571428572,
+          0.6811490714285714,
+          0.7256266428571428,
+          0.6992155714285715,
+          0.7715829285714285
+        ],
+        "median_ms": 0.7256266428571428
+      },
+      "after": {
+        "samples_ms": [
+          0.06856664285714285,
+          0.070589,
+          0.06636478571428571,
+          0.06941792857142857,
+          0.06735335714285715,
+          0.06640557142857142,
+          0.07039507142857143
+        ],
+        "median_ms": 0.06856664285714285
+      },
+      "speedup": 10.582793799150567
+    },
+    {
+      "amount": 1,
+      "height": 23,
+      "id": "fresh-representative-20261020-existing-08-transparent-19x23/amount-1",
+      "input_sha256": "2ed3075c21ebcacf84794151e3d44909c5480de82dc3d56008965cdfbf3006af",
+      "iterations": 32,
+      "output_sha256": "d06862b8edd7d597ce7c567f66586f5cd970e374db1c356e24145b727d1b6bb9",
+      "width": 19,
+      "before": {
+        "samples_ms": [
+          0.033782062499999994,
+          0.02983453125,
+          0.03562009375,
+          0.028660593749999998,
+          0.0284728125,
+          0.0285163125,
+          0.02804434375
+        ],
+        "median_ms": 0.028660593749999998
+      },
+      "after": {
+        "samples_ms": [
+          0.02836484375,
+          0.02845028125,
+          0.02759615625,
+          0.032059125,
+          0.02883896875,
+          0.028788281250000002,
+          0.029150093749999998
+        ],
+        "median_ms": 0.028788281250000002
+      },
+      "speedup": 0.9955646014817225
+    },
+    {
+      "amount": 2,
+      "height": 23,
+      "id": "fresh-representative-20261020-existing-08-transparent-19x23/amount-2",
+      "input_sha256": "2ed3075c21ebcacf84794151e3d44909c5480de82dc3d56008965cdfbf3006af",
+      "iterations": 32,
+      "output_sha256": "fff98184a5a271ad7eebbf9299cb6f36770956cbefd2aba7b5d9912aa151e36c",
+      "width": 19,
+      "before": {
+        "samples_ms": [
+          0.129829875,
+          0.1229073125,
+          0.11933096875,
+          0.1214144375,
+          0.13310731250000002,
+          0.1127974375,
+          0.142101125
+        ],
+        "median_ms": 0.1229073125
+      },
+      "after": {
+        "samples_ms": [
+          0.0238195625,
+          0.023469031249999998,
+          0.022241875,
+          0.026431312499999998,
+          0.021270125,
+          0.0216613125,
+          0.0201578125
+        ],
+        "median_ms": 0.022241875
+      },
+      "speedup": 5.525942057492904
+    },
+    {
+      "amount": 3,
+      "height": 23,
+      "id": "fresh-representative-20261020-existing-08-transparent-19x23/amount-3",
+      "input_sha256": "2ed3075c21ebcacf84794151e3d44909c5480de82dc3d56008965cdfbf3006af",
+      "iterations": 32,
+      "output_sha256": "68fc4c0352b140264634ee15281a2b5ec4de976eb4a15177fc2d11f09afb46f3",
+      "width": 19,
+      "before": {
+        "samples_ms": [
+          0.32868699999999995,
+          0.28311534374999997,
+          0.31053221875000003,
+          0.2900295,
+          0.290276125,
+          0.2748491875,
+          0.27462790625
+        ],
+        "median_ms": 0.2900295
+      },
+      "after": {
+        "samples_ms": [
+          0.02659375,
+          0.10887775000000001,
+          0.02615025,
+          0.02682503125,
+          0.026176249999999998,
+          0.02687384375,
+          0.0262244375
+        ],
+        "median_ms": 0.02659375
+      },
+      "speedup": 10.90592714453584
+    },
+    {
+      "amount": 1,
+      "height": 192,
+      "id": "fresh-representative-20261020-logo-aa-256x192/amount-1",
+      "input_sha256": "d2e8d5944bb2389bcd611fa6a0f7683d79427452ef6f4515a3ec192dca4f3f63",
+      "iterations": 1,
+      "output_sha256": "e3756ec847700f545aff2b0dd4f04dac5b3f19f237799ebf96671d253ac8a028",
+      "width": 256,
+      "before": {
+        "samples_ms": [
+          2.8078920000000003,
+          2.726158,
+          3.2062700000000004,
+          2.642723,
+          3.575586,
+          2.767251,
+          2.90006
+        ],
+        "median_ms": 2.8078920000000003
+      },
+      "after": {
+        "samples_ms": [
+          3.044117,
+          2.701191,
+          3.1588089999999998,
+          4.542185,
+          2.684827,
+          2.7598700000000003,
+          2.70743
+        ],
+        "median_ms": 2.7598700000000003
+      },
+      "speedup": 1.0174000949320077
+    },
+    {
+      "amount": 2,
+      "height": 192,
+      "id": "fresh-representative-20261020-logo-aa-256x192/amount-2",
+      "input_sha256": "d2e8d5944bb2389bcd611fa6a0f7683d79427452ef6f4515a3ec192dca4f3f63",
+      "iterations": 1,
+      "output_sha256": "7bfb83e153a8b87c07bd1db2d3dd4ddf5b72714f88b2d50d0d5b022874a8cb35",
+      "width": 256,
+      "before": {
+        "samples_ms": [
+          7.375109,
+          7.168498,
+          7.433937,
+          7.537242,
+          8.145045999999999,
+          7.322459,
+          7.995282
+        ],
+        "median_ms": 7.433937
+      },
+      "after": {
+        "samples_ms": [
+          2.545828,
+          2.61379,
+          2.510675,
+          2.87974,
+          2.9602809999999997,
+          2.422502,
+          2.407229
+        ],
+        "median_ms": 2.545828
+      },
+      "speedup": 2.9200468374139965
+    },
+    {
+      "amount": 3,
+      "height": 192,
+      "id": "fresh-representative-20261020-logo-aa-256x192/amount-3",
+      "input_sha256": "d2e8d5944bb2389bcd611fa6a0f7683d79427452ef6f4515a3ec192dca4f3f63",
+      "iterations": 1,
+      "output_sha256": "0ad734706a90c2f376536b6b4f2236c3a72f67780bd3461d153b62d829fd0bd9",
+      "width": 256,
+      "before": {
+        "samples_ms": [
+          20.000481,
+          17.200982,
+          16.987191,
+          16.538887,
+          17.183065,
+          16.837865,
+          16.835833
+        ],
+        "median_ms": 16.987191
+      },
+      "after": {
+        "samples_ms": [
+          3.224247,
+          3.117267,
+          3.0601410000000002,
+          3.282225,
+          2.9927289999999998,
+          2.964047,
+          3.003405
+        ],
+        "median_ms": 3.0601410000000002
+      },
+      "speedup": 5.551113821225884
+    },
+    {
+      "amount": 1,
+      "height": 160,
+      "id": "fresh-representative-20261020-text-aa-256x160/amount-1",
+      "input_sha256": "663f8dab7f8640377e5f52166459823974eec86395f5083809280e9ede145600",
+      "iterations": 1,
+      "output_sha256": "b50a072e322db4ab629d8a7047ec5718303249ce8ac3eddda7ac25855d3c7266",
+      "width": 256,
+      "before": {
+        "samples_ms": [
+          2.449734,
+          2.752088,
+          2.372968,
+          2.346538,
+          2.442242,
+          2.305977,
+          2.267789
+        ],
+        "median_ms": 2.372968
+      },
+      "after": {
+        "samples_ms": [
+          2.612257,
+          2.371035,
+          2.608311,
+          2.79322,
+          2.299438,
+          2.590074,
+          2.263503
+        ],
+        "median_ms": 2.590074
+      },
+      "speedup": 0.9161776844985897
+    },
+    {
+      "amount": 2,
+      "height": 160,
+      "id": "fresh-representative-20261020-text-aa-256x160/amount-2",
+      "input_sha256": "663f8dab7f8640377e5f52166459823974eec86395f5083809280e9ede145600",
+      "iterations": 1,
+      "output_sha256": "eb53c22ac06f35bb2a6b1f1392f28a6c153c21c9b2663c8ae28ae3dfe19d116a",
+      "width": 256,
+      "before": {
+        "samples_ms": [
+          8.031977,
+          7.074847,
+          6.778962,
+          7.130720999999999,
+          7.39616,
+          6.456937,
+          7.342719
+        ],
+        "median_ms": 7.130720999999999
+      },
+      "after": {
+        "samples_ms": [
+          2.302582,
+          2.388851,
+          2.324005,
+          2.5552219999999997,
+          2.0823709999999997,
+          2.162791,
+          2.16824
+        ],
+        "median_ms": 2.302582
+      },
+      "speedup": 3.0968369421805604
+    },
+    {
+      "amount": 3,
+      "height": 160,
+      "id": "fresh-representative-20261020-text-aa-256x160/amount-3",
+      "input_sha256": "663f8dab7f8640377e5f52166459823974eec86395f5083809280e9ede145600",
+      "iterations": 1,
+      "output_sha256": "45bbcde95c2da77d7a1106496f647c4adc03c532c8ef69da219884fcb107a84f",
+      "width": 256,
+      "before": {
+        "samples_ms": [
+          15.093162,
+          15.433845,
+          16.216603,
+          16.589647999999997,
+          16.748001,
+          15.464602,
+          20.973184
+        ],
+        "median_ms": 16.216603
+      },
+      "after": {
+        "samples_ms": [
+          2.788653,
+          2.735453,
+          2.9676720000000003,
+          3.11278,
+          2.651096,
+          2.7765139999999997,
+          2.602313
+        ],
+        "median_ms": 2.7765139999999997
+      },
+      "speedup": 5.84063433499705
+    },
+    {
+      "amount": 1,
+      "height": 128,
+      "id": "fresh-representative-20261020-thin-holes-lines-192x128/amount-1",
+      "input_sha256": "1ce817f913e17ff7ad8cc36ce5f8529fb211b496cb3a476515d7e685723e8970",
+      "iterations": 1,
+      "output_sha256": "c814c07170d9dcca52d9084b98ef99ecf0d6fc39940f3da4a07199b0700a7c50",
+      "width": 192,
+      "before": {
+        "samples_ms": [
+          1.524882,
+          1.561718,
+          1.537602,
+          1.624232,
+          1.531993,
+          3.093791,
+          1.720847
+        ],
+        "median_ms": 1.561718
+      },
+      "after": {
+        "samples_ms": [
+          1.612213,
+          1.579134,
+          1.598684,
+          1.972676,
+          1.584672,
+          1.6758000000000002,
+          1.603571
+        ],
+        "median_ms": 1.603571
+      },
+      "speedup": 0.9739001266548222
+    },
+    {
+      "amount": 2,
+      "height": 128,
+      "id": "fresh-representative-20261020-thin-holes-lines-192x128/amount-2",
+      "input_sha256": "1ce817f913e17ff7ad8cc36ce5f8529fb211b496cb3a476515d7e685723e8970",
+      "iterations": 1,
+      "output_sha256": "e4b69b433a5fd82b79ec3eabea170a1ca799a0afd03e39bc2035e252a20b395f",
+      "width": 192,
+      "before": {
+        "samples_ms": [
+          5.211416,
+          5.49384,
+          5.33393,
+          5.468401,
+          5.311165,
+          5.104505,
+          5.156253
+        ],
+        "median_ms": 5.311165
+      },
+      "after": {
+        "samples_ms": [
+          1.181146,
+          1.199132,
+          1.18399,
+          1.367175,
+          1.1844100000000002,
+          1.325583,
+          1.221356
+        ],
+        "median_ms": 1.199132
+      },
+      "speedup": 4.429174602962809
+    },
+    {
+      "amount": 3,
+      "height": 128,
+      "id": "fresh-representative-20261020-thin-holes-lines-192x128/amount-3",
+      "input_sha256": "1ce817f913e17ff7ad8cc36ce5f8529fb211b496cb3a476515d7e685723e8970",
+      "iterations": 1,
+      "output_sha256": "bfa801cd8ed580ae883de1a19bcee9d97f75095b48ab71ec13749344eff3bb9c",
+      "width": 192,
+      "before": {
+        "samples_ms": [
+          12.921066,
+          12.253914,
+          13.203552,
+          12.633545,
+          12.608838,
+          12.489828999999999,
+          13.737254
+        ],
+        "median_ms": 12.633545
+      },
+      "after": {
+        "samples_ms": [
+          1.426355,
+          1.486095,
+          1.7067860000000001,
+          1.425143,
+          1.438513,
+          1.486555,
+          1.4891189999999999
+        ],
+        "median_ms": 1.486095
+      },
+      "speedup": 8.501169171553636
+    },
+    {
+      "amount": 1,
+      "height": 192,
+      "id": "fresh-representative-20261020-logo-jpeg-256x192/amount-1",
+      "input_sha256": "54bae2aec24d8247edb41f969d545e559356d8c450c280fd29d1c9b74fba31d5",
+      "iterations": 1,
+      "output_sha256": "bf4b0937295a6d6809b0c8da2e91b2356a2b3fc7b96cb7175434f2c18a9a4048",
+      "width": 256,
+      "before": {
+        "samples_ms": [
+          4.069348000000001,
+          4.481749,
+          4.144100000000001,
+          4.310620999999999,
+          4.0658129999999995,
+          4.062708,
+          4.377251
+        ],
+        "median_ms": 4.144100000000001
+      },
+      "after": {
+        "samples_ms": [
+          4.194386,
+          4.09717,
+          3.9769489999999994,
+          4.443199999999999,
+          4.048397,
+          4.154807,
+          4.276791
+        ],
+        "median_ms": 4.154807
+      },
+      "speedup": 0.9974229849906388
+    },
+    {
+      "amount": 2,
+      "height": 192,
+      "id": "fresh-representative-20261020-logo-jpeg-256x192/amount-2",
+      "input_sha256": "54bae2aec24d8247edb41f969d545e559356d8c450c280fd29d1c9b74fba31d5",
+      "iterations": 1,
+      "output_sha256": "c1ecf458256267838694c80f844cf66f5bac0dc01b6ae021b6b32a4deb58bc1a",
+      "width": 256,
+      "before": {
+        "samples_ms": [
+          9.233393,
+          9.303608,
+          9.199752,
+          9.472582000000001,
+          9.162005,
+          9.066562000000001,
+          9.957621999999999
+        ],
+        "median_ms": 9.233393
+      },
+      "after": {
+        "samples_ms": [
+          2.7114570000000002,
+          2.711938,
+          2.7540400000000003,
+          4.398303,
+          2.6632439999999997,
+          2.539889,
+          2.5247859999999998
+        ],
+        "median_ms": 2.7114570000000002
+      },
+      "speedup": 3.4053252550197177
+    },
+    {
+      "amount": 3,
+      "height": 192,
+      "id": "fresh-representative-20261020-logo-jpeg-256x192/amount-3",
+      "input_sha256": "54bae2aec24d8247edb41f969d545e559356d8c450c280fd29d1c9b74fba31d5",
+      "iterations": 1,
+      "output_sha256": "0b1b7a55a53bb522718387d22ae472b0e305d93613db2f71d10e6534da1b69ad",
+      "width": 256,
+      "before": {
+        "samples_ms": [
+          21.922801,
+          21.3897,
+          24.148077,
+          21.323940999999998,
+          42.843556,
+          21.992615999999998,
+          21.2898
+        ],
+        "median_ms": 21.922801
+      },
+      "after": {
+        "samples_ms": [
+          3.3579790000000003,
+          3.128193,
+          3.115183,
+          7.220576,
+          3.297669,
+          3.060521,
+          3.301964
+        ],
+        "median_ms": 3.297669
+      },
+      "speedup": 6.6479689137994145
+    },
+    {
+      "amount": 1,
+      "height": 128,
+      "id": "fresh-representative-20261020-palette-rich-192x128/amount-1",
+      "input_sha256": "498ca41dfb4813347904c72bcabb04a8d1aa217a937083f5dce70516512b129c",
+      "iterations": 1,
+      "output_sha256": "9e9dadd221fa9eed822fb3adc6c27bce38343080ac06623b6adea9f1976f9591",
+      "width": 192,
+      "before": {
+        "samples_ms": [
+          1.836702,
+          2.242451,
+          2.1775840000000004,
+          2.1462260000000004,
+          4.136224,
+          1.918935,
+          1.878284
+        ],
+        "median_ms": 2.1462260000000004
+      },
+      "after": {
+        "samples_ms": [
+          1.894338,
+          2.0644639999999996,
+          1.826306,
+          1.8827209999999999,
+          1.850242,
+          2.127879,
+          1.8430300000000002
+        ],
+        "median_ms": 1.8827209999999999
+      },
+      "speedup": 1.1399596647617998
+    },
+    {
+      "amount": 2,
+      "height": 128,
+      "id": "fresh-representative-20261020-palette-rich-192x128/amount-2",
+      "input_sha256": "498ca41dfb4813347904c72bcabb04a8d1aa217a937083f5dce70516512b129c",
+      "iterations": 1,
+      "output_sha256": "060b6ff21824a337cc91f317cb7c196ad78d1caa097b9ea1cd614bad3b3173e7",
+      "width": 192,
+      "before": {
+        "samples_ms": [
+          6.074493,
+          5.255631999999999,
+          5.5270600000000005,
+          5.605217,
+          5.829133000000001,
+          5.294359999999999,
+          5.116062
+        ],
+        "median_ms": 5.5270600000000005
+      },
+      "after": {
+        "samples_ms": [
+          1.743481,
+          1.5722539999999998,
+          1.402108,
+          1.771894,
+          1.438302,
+          1.470961,
+          1.386495
+        ],
+        "median_ms": 1.470961
+      },
+      "speedup": 3.7574483619892036
+    },
+    {
+      "amount": 3,
+      "height": 128,
+      "id": "fresh-representative-20261020-palette-rich-192x128/amount-3",
+      "input_sha256": "498ca41dfb4813347904c72bcabb04a8d1aa217a937083f5dce70516512b129c",
+      "iterations": 1,
+      "output_sha256": "1729a8901bad9147abd96ec1fdd21420bb364256bc0329cf1b7fe95dcbe8d312",
+      "width": 192,
+      "before": {
+        "samples_ms": [
+          15.525943999999999,
+          13.017933000000001,
+          13.180235999999999,
+          13.47544,
+          13.536363,
+          12.298791999999999,
+          12.912424
+        ],
+        "median_ms": 13.180235999999999
+      },
+      "after": {
+        "samples_ms": [
+          1.754468,
+          1.674528,
+          1.786997,
+          1.84205,
+          1.677872,
+          1.722099,
+          2.242642
+        ],
+        "median_ms": 1.754468
+      },
+      "speedup": 7.512383240959653
+    },
+    {
+      "amount": 1,
+      "height": 128,
+      "id": "fresh-representative-20261020-alpha-rings-192x128/amount-1",
+      "input_sha256": "732daced607cb63bc9fab2d5c004ad9ec9588f1f602aec6e21a5aedc2b05913a",
+      "iterations": 1,
+      "output_sha256": "8c129b35437fcddae16bd76af22b3542904f29ef303cfcadd6019b3c6561821d",
+      "width": 192,
+      "before": {
+        "samples_ms": [
+          2.178776,
+          2.198916,
+          2.103203,
+          2.1291420000000003,
+          2.131234,
+          2.063994,
+          2.23515
+        ],
+        "median_ms": 2.131234
+      },
+      "after": {
+        "samples_ms": [
+          2.3145800000000003,
+          2.033758,
+          2.192266,
+          2.198585,
+          2.0661270000000003,
+          2.177184,
+          2.131825
+        ],
+        "median_ms": 2.177184
+      },
+      "speedup": 0.9788947557946411
+    },
+    {
+      "amount": 2,
+      "height": 128,
+      "id": "fresh-representative-20261020-alpha-rings-192x128/amount-2",
+      "input_sha256": "732daced607cb63bc9fab2d5c004ad9ec9588f1f602aec6e21a5aedc2b05913a",
+      "iterations": 1,
+      "output_sha256": "c88734efc802bea932d8b2bdda040b003ee8b1b4a3a7e1164f62f6fef87be958",
+      "width": 192,
+      "before": {
+        "samples_ms": [
+          5.961944,
+          5.482573,
+          5.628833,
+          5.585067,
+          6.450368,
+          5.465147,
+          5.653459
+        ],
+        "median_ms": 5.628833
+      },
+      "after": {
+        "samples_ms": [
+          1.1721920000000001,
+          1.138462,
+          1.083158,
+          1.169568,
+          1.1171790000000001,
+          1.106924,
+          1.212933
+        ],
+        "median_ms": 1.138462
+      },
+      "speedup": 4.944243198279784
+    },
+    {
+      "amount": 3,
+      "height": 128,
+      "id": "fresh-representative-20261020-alpha-rings-192x128/amount-3",
+      "input_sha256": "732daced607cb63bc9fab2d5c004ad9ec9588f1f602aec6e21a5aedc2b05913a",
+      "iterations": 1,
+      "output_sha256": "b47912d26a21cbd4a5553810c85990be6b221268fa6c568a5a9fe68daee4aabd",
+      "width": 192,
+      "before": {
+        "samples_ms": [
+          12.365711,
+          12.887476,
+          13.033667000000001,
+          12.014774000000001,
+          12.209876999999999,
+          11.929406,
+          13.126285
+        ],
+        "median_ms": 12.365711
+      },
+      "after": {
+        "samples_ms": [
+          1.3626289999999999,
+          1.620166,
+          1.47642,
+          1.7531560000000002,
+          1.3972609999999999,
+          1.354646,
+          1.385303
+        ],
+        "median_ms": 1.3972609999999999
+      },
+      "speedup": 8.849965038743656
+    },
+    {
+      "amount": 1,
+      "height": 85,
+      "id": "fresh-photographic-20261020-arctic-fox/amount-1",
+      "input_sha256": "318680c21532b0ad1fa96fa23b64617c8b6192483472c10fa9e95fa71707f0f6",
+      "iterations": 1,
+      "output_sha256": "5949583ca1e253c0c0610fc6cfe775cc52aa27c6773b12b823fe86a5f2b20d3b",
+      "width": 128,
+      "before": {
+        "samples_ms": [
+          1.72945,
+          1.623281,
+          1.765885,
+          1.753337,
+          1.821138,
+          1.62948,
+          1.666376
+        ],
+        "median_ms": 1.72945
+      },
+      "after": {
+        "samples_ms": [
+          1.6803160000000001,
+          1.663241,
+          1.739366,
+          1.651974,
+          1.64941,
+          1.664683,
+          1.8686900000000002
+        ],
+        "median_ms": 1.664683
+      },
+      "speedup": 1.038906506524065
+    },
+    {
+      "amount": 2,
+      "height": 85,
+      "id": "fresh-photographic-20261020-arctic-fox/amount-2",
+      "input_sha256": "318680c21532b0ad1fa96fa23b64617c8b6192483472c10fa9e95fa71707f0f6",
+      "iterations": 1,
+      "output_sha256": "f859e402de25c0a2ce53d52349153bf9d48ab8b9cf00cb138b11f72836ee65f9",
+      "width": 128,
+      "before": {
+        "samples_ms": [
+          3.440723,
+          3.587845,
+          3.4684049999999997,
+          3.362225,
+          7.513967,
+          4.3143460000000005,
+          3.7051
+        ],
+        "median_ms": 3.587845
+      },
+      "after": {
+        "samples_ms": [
+          0.981605,
+          0.899312,
+          0.8818050000000001,
+          1.0382609999999999,
+          0.880954,
+          0.87083,
+          0.8921520000000001
+        ],
+        "median_ms": 0.8921520000000001
+      },
+      "speedup": 4.021562469175656
+    },
+    {
+      "amount": 3,
+      "height": 85,
+      "id": "fresh-photographic-20261020-arctic-fox/amount-3",
+      "input_sha256": "318680c21532b0ad1fa96fa23b64617c8b6192483472c10fa9e95fa71707f0f6",
+      "iterations": 1,
+      "output_sha256": "0fef5320da5bb11eac92af7a624c06aefa4a12dfc1fa0122abf5587818db7e83",
+      "width": 128,
+      "before": {
+        "samples_ms": [
+          9.168325,
+          9.658101,
+          9.15857,
+          9.180323000000001,
+          9.378991,
+          8.735925,
+          9.276257
+        ],
+        "median_ms": 9.180323000000001
+      },
+      "after": {
+        "samples_ms": [
+          1.090349,
+          0.9607939999999999,
+          0.9850010000000001,
+          1.125382,
+          1.063008,
+          0.962387,
+          1.013924
+        ],
+        "median_ms": 1.013924
+      },
+      "speedup": 9.05425160071169
+    },
+    {
+      "amount": 1,
+      "height": 96,
+      "id": "fresh-photographic-20261020-mojave-desert/amount-1",
+      "input_sha256": "4e7d5c31d14dcb5abe7587b2022b0b7d059045b73d3ed8f8047f7bbabe890fc3",
+      "iterations": 1,
+      "output_sha256": "97eb046c795da6e277130939516405ba3309ca2f733712eb365136deee81a03e",
+      "width": 128,
+      "before": {
+        "samples_ms": [
+          1.5496699999999999,
+          1.580296,
+          1.523801,
+          1.534297,
+          1.708269,
+          1.5570110000000001,
+          1.644693
+        ],
+        "median_ms": 1.5570110000000001
+      },
+      "after": {
+        "samples_ms": [
+          1.634979,
+          1.609771,
+          1.532624,
+          1.7590450000000002,
+          1.560166,
+          1.703602,
+          1.671152
+        ],
+        "median_ms": 1.634979
+      },
+      "speedup": 0.9523125373475746
+    },
+    {
+      "amount": 2,
+      "height": 96,
+      "id": "fresh-photographic-20261020-mojave-desert/amount-2",
+      "input_sha256": "4e7d5c31d14dcb5abe7587b2022b0b7d059045b73d3ed8f8047f7bbabe890fc3",
+      "iterations": 1,
+      "output_sha256": "91d38d5679e75a55b9d8fbbd85e19eaf2c7c50bb8a8c705e4e0c36fac13f3c11",
+      "width": 128,
+      "before": {
+        "samples_ms": [
+          3.479932,
+          3.37858,
+          3.3807329999999998,
+          3.6784909999999997,
+          4.13078,
+          3.3729910000000003,
+          3.523327
+        ],
+        "median_ms": 3.479932
+      },
+      "after": {
+        "samples_ms": [
+          0.941956,
+          1.01751,
+          0.901606,
+          0.961385,
+          0.935466,
+          0.935456,
+          0.967084
+        ],
+        "median_ms": 0.941956
+      },
+      "speedup": 3.6943678897952767
+    },
+    {
+      "amount": 3,
+      "height": 96,
+      "id": "fresh-photographic-20261020-mojave-desert/amount-3",
+      "input_sha256": "4e7d5c31d14dcb5abe7587b2022b0b7d059045b73d3ed8f8047f7bbabe890fc3",
+      "iterations": 1,
+      "output_sha256": "c5a20f8fdf1ef9fab3f63b492624f3a587784436a6f8b05f0a0d099518171870",
+      "width": 128,
+      "before": {
+        "samples_ms": [
+          9.174334,
+          8.898269,
+          9.89672,
+          9.146211,
+          17.482706,
+          11.637186000000002,
+          9.351721
+        ],
+        "median_ms": 9.351721
+      },
+      "after": {
+        "samples_ms": [
+          1.082357,
+          1.183178,
+          1.016368,
+          1.126293,
+          1.034075,
+          1.018001,
+          1.007996
+        ],
+        "median_ms": 1.034075
+      },
+      "speedup": 9.043561637212
+    },
+    {
+      "amount": 1,
+      "height": 128,
+      "id": "fresh-photographic-20261020-jim-devine/amount-1",
+      "input_sha256": "64d35f183e2a6f359f449dc587f37101eee7ed40256f2214364e09789b706218",
+      "iterations": 1,
+      "output_sha256": "f8b56983f6cf32e791918dba58802bf493f05453bb543b71c7a6108040fe9d10",
+      "width": 103,
+      "before": {
+        "samples_ms": [
+          2.38121,
+          2.365907,
+          2.698047,
+          2.35441,
+          5.01539,
+          2.794242,
+          2.482823
+        ],
+        "median_ms": 2.482823
+      },
+      "after": {
+        "samples_ms": [
+          2.4171639999999996,
+          2.34775,
+          2.531527,
+          2.624526,
+          2.56736,
+          2.492287,
+          2.347029
+        ],
+        "median_ms": 2.492287
+      },
+      "speedup": 0.996202684522288
+    },
+    {
+      "amount": 2,
+      "height": 128,
+      "id": "fresh-photographic-20261020-jim-devine/amount-2",
+      "input_sha256": "64d35f183e2a6f359f449dc587f37101eee7ed40256f2214364e09789b706218",
+      "iterations": 1,
+      "output_sha256": "f4837d720e0f6e469612b01a3af73bca480d7edf5540c27339dee047c45a3abe",
+      "width": 103,
+      "before": {
+        "samples_ms": [
+          4.254496,
+          4.158051,
+          5.502623,
+          4.463882,
+          4.573086,
+          4.310020000000001,
+          4.359344999999999
+        ],
+        "median_ms": 4.359344999999999
+      },
+      "after": {
+        "samples_ms": [
+          1.1723919999999999,
+          1.30985,
+          1.111001,
+          2.266432,
+          1.1093979999999999,
+          1.109899,
+          1.1055430000000002
+        ],
+        "median_ms": 1.111001
+      },
+      "speedup": 3.9237993485154377
+    },
+    {
+      "amount": 3,
+      "height": 128,
+      "id": "fresh-photographic-20261020-jim-devine/amount-3",
+      "input_sha256": "64d35f183e2a6f359f449dc587f37101eee7ed40256f2214364e09789b706218",
+      "iterations": 1,
+      "output_sha256": "fc5ed69081d55a9722a6d109dd2ef0dd423a348f0fb6497733d2eac365d9d61f",
+      "width": 103,
+      "before": {
+        "samples_ms": [
+          11.697077,
+          11.794933,
+          12.115356,
+          12.451561,
+          11.405949,
+          12.023798000000001,
+          12.17155
+        ],
+        "median_ms": 12.023798000000001
+      },
+      "after": {
+        "samples_ms": [
+          1.21702,
+          1.399864,
+          1.208647,
+          3.3797010000000003,
+          1.26396,
+          1.291272,
+          1.231472
+        ],
+        "median_ms": 1.26396
+      },
+      "speedup": 9.512799455678978
+    },
+    {
+      "amount": 1,
+      "height": 384,
+      "id": "authored/flat-512x384/amount-1",
+      "input_sha256": "15abf88c17a514dd5f2bd350038317f60d22bf93986ac2260c6036dfbb4be27e",
+      "iterations": 1,
+      "output_sha256": "15abf88c17a514dd5f2bd350038317f60d22bf93986ac2260c6036dfbb4be27e",
+      "width": 512,
+      "before": {
+        "samples_ms": [
+          9.217479,
+          8.774313000000001,
+          9.187733999999999,
+          9.642817999999998,
+          8.92567,
+          14.361152,
+          8.687533
+        ],
+        "median_ms": 9.187733999999999
+      },
+      "after": {
+        "samples_ms": [
+          9.053861999999999,
+          8.843717,
+          8.920383000000001,
+          9.323568000000002,
+          9.462506000000001,
+          9.148695,
+          8.890497
+        ],
+        "median_ms": 9.053861999999999
+      },
+      "speedup": 1.0147861763300567
+    },
+    {
+      "amount": 2,
+      "height": 384,
+      "id": "authored/flat-512x384/amount-2",
+      "input_sha256": "15abf88c17a514dd5f2bd350038317f60d22bf93986ac2260c6036dfbb4be27e",
+      "iterations": 1,
+      "output_sha256": "15abf88c17a514dd5f2bd350038317f60d22bf93986ac2260c6036dfbb4be27e",
+      "width": 512,
+      "before": {
+        "samples_ms": [
+          20.41234,
+          21.168677,
+          28.761218000000003,
+          23.324238,
+          20.169005,
+          21.779094999999998,
+          21.065742
+        ],
+        "median_ms": 21.168677
+      },
+      "after": {
+        "samples_ms": [
+          8.424615999999999,
+          8.594462,
+          8.301772000000001,
+          8.6198,
+          8.846721,
+          12.857943,
+          8.372167999999999
+        ],
+        "median_ms": 8.594462
+      },
+      "speedup": 2.4630601659533777
+    },
+    {
+      "amount": 3,
+      "height": 384,
+      "id": "authored/flat-512x384/amount-3",
+      "input_sha256": "15abf88c17a514dd5f2bd350038317f60d22bf93986ac2260c6036dfbb4be27e",
+      "iterations": 1,
+      "output_sha256": "15abf88c17a514dd5f2bd350038317f60d22bf93986ac2260c6036dfbb4be27e",
+      "width": 512,
+      "before": {
+        "samples_ms": [
+          39.708252,
+          39.514,
+          40.978381,
+          40.271109,
+          39.202392,
+          41.895981,
+          39.746891
+        ],
+        "median_ms": 39.746891
+      },
+      "after": {
+        "samples_ms": [
+          11.006458,
+          11.328633,
+          10.540768,
+          11.630106,
+          10.852297,
+          11.083114,
+          10.474038
+        ],
+        "median_ms": 11.006458
+      },
+      "speedup": 3.6112336048527145
+    },
+    {
+      "amount": 1,
+      "height": 384,
+      "id": "authored/noisy-512x384/amount-1",
+      "input_sha256": "7fb8e456f85f9f7228ebf357f795e73d4952a5c5ef81f0779fbeea39304e6151",
+      "iterations": 1,
+      "output_sha256": "286f7bbe2af57e0711e7d9eb85d91dbd368024123e77a58ab34bafe93903cd73",
+      "width": 512,
+      "before": {
+        "samples_ms": [
+          44.785146,
+          45.010554,
+          44.357372,
+          71.086228,
+          44.032613,
+          48.876526000000005,
+          44.744904000000005
+        ],
+        "median_ms": 44.785146
+      },
+      "after": {
+        "samples_ms": [
+          45.151676,
+          43.985112,
+          43.668856999999996,
+          45.543495,
+          48.575944,
+          46.613534,
+          43.924831999999995
+        ],
+        "median_ms": 45.151676
+      },
+      "speedup": 0.991882250395312
+    },
+    {
+      "amount": 2,
+      "height": 384,
+      "id": "authored/noisy-512x384/amount-2",
+      "input_sha256": "7fb8e456f85f9f7228ebf357f795e73d4952a5c5ef81f0779fbeea39304e6151",
+      "iterations": 1,
+      "output_sha256": "25ef106dcc9603a7cb77480e8f0e1630e8897c3413ba16b8a58befb2ced57065",
+      "width": 512,
+      "before": {
+        "samples_ms": [
+          65.504136,
+          69.924227,
+          65.26196200000001,
+          73.464465,
+          66.83648000000001,
+          76.890887,
+          66.948138
+        ],
+        "median_ms": 66.948138
+      },
+      "after": {
+        "samples_ms": [
+          22.060278,
+          18.69677,
+          20.517839,
+          19.400499,
+          20.741334000000002,
+          19.567039,
+          20.022123999999998
+        ],
+        "median_ms": 20.022123999999998
+      },
+      "speedup": 3.3437080901107197
+    },
+    {
+      "amount": 3,
+      "height": 384,
+      "id": "authored/noisy-512x384/amount-3",
+      "input_sha256": "7fb8e456f85f9f7228ebf357f795e73d4952a5c5ef81f0779fbeea39304e6151",
+      "iterations": 1,
+      "output_sha256": "b7d398a221ed717bded38772cd1a1977b717f86a9ea353e365c1b60a7e9572e9",
+      "width": 512,
+      "before": {
+        "samples_ms": [
+          175.923835,
+          193.136594,
+          202.451359,
+          193.209404,
+          180.62577399999998,
+          188.402116,
+          178.18083900000002
+        ],
+        "median_ms": 188.402116
+      },
+      "after": {
+        "samples_ms": [
+          32.019962,
+          21.373135,
+          20.514594,
+          21.061977,
+          20.635095999999997,
+          21.700707,
+          21.201738000000002
+        ],
+        "median_ms": 21.201738000000002
+      },
+      "speedup": 8.886163766385566
+    }
+  ]
+}

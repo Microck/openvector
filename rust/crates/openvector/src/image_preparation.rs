@@ -108,6 +108,9 @@ pub fn reduce_prepared_noise(width: usize, height: usize, bgra: &[u8], amount: u
     let radius = amount.max(1) as i64;
     let kernel_width = (radius * 2 + 1) as usize;
     if width < kernel_width || height < kernel_width { return Err(SMALLER_THAN_KERNEL.to_string()); }
+    if (2..=3).contains(&amount) {
+        return Ok(reduce_noise_histograms(width, height, bgra, radius as usize));
+    }
     let sample_count = kernel_width * kernel_width;
     let median_index = sample_count / 2;
     let mut reduced = vec![0u8; bgra.len()];
@@ -142,6 +145,81 @@ pub fn reduce_prepared_noise(width: usize, height: usize, bgra: &[u8], amount: u
         }
     }
     Ok(OwnedImage { width, height, bgra: reduced })
+}
+
+// The 5x5 and 7x7 windows contain at most 49 samples. Two-level byte
+// histograms find the same rank as sorting, with at most 32 bins to visit.
+struct NoiseHistogram { bins: [u8; 256], groups: [u8; 16] }
+
+impl NoiseHistogram {
+    fn new() -> Self { Self { bins: [0; 256], groups: [0; 16] } }
+
+    fn add(&mut self, value: u8) {
+        self.bins[value as usize] += 1;
+        self.groups[value as usize >> 4] += 1;
+    }
+
+    fn remove(&mut self, value: u8) {
+        self.bins[value as usize] -= 1;
+        self.groups[value as usize >> 4] -= 1;
+    }
+
+    fn rank(&self, rank: usize) -> (u8, usize) {
+        let (mut group, mut before) = (0, 0);
+        while before + self.groups[group] as usize <= rank {
+            before += self.groups[group] as usize;
+            group += 1;
+        }
+        let mut value = group << 4;
+        while before + self.bins[value] as usize <= rank {
+            before += self.bins[value] as usize;
+            value += 1;
+        }
+        (value as u8, before)
+    }
+
+    fn nonpeak_median(&self, count: usize) -> u8 {
+        let (value, before) = self.rank(count / 2);
+        let equal = self.bins[value as usize] as usize;
+        // Preserve the original nonpeak rule: a minimum/maximum median moves
+        // to the next/previous distinct value, unless the window is constant.
+        if before == 0 && equal < count { self.rank(equal).0 }
+        else if before > 0 && before + equal == count { self.rank(before - 1).0 }
+        else { value }
+    }
+}
+
+fn reduce_noise_histograms(width: usize, height: usize, bgra: &[u8], radius: usize) -> OwnedImage {
+    let kernel_width = radius * 2 + 1;
+    let sample_count = kernel_width * kernel_width;
+    let mut reduced = vec![0; bgra.len()];
+    for y in 0..height {
+        let mut rows = [0; 7];
+        for (offset, row) in rows[..kernel_width].iter_mut().enumerate() {
+            *row = (y + offset).saturating_sub(radius).min(height - 1) * width * 4;
+        }
+        let mut histograms: [NoiseHistogram; 4] = std::array::from_fn(|_| NoiseHistogram::new());
+        for &row in &rows[..kernel_width] {
+            for offset in 0..kernel_width {
+                let pixel = row + offset.saturating_sub(radius) * 4;
+                for channel in 0..4 { histograms[channel].add(bgra[pixel + channel]); }
+            }
+        }
+        for x in 0..width {
+            let target = (y * width + x) * 4;
+            for channel in 0..4 { reduced[target + channel] = histograms[channel].nonpeak_median(sample_count); }
+            if x + 1 == width { break; }
+            let leaving = x.saturating_sub(radius) * 4;
+            let entering = (x + radius + 1).min(width - 1) * 4;
+            for &row in &rows[..kernel_width] {
+                for channel in 0..4 {
+                    histograms[channel].remove(bgra[row + leaving + channel]);
+                    histograms[channel].add(bgra[row + entering + channel]);
+                }
+            }
+        }
+    }
+    OwnedImage { width, height, bgra: reduced }
 }
 
 fn hull_plane(plane: &mut [u8], scratch: &mut [u8], width: usize, height: usize, delta: isize, positive: bool) {
