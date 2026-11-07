@@ -33,8 +33,20 @@ fn distance(palette: &[f32], offset: usize, blue: f32, green: f32, red: f32, alp
 }
 
 pub(crate) fn assign_indices(bgra: &[u8], colors: &[f32], indices: &mut [i32]) {
+    // Artwork contains many identical BGRA samples, often beyond adjacent runs.
+    // Cache only this call: refinement changes the palette before the next pass.
+    // The full key check makes collisions affect speed, never assignments.
+    const CACHE_BITS: u32 = 10;
+    let mut cache = [(0u32, -1i32); 1 << CACHE_BITS];
     for (pixel, index) in indices.iter_mut().enumerate() {
         let offset = pixel * 4;
+        let key = u32::from_le_bytes(bgra[offset..offset + 4].try_into().unwrap());
+        let slot = (key.wrapping_mul(0x9e37_79b9) >> (32 - CACHE_BITS)) as usize;
+        let cached = &mut cache[slot];
+        if cached.1 >= 0 && cached.0 == key {
+            *index = cached.1;
+            continue;
+        }
         let blue = byte_to_unit(bgra[offset]);
         let green = byte_to_unit(bgra[offset + 1]);
         let red = byte_to_unit(bgra[offset + 2]);
@@ -49,6 +61,7 @@ pub(crate) fn assign_indices(bgra: &[u8], colors: &[f32], indices: &mut [i32]) {
             }
         }
         *index = best;
+        *cached = (key, best);
     }
 }
 

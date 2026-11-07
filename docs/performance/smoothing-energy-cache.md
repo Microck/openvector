@@ -20,9 +20,11 @@ construction, and is owned/cloned with the prepared kernel.
 
 ## Measurements
 
-This change is independent of PR #27. Its baseline is unchanged main
-`0efa9aad869e6b58cd7947f3172f44b8a6144215`, with none of PR #27's touched-pixel
-workspace changes. Results cannot be added to PR #27's percentages.
+These measurements evaluated the cache independently of PR #27. Their baseline is
+unchanged main `0efa9aad869e6b58cd7947f3172f44b8a6144215`, without PR #27's
+touched-pixel workspace changes. The release integration retains both optimizations;
+these results do not measure that combination and cannot be added to PR #27's
+percentages.
 
 Both builds used identical benchmark sources/dependencies, Rust 1.99.1 / LLVM
 23.1.1 and default Cargo release settings (`--locked --offline --release`). Host:
