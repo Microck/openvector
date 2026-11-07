@@ -1,3 +1,10 @@
+# 0.1.2 (candidate, unreleased)
+
+- text fields expose content and selections to assistive technology, including unicode selection positions inside graphemes.
+- linux at-spi diagnostics check named controls, dialogs, focus and retained numeric edits in isolated sessions.
+- full screen-reader support, wayland and cross-platform screen readers remain unverified.
+- publication is gated on the complete reference corpus, native platform/package checks and corresponding-source rebuild verification.
+
 # 0.1.1
 
 - windows setup uses the openvector icon and lets you choose the installation folder.
