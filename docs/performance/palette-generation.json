@@ -1,0 +1,657 @@
+{
+  "schema": 1,
+  "benchmark": "palette-assignment-cache",
+  "operation": "generate",
+  "generated_color_count": 12,
+  "observer_color_count": 12,
+  "rng_seed": 1,
+  "baseline_ref": "0efa9aad869e6b58cd7947f3172f44b8a6144215",
+  "candidate_ref": "ae08356112983027197b2564bd7d054212dff1e9",
+  "binaries": {
+    "baseline": {
+      "path": "/workspace/scratch/5f72eb18ef91/openvector-before/rust/target/release/examples/benchmark_palette",
+      "sha256": "688362916ac326fe0b2cbd4628d926c1781c10e7112350f936d94e7e4a07b77f"
+    },
+    "candidate": {
+      "path": "/workspace/scratch/5f72eb18ef91/openvector-palette/rust/target/release/examples/benchmark_palette",
+      "sha256": "6ccad3e9c3cae08322162904e89062936c898db63d0fb4205df979885c268ac2"
+    }
+  },
+  "environment": {
+    "platform": "Linux-6.18.57-x86_64-with-glibc2.41",
+    "cpu": "AMD EPYC 9V74 80-Core Processor",
+    "logical_cpu": 0,
+    "python": "3.12.14",
+    "compiler": "rustc 1.99.1 (58cf8f9c3 2026-10-13)"
+  },
+  "method": {
+    "rounds": 7,
+    "alternating_orders": [
+      [
+        "baseline",
+        "candidate"
+      ],
+      [
+        "candidate",
+        "baseline"
+      ],
+      [
+        "baseline",
+        "candidate"
+      ],
+      [
+        "candidate",
+        "baseline"
+      ],
+      [
+        "baseline",
+        "candidate"
+      ],
+      [
+        "candidate",
+        "baseline"
+      ],
+      [
+        "baseline",
+        "candidate"
+      ]
+    ],
+    "warmup_per_case_per_timed_process": 1,
+    "initial_untimed_correctness_call_per_case_per_process": 1,
+    "observer_checks_inside_timed_region": false,
+    "statistic": "median of per-case single-stage elapsed milliseconds"
+  },
+  "verification": {
+    "exact_full_snapshots_equal": true,
+    "snapshot_bytes": 20277928,
+    "snapshot_sha256": "52705811a2969d646ed37c8bb1ae66da718d65ea590de12041460efae9c4c87c",
+    "includes": [
+      "palette_f32_bits",
+      "assignment_indices",
+      "weights_f64_bits",
+      "pass_count",
+      "random_state",
+      "iteration_observers",
+      "mid_callback_cancellation_prefix_and_state"
+    ],
+    "cases": [
+      {
+        "id": "captured/fresh-representative-20261020-existing-15-transparent-31x37",
+        "controls": {
+          "anti_alias": true,
+          "bins": 16,
+          "connected": true,
+          "cost_bits": 4594572340058128384,
+          "edge_floor_bits": 4569525120155796269,
+          "edge_scale_bits": 4631107791820423168,
+          "height": 37,
+          "width": 31
+        },
+        "input_sha256": "78ef242bfed62d6f40e18b9f4b873113139b51008f8fd87eba732196bd7b4953",
+        "output_sha256": "a0ee95213a0778ca7c22991d43d9d8b7810942a230d903033c797c3869d64a36",
+        "observer_sha256": "7cbda1f4275322a5c1321527f3bb666c6c25cad4becf29a1e0eb85bba64ca3dd"
+      },
+      {
+        "id": "captured/fresh-representative-20261020-existing-08-transparent-19x23",
+        "controls": {
+          "anti_alias": true,
+          "bins": 16,
+          "connected": true,
+          "cost_bits": 4594572340058128384,
+          "edge_floor_bits": 4569525120155796269,
+          "edge_scale_bits": 4631107791820423168,
+          "height": 23,
+          "width": 19
+        },
+        "input_sha256": "604bda0a2345368eb54a8c171376d793be4062df9e8f9dafa903cb69b6390569",
+        "output_sha256": "2daec16d3f220ee19413c1ed947e5e22616b5b6bf05a15b95a3e41ecd9da9c5d",
+        "observer_sha256": "aa0caa98a2ef116c3e3fe37d8801159c955c38a534ed876c9675e952924fcf30"
+      },
+      {
+        "id": "captured/fresh-representative-20261020-logo-aa-256x192",
+        "controls": {
+          "anti_alias": true,
+          "bins": 16,
+          "connected": true,
+          "cost_bits": 4594572340058128384,
+          "edge_floor_bits": 4569525120155796269,
+          "edge_scale_bits": 4631107791820423168,
+          "height": 192,
+          "width": 256
+        },
+        "input_sha256": "7a407fd42abdf697e7ac9ba2a597830cee3882ab553926f4838089a3aec4e2ed",
+        "output_sha256": "eb0832afda04ebd333d5963e98f368275dcb2021e88b8b44407846b296103b2e",
+        "observer_sha256": "778eb79b42f85f32626fb4e748e48e2b2a3b8133a27798d1a687d4f1f342d16a"
+      },
+      {
+        "id": "captured/fresh-representative-20261020-text-aa-256x160",
+        "controls": {
+          "anti_alias": true,
+          "bins": 16,
+          "connected": true,
+          "cost_bits": 4594572340058128384,
+          "edge_floor_bits": 4569525120155796269,
+          "edge_scale_bits": 4631107791820423168,
+          "height": 160,
+          "width": 256
+        },
+        "input_sha256": "652244eb260e2054b8d0c7d61fad0f2a18f7f48ac1ea994c1cfbbb0f7be4bdca",
+        "output_sha256": "adaee24e4a565b9d5d3e0bdea4f18a56b7abd26527d56ee3b34959d308da035f",
+        "observer_sha256": "09c4d9c03b8613c492f48266ffd870b210bff122848400e6c96c248e69832920"
+      },
+      {
+        "id": "captured/fresh-representative-20261020-thin-holes-lines-192x128",
+        "controls": {
+          "anti_alias": true,
+          "bins": 16,
+          "connected": true,
+          "cost_bits": 4594572340058128384,
+          "edge_floor_bits": 4569525120155796269,
+          "edge_scale_bits": 4631107791820423168,
+          "height": 128,
+          "width": 192
+        },
+        "input_sha256": "9564a40a0af6aa58c2069fbe0a33ea3ca779e7efa697859f1a42fd111864cdb9",
+        "output_sha256": "5509b619c3387c1da2722bd3e06fd41f5216d7cf5bb55324f917f2cbf3fba5f8",
+        "observer_sha256": "3339dbca6ad1696f08204fafd00c536cb24cb31671b52aaae8cb5c64bad86c4d"
+      },
+      {
+        "id": "captured/fresh-representative-20261020-logo-jpeg-256x192",
+        "controls": {
+          "anti_alias": true,
+          "bins": 16,
+          "connected": true,
+          "cost_bits": 4594572340058128384,
+          "edge_floor_bits": 4569525120155796269,
+          "edge_scale_bits": 4631107791820423168,
+          "height": 192,
+          "width": 256
+        },
+        "input_sha256": "c740f1604c83b5d973acac8fc97cda29acf628276f6b272a102e9e65155fdf8a",
+        "output_sha256": "7dd63677a7540a22174c715362fed00d2f57ead866fa29e1aff1a92c811f6b20",
+        "observer_sha256": "03e2a503d425be2f5a2bcf0bae9f395c5904fa7043338ddbf7134e241be77da7"
+      },
+      {
+        "id": "captured/fresh-representative-20261020-palette-rich-192x128",
+        "controls": {
+          "anti_alias": true,
+          "bins": 16,
+          "connected": true,
+          "cost_bits": 4594572340058128384,
+          "edge_floor_bits": 4569525120155796269,
+          "edge_scale_bits": 4631107791820423168,
+          "height": 128,
+          "width": 192
+        },
+        "input_sha256": "bee2c40ca32e1454f02ff1b176b07e373741b408c63a1eb9fcb5f6626eedb307",
+        "output_sha256": "c6d9837d770a848153419488a59140725b4fa703c316740dfc30d07af0a72b1c",
+        "observer_sha256": "787764041b43a169e6b6195bd78360bd15838839b34ce624da217feb2135e239"
+      },
+      {
+        "id": "captured/fresh-representative-20261020-alpha-rings-192x128",
+        "controls": {
+          "anti_alias": true,
+          "bins": 16,
+          "connected": true,
+          "cost_bits": 4594572340058128384,
+          "edge_floor_bits": 4569525120155796269,
+          "edge_scale_bits": 4631107791820423168,
+          "height": 128,
+          "width": 192
+        },
+        "input_sha256": "3a4bf38f10f0db8f9ffab2e2c10beaa7c83845da7fb6129ed0fd6b70cee99eaa",
+        "output_sha256": "abfa81bc6d2a4ac4a2ef48402e62d8c514fcf516bc1f722e1772a0627811bc58",
+        "observer_sha256": "a49ccaff9a4fccc3a30fb8ce13c2520166543cc46d689ad90561ba0422688ba9"
+      },
+      {
+        "id": "captured/fresh-photographic-20261020-arctic-fox",
+        "controls": {
+          "anti_alias": false,
+          "bins": 16,
+          "connected": true,
+          "cost_bits": 4594572340058128384,
+          "edge_floor_bits": 4569525120155796269,
+          "edge_scale_bits": 4631107791820423168,
+          "height": 85,
+          "width": 128
+        },
+        "input_sha256": "fc2ab4bf85b55fc4618f7f0b70d31b420f3421a962f44d587155560f50bc8463",
+        "output_sha256": "e5e53a58e87b8315409cb3af412b980202b372c9f13783df8402edda9f3be888",
+        "observer_sha256": "3cf4de1e0ebe3a8b33d9d7c91cdee5c67fa7b9c3400f55d8165ff6c09f90cde0"
+      },
+      {
+        "id": "captured/fresh-photographic-20261020-mojave-desert",
+        "controls": {
+          "anti_alias": false,
+          "bins": 16,
+          "connected": true,
+          "cost_bits": 4594572340058128384,
+          "edge_floor_bits": 4569525120155796269,
+          "edge_scale_bits": 4631107791820423168,
+          "height": 96,
+          "width": 128
+        },
+        "input_sha256": "711344bf9b6f4e6760a4fa7e954ec8384da8582c10ad683bba4a08fa4d20de29",
+        "output_sha256": "9482aaf99654e1c21e56e35e7eec33892e6829ec08bc348b5af02de795a05d14",
+        "observer_sha256": "be29ca9b4813830e171eaa70316bd733ca6daa0e1ab794c0f6b1f1644209f837"
+      },
+      {
+        "id": "captured/fresh-photographic-20261020-jim-devine",
+        "controls": {
+          "anti_alias": false,
+          "bins": 16,
+          "connected": true,
+          "cost_bits": 4594572340058128384,
+          "edge_floor_bits": 4569525120155796269,
+          "edge_scale_bits": 4631107791820423168,
+          "height": 128,
+          "width": 103
+        },
+        "input_sha256": "c7352ac7be262135eadba30e03e24ed2247995c6182a17ee2f7463a5bf488922",
+        "output_sha256": "3ce45193b73805576bbc6748030e150ebb86593285d17b9dc0e0c20341603932",
+        "observer_sha256": "10160124f715ee7ebf9945fa9a1d2fcd27882bb3a5f3a17fd1b597956effcc59"
+      },
+      {
+        "id": "authored/poster-512x384-aa0",
+        "controls": {
+          "anti_alias": false,
+          "bins": 16,
+          "connected": true,
+          "cost_bits": 4594572339843380019,
+          "edge_floor_bits": 4576918229304087675,
+          "edge_scale_bits": 4632233691727265792,
+          "height": 384,
+          "width": 512
+        },
+        "input_sha256": "9113b9bf4d17f3190f38f6dfe6f20856570c7f40cef76c7a434a48a897432c9e",
+        "output_sha256": "f06dacf6db265372ad61cf759cdff1983d1536da8beedeb61e13a2ba98d5248a",
+        "observer_sha256": "4b2862fc60fbd2a9ef5a5a3d847e26b5195464ebcd947313a204001c83f78210"
+      },
+      {
+        "id": "authored/poster-512x384-aa1",
+        "controls": {
+          "anti_alias": true,
+          "bins": 16,
+          "connected": true,
+          "cost_bits": 4594572339843380019,
+          "edge_floor_bits": 4576918229304087675,
+          "edge_scale_bits": 4632233691727265792,
+          "height": 384,
+          "width": 512
+        },
+        "input_sha256": "c47d57abf6c94170ddf4e7c359db41fd30d648afd9d76f301a4c5cbcc83482f0",
+        "output_sha256": "72575962b231fd7325fa388a7b7320cd40810b9cb75b4c994befe9c6d2ab7c9a",
+        "observer_sha256": "a3b42b4ec9fa8b2f22a39e764674a095810ed98d4d669003133aeef212704300"
+      },
+      {
+        "id": "authored/noise-256x192-aa0",
+        "controls": {
+          "anti_alias": false,
+          "bins": 16,
+          "connected": true,
+          "cost_bits": 4594572339843380019,
+          "edge_floor_bits": 4576918229304087675,
+          "edge_scale_bits": 4632233691727265792,
+          "height": 192,
+          "width": 256
+        },
+        "input_sha256": "32f4e348d32c5902990a4e49d60cdcc837d640ab6def6ab7dc2c712b563bcb96",
+        "output_sha256": "ba3ee613077c4074793baaa93f40c085fdbb95a489cfbf246c301d825c8a6159",
+        "observer_sha256": "3684e88cd00544f5247b155a8d53336a1c0a64502cf5514e4df8d526bb8c71bd"
+      }
+    ]
+  },
+  "results": [
+    {
+      "id": "captured/fresh-representative-20261020-existing-15-transparent-31x37",
+      "baseline_ms": [
+        0.396206,
+        0.367112,
+        0.353812,
+        0.368484,
+        0.37223999999999996,
+        0.46612,
+        0.38644100000000003
+      ],
+      "candidate_ms": [
+        0.164568,
+        0.16652999999999998,
+        0.303356,
+        0.16567900000000002,
+        0.262074,
+        0.16469799999999998,
+        0.310106
+      ],
+      "baseline_median_ms": 0.37223999999999996,
+      "candidate_median_ms": 0.16652999999999998,
+      "speedup": 2.2352729237975137,
+      "time_reduction_percent": 55.262733720180535
+    },
+    {
+      "id": "captured/fresh-representative-20261020-existing-08-transparent-19x23",
+      "baseline_ms": [
+        0.194202,
+        0.160831,
+        0.161172,
+        0.160691,
+        0.16035100000000002,
+        0.27707699999999996,
+        0.160802
+      ],
+      "candidate_ms": [
+        0.12070099999999999,
+        0.106851,
+        0.092299,
+        0.09303,
+        0.091738,
+        0.09165799999999999,
+        0.091728
+      ],
+      "baseline_median_ms": 0.160831,
+      "candidate_median_ms": 0.092299,
+      "speedup": 1.7424999187423482,
+      "time_reduction_percent": 42.611188141589615
+    },
+    {
+      "id": "captured/fresh-representative-20261020-logo-aa-256x192",
+      "baseline_ms": [
+        29.432298,
+        14.60472,
+        14.183015000000001,
+        13.659669,
+        14.414904,
+        13.475571,
+        14.26506
+      ],
+      "candidate_ms": [
+        4.690292,
+        4.686617,
+        4.68888,
+        5.273439000000001,
+        4.877313,
+        4.990854000000001,
+        5.750076
+      ],
+      "baseline_median_ms": 14.26506,
+      "candidate_median_ms": 4.877313,
+      "speedup": 2.924778458958857,
+      "time_reduction_percent": 65.80937619610432
+    },
+    {
+      "id": "captured/fresh-representative-20261020-text-aa-256x160",
+      "baseline_ms": [
+        11.718701,
+        16.954222,
+        11.909567,
+        11.634444,
+        12.511572000000001,
+        11.349725,
+        12.264842
+      ],
+      "candidate_ms": [
+        3.875438,
+        3.8685970000000003,
+        4.265683,
+        4.234186,
+        4.094227,
+        4.142138,
+        3.9459330000000006
+      ],
+      "baseline_median_ms": 11.909567,
+      "candidate_median_ms": 4.094227,
+      "speedup": 2.90886826744096,
+      "time_reduction_percent": 65.62236897445557
+    },
+    {
+      "id": "captured/fresh-representative-20261020-thin-holes-lines-192x128",
+      "baseline_ms": [
+        6.985555,
+        7.110341,
+        6.844392,
+        6.861227,
+        7.0818080000000005,
+        6.870681,
+        6.804873000000001
+      ],
+      "candidate_ms": [
+        2.40118,
+        2.388651,
+        2.5586979999999997,
+        2.483815,
+        2.475883,
+        2.690295,
+        2.608061
+      ],
+      "baseline_median_ms": 6.870681,
+      "candidate_median_ms": 2.483815,
+      "speedup": 2.76618065355109,
+      "time_reduction_percent": 63.849071147386994
+    },
+    {
+      "id": "captured/fresh-representative-20261020-logo-jpeg-256x192",
+      "baseline_ms": [
+        13.914624,
+        13.949383,
+        14.539852000000002,
+        13.717075000000001,
+        14.342625,
+        14.101552,
+        14.384848999999999
+      ],
+      "candidate_ms": [
+        5.933381,
+        5.771147,
+        5.756015,
+        5.8071019999999995,
+        6.374614,
+        6.115035,
+        5.760592
+      ],
+      "baseline_median_ms": 14.101552,
+      "candidate_median_ms": 5.8071019999999995,
+      "speedup": 2.4283286224350804,
+      "time_reduction_percent": 58.81941221788921
+    },
+    {
+      "id": "captured/fresh-representative-20261020-palette-rich-192x128",
+      "baseline_ms": [
+        6.2410950000000005,
+        4.5640220000000005,
+        4.526997,
+        6.3108189999999995,
+        4.61574,
+        4.8119950000000005,
+        4.4190640000000005
+      ],
+      "candidate_ms": [
+        2.2675490000000003,
+        1.919346,
+        2.02842,
+        1.9657559999999998,
+        2.0283599999999997,
+        1.923813,
+        1.941038
+      ],
+      "baseline_median_ms": 4.61574,
+      "candidate_median_ms": 1.9657559999999998,
+      "speedup": 2.348073718203073,
+      "time_reduction_percent": 57.411899283755154
+    },
+    {
+      "id": "captured/fresh-representative-20261020-alpha-rings-192x128",
+      "baseline_ms": [
+        6.926987,
+        6.985493,
+        7.220367,
+        7.332174999999999,
+        6.965954,
+        7.101418,
+        7.213357
+      ],
+      "candidate_ms": [
+        2.5455170000000003,
+        2.6099650000000003,
+        2.6967250000000003,
+        2.650496,
+        2.577485,
+        2.718557,
+        2.5388569999999997
+      ],
+      "baseline_median_ms": 7.101418,
+      "candidate_median_ms": 2.6099650000000003,
+      "speedup": 2.720886295410091,
+      "time_reduction_percent": 63.2472697706289
+    },
+    {
+      "id": "captured/fresh-photographic-20261020-arctic-fox",
+      "baseline_ms": [
+        2.727011,
+        2.966972,
+        2.9716880000000003,
+        2.765448,
+        2.762063,
+        2.708843,
+        2.834492
+      ],
+      "candidate_ms": [
+        2.212997,
+        2.1980649999999997,
+        2.230254,
+        2.302172,
+        2.2856859999999997,
+        2.379248,
+        2.117995
+      ],
+      "baseline_median_ms": 2.765448,
+      "candidate_median_ms": 2.230254,
+      "speedup": 1.2399699765138859,
+      "time_reduction_percent": 19.35288604233383
+    },
+    {
+      "id": "captured/fresh-photographic-20261020-mojave-desert",
+      "baseline_ms": [
+        3.47131,
+        3.2040279999999997,
+        3.1074420000000003,
+        3.45862,
+        3.0579579999999997,
+        3.260763,
+        3.833685
+      ],
+      "candidate_ms": [
+        2.1689410000000002,
+        2.141981,
+        2.27439,
+        2.08173,
+        2.202843,
+        2.120248,
+        2.102391
+      ],
+      "baseline_median_ms": 3.260763,
+      "candidate_median_ms": 2.141981,
+      "speedup": 1.5223118225605177,
+      "time_reduction_percent": 34.31043593171291
+    },
+    {
+      "id": "captured/fresh-photographic-20261020-jim-devine",
+      "baseline_ms": [
+        4.489721,
+        3.250157,
+        3.2820549999999997,
+        3.323617,
+        3.441294,
+        3.58519,
+        3.301894
+      ],
+      "candidate_ms": [
+        3.561465,
+        3.0093550000000002,
+        3.240984,
+        3.2619849999999997,
+        3.1521689999999998,
+        3.262835,
+        2.877326
+      ],
+      "baseline_median_ms": 3.323617,
+      "candidate_median_ms": 3.240984,
+      "speedup": 1.0254962690343425,
+      "time_reduction_percent": 2.4862371326178634
+    },
+    {
+      "id": "authored/poster-512x384-aa0",
+      "baseline_ms": [
+        66.46139199999999,
+        50.251518000000004,
+        54.739808000000004,
+        51.133724,
+        52.928444,
+        51.497692,
+        51.688199
+      ],
+      "candidate_ms": [
+        12.321607,
+        12.075697,
+        12.655539000000001,
+        12.654907999999999,
+        13.170663000000001,
+        12.397160000000001,
+        12.330471000000001
+      ],
+      "baseline_median_ms": 51.688199,
+      "candidate_median_ms": 12.397160000000001,
+      "speedup": 4.169358062653059,
+      "time_reduction_percent": 76.01549243377583
+    },
+    {
+      "id": "authored/poster-512x384-aa1",
+      "baseline_ms": [
+        39.017751000000004,
+        40.554477999999996,
+        40.072011999999994,
+        42.755055999999996,
+        40.299704,
+        42.678571,
+        41.125986000000005
+      ],
+      "candidate_ms": [
+        13.989634,
+        13.987892,
+        14.555584999999999,
+        14.282746000000001,
+        14.687203,
+        14.055073,
+        14.932954
+      ],
+      "baseline_median_ms": 40.554477999999996,
+      "candidate_median_ms": 14.282746000000001,
+      "speedup": 2.8394034312449437,
+      "time_reduction_percent": 64.78133438186529
+    },
+    {
+      "id": "authored/noise-256x192-aa0",
+      "baseline_ms": [
+        12.257943000000001,
+        13.296672000000001,
+        12.905435,
+        12.508037,
+        12.960908,
+        13.239146999999999,
+        14.875757
+      ],
+      "candidate_ms": [
+        12.697001,
+        12.797823,
+        13.146418,
+        12.317981,
+        13.476653,
+        12.610311000000001,
+        13.560651
+      ],
+      "baseline_median_ms": 12.960908,
+      "candidate_median_ms": 12.797823,
+      "speedup": 1.0127431829616647,
+      "time_reduction_percent": 1.2582837560454863
+    }
+  ],
+  "wall_seconds_including_validation": 9.151115183999536
+}
