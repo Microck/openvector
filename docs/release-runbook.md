@@ -1,8 +1,7 @@
 # Release runbook
 
-OpenVector ships public GitHub application releases. The npm package remains
-unpublished; keep `package.json` private. Publishing binaries requires a verified
-candidate and explicit release authorization.
+OpenVector ships GitHub application releases and an npm CLI/Node library.
+Publishing either requires a verified candidate and explicit release authorization.
 
 The first release, `v0.0.0`, retains the version embedded in the verified desktop
 builds. Its Windows x64 ZIP preserves all 17 files from the tested package; its
@@ -128,13 +127,27 @@ Before publishing:
 
 Only after explicit release authorization, use the reviewed commit and notes.
 Confirm `gh repo view Microck/openvector --json visibility` returns `PUBLIC`.
-Keep the package's npm `private` flag; this workflow uses GitHub assets, not npm.
+The application downloads and npm package have separate publication steps.
 
 Create an annotated `vX.Y.Z` tag at the validated commit with author identity
 `Microck <contact@micr.dev>`, push that tag, and create a normal GitHub release with
 all selected archives and `SHA256SUMS.txt` attached. Use `--verify-tag`, an explicit
 `--target` commit, `--notes-file`, and `--latest`. Never infer prerelease status from
 an unreleased version number. There is no automatic publication workflow.
+
+## Publish the npm package
+
+Use `.github/workflows/npm-candidates.yml` on a `release/npm-` branch. It builds
+Linux x64/arm64 and Windows GNU x64 binaries with their notices, then assembles
+one `npm-package` artifact. The installed-package jobs must pass on all three
+platforms with Node 22.19 and Node 24 before publication.
+
+Download that exact tarball, inspect its members and record its SHA-512 integrity.
+Publish the tarball with `npm publish <package.tgz> --access public`; do not run
+`npm publish` from a host-only build directory. Never include npm credentials in
+artifacts or workflow logs. Download the registry package after publication,
+compare its integrity and run `npm run test:package -- <downloaded-package.tgz>`
+on supported native targets. macOS remains excluded until its release QA passes.
 
 ## Verify and recover
 

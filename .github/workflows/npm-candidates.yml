@@ -1,0 +1,123 @@
+name: npm candidates
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: npm-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native:
+    if: github.event_name == 'workflow_dispatch' || startsWith(github.head_ref, 'release/npm-')
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: ubuntu-24.04
+            target: x86_64-unknown-linux-gnu
+            platform: linux-x64
+          - runner: ubuntu-24.04-arm
+            target: aarch64-unknown-linux-gnu
+            platform: linux-arm64
+          - runner: ubuntu-24.04
+            target: x86_64-pc-windows-gnu
+            platform: win32-x64
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 45
+    env:
+      RUSTUP_TOOLCHAIN: 1.99.1
+      CARGO_BUILD_JOBS: '2'
+      TARGET: ${{ matrix.target }}
+      PLATFORM: ${{ matrix.platform }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '24'
+      - name: Install C toolchain
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential pkg-config
+      - name: Install Windows cross-compiler
+        if: matrix.platform == 'win32-x64'
+        run: sudo apt-get install -y gcc-mingw-w64-x86-64 g++-mingw-w64-x86-64
+      - name: Prepare Rust toolchain
+        run: rustup toolchain install 1.99.1 --profile minimal --component rust-docs --target "$TARGET"
+      - name: Build native CLI and Node addon
+        run: npm run build -- --target "$TARGET"
+      - name: Archive binaries with executable modes and notices
+        run: tar -czf "native-$PLATFORM.tar.gz" native
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: native-${{ matrix.platform }}
+          path: native-*.tar.gz
+          if-no-files-found: error
+
+  package:
+    needs: native
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '24'
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          pattern: native-*
+          merge-multiple: true
+          path: input
+      - name: Assemble one package for all supported targets
+        run: |
+          for archive in input/*.tar.gz; do tar -xzf "$archive"; done
+          for platform in linux-x64 linux-arm64 win32-x64; do
+            test -f "native/$platform/openvector-node.node"
+            test -f "native/$platform/rust-licenses.txt"
+            test -f "native/$platform/toolchain-licenses.txt"
+          done
+          test -x native/linux-x64/openvector
+          test -x native/linux-arm64/openvector
+          test -f native/win32-x64/openvector.exe
+          mkdir dist
+          npm pack --ignore-scripts --pack-destination dist
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: npm-package
+          path: dist/*.tgz
+          if-no-files-found: error
+
+  installed-package:
+    needs: package
+    strategy:
+      fail-fast: false
+      matrix:
+        runner: [ubuntu-24.04, ubuntu-24.04-arm, windows-2025]
+        node: ['22.19.0', '24']
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: ${{ matrix.node }}
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          name: npm-package
+          path: input
+      - name: Verify installed Node API and CLI
+        shell: bash
+        run: npm run test:package -- input/*.tgz

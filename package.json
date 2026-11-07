@@ -1,12 +1,16 @@
 {
   "name": "openvector",
   "version": "0.1.2",
-  "private": true,
   "description": "Independent raster-to-vector Rust engine with Node-API bindings and a native CLI.",
   "type": "module",
   "license": "MIT",
   "engines": {
     "node": ">=22.19.0"
+  },
+  "cpu": ["x64", "arm64"],
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
   },
   "exports": {
     ".": {
@@ -63,6 +67,7 @@
   "scripts": {
     "build": "node tools/build-native.mjs",
     "prepack": "npm run build",
+    "test:package": "node tools/check-npm-package.mjs",
     "test": "node --test test/*.test.mjs",
     "test:smoke": "node --test test/pixel-map.test.mjs test/decimal-format.test.mjs test/pixel-input.test.mjs test/vector-primitives.test.mjs test/export-metadata.test.mjs test/bitmap-codecs-independent.node-check.mjs test/vector-file-clean.node-check.mjs gui/test/numeric-independent.node-check.mjs gui/test/auto-update-independent.node-check.mjs"
   },

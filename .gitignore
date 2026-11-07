@@ -29,6 +29,7 @@ __pycache__/
 !/tools/windows-installer.nsi
 !/tools/package-release-source.sh
 !/tools/check-desktop-package.mjs
+!/tools/check-npm-package.mjs
 !/tools/rust-std-licenses.json
 !/tools/rust-upstream-licenses.json
 !/tools/build-file-win32.py

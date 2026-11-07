@@ -51,19 +51,36 @@ but still saves preferences in the normal per-user location.
 linux packages target ubuntu 24.04 with glibc 2.39 and were tested with X11.
 the required desktop libraries are in the [build guide](docs/building.md).
 wayland remains unverified. the release includes matching source and SHA-256 checksums.
-there is no published npm package.
 
 these checks do not establish exact parity or coverage of every input.
 v0.1.2 improves text-field accessibility, but full screen-reader support remains unverified.
 see the [release coverage limits](https://github.com/Microck/openvector/releases/tag/v0.1.2)
 and [verification and known limits](docs/verification.md).
 
+## install the cli and node library
+
+npm publication is pending native package checks and review. the install commands
+below apply after publication; use the desktop downloads above in the meantime.
+
+the npm package includes native binaries for linux amd64 and arm64, and
+windows x64. use node.js 22.19 or later. windows arm64 machines need x64 node.js;
+native arm64 windows, macos and alpine/musl packages are not included.
+linux packages are built and tested on ubuntu 24.04.
+
+```sh
+npm install openvector
+npx openvector vectorize logo.png --output logo.svg
+```
+
+the desktop app is a separate download. npm installation does not need rust
+or download additional native binaries.
+
 ## build from source
 
 use node.js 22.19 or later, npm, rust with its `rust-docs` component, git, and a c
 compiler/linker. native packaging also needs platform-specific toolchain notices.
 the [build guide](docs/building.md) covers supported targets, cross-compilation,
-linux libraries, and the windows node-api linker input.
+linux libraries, and windows node-api linking.
 
 ```sh
 git clone https://github.com/Microck/openvector.git
@@ -97,7 +114,7 @@ replacement option. processing does not rewrite the source image.
 
 ## use it from node.js
 
-after building the native addon:
+after installing the npm package or building the native addon:
 
 ```js
 import { readFileSync } from 'node:fs';
