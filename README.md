@@ -6,7 +6,7 @@
   <h1>openvector</h1>
   <p>raster-to-vector conversion for the desktop, terminal, and node.js.</p>
   <p>
-    <a href="https://github.com/Microck/openvector/releases/latest"><picture><source media="(prefers-color-scheme: dark)" srcset="https://shieldcn.dev/badge/release-0.1.0.svg?variant=secondary&amp;size=xs&amp;logo=false&amp;mode=dark"><img src="https://shieldcn.dev/badge/release-0.1.0.svg?variant=secondary&amp;size=xs&amp;logo=false&amp;mode=light" alt="release 0.1.0"></picture></a>
+    <a href="https://github.com/Microck/openvector/releases/latest"><picture><source media="(prefers-color-scheme: dark)" srcset="https://shieldcn.dev/badge/release-0.1.1.svg?variant=secondary&amp;size=xs&amp;logo=false&amp;mode=dark"><img src="https://shieldcn.dev/badge/release-0.1.1.svg?variant=secondary&amp;size=xs&amp;logo=false&amp;mode=light" alt="release 0.1.1"></picture></a>
     <a href="https://github.com/Microck/openvector/releases"><picture><source media="(prefers-color-scheme: dark)" srcset="https://shieldcn.dev/github/downloads/Microck/openvector.svg?variant=secondary&amp;size=xs&amp;logo=false&amp;mode=dark"><img src="https://shieldcn.dev/github/downloads/Microck/openvector.svg?variant=secondary&amp;size=xs&amp;logo=false&amp;mode=light" alt="total release downloads"></picture></a>
     <a href="https://github.com/Microck/openvector/actions/workflows/source.yml"><picture><source media="(prefers-color-scheme: dark)" srcset="https://shieldcn.dev/github/ci/Microck/openvector.svg?workflow=source.yml&amp;branch=main&amp;variant=secondary&amp;size=xs&amp;logo=false&amp;mode=dark"><img src="https://shieldcn.dev/github/ci/Microck/openvector.svg?workflow=source.yml&amp;branch=main&amp;variant=secondary&amp;size=xs&amp;logo=false&amp;mode=light" alt="source ci status"></picture></a>
     <a href="LICENSE"><picture><source media="(prefers-color-scheme: dark)" srcset="https://shieldcn.dev/badge/license-MIT.svg?variant=secondary&amp;size=xs&amp;logo=false&amp;mode=dark"><img src="https://shieldcn.dev/badge/license-MIT.svg?variant=secondary&amp;size=xs&amp;logo=false&amp;mode=light" alt="MIT license"></picture></a>
@@ -33,16 +33,17 @@ it runs independently and does not require vector magic or a network service.
 download the desktop app from [github releases](https://github.com/Microck/openvector/releases/latest).
 each package includes its third-party notices.
 
-### v0.1.0
-
-linux and windows downloads are available below. macos downloads are withheld
-until manual macbook testing is complete.
+### v0.1.1
 
 | platform | package | run |
 | --- | --- | --- |
-| linux, amd64 | [tar.gz](https://github.com/Microck/openvector/releases/download/v0.1.0/openvector-0.1.0-linux-amd64.tar.gz) | extract, then run `./openvector-0.1.0-linux-amd64/openvector-gui` |
-| linux, arm64 | [tar.gz](https://github.com/Microck/openvector/releases/download/v0.1.0/openvector-0.1.0-linux-arm64.tar.gz) | extract, then run `./openvector-0.1.0-linux-arm64/openvector-gui` |
-| windows 10 and 11, x64 | [installer](https://github.com/Microck/openvector/releases/download/v0.1.0/openvector-0.1.0-windows-x64-Setup.exe) or [portable zip](https://github.com/Microck/openvector/releases/download/v0.1.0/openvector-0.1.0-windows-x64-portable.zip) | run the installer, or extract the whole zip and open `openvector-gui.exe` |
+| macos, apple silicon | [dmg](https://github.com/Microck/openvector/releases/download/v0.1.1/openvector-0.1.1-macos-arm64.dmg) | open the disk image and drag OpenVector to Applications |
+| macos, intel | [dmg](https://github.com/Microck/openvector/releases/download/v0.1.1/openvector-0.1.1-macos-x64.dmg) | open the disk image and drag OpenVector to Applications |
+| linux, amd64 | [tar.gz](https://github.com/Microck/openvector/releases/download/v0.1.1/openvector-0.1.1-linux-amd64.tar.gz) | extract, then run `./openvector-0.1.1-linux-amd64/openvector-gui` |
+| linux, arm64 | [tar.gz](https://github.com/Microck/openvector/releases/download/v0.1.1/openvector-0.1.1-linux-arm64.tar.gz) | extract, then run `./openvector-0.1.1-linux-arm64/openvector-gui` |
+| windows 10 and 11, x64 | [installer](https://github.com/Microck/openvector/releases/download/v0.1.1/openvector-0.1.1-windows-x64-Setup.exe) or [portable zip](https://github.com/Microck/openvector/releases/download/v0.1.1/openvector-0.1.1-windows-x64-portable.zip) | run the installer, or extract the whole zip and open `openvector-gui.exe` |
+
+macos packages are developer id-signed, notarized, and stapled.
 
 windows executables are unsigned; the portable package needs no installation
 but still saves preferences in the normal per-user location.
