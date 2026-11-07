@@ -96,8 +96,8 @@ pub fn stream_general_decimal(value: f64) -> String {
     if fixed.contains('.') { trim_fraction_zeros(&fixed) } else { fixed }
 }
 
-#[derive(Clone)]
-struct Long { mantissa: BigInt, exponent: i64 }
+#[derive(Clone, Copy)]
+struct Long { mantissa: u128, exponent: i64 }
 
 static DECIMAL_POWERS: LazyLock<Mutex<HashMap<i64, Long>>> = LazyLock::new(|| Mutex::new(HashMap::new()));
 
@@ -106,7 +106,7 @@ fn bits(value: &BigInt) -> i64 { value.magnitude().bits() as i64 }
 // The runtime power table's extra rounded word is undone before use. Its
 // effective entries are nearest-even 80-bit significands of exact powers.
 fn decimal_power(power: i64) -> Long {
-    if let Some(found) = DECIMAL_POWERS.lock().unwrap().get(&power) { return found.clone(); }
+    if let Some(found) = DECIMAL_POWERS.lock().unwrap().get(&power) { return *found; }
     let ten = BigInt::from(10);
     let mut numerator = if power > 0 { ten.pow(power as u32) } else { BigInt::one() };
     let mut denominator = if power > 0 { BigInt::one() } else { ten.pow((-power) as u32) };
@@ -119,30 +119,34 @@ fn decimal_power(power: i64) -> Long {
     let remainder = &numerator % &denominator;
     let twice = remainder * 2;
     if twice > denominator || (twice == denominator && (&mantissa & BigInt::one()).is_one()) { mantissa += 1; }
-    let factor = Long { mantissa, exponent: exponent + 16383 };
-    DECIMAL_POWERS.lock().unwrap().insert(power, factor.clone());
+    let factor = Long { mantissa: mantissa.to_u128().unwrap(), exponent: exponent + 16383 };
+    DECIMAL_POWERS.lock().unwrap().insert(power, factor);
     factor
 }
 
 // 0x7c3730ed retains only product diagonals at or above the fourth 16-bit
 // word. Carries from the omitted low diagonals never enter its accumulator.
 fn multiply_long(left: &Long, right: &Long) -> Long {
-    let mask = BigInt::from(0xffffu32);
-    let mut product = BigInt::zero();
-    for a in 0..5u64 {
-        let limb = (&left.mantissa >> (a * 16)) & &mask;
-        for b in (4 - a)..5u64 {
-            product += (&limb * ((&right.mantissa >> (b * 16)) & &mask)) << ((a + b - 4) * 16);
+    // Two 80-bit significands would need 160 bits, but the native algorithm
+    // drops four low words before accumulation. The retained sum is < 2^96,
+    // so u128 is exact. Do not substitute a full product followed by a shift:
+    // carries from the omitted diagonals would change native decimal output.
+    const MASK: u128 = 0xffff;
+    debug_assert!((1u128 << 79..1u128 << 80).contains(&left.mantissa));
+    debug_assert!((1u128 << 79..1u128 << 80).contains(&right.mantissa));
+    let mut product = 0u128;
+    for a in 0..5u32 {
+        let limb = (left.mantissa >> (a * 16)) & MASK;
+        for b in (4 - a)..5u32 {
+            product += (limb * ((right.mantissa >> (b * 16)) & MASK)) << ((a + b - 4) * 16);
         }
     }
     let mut exponent = left.exponent + right.exponent - 16382;
-    let limit = BigInt::one() << 95u32;
-    while product < limit { product <<= 1u32; exponent -= 1; }
-    let mut mantissa: BigInt = &product >> 16u32;
-    let remainder = &product & &mask;
-    let half = BigInt::from(0x8000u32);
-    if remainder > half || (remainder == half && (&mantissa & BigInt::one()).is_one()) { mantissa += 1; }
-    if mantissa == BigInt::one() << 80u32 { mantissa >>= 1u32; exponent += 1; }
+    while product < 1u128 << 95 { product <<= 1; exponent -= 1; }
+    let mut mantissa = product >> 16;
+    let remainder = product & MASK;
+    if remainder > 0x8000 || (remainder == 0x8000 && mantissa & 1 != 0) { mantissa += 1; }
+    if mantissa == 1u128 << 80 { mantissa >>= 1; exponent += 1; }
     Long { mantissa, exponent }
 }
 
@@ -150,10 +154,9 @@ struct Digits { digits: String, point: i64 }
 
 fn decimal_digits(value: f64) -> Digits {
     let (significand, exponent) = binary_parts(value);
-    let significand = BigInt::from(significand);
-    let highest = bits(&significand) - 1;
-    let mut number = Long { mantissa: significand << (79 - highest) as u64, exponent: exponent as i64 + highest + 16383 };
-    let top = (&number.mantissa >> 72u32).to_i64().unwrap();
+    let highest = 63 - significand.leading_zeros() as i64;
+    let mut number = Long { mantissa: (significand as u128) << (79 - highest) as u32, exponent: exponent as i64 + highest + 16383 };
+    let top = (number.mantissa >> 72) as i64;
     let mixed = ((((number.exponent >> 8) + top * 2) * 77 - 0x134312f4 + number.exponent * 0x4d10) as i64) as i32;
     let mut point = (mixed >> 16) as i64;
     let mut power = point.abs();
@@ -166,19 +169,22 @@ fn decimal_digits(value: f64) -> Digits {
     }
     if number.exponent > 0x3ffe {
         point += 1;
-        number = multiply_long(&number, &Long { mantissa: BigInt::parse_bytes(b"cccccccccccccccccccc", 16).unwrap(), exponent: 0x3ffb });
+        number = multiply_long(&number, &Long { mantissa: 0xcccc_cccc_cccc_cccc_cccc, exponent: 0x3ffb });
     }
-    let mut fraction: BigInt = &number.mantissa << (8 + number.exponent - 0x3ffe) as u64;
-    let fraction_mask = (BigInt::one() << 88u32) - 1;
-    let mut digits = String::new();
-    for _ in 0..18 {
+    // Normalization leaves an 88-bit fraction in [0, 1). Multiplication by
+    // ten needs at most 92 bits; the 17-digit decimal accumulator fits in u64.
+    let shift = 8 + number.exponent - 0x3ffe;
+    debug_assert!((0..=8).contains(&shift));
+    let mut fraction = number.mantissa << shift as u32;
+    let fraction_mask = (1u128 << 88) - 1;
+    let mut rounded = 0u64;
+    for _ in 0..17 {
         fraction *= 10;
-        digits.push_str(&(&fraction >> 88u32).to_string());
-        fraction &= &fraction_mask;
+        rounded = rounded * 10 + (fraction >> 88) as u64;
+        fraction &= fraction_mask;
     }
-    let mut rounded: BigInt = digits[..17].parse().unwrap();
-    if digits.as_bytes()[17] >= b'5' { rounded += 1; }
-    let mut text = format!("{:0>17}", rounded.to_string());
+    if (fraction * 10) >> 88 >= 5 { rounded += 1; }
+    let mut text = format!("{rounded:017}");
     if text.len() > 17 { point += 1; text.truncate(17); }
     Digits { digits: text, point }
 }
@@ -246,3 +252,7 @@ pub fn stream_fixed_decimal(value: f64, precision: usize) -> String {
     }
     format!("{}{field}", if negative { "-" } else { "" })
 }
+
+#[cfg(test)]
+#[path = "decimal_format_tests.rs"]
+mod tests;
