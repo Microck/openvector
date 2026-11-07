@@ -83,6 +83,7 @@ pub struct ImageKernel {
     records: Vec<Record>,
     lists: Vec<List>,
     backgrounds: Vec<i32>,
+    pixel_energies: Vec<f64>,
     touched_pixels: Vec<usize>,
     energy: f64,
 }
@@ -92,7 +93,7 @@ fn fr(v: f64) -> f64 { v as f32 as f64 }
 impl ImageKernel {
     pub fn new(width: usize, height: usize, bgra: Vec<u8>, node_count: usize, regions: Vec<KernelRegion>, colors: Vec<f32>) -> Self {
         ImageKernel { node_count, width, height, regions, bgra, colors, flags: vec![0; width * height], invalid: BTreeSet::new(),
-            scratch: PixelFragmentScratch::new(), records: Vec::new(), lists: Vec::new(), backgrounds: Vec::new(), touched_pixels: Vec::new(), energy: 0.0 }
+            scratch: PixelFragmentScratch::new(), records: Vec::new(), lists: Vec::new(), backgrounds: Vec::new(), pixel_energies: Vec::new(), touched_pixels: Vec::new(), energy: 0.0 }
     }
 
     #[allow(clippy::too_many_arguments)]
@@ -381,16 +382,30 @@ impl ImageKernel {
         std::array::from_fn(|ch| self.colors[offset + ch] - self.bgra[offset + ch] as f32 * BYTE_SCALE)
     }
 
+    fn pixel_energy(&self, pixel: usize) -> f64 {
+        let [b, g, r, a] = self.residuals(pixel * 4).map(|v| v as f64);
+        ((b * b + g * g) + r * r) + a * a
+    }
+
     pub fn energy(&mut self, positions: &[f64]) -> Result<f64, InputError> {
         self.invalid.clear();
         self.trace_pixels(positions);
         self.backgrounds.resize(self.lists.len(), -1);
         for &pixel in &self.touched_pixels { self.backgrounds[pixel] = -1; }
+        if self.pixel_energies.len() != self.lists.len() {
+            self.pixel_energies = (0..self.lists.len()).map(|pixel| self.pixel_energy(pixel)).collect();
+        }
         let mut energy = 0.0;
         for pixel in 0..self.lists.len() {
-            if self.lists[pixel].head != NONE { self.backgrounds[pixel] = self.color_pixel(pixel)?; }
-            let [b, g, r, a] = self.residuals(pixel * 4).map(|v| v as f64);
-            energy = (((b * b + g * g) + r * r) + a * a) + energy;
+            if self.lists[pixel].head != NONE {
+                let background = self.color_pixel(pixel);
+                // color_pixel can partially change colors before failing. Preserve
+                // those changes in the cache even when this evaluation returns Err.
+                self.pixel_energies[pixel] = self.pixel_energy(pixel);
+                self.backgrounds[pixel] = background?;
+            }
+            // Preserve the original row-major summation and floating-point order.
+            energy = self.pixel_energies[pixel] + energy;
         }
         energy *= 0.5;
         self.energy = energy;
