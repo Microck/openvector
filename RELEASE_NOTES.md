@@ -1,5 +1,6 @@
 # 0.1.2
 
+- the cli and node library are available on npm for linux amd64/arm64 and windows x64 with node.js 22.19 or later.
 - text fields expose content and selections to assistive technology, including unicode selection positions inside graphemes.
 - linux at-spi diagnostics check named controls, dialogs, focus and retained numeric edits in isolated sessions.
 - full screen-reader support, wayland and cross-platform screen readers remain unverified.

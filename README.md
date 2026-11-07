@@ -59,8 +59,7 @@ and [verification and known limits](docs/verification.md).
 
 ## install the cli and node library
 
-npm publication is pending native package checks and review. the install commands
-below apply after publication; use the desktop downloads above in the meantime.
+the cli and node library are published as [openvector](https://www.npmjs.com/package/openvector).
 
 the npm package includes native binaries for linux amd64 and arm64, and
 windows x64. use node.js 22.19 or later. windows arm64 machines need x64 node.js;
