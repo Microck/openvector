@@ -46,6 +46,9 @@ height stay linked to the source aspect ratio. Its formats are BMP, JPG, PNG and
 Drag result has its own vector format selection and Minimize on drag choice.
 Entering Export prepares a temporary vector file before Drag [format] file becomes
 available. Preparation failure offers Retry preparation.
+Fast preparation keeps the Drag [format] file label and appearance stable during
+the window's busy grace period. Longer preparation shows Preparing drag file.
+Neither state permits dragging until the selected format's file is ready.
 
 ### Ending at once
 

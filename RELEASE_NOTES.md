@@ -1,4 +1,17 @@
-# unreleased
+# 0.1.2
+
+- text fields expose content and selections to assistive technology, including unicode selection positions inside graphemes.
+- linux at-spi diagnostics check named controls, dialogs, focus and retained numeric edits in isolated sessions.
+- full screen-reader support, wayland and cross-platform screen readers remain unverified.
+- released with documented coverage limits: two missing private captures, incomplete strict-suite validation, no fresh windows 10 check, and an incomplete manual native workflow matrix. see the [release verification details](https://github.com/Microck/openvector/releases/tag/v0.1.2).
+
+# 0.1.1
+
+- windows setup uses the openvector icon and lets you choose the installation folder.
+- export screens no longer show the svg dimensions note. exported dimensions are unchanged.
+- changing drag formats no longer flashes the preparation label for fast exports.
+
+# 0.1.0
 
 - emf exports identify openvector and contain no captured application metadata.
 - the javascript pdf writer now uses the same openvector producer field as the native engine.
