@@ -18,6 +18,8 @@ const npm = (args) => execFileSync(process.execPath, [process.env.npm_execpath, 
 const bitmap = 'Qk32AAAAAAAAADYAAAAoAAAACAAAAAgAAAABABgAAAAAAMAAAADEDgAAxA4AAAAAAAAAAAAAAAD/AAD/AAD/AAD/AAD/AAD/AAD/AAD/AAD/AAD/AAD/AAD/AAD/AAD/AAD/AAD/AAD/AAD//wAA/wAA/wAA/wAAAAD/AAD/AAD/AAD//wAA/wAA/wAA/wAAAAD/AAD/AAD/AAD//wAA/wAA/wAA/wAAAAD/AAD/AAD/AAD//wAA/wAA/wAA/wAAAAD/AAD/AAD/AAD/AAD/AAD/AAD/AAD/AAD/AAD/AAD/AAD/AAD/AAD/AAD/AAD/AAD/AAD/';
 const expected = 'e762312fc6cb03bca38f557bc5b2c724653a3ea774d722a5ab2f9e3d34d2f952';
 try {
+  // npm otherwise searches ancestors for a project and can modify operator files.
+  writeFileSync(join(directory, 'package.json'), JSON.stringify({ private: true }));
   npm(['install', '--ignore-scripts', '--no-audit', '--no-fund', archive]);
   writeFileSync(join(directory, 'input.bmp'), Buffer.from(bitmap, 'base64'));
   execFileSync(process.execPath, ['--input-type=module', '--eval', `

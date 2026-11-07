@@ -149,6 +149,10 @@ artifacts or workflow logs. Download the registry package after publication,
 compare its integrity and run `npm run test:package -- <downloaded-package.tgz>`
 on supported native targets. macOS remains excluded until its release QA passes.
 
+The consumer checker creates its own temporary `package.json` before installing.
+Keep that project boundary: without it, npm can discover a parent project and
+rewrite unrelated manifests, lockfiles and dependencies.
+
 ## Verify and recover
 
 Download the published assets into a fresh directory using `gh release download`.
