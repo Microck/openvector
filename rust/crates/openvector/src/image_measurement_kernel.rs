@@ -83,6 +83,7 @@ pub struct ImageKernel {
     records: Vec<Record>,
     lists: Vec<List>,
     backgrounds: Vec<i32>,
+    touched_pixels: Vec<usize>,
     energy: f64,
 }
 
@@ -91,7 +92,7 @@ fn fr(v: f64) -> f64 { v as f32 as f64 }
 impl ImageKernel {
     pub fn new(width: usize, height: usize, bgra: Vec<u8>, node_count: usize, regions: Vec<KernelRegion>, colors: Vec<f32>) -> Self {
         ImageKernel { node_count, width, height, regions, bgra, colors, flags: vec![0; width * height], invalid: BTreeSet::new(),
-            scratch: PixelFragmentScratch::new(), records: Vec::new(), lists: Vec::new(), backgrounds: Vec::new(), energy: 0.0 }
+            scratch: PixelFragmentScratch::new(), records: Vec::new(), lists: Vec::new(), backgrounds: Vec::new(), touched_pixels: Vec::new(), energy: 0.0 }
     }
 
     #[allow(clippy::too_many_arguments)]
@@ -105,7 +106,10 @@ impl ImageKernel {
         }
         let id = self.records.len();
         self.records.push(Record { flags, sample: sample as i32, region, x: fr(x), y: fr(y), perimeter, turn: fr(turn), next: NONE });
-        let list = &mut self.lists[row as usize * self.width + column as usize];
+        let pixel = row as usize * self.width + column as usize;
+        let list = &mut self.lists[pixel];
+        // Track each pixel once per evaluation, even if clipping later removes its head.
+        if list.tail == NONE { self.touched_pixels.push(pixel); }
         if list.tail != NONE { self.records[list.tail].next = id; } else { list.head = id; }
         list.tail = id;
     }
@@ -256,7 +260,10 @@ impl ImageKernel {
 
     fn trace_pixels(&mut self, positions: &[f64]) {
         self.records.clear();
-        self.lists = vec![List { head: NONE, tail: NONE }; self.width * self.height];
+        // Only touched lists can retain records from the previous evaluation.
+        for &pixel in &self.touched_pixels { self.lists[pixel] = List { head: NONE, tail: NONE }; }
+        self.touched_pixels.clear();
+        self.lists.resize(self.width * self.height, List { head: NONE, tail: NONE });
         for region in 0..self.regions.len() {
             let contour = self.regions[region].contour.clone();
             let n = contour.len();
@@ -276,7 +283,10 @@ impl ImageKernel {
             }
             if (turn - 2.0 * PI).abs() > 0.001 { self.invalid.insert(region); }
         }
-        for pixel in 0..self.lists.len() {
+        // Keep clipping and gradient additions in the original row-major order.
+        self.touched_pixels.sort_unstable();
+        for index in 0..self.touched_pixels.len() {
+            let pixel = self.touched_pixels[index];
             if self.lists[pixel].head != NONE { self.clip_pixel(pixel); }
         }
     }
@@ -374,7 +384,8 @@ impl ImageKernel {
     pub fn energy(&mut self, positions: &[f64]) -> Result<f64, InputError> {
         self.invalid.clear();
         self.trace_pixels(positions);
-        self.backgrounds = vec![-1; self.lists.len()];
+        self.backgrounds.resize(self.lists.len(), -1);
+        for &pixel in &self.touched_pixels { self.backgrounds[pixel] = -1; }
         let mut energy = 0.0;
         for pixel in 0..self.lists.len() {
             if self.lists[pixel].head != NONE { self.backgrounds[pixel] = self.color_pixel(pixel)?; }
@@ -387,7 +398,7 @@ impl ImageKernel {
     }
 
     pub fn add_gradient(&self, gradient: &mut [f64], positions: &[f64]) {
-        for pixel in 0..self.lists.len() {
+        for &pixel in &self.touched_pixels {
             let head = self.lists[pixel].head;
             if head == NONE { continue; }
             let res = self.residuals(pixel * 4);

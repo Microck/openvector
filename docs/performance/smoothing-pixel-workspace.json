@@ -1,0 +1,545 @@
+{
+  "base_commit": "0efa9aad869e6b58cd7947f3172f44b8a6144215",
+  "conditions": {
+    "os": "Debian13 x86_64 managed cloud host",
+    "cpu": "AMD EPYC9V74, shared five-vCPU instance, benchmark pinned CPU0",
+    "rust": "1.99.1, LLVM23.1.1",
+    "build": "cargo --locked --offline --release; default release settings, same compiler/dependencies/examples",
+    "sampling": "7 paired samples, alternating A/B order; no concurrent builds/tests during timing",
+    "pipeline": "10 repetitions/case/sample, one correctness/warmup before timing and one after",
+    "image": "40 evaluations/sample; four coordinate-state warmups; snapshots/hash outside timing",
+    "full_scaled": "4 repetitions/sample; one warmup before and one correctness run after; authored scaled ring profile6, scale8/32 with replicated BGRA/labels and scaled geometry/sample counts"
+  },
+  "results": [
+    {
+      "kind": "full-scaled",
+      "case": "full-136x104",
+      "before_ms": [
+        91.798047,
+        97.882464,
+        94.435418,
+        93.653257,
+        91.703177,
+        93.166331,
+        92.615883
+      ],
+      "before_median_ms": 93.166331,
+      "after_ms": [
+        92.12757,
+        96.641683,
+        94.740986,
+        92.189899,
+        92.125392,
+        102.86394,
+        91.302914
+      ],
+      "after_median_ms": 92.189899,
+      "time_reduction_percent": 1.0480524343069844,
+      "matching_snapshot_sha256": "24687afc719e1eccf603373cda0f7ef51d2cb7f624174ef11aadfeafad2f36b2"
+    },
+    {
+      "kind": "full-scaled",
+      "case": "full-544x416",
+      "before_ms": [
+        409.368517,
+        429.766746,
+        424.552236,
+        410.880851,
+        409.77865,
+        409.008728,
+        419.61092
+      ],
+      "before_median_ms": 410.880851,
+      "after_ms": [
+        385.312366,
+        381.270544,
+        389.478829,
+        379.531764,
+        384.096616,
+        377.438782,
+        376.102363
+      ],
+      "after_median_ms": 381.270544,
+      "time_reduction_percent": 7.20654343660324,
+      "matching_snapshot_sha256": "e9c4a229031d15402c376d2acc9bf568f30d59850f132aaf3cb912b3c86567a5"
+    },
+    {
+      "kind": "image",
+      "case": "1088x832",
+      "before_ms": [
+        7.236748,
+        7.701131,
+        7.809428,
+        7.40593,
+        7.379513,
+        7.261336,
+        7.252859
+      ],
+      "before_median_ms": 7.379513,
+      "after_ms": [
+        5.856111,
+        5.87868,
+        5.875137,
+        6.271785,
+        5.845974,
+        5.922462,
+        5.826081
+      ],
+      "after_median_ms": 5.875137,
+      "time_reduction_percent": 20.38584388969842,
+      "matching_snapshot_sha256": "53af6c0aa7e53c2d9ddcb18396bf5b89aaa36ae79b48170dbd24e11ac724db14"
+    },
+    {
+      "kind": "image",
+      "case": "17x13",
+      "before_ms": [
+        0.03353,
+        0.033214,
+        0.033182,
+        0.033276,
+        0.034934,
+        0.033334,
+        0.033315
+      ],
+      "before_median_ms": 0.033315,
+      "after_ms": [
+        0.034421,
+        0.034546,
+        0.036471,
+        0.034808,
+        0.036358,
+        0.034579,
+        0.034671
+      ],
+      "after_median_ms": 0.034671,
+      "time_reduction_percent": -4.070238631247195,
+      "matching_snapshot_sha256": "c008c4e2712ac8f47cff30762a29bd7bdd7121e8b53e5900b2f531fbdea84af8"
+    },
+    {
+      "kind": "image",
+      "case": "272x208",
+      "before_ms": [
+        0.593831,
+        0.597189,
+        0.60353,
+        0.590763,
+        0.595857,
+        0.58966,
+        0.584646
+      ],
+      "before_median_ms": 0.593831,
+      "after_ms": [
+        0.571053,
+        0.570229,
+        0.579868,
+        0.60232,
+        0.57593,
+        0.565682,
+        0.5892
+      ],
+      "after_median_ms": 0.57593,
+      "time_reduction_percent": 3.014494022710156,
+      "matching_snapshot_sha256": "1f9069a62bf7ed8b37976258403806da9cfd88ba41f27cacb708464646004cb1"
+    },
+    {
+      "kind": "pipeline",
+      "case": "alpha-profile-3",
+      "before_ms": [
+        3.470468,
+        2.115116,
+        2.056609,
+        2.102551,
+        2.054721,
+        2.06011,
+        2.055418
+      ],
+      "before_median_ms": 2.06011,
+      "after_ms": [
+        2.056015,
+        2.151293,
+        2.128392,
+        2.068954,
+        2.057931,
+        2.141056,
+        2.058623
+      ],
+      "after_median_ms": 2.068954,
+      "time_reduction_percent": -0.4292974646985014
+    },
+    {
+      "kind": "pipeline",
+      "case": "alpha-profile-6",
+      "before_ms": [
+        162.758144,
+        168.715811,
+        170.492172,
+        164.646568,
+        166.008537,
+        161.219753,
+        161.146302
+      ],
+      "before_median_ms": 164.646568,
+      "after_ms": [
+        168.874028,
+        163.920737,
+        168.763973,
+        169.889679,
+        164.848406,
+        166.841363,
+        162.06144
+      ],
+      "after_median_ms": 166.841363,
+      "time_reduction_percent": -1.3330341632143825
+    },
+    {
+      "kind": "pipeline",
+      "case": "alpha-profile-9",
+      "before_ms": [
+        0.281659,
+        0.283534,
+        0.300743,
+        0.281876,
+        0.295969,
+        0.283428,
+        0.282834
+      ],
+      "before_median_ms": 0.283428,
+      "after_ms": [
+        0.284808,
+        0.28488,
+        0.291953,
+        0.28801,
+        0.284887,
+        0.293753,
+        0.285182
+      ],
+      "after_median_ms": 0.285182,
+      "time_reduction_percent": -0.618852054137198
+    },
+    {
+      "kind": "pipeline",
+      "case": "diagonal-profile-3",
+      "before_ms": [
+        0.656599,
+        0.440837,
+        0.442458,
+        0.459319,
+        0.438253,
+        0.440549,
+        0.442586
+      ],
+      "before_median_ms": 0.442458,
+      "after_ms": [
+        0.441952,
+        0.565872,
+        0.469022,
+        0.449067,
+        0.448394,
+        0.444948,
+        0.444512
+      ],
+      "after_median_ms": 0.448394,
+      "time_reduction_percent": -1.3415962645042008
+    },
+    {
+      "kind": "pipeline",
+      "case": "diagonal-profile-6",
+      "before_ms": [
+        203.507944,
+        205.76428,
+        203.078819,
+        211.815174,
+        210.402182,
+        202.995847,
+        202.364367
+      ],
+      "before_median_ms": 203.507944,
+      "after_ms": [
+        205.364206,
+        207.123587,
+        209.834666,
+        205.553149,
+        204.145611,
+        210.321796,
+        203.111058
+      ],
+      "after_median_ms": 205.553149,
+      "time_reduction_percent": -1.004975510931397
+    },
+    {
+      "kind": "pipeline",
+      "case": "diagonal-profile-9",
+      "before_ms": [
+        0.361661,
+        0.392072,
+        0.372668,
+        0.359442,
+        0.361213,
+        0.359612,
+        0.359719
+      ],
+      "before_median_ms": 0.361213,
+      "after_ms": [
+        0.366253,
+        0.360422,
+        0.382178,
+        0.412053,
+        0.359045,
+        0.377185,
+        0.374475
+      ],
+      "after_median_ms": 0.374475,
+      "time_reduction_percent": -3.671517913253398
+    },
+    {
+      "kind": "pipeline",
+      "case": "ring-profile-3",
+      "before_ms": [
+        2.310751,
+        0.323749,
+        0.32682,
+        0.327787,
+        0.325259,
+        0.32565,
+        0.325606
+      ],
+      "before_median_ms": 0.32565,
+      "after_ms": [
+        0.328101,
+        0.366579,
+        0.34884,
+        0.327523,
+        0.326021,
+        0.328058,
+        0.326616
+      ],
+      "after_median_ms": 0.328058,
+      "time_reduction_percent": -0.7394441885459915
+    },
+    {
+      "kind": "pipeline",
+      "case": "ring-profile-6",
+      "before_ms": [
+        132.034983,
+        138.107381,
+        134.824891,
+        135.865788,
+        135.37478,
+        131.693034,
+        131.203612
+      ],
+      "before_median_ms": 134.824891,
+      "after_ms": [
+        133.553513,
+        135.970132,
+        137.692543,
+        132.601796,
+        133.106068,
+        135.914061,
+        132.459954
+      ],
+      "after_median_ms": 133.553513,
+      "time_reduction_percent": 0.9429846303380275
+    },
+    {
+      "kind": "pipeline",
+      "case": "ring-profile-9",
+      "before_ms": [
+        0.583545,
+        0.597549,
+        0.653101,
+        0.584688,
+        0.586104,
+        0.583374,
+        0.583484
+      ],
+      "before_median_ms": 0.584688,
+      "after_ms": [
+        0.716715,
+        0.588544,
+        0.621442,
+        0.636093,
+        0.589873,
+        0.607821,
+        0.588816
+      ],
+      "after_median_ms": 0.607821,
+      "time_reduction_percent": -3.9564690912076115
+    },
+    {
+      "kind": "pipeline",
+      "case": "split-profile-3",
+      "before_ms": [
+        0.085873,
+        0.083159,
+        0.083079,
+        0.082795,
+        0.082884,
+        0.083275,
+        0.085397
+      ],
+      "before_median_ms": 0.083159,
+      "after_ms": [
+        0.084842,
+        0.081485,
+        0.083661,
+        0.082861,
+        0.083079,
+        0.083561,
+        0.085895
+      ],
+      "after_median_ms": 0.083561,
+      "time_reduction_percent": -0.48341129643213554
+    },
+    {
+      "kind": "pipeline",
+      "case": "split-profile-6",
+      "before_ms": [
+        9.92259,
+        9.422896,
+        9.226145,
+        9.557013,
+        9.138635,
+        9.175872,
+        9.138654
+      ],
+      "before_median_ms": 9.226145,
+      "after_ms": [
+        9.252662,
+        9.43915,
+        9.539946,
+        9.382607,
+        9.249576,
+        9.939997,
+        9.21366
+      ],
+      "after_median_ms": 9.382607,
+      "time_reduction_percent": -1.695854552470175
+    },
+    {
+      "kind": "pipeline",
+      "case": "split-profile-9",
+      "before_ms": [
+        0.014385,
+        0.01452,
+        0.022622,
+        0.015883,
+        0.014471,
+        0.014429,
+        0.01444
+      ],
+      "before_median_ms": 0.014471,
+      "after_ms": [
+        0.014538,
+        0.016019,
+        0.014538,
+        0.016451,
+        0.014462,
+        0.034351,
+        0.014675
+      ],
+      "after_median_ms": 0.014675,
+      "time_reduction_percent": -1.4097159836915283
+    },
+    {
+      "kind": "pipeline",
+      "case": "three-way-profile-3",
+      "before_ms": [
+        0.260606,
+        0.246335,
+        0.24737,
+        0.250228,
+        0.244433,
+        0.246968,
+        0.249533
+      ],
+      "before_median_ms": 0.24737,
+      "after_ms": [
+        0.2465,
+        0.253598,
+        0.246264,
+        0.244088,
+        0.245744,
+        0.264982,
+        0.247203
+      ],
+      "after_median_ms": 0.2465,
+      "time_reduction_percent": 0.3516998827667096
+    },
+    {
+      "kind": "pipeline",
+      "case": "three-way-profile-6",
+      "before_ms": [
+        29.533141,
+        30.443634,
+        31.453621,
+        30.014834,
+        29.620219,
+        29.423327,
+        29.767262
+      ],
+      "before_median_ms": 29.767262,
+      "after_ms": [
+        30.240565,
+        29.723039,
+        30.825085,
+        31.063719,
+        30.406078,
+        31.253858,
+        29.673569
+      ],
+      "after_median_ms": 30.406078,
+      "time_reduction_percent": -2.1460354667486787
+    },
+    {
+      "kind": "pipeline",
+      "case": "three-way-profile-9",
+      "before_ms": [
+        0.041873,
+        0.0407,
+        0.041809,
+        0.039049,
+        0.03935,
+        0.041417,
+        0.038979
+      ],
+      "before_median_ms": 0.0407,
+      "after_ms": [
+        0.040736,
+        0.039171,
+        0.040616,
+        0.039002,
+        0.040955,
+        0.038926,
+        0.039065
+      ],
+      "after_median_ms": 0.039171,
+      "time_reduction_percent": 3.756756756756763
+    },
+    {
+      "kind": "pipeline-total",
+      "case": "all-15",
+      "before_ms": [
+        545.824222,
+        556.991573,
+        553.622927,
+        556.402995,
+        554.9870099999999,
+        538.946645,
+        538.058193
+      ],
+      "before_median_ms": 553.622927,
+      "after_ms": [
+        551.865434,
+        550.884508,
+        561.2831189999999,
+        553.055052,
+        546.20613,
+        558.885716,
+        540.984743
+      ],
+      "after_median_ms": 551.865434,
+      "time_reduction_percent": 0.31745307397646017
+    }
+  ]
+}
