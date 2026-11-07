@@ -7,16 +7,20 @@ use num_bigint::BigInt;
 use num_traits::Zero;
 use std::sync::LazyLock;
 
-fn series(tangent: &BigInt, working_unit: &BigInt) -> BigInt {
-    let square = tangent * tangent / working_unit;
-    let mut power = tangent.clone();
-    let mut sum = tangent.clone();
+fn series(tangent: &BigInt, working_precision: u32) -> BigInt {
+    // Every power has the tangent's sign. Work on its magnitude so shifting
+    // by the fixed-point precision is exactly division by 2^precision with
+    // truncation toward zero, including for negative reduced arguments.
+    let magnitude = tangent.magnitude();
+    let square = (magnitude * magnitude) >> working_precision;
+    let mut power = magnitude.clone();
+    let mut sum = magnitude.clone();
     let mut subtract = true;
-    let mut denominator = BigInt::from(3);
+    let mut denominator = 3u32;
     loop {
-        power = &power * &square / working_unit;
-        let term = &power / &denominator;
-        if term.is_zero() { return sum; }
+        power = (power * &square) >> working_precision;
+        let term = &power / denominator;
+        if term.is_zero() { return BigInt::from_biguint(tangent.sign(), sum); }
         if subtract { sum -= term } else { sum += term }
         subtract = !subtract;
         denominator += 2;
@@ -27,9 +31,9 @@ struct Constants { pi: BigInt, half_pi: BigInt, half_angle: BigInt }
 
 static CONSTANTS: LazyLock<Constants> = LazyLock::new(|| {
     let unit = unit();
-    let pi = series(&(&unit / 5), &unit) * 16 - series(&(&unit / 239), &unit) * 4;
+    let pi = series(&(&unit / 5), PRECISION) * 16 - series(&(&unit / 239), PRECISION) * 4;
     let half_pi = &pi / 2;
-    let half_angle = series(&(&unit / 2), &unit);
+    let half_angle = series(&(&unit / 2), PRECISION);
     Constants { pi, half_pi, half_angle }
 });
 
@@ -68,8 +72,8 @@ pub fn contour_angle_step(y: f64, x: f64, previous_angle: f64) -> AngleStep {
     let ratio = shifted / BigInt::from(denominator.0);
     let mut angle = if ratio > &working_unit / 4 {
         let reduced = (&ratio - &working_unit / 2) * &working_unit / (&working_unit + &ratio / 2);
-        (&c.half_angle << extra) + series(&reduced, &working_unit)
-    } else { series(&ratio, &working_unit) };
+        (&c.half_angle << extra) + series(&reduced, working_precision)
+    } else { series(&ratio, working_precision) };
     if transpose { angle = (&c.half_pi << extra) - angle; }
     if x < 0.0 { angle = (&c.pi << extra) - angle; }
     let register = round_significand(&if y < 0.0 { -angle } else { angle }, 64);
@@ -77,5 +81,81 @@ pub fn contour_angle_step(y: f64, x: f64, previous_angle: f64) -> AngleStep {
     AngleStep {
         angle: binary_double(&register, -(working_precision as i64)),
         difference: binary_double(&difference, -(working_precision as i64)),
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use num_traits::One;
+
+    // Retain the original signed, division-based evaluator as an exact oracle.
+    fn signed_division_series(tangent: &BigInt, precision: u32) -> BigInt {
+        let unit = BigInt::one() << precision;
+        let square = tangent * tangent / &unit;
+        let mut power = tangent.clone();
+        let mut sum = tangent.clone();
+        let mut subtract = true;
+        let mut denominator = BigInt::from(3);
+        loop {
+            power = &power * &square / &unit;
+            let term = &power / &denominator;
+            if term.is_zero() { return sum; }
+            if subtract { sum -= term } else { sum += term }
+            subtract = !subtract;
+            denominator += 2;
+        }
+    }
+
+    fn assert_series(tangent: BigInt, precision: u32) {
+        assert_eq!(series(&tangent, precision), signed_division_series(&tangent, precision),
+            "tangent={tangent}, precision={precision}");
+    }
+
+    #[test]
+    fn magnitude_series_preserves_signed_truncation() {
+        // Exhaust the small fixed-point grids: negative right shifts would
+        // round down instead of toward zero, so these catch that substitution.
+        for precision in [4, 8, 12] {
+            let half = 1i64 << (precision - 1);
+            for tangent in -half..=half { assert_series(BigInt::from(tangent), precision); }
+        }
+    }
+
+    #[test]
+    fn magnitude_series_matches_boundaries_and_extra_precision() {
+        // 2045 is the largest binary_parts exponent gap between finite f64
+        // directions, including the smallest subnormal and largest normal.
+        for precision in [PRECISION, PRECISION + 1, PRECISION + 64, PRECISION + 1074, PRECISION + 2045] {
+            let unit = BigInt::one() << precision;
+            let anchors = [BigInt::zero(), BigInt::one(), BigInt::one() << (precision / 2),
+                &unit / 239, &unit / 5, &unit / 4, &unit / 3, &unit / 2];
+            for anchor in anchors {
+                for offset in [-1, 0, 1] {
+                    let tangent: BigInt = &anchor + offset;
+                    assert_series(tangent.clone(), precision);
+                    assert_series(-tangent, precision);
+                }
+            }
+        }
+    }
+
+    #[test]
+    fn magnitude_series_matches_varied_direction_ratios() {
+        let mut seed = 0x517cc1b727220a95u64;
+        for precision in [PRECISION, PRECISION + 64, PRECISION + 1074, PRECISION + 2045] {
+            let unit = BigInt::one() << precision;
+            for _ in 0..128 {
+                seed = seed.wrapping_mul(6364136223846793005).wrapping_add(1442695040888963407);
+                let ratio: BigInt = (BigInt::from(seed >> 11) * &unit) >> 53;
+                // Exercise the same ratio reduction as contour_angle_step,
+                // including its negative arguments when 1/4 < ratio < 1/2.
+                let tangent = if ratio > &unit / 4 {
+                    (&ratio - &unit / 2) * &unit / (&unit + &ratio / 2)
+                } else { ratio };
+                assert_series(tangent.clone(), precision);
+                assert_series(-tangent, precision);
+            }
+        }
     }
 }
