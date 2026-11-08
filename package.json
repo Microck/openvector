@@ -61,6 +61,7 @@
     "tools/rust-upstream-licenses.json",
     "LICENSE",
     "README.md",
+    "CHANGELOG.md",
     "tools/package-gui.mjs",
     "docs/"
   ],
