@@ -4,7 +4,7 @@ members = ["crates/openvector", "crates/openvector-cli", "crates/openvector-gui"
 exclude = ["vendor/gpui", "vendor/gpui_linux", "vendor/gpui_macos", "vendor/gpui_wgpu", "vendor/gpui_windows", "vendor/gpui_apple", "vendor/napi-build"]
 
 [workspace.package]
-version = "0.1.2"
+version = "0.1.3"
 edition = "2024"
 license = "MIT"
 publish = false

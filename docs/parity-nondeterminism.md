@@ -1,4 +1,11 @@
-# Adam7 reference nondeterminism
+# Historical Adam7 reference nondeterminism
+
+This document records the 2026-10-20 native evidence and its test results.
+The approved product behavior is defined in the
+[image-input contract](image-input-contract.json) and
+[profile-history contract](profile-history-contract.json).
+Those contracts supersede the historical failing assertions described below.
+The original captures remain unchanged.
 
 ## Finding
 
@@ -82,7 +89,7 @@ The analysis specifies every other stable byte, not just this example. For each 
 
 These masks describe a finite sample, not a proof that every other process history must preserve those bytes. A later native capture that contradicts a stable position must remain visible and extend the evidence. It must not be silently discarded.
 
-## Raw-decoder failures remain unresolved
+## Raw-decoder failures at the audit
 
 The historical diagnostic attempted all 337 cases and reports exactly the seven IDs above. It records 121 differing raw-decoded bytes in total but lists only 119 individual differences. `adam7-17x13-25` reports 42 differences and lists the first 40. The other six lists are complete.
 
@@ -91,26 +98,32 @@ Do not apply the source-stage variability mask to the raw `decoded` comparison. 
 - `adam7-9x7-25` has historical raw-decoded mismatches at offsets 221 and 230, with independent value 0 and retained native value 201. Both corresponding source offsets are consistently 0 in this audit and its retained corpus source stage.
 - `adam7-9x7-26` has a historical raw-decoded mismatch at offset 5, with independent value 0 and native value 1. Its corresponding source offset is consistently 0.
 
-The operation-93 evidence does not prove those raw-decoded offsets variable. Their strict assertions must remain. More generally, finding native variability somewhere in a sample is not permission to waive a different byte, different stage, different sample or deterministic decoder error.
+The operation-93 evidence does not prove those raw-decoded offsets variable. At
+the audit, strict comparisons therefore remained enabled. Variability in one
+stage did not justify masking a different byte, stage or sample.
 
-The existing strict assertions are intentionally unchanged:
+The 2026-10-20 assertions compared complete buffers:
 
-- [`test/image-input.test.mjs`](../test/image-input.test.mjs#L9) compares the complete raw decoded buffer, source setter buffer, working buffer and prepared source buffer. Its historical first reported mismatch is `adam7-9x7-10`.
-- [`rust/crates/openvector/tests/image_input.rs`](../rust/crates/openvector/tests/image_input.rs#L20) keeps `image::native_pixels` and `image::native_preparation` as ordinary full-byte fixture comparisons. Neither is ignored or converted into a masked comparison.
+- [`test/image-input.test.mjs`](../test/image-input.test.mjs) compared the raw decoded buffer, source setter buffer, working buffer and prepared source buffer. Its first reported mismatch was `adam7-9x7-10`.
+- [`rust/crates/openvector/tests/image_input.rs`](../rust/crates/openvector/tests/image_input.rs) kept `image::native_pixels` and `image::native_preparation` as full-byte fixture comparisons. Neither was ignored or converted into a masked comparison.
 
 The retained-evidence audit did not execute the JavaScript or Rust implementation. Its historical diagnostic is separate from the subsequent Rust verification reported below.
 
-## Additional stable-property tests
+## Historical stable-property tests
 
-Seven separate tests now implement the stable-property contract below in `rust/crates/openvector/tests/image_input.rs`, using `test/fixtures/adam7-stable-properties-20261020.json`. That fixture retains the exact per-stage masks and consensus bytes plus the SHA-256 of the analysis from which they were extracted. These tests supplement, rather than replace, the strict corpus tests.
+Seven tests added at the audit implemented the stable-property checks below in
+`rust/crates/openvector/tests/image_input.rs`, using
+`test/fixtures/adam7-stable-properties-20261020.json`. That fixture retains exact
+per-stage masks and consensus bytes with the analysis SHA-256. These checks
+supplemented the strict corpus tests at that time.
 
-Each test uses its exact encoded input and controls from the original fixture:
+Each historical test used its encoded input and controls from the original fixture:
 
 1. Assert decoded format `png`, dimensions, intrinsic alpha metadata from the retained raw fixture, input immutability and independent output ownership. These remain fixture assertions; operation 93 does not add repeated raw-stage evidence.
 2. Run the ordinary independent source preparation. Assert all stage dimensions and exact stable bytes using that stage's `operation93AndRetainedCorpus` mask and consensus values. Compare every position marked 255, including zero-valued expectations.
 3. Assert each complete stable row and every alpha byte against the exact recorded bytes. Do not replace alpha expectations with 255 for the opaque-input variants.
 4. For these mode-0, amount-0 samples, assert complete equality between the independent source, working and prepared BGRA arrays. This checks the stage relationship even at positions whose exact native values varied.
-5. Keep the full native fixture assertions enabled and visibly failing until their actual discrepancies are resolved or an explicit product decision defines behavior for proven variable native output. Do not copy captured scratch bytes into the decoder, choose one convenient native run as a fallback, or report stable-property coverage as full byte parity.
+5. Keep full native fixture assertions enabled until discrepancies are resolved or an explicit product decision defines behavior. The product decision now lives in the linked contracts. Captured scratch bytes and a conveniently selected native run are not valid decoder oracles.
 
 Verification on 2026-10-20 in the isolated Paris Raft: all seven stable-property tests pass. The complete `image_input` target reports 119 passed, 2 failed, 0 ignored. The unchanged strict failures remain `adam7-9x7-10` decoded byte 5 (Rust 0, retained native 167) and source byte 5 (Rust 0, retained native 18). The two fresh-input tests also pass, comparing all 120 new cases. Stable-property success is not a claim of full byte parity.
 
@@ -155,12 +168,19 @@ This establishes the invalid native read. It does not identify the first arithme
 
 All three controls match the historical fixture's complete automatic state and all nine editor frames. Their final source and working pixels, dimensions, segmentation labels and counts, region color IDs, selected settings, palettes, cache keys, random state and all 100 typed parameters agree. The region creation BGRA values also agree. Final contours, smoothing metadata, fitted geometry and output chains are outside this stable-property contract.
 
-The random state is 4022 throughout the pre-refit editor frames and 3565 after native completion in all three controls. Settings and typed parameters are identical before and after refitting. The post-refit random state remains an observed native invariant, but the independent engine cannot exercise it past the palette-bound rejection.
+The random state is 4022 throughout the pre-refit editor frames and 3565 after native completion in all three controls. Settings and typed parameters agree before and after refitting. At the audit, the independent engine stopped at its palette-bound rejection and could not check the post-refit state.
 
 The separately named `native_alpha_edit_stable_properties_before_refit` test in [`segmentation_editor.rs`](../rust/crates/openvector/tests/segmentation_editor.rs) uses [`alpha-nondeterminism-20261020.json`](../test/fixtures/alpha-nondeterminism-20261020.json). The fixture links to the analysis SHA-256 and all three response hashes. It contains only common expected values.
 
 The test runs ordinary independent decoding and automatic processing, replays all seven pre-refit actions, and calls the real `commit_editing` operation. It compares the full automatic state, original pixels, editor pixels and histories, every committed segmentation label, region counts and color IDs, region creation colors, selected settings, source and working pixels, pre-refit random state and exact typed parameter bits. It stops at the commit boundary before undefined native sampling. Captured state, heap bytes and nonfinite geometry never become processing inputs.
 
-The existing `alpha_edit_creation_palette_native_bits` test separately compares creation-palette float32 bits with the sampler capture. The unchanged `native_command_alpha_premultiplied` test still attempts full completion and retains its strict failure. The contour-initialization guard is unchanged. The ten other command workflows either disable coordinate color sampling or keep sampled color IDs within the live palette.
+At the audit, `alpha_edit_creation_palette_native_bits` separately compared
+creation-palette float32 bits with the sampler capture.
+`native_command_alpha_premultiplied` still failed during completion. No tests,
+builds, linters or formatters ran for that evidence-only addition.
 
-No Rust or JavaScript tests, builds, linters or formatters were run for this evidence addition. Stable-property coverage does not make the full workflow pass. Replacing the live palette, clamping an ID, consuming captured heap bytes, injecting NaNs or selecting a convenient native completion would change the observed behavior rather than reproduce a defined result.
+The approved product contract now requires a complete owned sampling palette and
+valid edited output. It does not permit clamped color IDs, captured heap bytes,
+injected NaNs or a selected native completion. See the linked contract and the
+current verification results rather than treating these historical failures as
+release exceptions.

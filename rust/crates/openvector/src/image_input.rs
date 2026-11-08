@@ -89,7 +89,11 @@ pub fn decode_png(encoded: &[u8]) -> Result<DecodedImage, InputError> {
     flate2::read::ZlibDecoder::new(&compressed[..]).take(expected as u64+1).read_to_end(&mut inflated).map_err(|e| InputError::new(e.to_string()))?;
     if inflated.len() != expected { return fail("PNG decoded scanline size does not match its dimensions."); }
     let mut bgra = vec![0;width*height*4]; let bpp = (channels*depth).div_ceil(8).max(1);
-    let legacy = depth == 16 && (kind == 2 || kind == 6); let mut storage = if legacy { vec![0;width*height*channels*2] } else { Vec::new() };
+    // Adam7 pixels must be reduced only when their pass supplies the samples.
+    // Reimporting retained rows after each pass corrupts already decoded pixels.
+    let correct_adam7 = interlace == 1 && depth == 16 && (kind == 2 || kind == 6);
+    let legacy = depth == 16 && (kind == 2 || kind == 6) && !correct_adam7;
+    let mut storage = if legacy { vec![0;width*height*channels*2] } else { Vec::new() };
     let scale = |n: u16| -> u8 { if depth == 16 { (n >> 8) as u8 } else if depth == 8 { n as u8 } else { (n as f64*(255.0/((1usize << depth)-1) as f64)) as u8 } };
     offset = 0;
     for &[px,py,dx,dy] in passes {
@@ -106,13 +110,16 @@ pub fn decode_png(encoded: &[u8]) -> Result<DecodedImage, InputError> {
                     (palette[color*3],palette[color*3+1],palette[color*3+2],transparency.and_then(|t| t.get(color)).copied().unwrap_or(255))
                 } else if kind == 0 || kind == 4 { let gray = scale(sample_at(&row,sample,depth)); (gray,gray,gray,if kind == 4 { scale(sample_at(&row,sample+1,depth)) } else { 255 }) }
                 else { (scale(sample_at(&row,sample,depth)),scale(sample_at(&row,sample+1,depth)),scale(sample_at(&row,sample+2,depth)),if kind == 6 { scale(sample_at(&row,sample+3,depth)) } else { 255 }) };
+                let alpha = if correct_adam7 && kind == 2 && transparency.is_some_and(|t| {
+                    (0..3).all(|channel| sample_at(&row,sample+channel,depth) == short(t,channel*2))
+                }) { 0 } else { alpha };
                 bgra[pixel*4..pixel*4+4].copy_from_slice(&[blue,green,red,alpha]);
             }
             std::mem::swap(&mut row,&mut previous);
         } }
         if legacy { import_legacy_rows(&mut storage,&mut bgra,width,height,kind,transparency); }
     }
-    if let Some(t) = transparency { if kind == 0 || kind == 2 {
+    if let Some(t) = transparency { if !correct_adam7 && (kind == 0 || kind == 2) {
         let keys = if kind == 0 { [if depth < 8 { short(t,0) as f64*255.0/((1usize << depth)-1) as f64 } else { (short(t,0)&255) as f64 };3] }
             else { [(short(t,0)&255) as f64,(short(t,2)&255) as f64,(short(t,4)&255) as f64] };
         for y in 0..height { bgra[y*width*4+3] = 255; for x in 0..width { let p = (y*width+x)*4; if bgra[p+2] as f64 == keys[0] && bgra[p+1] as f64 == keys[1] && bgra[p] as f64 == keys[2] { bgra[p+3] = 0; } } }

@@ -6,6 +6,7 @@ import {CoreSession} from '../src/settings.mjs';
 import {decodeImage,resolveImageFilename} from '../src/image-input.mjs';
 import {SegmentationEditor} from '../src/segmentation-editor.mjs';
 import {cleanStartupProfile,compareDocumentState} from './helpers/native-gui.mjs';
+import {exportSvg} from '../src/svg.mjs';
 
 const [metadata, ...workflows] = gunzipSync(readFileSync(new URL('./fixtures/segmentation-edit-reference.ndjson.gz',import.meta.url)))
   .toString().trim().split('\n').map(JSON.parse);
@@ -70,25 +71,76 @@ test('editor owns snapshots and validates a complete command before mutation',()
   assert.deepEqual(editor.snapshot(),saved);
 });
 
-// Preserve captured NaN payload/sign bits. They are expected-value codecs,
-// not usable coordinates or permission to treat non-finite geometry as healthy.
-function restoreReferenceFloats(value) {
-  if (value && typeof value === 'object') {
-    if (Object.hasOwn(value,'float64Bits')) return Buffer.from(value.float64Bits,'hex').readDoubleLE();
-    if (Array.isArray(value)) return value.map(restoreReferenceFloats);
-    return Object.fromEntries(Object.entries(value).map(([key,item]) => [key,restoreReferenceFloats(item)]));
-  }
-  return value;
-}
+for (const {from,to,pixels} of [
+  {from:[1.9375,2.5],to:[2.0625,2.5],pixels:[11,12]},
+  {from:[2.0625,2.5],to:[1.9375,2.5],pixels:[11,12]},
+  {from:[2.5,1.9375],to:[2.5,2.0625],pixels:[7,12]},
+  {from:[1.99,1.99],to:[2.01,2.01],pixels:[6,12]},
+]) test(`short pencil paints only endpoint pixels: ${from} to ${to}`,() => {
+  const bgra = new Uint8Array(5*5*4).fill(255);
+  const editor = new SegmentationEditor({width:5,height:5,bgra,source:bgra,
+    backgroundMode:0,background:[0,0,0,1],color:[0,0,0,1]});
+  const expected = bgra.slice();
+  for (const pixel of pixels) expected.set([0,0,0,255],pixel*4);
+  const painted = editor.apply({tool:'pencil',from,to,color:[0,0,0,1]});
+  assert.deepEqual(painted.bgra,expected);
+  assert.deepEqual(painted.undo.map(record => record.coordinates),[[...from,...to]]);
+  assert.deepEqual(editor.undo().bgra,bgra);
+  assert.deepEqual(editor.redo(),painted);
+});
 
-function compareReferenceFloatBits(actual,expected,path = '') {
-  if (!expected || typeof expected !== 'object') return;
-  if (Object.hasOwn(expected,'float64Bits')) {
-    const bits = Buffer.alloc(8);bits.writeDoubleLE(actual);
-    assert.equal(bits.toString('hex'),expected.float64Bits,'captured non-finite bits at '+path);
-    return;
+test('short pencil gestures retain local pixels and replayable history without no-op moves',() => {
+  const bgra = new Uint8Array(5*5*4).fill(255),pointer = {previousPoint:[-1,-1]};
+  const editor = new SegmentationEditor({width:5,height:5,bgra,source:bgra,
+    backgroundMode:0,background:[0,0,0,1],color:[0,0,0,1]});
+  editor.gesture({phase:'select',tool:'pencil'},pointer);
+  const pressed = editor.gesture({phase:'press',point:[1.9375,2.5],buttons:1},pointer);
+  const painted = editor.gesture({phase:'move',point:[2.0625,2.5],buttons:1},pointer);
+  const expected = bgra.slice();
+  expected.set([0,0,0,255],11*4);expected.set([0,0,0,255],12*4);
+  assert.deepEqual(painted.bgra,expected);
+  assert.deepEqual(painted.undo,[
+    {kind:3,x:1,y:2,coordinates:[1.9375,2.5,1.9375,2.5],argb:[1,0,0,0],
+      key:'3 1 2 1.9375 2.5 1.9375 2.5 [1, 0, 0, 0]'},
+    {kind:3,x:2,y:2,coordinates:[2.0625,2.5,1.9375,2.5],argb:[1,0,0,0],
+      key:'3 2 2 2.0625 2.5 1.9375 2.5 [1, 0, 0, 0]'},
+  ]);
+  assert.equal(painted.key,'3 1 2 1.9375 2.5 1.9375 2.5 [1, 0, 0, 0]3 2 2 2.0625 2.5 1.9375 2.5 [1, 0, 0, 0]');
+  assert.deepEqual(editor.gesture({phase:'move',point:[2.125,2.5],buttons:1},pointer),painted);
+  assert.deepEqual(pointer.previousPoint,[2.125,2.5]);
+  const undone = editor.undo();
+  assert.deepEqual(undone.bgra,pressed.bgra);
+  assert.deepEqual(undone.undo,pressed.undo);
+  assert.deepEqual(undone.redo,[painted.undo[1]]);
+  assert.deepEqual(editor.redo(),painted);
+});
+
+function assertCompletedEditedFit(state,editor) {
+  assert.equal(state.status,0);
+  assert.equal(state.fitting.complete,true);
+  function assertFinite(value) {
+    if(typeof value==='number')assert.ok(Number.isFinite(value),'finite fitted coordinates');
+    else if(value && typeof value==='object')for(const item of Object.values(value))assertFinite(item);
   }
-  for (const [key,value] of Object.entries(expected)) compareReferenceFloatBits(actual?.[key],value,path+'.'+key);
+  assertFinite(state.contours);
+  assertFinite(state.smoothing);
+  assertFinite(state.fitting.geometry);
+  const {regions}=state.fitting.geometry,{indices,counts}=state.segmentation;
+  assert.equal(regions.length,counts.length);
+  const observed=new Array(regions.length).fill(0);
+  for(const [pixel,region] of indices.entries()) {
+    observed[region]++;
+    assert.deepEqual(Array.from(regions[region].bgra),Array.from(editor.bgra.slice(pixel*4,pixel*4+4)),`painted pixel ${pixel}`);
+    assert.deepEqual(regions[region].bgra,state.contours.regions[region].bgra);
+  }
+  assert.deepEqual(observed,Array.from(counts));
+  assert.deepEqual(regions.map(region=>region.pixelCount),observed);
+  const svg=exportSvg({geometry:state.fitting.geometry,width:editor.width,height:editor.height});
+  assert.doesNotMatch(svg,/NaN|Infinity/);
+  for(const {bgra} of regions)if(bgra[3]>10) {
+    const rgb=[bgra[2],bgra[1],bgra[0]].map(channel=>channel.toString(16).padStart(2,'0')).join('');
+    assert.ok(svg.includes('#'+rgb),'serialized painted color '+rgb);
+  }
 }
 
 for (const record of workflows) test('native document after editing: '+record.id,() => {
@@ -107,9 +159,12 @@ for (const record of workflows) test('native document after editing: '+record.id
     else {
       const state = document.finishEditing(automatic.settings);
       const expected = record.expectedCompleted[completed++].state;
-      compareReferenceFloatBits(state.contours,expected.contours,'contours');
-      compareReferenceFloatBits(state.fitting.geometry,expected.fittedGeometry,'fittedGeometry');
-      compareDocumentState(state,restoreReferenceFloats(expected),metadata.parameters);
+      if(record.id==='alpha-premultiplied') {
+        assertCompletedEditedFit(state,document.editingState());
+        assert.deepEqual(state.segmentation.palette,automatic.settings.palette,'exposed palette remains selected controls');
+        assert.ok(Math.max(...state.segmentation.colorIndices)>=state.segmentation.palette.length/4,
+          'painted slots survive beyond the shorter live palette');
+      } else compareDocumentState(state,expected,metadata.parameters);
       editor = document.beginEditing();
     }
     compareFrame(editor,record.expectedFrames[index+1],record.id+' document action '+index);
@@ -137,8 +192,9 @@ test('alpha edit rebuild matches the native creation palette before profile relo
   assert.equal(palette.length/4,3);
 });
 
-for (const target of ['smoothing','fitting']) test(`finishEditing stops on ${target} cancellation after committing edits and retries the same document`,()=>{
-  const record=workflows.find(row=>row.id==='palette-reorder'),source={...decodeImage(Buffer.from(record.input.bytes,'base64')),
+for (const id of ['palette-reorder','alpha-premultiplied']) for (const target of ['smoothing','fitting'])
+test(`finishEditing ${id} stops on ${target} cancellation after committing edits and retries the same document`,()=>{
+  const record=workflows.find(row=>row.id===id),source={...decodeImage(Buffer.from(record.input.bytes,'base64')),
     ...resolveImageFilename(record.input.name)};
   const actual=new CoreSession().createDocument(source),direct=new CoreSession().createDocument(source);
   let settings;
@@ -170,6 +226,9 @@ for (const target of ['smoothing','fitting']) test(`finishEditing stops on ${tar
   assert.equal(actual.editingState().tool,'pan');
   assert.deepEqual(actual.finishEditing(settings),direct.finishEditing(settings),'same retained-state retry');
   assert.equal(actual.snapshot().fitting.complete,true);
+  assertCompletedEditedFit(actual.snapshot(),editing);
+  const complete=actual.snapshot();
+  assert.deepEqual(actual.finishEditing(settings),complete,'cached finish retains palette, geometry and random state');
 });
 
 test('finishEditing validates observers before committing pending edits',()=>{

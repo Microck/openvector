@@ -10,6 +10,13 @@ const storeDouble = value => binaryDouble(value,-Number(precision));
 const storeFloat = value => storeDouble(roundSignificand(value,24));
 const tools = ['pan','pencil','fill','zap','picker'];
 
+/** Convert one owned associated BGRA color to straight bytes in place. */
+export function unassociateBgraColor(bytes,offset) {
+  const alpha=bytes[offset+3];
+  for (let channel=0;channel<3;channel++) bytes[offset+channel]=alpha===0 ? 0
+    : Math.min(255,Math.floor((bytes[offset+channel]*255+Math.floor(alpha/2))/alpha));
+}
+
 // The native sampler truncates extended expressions, but spills the X product
 // to double before adding its origin. A double-only line changes boundary pixels.
 function strokeSamples(from,to,paint) {
@@ -26,10 +33,9 @@ function strokeSamples(from,to,paint) {
     if (next >= root) break;
     root = next;
   }
-  const samples = Number(extended(extended(root)*4n)/unit);
-  // With one sample, both 0/0 expressions convert to x87's int64 indefinite;
-  // the native painter receives its low int32 word, zero for both coordinates.
-  if (samples === 1) return paint(0,0);
+  // Fewer than two native samples divide by zero. Sample both endpoints for
+  // these short boundary crossings instead of painting an unrelated origin.
+  const samples = Math.max(2,Number(extended(extended(root)*4n)/unit));
   let changed = false,previousX = -1,previousY = -1;
   for (let sample = 0; sample < samples; sample++) {
     const ratio = extended(BigInt(sample)*unit/BigInt(samples-1));
@@ -91,6 +97,7 @@ export class SegmentationEditor {
   #width;#height;#base;#pixels;#source;#background;#backgroundMode;
   #undo = [];#redo = [];
   #tool = 'pan';#previousTool = 'pan';#color;
+  #straightMode = false;
 
   constructor(input) {
     const {width,height,bgra} = readRasterInput(input);
@@ -103,6 +110,21 @@ export class SegmentationEditor {
     this.#color = readEditorGesture({phase:'color',color:input.color},tools).color;
     this.#background = Array.from(background,value => Math.round(value*65535)/65535);
     this.#backgroundMode = input.backgroundMode;
+  }
+
+  /** Application entry converts only the automatic base, never user paint or
+   * replay records. Re-entry must not unassociate those bytes a second time. */
+  enableStraightColors() {
+    if (this.#straightMode) return;
+    if (this.#undo.length || this.#redo.length)
+      throw new Error('Cannot change color representation after editing has begun.');
+    for (let offset = 0; offset < this.#base.length; offset += 4) {
+      unassociateBgraColor(this.#base,offset);unassociateBgraColor(this.#pixels,offset);
+    }
+    const color = Uint8Array.from(this.#color,value => Math.round(value*255));
+    unassociateBgraColor(color,0);
+    this.#color = Float32Array.from(color,value => value/255);
+    this.#straightMode = true;
   }
 
   historyState() { return {undoCount:this.#undo.length,redoCount:this.#redo.length}; }
@@ -208,6 +230,17 @@ export class SegmentationEditor {
   }
 
   #sourceColor(pixel) {
+    if (this.#straightMode) {
+      const offset = pixel*4,alpha = this.#source[offset+3]/255;
+      const remaining = this.#backgroundMode === 1 || this.#backgroundMode === 2
+        ? (1-alpha)*this.#background[3] : 0;
+      const outputAlpha = alpha+remaining;
+      let color = Math.min(255,Math.max(0,Math.round(outputAlpha*255))) << 24;
+      if (outputAlpha > 0) for (let channel = 0; channel < 3; channel++)
+        color |= Math.min(255,Math.max(0,Math.round(
+          ((this.#source[offset+channel]/255+remaining*this.#background[channel])/outputAlpha)*255))) << (channel*8);
+      return color >>> 0;
+    }
     if (this.#backgroundMode !== 1 && this.#backgroundMode !== 2) return packedColor(this.#source,pixel*4);
     const alpha = this.#source[pixel*4+3]/255,remaining = 1-alpha;
     const backgroundAlpha = this.#background[3],bytes = new Uint8Array(4);

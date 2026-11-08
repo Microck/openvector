@@ -8,7 +8,7 @@ import { extractContours } from './contours.mjs';
 import { ContourFitter } from './contour-fitting.mjs';
 import { assembleOutputShapes } from './vector-output.mjs';
 import { readDocumentSettings,readBatchControls,batchDocumentSettings,defaultDocumentSettings,documentPaletteKey,documentSegmentationKey,documentSmoothingKey,documentFittingKey } from './document-controls.mjs';
-import { SegmentationEditor } from './segmentation-editor.mjs';
+import { SegmentationEditor,unassociateBgraColor } from './segmentation-editor.mjs';
 import { BackgroundEditor } from './background-editor.mjs';
 import { paletteFromByteColors,rebuildConnectedRegions } from './region-data.mjs';
 import {CancelTaskException} from './task-cancellation.mjs';
@@ -73,6 +73,8 @@ export class ImageDocument {
   #editor = null;
   #committedEditing = {undo:[],redo:[]};
   #regionPalette = null;
+  #automaticPremultipliedColors = false;
+  #automaticPalettes = [];
   #background = new BackgroundEditor();
   #fitter = null;
   #fitterRegions = null;
@@ -111,6 +113,7 @@ export class ImageDocument {
     this.#sourceAlphaType = -1;
     this.#fitter = null;this.#fitterRegions = null;
     this.#editor = null;this.#regionPalette = null;this.#committedEditing = {undo:[],redo:[]};
+    this.#automaticPremultipliedColors = false;this.#automaticPalettes = [];
     this.#background.revert();this.#background.finish();
   }
 
@@ -261,11 +264,13 @@ export class ImageDocument {
       settings = {...settings,palette:selectedPalette(state,paletteCount)};
       publish('palette');
     }
+    this.#rememberAutomaticPalette(settings);
     for (const stage of ['segmentation','smoothing','fitting']) {
       completed = this.runTask(stage,{...settings,
         onProgress:onProgress === undefined ? undefined : event => onProgress({stage,status:this.#state.status,...event})});
       state = completed.state;
       if (completed.didWork && state.status === 2) throw new CancelTaskException(`Automatic ${stage} was cancelled.`);
+      if (stage === 'segmentation') this.#automaticPremultipliedColors = state.stageKeys.segmentationEdits === '';
       publish(stage);
     }
     return {settings,paletteCount,sourceAlphaType:this.#sourceAlphaType,recommendedBackgroundMode,state};
@@ -323,6 +328,7 @@ export class ImageDocument {
       if (paletteCount === null) paletteCount = minimumPaletteCount(state);
       if (paletteCount === null) throw new Error('Batch palette selection found no eligible candidate.');
       settings = {...settings,palette:selectedPalette(state,paletteCount)};
+      this.#rememberAutomaticPalette(settings);
     }
     for (const stage of ['segmentation','smoothing','fitting']) {
       state = this.runTask(stage,{...settings,
@@ -331,6 +337,16 @@ export class ImageDocument {
       observeStage?.(stage,structuredClone(state),{paletteCount});
     }
     return {settings,paletteCount,sourceAlphaType,recommendedBackgroundMode,state};
+  }
+
+  #isAutomaticPalette({paletteMode,palette}) {
+    return this.#automaticPalettes.some(entry => entry.mode === paletteMode &&
+      entry.palette.length === palette.length && entry.palette.every((value,index) => value === palette[index]));
+  }
+
+  #rememberAutomaticPalette(settings) {
+    if (!this.#isAutomaticPalette(settings))
+      this.#automaticPalettes.push({mode:settings.paletteMode,palette:settings.palette.slice()});
   }
 
   #analyze(settings,{lower,upper,onProgress}) {
@@ -425,6 +441,7 @@ export class ImageDocument {
     const key = documentSegmentationKey(settings),needsWork = key !== state.stageKeys.segmentation;
     state.stageKeys.segmentation = key;
     if (needsWork) {
+      this.#automaticPremultipliedColors = this.#isAutomaticPalette(settings);
       this.#prepareSource(settings,parameters);
       // Segmentation uses the full source. Palette reduction owns a different
       // preparation and can later replace the live working/grid dimensions.
@@ -464,7 +481,7 @@ export class ImageDocument {
 
   /** Editing owns a base bitmap independent of later live palette transfers.
    * Native history replays onto this base, not onto the last edited result. */
-  beginEditing() {
+  #prepareEditing() {
     if (this.#state.segmentation === null || this.#regionPalette === null) throw new Error('Document editing needs completed segmentation.');
     this.#background.finish();
     if (this.#editor === null) {
@@ -476,7 +493,29 @@ export class ImageDocument {
       this.#editor = new SegmentationEditor({width,height,bgra,source:this.#state.original.bgra,backgroundMode,background,
         color:palette.subarray(0,4)});
     }
+  }
+
+  beginEditing() {
+    this.#prepareEditing();
     return this.#editor.snapshot();
+  }
+
+  /** Product-facing entry uses straight colors; beginEditing retains the raw
+   * native reference boundary. The editor owns conversion and its undo base. */
+  beginEditingForOutput() {
+    this.#prepareEditing();
+    if (this.#automaticPremultipliedColors) this.#editor.enableStraightColors();
+    return this.#editor.snapshot();
+  }
+
+  /** Output colors follow geometry ownership, not the current history key:
+   * reverting an already refitted edit can also produce an empty key. */
+  presentationGeometry() {
+    if (!this.#state.fitting?.complete) return null;
+    const geometry = structuredClone(this.#state.fitting.geometry);
+    if (this.#automaticPremultipliedColors)
+      for (const region of geometry.regions) unassociateBgraColor(region.bgra,0);
+    return geometry;
   }
 
   #editingSession() {
@@ -517,6 +556,7 @@ export class ImageDocument {
     this.#editor.endEditing();
     this.#background.finish();
     if (editor.key !== state.stageKeys.segmentationEdits) {
+      this.#automaticPremultipliedColors = false;
       const {width,height,bgra} = editor;
       function* colors() {
         for (let offset = 0; offset < bgra.length; offset += 4) yield bgra.subarray(offset,offset+4);
@@ -583,10 +623,14 @@ export class ImageDocument {
     if (needsWork) {
       const geometry = extractContours({...state.segmentation,palette:this.#regionPalette,antiAlias:Boolean(parameters['Shared::is_anti_aliased'])});
       state.fitting = null;
-      // Geometry retains region creation colors. Coordinate initialization
-      // samples the live palette that profile loading transferred above.
+      // Region IDs own creation slots. Overlay the entire live palette so its
+      // defined sampling semantics survive without discarding painted slots.
+      // Output colors remain owned by the unchanged contour geometry.
+      const samplingPalette = new Float32Array(Math.max(this.#regionPalette.length,state.segmentation.palette.length));
+      samplingPalette.set(this.#regionPalette);
+      samplingPalette.set(state.segmentation.palette);
       try {
-        const smoothed = this.#session.smooth({...state.working,...state.segmentation,geometry,parameters},(event,live) => {
+        const smoothed = this.#session.smooth({...state.working,...state.segmentation,palette:samplingPalette,geometry,parameters},(event,live) => {
           this.#retainSmoothing(live);
           state.progress = event.percent;
           onProgress?.(event);

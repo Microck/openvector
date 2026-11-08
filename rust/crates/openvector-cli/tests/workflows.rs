@@ -71,19 +71,41 @@ fn vectorize_native_geometry_stdin_output_protection_and_bitmaps(){
     for (args,error) in [(vec!["vectorize","input image.bmp","--scale","2"],"only to bitmap"),(vec!["vectorize","input image.bmp","--format","png","--flatten"],"only to non-PNG"),(vec!["vectorize","input image.bmp","--format","png","--scale","0"],"positive finite")]{failure(&invoke(root,&args,None),error);}
     for plan in ["{","{}","[null]","[{\"action\":\"unknown\"}]","[{\"settings\":{\"smothness\":9}}]"]{std::fs::write(root.join("plan.json"),plan).unwrap();std::fs::write(root.join("protected.svg"),b"keep").unwrap();let failed=invoke(root,&["vectorize","input image.bmp","--edits","plan.json","-o","protected.svg","--force"],None);assert_eq!(failed.status.code(),Some(1));assert!(failed.stdout.is_empty());assert_eq!(std::fs::read(root.join("protected.svg")).unwrap(),b"keep");}
 }
+
+// App editing uses straight RGB before refitting, unlike the historical raw
+// numerical capture. Compare every resulting SVG byte with the separate JS
+// implementation, including recipes whose original native output was invalid.
+fn application_edit_svg(reference:&Value)->Vec<u8>{
+    let helper=Path::new(env!("CARGO_MANIFEST_DIR")).join("../../../test/helpers/application-edit-reference.mjs");
+    let actions=reference["actions"].as_array().unwrap().iter().filter(|action|action["action"]!=5).cloned().collect::<Vec<_>>();
+    let recipe=serde_json::to_vec(&json!({"input":reference["input"],"actions":actions})).unwrap();
+    let mut child=Command::new("node").arg(helper).arg("--direct-stdin")
+        .stdin(Stdio::piped()).stdout(Stdio::piped()).stderr(Stdio::piped()).spawn()
+        .expect("Node.js 22.19+ is required for the independent application-edit reference.");
+    let mut stdin=child.stdin.take().unwrap();
+    let (output,written)=std::thread::scope(|scope|{
+        let writer=scope.spawn(move||stdin.write_all(&recipe));
+        let output=child.wait_with_output().unwrap();
+        (output,writer.join().unwrap())
+    });
+    written.expect("Send recipe inputs to independent application-edit reference.");
+    success(&output);
+    output.stdout
+}
 #[test]
 fn native_segmentation_edit_recipes(){
     let directory=Directory::new();let root=&directory.0;
-    let rows=common::read_ndjson("segmentation-edit-reference.ndjson.gz");let mut count=0;
-    for reference in rows.iter().skip(1).filter(|r|r["referenceOutcome"]=="completed-native-finite"){
-        count+=1;std::fs::write(root.join("input.bmp"),common::b64(reference["input"]["bytes"].as_str().unwrap())).unwrap();
+    let rows=common::read_ndjson("segmentation-edit-reference.ndjson.gz");
+    for reference in rows.iter().skip(1){
+        let input_name=reference["input"]["name"].as_str().unwrap();std::fs::write(root.join(input_name),common::b64(reference["input"]["bytes"].as_str().unwrap())).unwrap();
         let commands=reference["actions"].as_array().unwrap().iter().filter(|a|a["action"]!=5).map(|a|{
             if a["action"]!=1{return json!({"action":match a["action"].as_i64().unwrap(){2=>"undo",3=>"redo",4=>"revert",_=>panic!("unknown native action")}})}
             let color=a["argb"].as_array().unwrap().iter().rev().cloned().collect::<Vec<_>>();
             if a["kind"]==3{let c=a["coordinates"].as_array().unwrap();json!({"tool":"pencil","from":&c[..2],"to":&c[2..],"color":color,"commit":a["commit"]})}else{json!({"tool":if a["kind"]==5{"fill"}else{"zap"},"x":a["x"],"y":a["y"],"color":color,"commit":a["commit"]})}
         }).collect::<Vec<_>>();std::fs::write(root.join("edits.json"),serde_json::to_vec(&commands).unwrap()).unwrap();
-        let output=invoke(root,&["vectorize","input.bmp","--edits","edits.json"],None);success(&output);let native=&reference["expectedCompleted"].as_array().unwrap().last().unwrap()["state"];assert_eq!(output.stdout,svg(native,&[]),"{}",reference["id"]);
-    }assert!(count>0);
+        let output=invoke(root,&["vectorize",input_name,"--edits","edits.json","--layout","stacked"],None);success(&output);
+        assert_eq!(output.stdout,application_edit_svg(reference),"{}",reference["id"]);
+    }
 }
 #[test]
 fn edit_plans_restore_committed_pixels_and_leave_the_pencil_tool(){

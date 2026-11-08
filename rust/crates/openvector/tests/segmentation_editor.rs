@@ -11,6 +11,60 @@ fn compare_editor(actual:&EditorSnapshot,expected:&Value,label:&str){
     let actual_json=serde_json::to_value(actual).unwrap();for list in ["undo","redo"]{let expected=Value::Array(expected[list].as_array().unwrap().iter().map(|v|{let mut record=v.clone();record.as_object_mut().unwrap().remove("bits");record}).collect());compare_json(&actual_json[list],&expected,&format!("{label} {list}"));}
     if let Some(mode)=expected.get("inputMode"){assert_eq!(actual.tool,tool(mode),"{label} tool");let color:Vec<Value>=expected["paintArgb"].as_array().unwrap().iter().rev().cloned().collect();compare_json(&json!(actual.color),&json!(color),&format!("{label} paint"));}
 }
+
+// Historical alpha refits read beyond the live palette. Require a complete,
+// finite graph and exact painted region colors instead of those arbitrary bits.
+fn assert_completed_edited_fit(state:&openvector::image_document::DocumentSnapshot,editor:&EditorSnapshot){
+    assert_eq!(state.status,0);
+    let fitting=state.fitting.as_ref().unwrap();
+    assert!(fitting.complete);
+    let geometry=&fitting.geometry;
+    for node in &geometry.nodes{assert!(node.x.is_finite()&&node.y.is_finite());}
+    for cubic in &geometry.cubics{assert!(cubic.points.iter().all(|v|v.is_finite()));}
+    let contours=state.contours.as_ref().unwrap();
+    for node in &contours.nodes{assert!(node.x.is_finite()&&node.y.is_finite());}
+    assert!(state.smoothing.as_ref().unwrap().reference_positions.iter().all(|v|v.is_finite()));
+    let map=state.segmentation.as_ref().unwrap();
+    assert_eq!(geometry.regions.len(),map.counts.len());
+    let mut counts=vec![0;geometry.regions.len()];
+    for (pixel,&region) in map.indices.as_ref().unwrap().iter().enumerate(){
+        let region=region as usize;
+        counts[region]+=1;
+        assert_eq!(geometry.regions[region].bgra.as_slice(),&editor.bgra[pixel*4..pixel*4+4],"painted pixel {pixel}");
+        assert_eq!(contours.regions[region].bgra,geometry.regions[region].bgra);
+    }
+    assert_eq!(counts,map.counts);
+    assert_eq!(geometry.regions.iter().map(|r|r.pixel_count).collect::<Vec<_>>(),counts);
+    let input=openvector::vector_output::VectorOutputInput::new(geometry,editor.width as i64,editor.height as i64);
+    let svg=openvector::svg::export_svg(&input).unwrap();
+    assert!(!svg.contains("NaN")&&!svg.contains("inf"));
+    for region in &geometry.regions{
+        let [b,g,r,a]=region.bgra;
+        if a>10{assert!(svg.contains(&format!("#{r:02x}{g:02x}{b:02x}")),"serialized painted color {:?}",region.bgra);}
+    }
+}
+
+fn short_stroke_expected(initial:&EditorSnapshot,frame:usize,native:&Value)->EditorSnapshot{
+    use openvector::segmentation_editor::ToolRecord;
+    let record=|x,y,coordinates,key:&str|ToolRecord{kind:3,x,y,coordinates,argb:[1.0,0.0,0.0,0.0],key:key.into(),joins_previous:false};
+    let records=[
+        record(0,8,[0.9375,8.5,0.9375,8.5],"3 0 8 0.9375 8.5 0.9375 8.5 [1, 0, 0, 0]"),
+        record(1,8,[1.25,8.5,0.9375,8.5],"3 1 8 1.25 8.5 0.9375 8.5 [1, 0, 0, 0]"),
+        record(0,10,[0.9375,10.5,0.9375,10.5],"3 0 10 0.9375 10.5 0.9375 10.5 [1, 0, 0, 0]"),
+        record(1,10,[1.0625,10.5,0.9375,10.5],"3 1 10 1.0625 10.5 0.9375 10.5 [1, 0, 0, 0]"),
+    ];
+    let active=match frame{0..=4=>0,5|8=>1,6|7|9=>2,10=>3,_=>4};
+    let mut expected=initial.clone();
+    expected.tool=tool(&native["inputMode"]).into();
+    expected.color=std::array::from_fn(|c|native["paintArgb"][3-c].as_f64().unwrap() as f32);
+    expected.undo=records[..active].to_vec();
+    expected.redo=if frame==8{vec![records[1].clone()]}else{Vec::new()};
+    expected.key=expected.undo.iter().map(|record|record.key.as_str()).collect();
+    for (record,&(x,y)) in [(0,8),(1,8),(0,10),(1,10)].iter().enumerate(){
+        if record<active{let offset=(y*initial.width+x)*4;expected.bgra[offset..offset+4].copy_from_slice(&[0,0,0,255]);}
+    }
+    expected
+}
 fn run_native_command_workflow(id:&str) {
     static ROWS:std::sync::LazyLock<Vec<Value>>=std::sync::LazyLock::new(||{
         let rows=common::read_ndjson("segmentation-edit-reference.ndjson.gz");
@@ -35,7 +89,8 @@ fn run_native_command_workflow(id:&str) {
             5=>{
                 let state=document.finish_editing(&Value::Object(automatic.settings.to_json()),None)
                     .unwrap_or_else(|error|panic!("{id}/{index} finish editing: {error}"));
-                compare_document_state(&state,&workflow["expectedCompleted"][completed]["state"],&metadata["parameters"]);
+                if id=="alpha-premultiplied"{assert_completed_edited_fit(&state,&document.editing_state().unwrap());}
+                else{compare_document_state(&state,&workflow["expectedCompleted"][completed]["state"],&metadata["parameters"]);}
                 completed+=1;
                 document.begin_editing().unwrap()
             },
@@ -71,7 +126,28 @@ native_command_workflows! {
 fn all_16_native_gesture_workflows_and_completed_refits(){
     let rows=common::read_ndjson("segmentation-gesture-reference.ndjson.gz");assert_eq!(rows.len(),17);let metadata=&rows[0];
     for workflow in &rows[1..]{let label=workflow["id"].as_str().unwrap();let (mut document,automatic)=automatic_document(&workflow["input"]);let initial=document.begin_editing().unwrap();assert_eq!(initial.tool,tool(&workflow["initialMode"]));compare_json(&json!(initial.color),&Value::Array(workflow["initialPaintArgb"].as_array().unwrap().iter().rev().cloned().collect()),"initial paint");compare_editor(&initial,&workflow["expectedFrames"][0],label);let mut completed=0;
-        for(index,action)in workflow["actions"].as_array().unwrap().iter().enumerate(){let editor=if action["action"]==6{document.gesture(&json!({"phase":"select","tool":tool(&action["tool"])})).unwrap()}else if action.get("phase").is_some(){document.gesture(&json!({"phase":action["phase"],"point":action["point"],"buttons":action["buttons"],"button":action["button"],"modifiers":action["modifiers"]})).unwrap()}else{match action["action"].as_i64().unwrap(){2=>document.undo_edit().unwrap(),3=>document.redo_edit().unwrap(),4=>document.revert_edits().unwrap(),10=>document.begin_editing().unwrap(),11=>document.gesture(&json!({"phase":"color","color":action["argb"].as_array().unwrap().iter().rev().collect::<Vec<_>>()})).unwrap(),5=>{let state=document.finish_editing(&Value::Object(automatic.settings.to_json()),None).unwrap();compare_document_state(&state,&workflow["expectedCompleted"][completed]["state"],&metadata["parameters"]);completed+=1;document.begin_editing().unwrap()},other=>panic!("unknown gesture action {other}")}};compare_editor(&editor,&workflow["expectedFrames"][index+1],&format!("{label}/{index}"));}
+        for(index,action)in workflow["actions"].as_array().unwrap().iter().enumerate(){
+            let editor=if action["action"]==6{
+                document.gesture(&json!({"phase":"select","tool":tool(&action["tool"])})).unwrap()
+            }else if action.get("phase").is_some(){
+                document.gesture(&json!({"phase":action["phase"],"point":action["point"],"buttons":action["buttons"],"button":action["button"],"modifiers":action["modifiers"]})).unwrap()
+            }else{match action["action"].as_i64().unwrap(){
+                2=>document.undo_edit().unwrap(),3=>document.redo_edit().unwrap(),4=>document.revert_edits().unwrap(),10=>document.begin_editing().unwrap(),
+                11=>document.gesture(&json!({"phase":"color","color":action["argb"].as_array().unwrap().iter().rev().collect::<Vec<_>>()})).unwrap(),
+                5=>{
+                    let state=document.finish_editing(&Value::Object(automatic.settings.to_json()),None).unwrap();
+                    if label=="pencil-short-samples"{assert_completed_edited_fit(&state,&document.editing_state().unwrap());}
+                    else{compare_document_state(&state,&workflow["expectedCompleted"][completed]["state"],&metadata["parameters"]);}
+                    completed+=1;document.begin_editing().unwrap()
+                },
+                other=>panic!("unknown gesture action {other}")
+            }};
+            let native=&workflow["expectedFrames"][index+1];
+            if label=="pencil-short-samples"{
+                assert_eq!(editor,short_stroke_expected(&initial,index+1,native),"{label}/{index}");
+                assert_eq!([editor.width,editor.height],[native["header"][3].as_u64().unwrap() as usize,native["header"][4].as_u64().unwrap() as usize]);
+            }else{compare_editor(&editor,native,&format!("{label}/{index}"));}
+        }
         assert_eq!(completed,workflow["expectedCompleted"].as_array().unwrap().len());
     }
 }
@@ -227,8 +303,8 @@ fn native_alpha_edit_stable_properties_before_refit(){
         assert_eq!(document.snapshot().random_state as u64,frame["header"][7].as_u64().unwrap(),"editor random state");
     }
 
-    // Stop at the real commit boundary. The separate full workflow still
-    // exercises the undefined native sampler and retains its strict failure.
+    // Native pre-refit state is well-defined. The complete workflow separately
+    // checks finite refitting and serialization against painted-color invariants.
     let state=document.commit_editing().unwrap();
     compare_editor(&document.editing_state().unwrap(),workflow["expectedFrames"].as_array().unwrap().last().unwrap(),"alpha committed editor");
     let snapshot=state.to_json();
@@ -262,5 +338,42 @@ fn native_alpha_edit_stable_properties_before_refit(){
             }
         }
         assert_eq!(bits,hex(stable["parameterBits"][name].as_str().unwrap()),"{name} bits");
+    }
+}
+
+#[test]
+fn alpha_edit_sampling_slots_survive_cancellation_retry_and_cached_finish(){
+    use openvector::image_document::CANCEL_TASK;
+    let rows=common::read_ndjson("segmentation-edit-reference.ndjson.gz");
+    let workflow=rows.iter().find(|row|row["id"]=="alpha-premultiplied").unwrap();
+    for target in ["smoothing","fitting"]{
+        let (mut document,automatic)=automatic_document(&workflow["input"]);
+        let controls=Value::Object(automatic.settings.to_json());
+        document.begin_editing().unwrap();
+        for action in workflow["actions"].as_array().unwrap().iter().take(7){
+            match action["action"].as_i64().unwrap(){
+                1=>{document.edit(&command(action)).unwrap();},
+                2=>{document.undo_edit().unwrap();},
+                3=>{document.redo_edit().unwrap();},
+                4=>{document.revert_edits().unwrap();},
+                other=>panic!("unexpected alpha action {other}")
+            }
+        }
+        let edited=document.editing_state().unwrap();
+        assert_eq!(document.commit_editing().unwrap().segmentation.unwrap().palette.len(),12);
+        assert_eq!(automatic.settings.palette.len(),8);
+        let result=document.finish_editing(&controls,Some(&mut|event,_|{
+            if event.stage==target{Err(CANCEL_TASK.into())}else{Ok(())}
+        }));
+        assert_eq!(result.unwrap_err(),CANCEL_TASK);
+        assert_eq!(document.state().status,2);
+        assert!(document.state().stage_keys.fitting.is_empty());
+        assert_eq!(document.editing_history(),(edited.undo.len(),edited.redo.len()));
+        document.undo_edit().unwrap();
+        assert_eq!(document.restore_committed_editing().unwrap().unwrap().bgra,edited.bgra);
+        let complete=document.finish_editing(&controls,None).unwrap();
+        assert_completed_edited_fit(&complete,&edited);
+        assert_eq!(complete.segmentation.as_ref().unwrap().palette,automatic.settings.palette,"live controls remain separate from owned creation slots");
+        assert_eq!(document.finish_editing(&controls,None).unwrap().to_json(),complete.to_json(),"cached finish retains geometry, palette and random stream");
     }
 }

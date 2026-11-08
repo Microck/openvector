@@ -7,10 +7,10 @@ import {join,dirname,resolve,basename} from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {gunzipSync} from 'node:zlib';
 import {SavedAdvancedProfiles,defaultAdvancedProfile,defaultAdvancedProfileName} from '../src/saved-profiles.mjs';
-import {defaultSelectedProfile} from '../src/settings-profile.mjs';
+import {defaultSelectedProfile,defaultBatchProfile,applyAdvancedProfile,batchProfileControls} from '../src/settings-profile.mjs';
 import {decodeImage} from '../src/image-input.mjs';
 import {exportSvg} from '../src/svg.mjs';
-import {createBatchCase,assertBatchResult} from './helpers/native-batch.mjs';
+import {createBatchCase,assertApplicationBatchResult} from './helpers/native-batch.mjs';
 
 const executable=fileURLToPath(new URL('../bin/openvector.mjs',import.meta.url));
 const corpus=name=>gunzipSync(readFileSync(new URL('./fixtures/'+name+'-reference.ndjson.gz',import.meta.url)))
@@ -69,7 +69,8 @@ for (const reference of batches) test('profile batch CLI matches cold native fil
   const before=readFileSync(settings),began=Date.now();
   const completed=invoke(context.directory,['batch',...context.filenames,'--output-dir',context.outputDirectory,'--format','svg',
     '--settings',settings,'--profile','saved','--profiles-file',filename]);success(completed);
-  assertBatchResult(JSON.parse(completed.stdout),context,began,Date.now());
+  const controls=batchProfileControls(applyAdvancedProfile(defaultBatchProfile(),selected,{batch:true}));
+  assertApplicationBatchResult(JSON.parse(completed.stdout),context,began,Date.now(),controls);
   assert.deepEqual(readFileSync(settings),before);assert.equal(JSON.parse(readFileSync(filename)).profiles[0].name,'saved');
 });
 

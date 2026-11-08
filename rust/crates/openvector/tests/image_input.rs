@@ -1,5 +1,5 @@
-//! Frozen native decoder and source-preparation fixtures. No mismatch is
-//! filtered, ignored, or replaced by a modern codec's interpretation.
+//! Strict native comparisons for defined behavior, and sample-domain
+//! correctness oracles for the approved 16-bit RGB/RGBA Adam7 contract.
 mod common;
 use common::{b64,read_bytes,read_json,read_ndjson};
 use openvector::image_input::{decode_image,resolve_image_filename};
@@ -25,7 +25,10 @@ fn native_input_rows(corpus: &str, rows: Vec<Value>, preparation: bool) {
     let metadata = &rows[0];
     assert_eq!(metadata["wholeNativeResponseRepeatIdentical"],true);
     assert_eq!(rows.len()-1,n(metadata,"cases"));
-    if corpus == "image" { assert_eq!(rows.len()-1,337); }
+    if corpus == "image" {
+        assert_eq!(rows.len()-1,337);
+        assert_eq!(rows[1..].iter().filter(|frame| correct_adam7(&b64(frame["encoded"].as_str().unwrap()))).count(), 16);
+    }
     for frame in &rows[1..] { native_frame(corpus, frame, preparation); }
     if corpus == "image" {
         assert_eq!(rows[1..].iter().filter(|r| n(&r["decoded"],"matte") == 0).count(),138);
@@ -39,6 +42,13 @@ fn native_frame(corpus: &str, frame: &Value, preparation: bool) {
     let expected = &frame["decoded"];
     assert_eq!(decoded.format,frame["format"].as_str().unwrap(),"{id} format");
     assert_eq!((decoded.width,decoded.height,decoded.has_alpha),(n(expected,"width"),n(expected,"height"),n(expected,"matte") != 0),"{id} dimensions/alpha");
+    if correct_adam7(&encoded) {
+        let expected = adam7_sample_pixels(frame, &encoded);
+        assert_eq!(decoded.bgra, expected, "{id} sample-domain decode");
+        if preparation { adam7_preparation(frame, &decoded, &expected); }
+        assert_eq!(encoded, before, "{id} input ownership");
+        return;
+    }
     if !preparation {
         if decoded.format == "jpeg" { let raw = decode_jpeg_pixels(&encoded).unwrap(); assert_eq!(raw.color_space as usize,n(expected,"colorSpace"),"{id} colorspace"); pixels(&raw.bgra,&expected["bgra"],&format!("{id} raw JPEG")); }
         else if decoded.format == "tiff" { let raw = decode_tiff_pixels(&encoded).unwrap(); assert_eq!(raw.color_space as usize,n(expected,"colorSpace"),"{id} colorspace"); assert_eq!(raw.has_alpha,decoded.has_alpha,"{id} raw matte"); pixels(&raw.bgra,&expected["bgra"],&format!("{id} raw TIFF")); }
@@ -53,8 +63,6 @@ fn native_frame(corpus: &str, frame: &Value, preparation: bool) {
     assert_eq!(encoded,before,"{id} input ownership");
 }
 macro_rules! corpus { ($name:ident,$fixture:literal) => { mod $name { #[test] fn native_pixels() { super::native_input($fixture,false); } #[test] fn native_preparation() { super::native_input($fixture,true); } } }; }
-// Includes the known Adam7/native-source mismatch as a regular failing
-// assertion, rather than changing its expected bytes or declaring it ignored.
 corpus!(image,"image");
 corpus!(bmp_layout,"bmp-layout");
 corpus!(bmp_bitfields,"bmp-bitfields");
@@ -147,55 +155,73 @@ fresh_multiformat! {
     tiff_be_packbits_narrow = "26-tiff-be-gray8-packbits-1x23", tiff_le_lzw_clear = "27-tiff-le-gray8-lzw-clear-160x96",
 }
 
-// Additional finite-observation assertions, not exemptions from image::native_*.
-// Operation 93 only establishes variability after source preparation; raw
-// decoded pixels therefore never use these masks.
-fn adam7_stable_properties(id: &str) {
-    let rows = read_ndjson("image-input-reference.ndjson.gz");
-    let frame = rows.iter().find(|row| row["id"] == id).unwrap();
-    let evidence = read_json("adam7-stable-properties-20261020.json");
-    let expected = evidence["cases"].as_array().unwrap().iter().find(|case| case["id"] == id).unwrap();
-    let encoded = b64(frame["encoded"].as_str().unwrap());
-    let before = encoded.clone();
-    let mut decoded = decode_image(&encoded).unwrap();
-    assert_eq!(decoded.format, "png");
-    assert_eq!((decoded.width, decoded.height, decoded.has_alpha),
-        (n(&frame["decoded"], "width"), n(&frame["decoded"], "height"), n(&frame["decoded"], "matte") != 0));
-    let parameters = json!({"Shared::is_anti_aliased":frame["antiAlias"]});
-    let initial = prepare_image_state(decoded.width, decoded.height, &decoded.bgra, decoded.has_alpha, 0, 0, &parameters).unwrap();
-    let prepared = prepare_image_state(decoded.width, decoded.height, &decoded.bgra, decoded.has_alpha,
-        n(frame, "mode") as u32, n(frame, "amount") as u32, &parameters).unwrap();
-    for (stage, actual) in [("source", &initial.source), ("working", &prepared.working), ("prepared", &prepared.source)] {
-        let stable = &expected["stages"][stage];
-        assert_eq!((actual.width, actual.height), (n(&stable["metadata"], "width"), n(&stable["metadata"], "height")), "{id}/{stage}");
-        let mask = b64(stable["stableByteMaskB64"].as_str().unwrap());
-        let consensus = b64(stable["consensusBgraB64"].as_str().unwrap());
-        assert_eq!(actual.bgra.len(), mask.len());
-        assert_eq!(actual.bgra.len(), consensus.len());
-        for (offset, ((value, expected), mask)) in actual.bgra.iter().zip(&consensus).zip(&mask).enumerate() {
-            assert!(*mask == 0 || *mask == 255, "invalid evidence mask");
-            if offset % 4 == 3 || (offset / (actual.width * 4)) % 2 == 1 {
-                assert_eq!(*mask, 255, "{id}/{stage} observed alpha/odd-row stability at {offset}");
-            }
-            if *mask == 255 { assert_eq!(value, expected, "{id}/{stage} stable byte {offset}"); }
-        }
-    }
-    assert_eq!(initial.source.bgra, prepared.source.bgra, "{id} mode-0 source relationship");
-    assert_eq!(initial.source.bgra, prepared.working.bgra, "{id} working relationship");
-    decoded.bgra.fill(0);
-    assert_eq!(encoded, before, "{id} decoded output owns its storage");
+// This class replaces the original scratch-memory output, including bytes
+// that happened to repeat in finite native observations. No masks apply.
+fn correct_adam7(encoded: &[u8]) -> bool {
+    encoded.starts_with(b"\x89PNG\r\n\x1a\n") && encoded[24] == 16
+        && matches!(encoded[25], 2 | 6) && encoded[28] == 1
 }
 
-macro_rules! stable_adam7 {
-    ($name:ident, $id:literal) => { #[test] fn $name() { adam7_stable_properties($id); } };
+fn adam7_sample_pixels(frame: &Value, encoded: &[u8]) -> Vec<u8> {
+    assert!(correct_adam7(encoded));
+    let channels = if encoded[25] == 2 { 3 } else { 4 };
+    let samples = frame["writer"]["samples"].as_array().expect("recorded writer samples");
+    assert_eq!(samples.len(), n(frame, "width") * n(frame, "height") * channels);
+    let mut key = None;
+    let mut offset = 8;
+    while offset < encoded.len() {
+        let length = u32::from_be_bytes(encoded[offset..offset+4].try_into().unwrap()) as usize;
+        if &encoded[offset+4..offset+8] == b"tRNS" {
+            key = Some(std::array::from_fn::<_, 3, _>(|channel| {
+                u16::from_be_bytes(encoded[offset+8+channel*2..offset+10+channel*2].try_into().unwrap()) as u64
+            }));
+        }
+        offset += length + 12;
+    }
+    samples.chunks_exact(channels).flat_map(|pixel| {
+        let rgb = [pixel[0].as_u64().unwrap(), pixel[1].as_u64().unwrap(), pixel[2].as_u64().unwrap()];
+        let alpha = if channels == 4 { (pixel[3].as_u64().unwrap() >> 8) as u8 }
+            else if key == Some(rgb) { 0 } else { 255 };
+        [(rgb[2] >> 8) as u8, (rgb[1] >> 8) as u8, (rgb[0] >> 8) as u8, alpha]
+    }).collect()
 }
-stable_adam7!(adam7_9x7_10_stable, "adam7-9x7-10");
-stable_adam7!(adam7_9x7_25_stable, "adam7-9x7-25");
-stable_adam7!(adam7_9x7_26_stable, "adam7-9x7-26");
-stable_adam7!(adam7_17x13_6_stable, "adam7-17x13-6");
-stable_adam7!(adam7_17x13_10_stable, "adam7-17x13-10");
-stable_adam7!(adam7_17x13_25_stable, "adam7-17x13-25");
-stable_adam7!(adam7_17x13_26_stable, "adam7-17x13-26");
+
+fn adam7_preparation(frame: &Value, decoded: &openvector::pixel_input::DecodedImage, expected: &[u8]) {
+    // Every archived affected case uses mode zero and is too small to resize.
+    // Compute the complete prepared buffer from authored samples, not decoder output.
+    assert_eq!((n(frame, "mode"), n(frame, "amount")), (0, 0));
+    let expected: Vec<u8> = expected.chunks_exact(4).flat_map(|pixel| {
+        let alpha = pixel[3] as f64 * (1.0 / 255.0);
+        [(pixel[0] as f64 * alpha) as u8, (pixel[1] as f64 * alpha) as u8,
+            (pixel[2] as f64 * alpha) as u8, pixel[3]]
+    }).collect();
+    for anti_alias in [0, 1] {
+        let prepared = prepare_image_state(decoded.width, decoded.height, &decoded.bgra,
+            decoded.has_alpha, 0, 0, &json!({"Shared::is_anti_aliased":anti_alias})).unwrap();
+        for actual in [&prepared.source, &prepared.working] {
+            assert_eq!((actual.width, actual.height), (decoded.width, decoded.height));
+            assert_eq!(actual.bgra, expected, "{} prepared samples", frame["id"]);
+        }
+    }
+}
+
+#[test]
+fn authored_adam7_pixels_and_preparation() {
+    let fixture = read_json("png-adam7-correctness.json");
+    for frame in fixture["cases"].as_array().unwrap() {
+        let encoded = b64(frame["encoded"].as_str().unwrap());
+        let before = encoded.clone();
+        let mut decoded = decode_image(&encoded).unwrap();
+        assert_eq!((decoded.width, decoded.height), (n(frame, "width"), n(frame, "height")));
+        assert_eq!(decoded.has_alpha, n(&frame["writer"], "colorType") == 6 || frame["writer"]["transparentKey"] == true);
+        let expected = adam7_sample_pixels(frame, &encoded);
+        assert_eq!(decoded.bgra, expected, "{} authored samples", frame["id"]);
+        adam7_preparation(frame, &decoded, &expected);
+        decoded.bgra.fill(0);
+        assert_eq!(encoded, before);
+        assert_eq!(decode_image(&encoded).unwrap().bgra, expected);
+    }
+}
 
 fn failures(corpus: &str, count: usize, message: impl Fn(&str,&str)->bool, heap_failure: bool) {
     let rows = read_ndjson(&format!("{corpus}-errors-reference.ndjson.gz"));

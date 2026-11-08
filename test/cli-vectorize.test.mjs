@@ -13,8 +13,13 @@ import {exportPdf} from '../src/pdf.mjs';
 import {exportAi} from '../src/ai.mjs';
 import {exportDxf} from '../src/dxf.mjs';
 import {defaultExportOptions} from '../src/export-options.mjs';
-import {decodeImage} from '../src/image-input.mjs';
-import {observedEpsCreationDate} from './helpers/native-vector-output.mjs';
+import {decodeImage,resolveImageFilename} from '../src/image-input.mjs';
+import {CoreSession} from '../src/settings.mjs';
+import {renderBitmap} from '../src/bitmap-raster.mjs';
+import {encodeBmp,encodeJpeg,encodePng,encodeTiff} from '../src/bitmap-codecs.mjs';
+import {cleanStartupProfile} from './helpers/native-gui.mjs';
+import {observedEpsCreationDate,presentationOfNativeGeometry} from './helpers/native-vector-output.mjs';
+import {replayApplicationEdits} from './helpers/application-edit-reference.mjs';
 
 const cli=fileURLToPath(new URL('../bin/openvector.mjs',import.meta.url));
 const directory=mkdtempSync(join(tmpdir(),'openvector-cli-'));
@@ -103,7 +108,9 @@ for (const reference of backgroundReferences) test('CLI native background recipe
   } else {
     success(output);
     const hiddenRegions = reference.expectedFrames.at(-1).visibility.visible.flatMap((visible,index) => visible ? [] : [index]);
-    assert.deepEqual(output.stdout,Buffer.from(exportSvg({geometry:native.fittedGeometry,
+    const geometry=native.stageKeys.segmentationEdits ? native.fittedGeometry
+      : presentationOfNativeGeometry(native.fittedGeometry).geometry;
+    assert.deepEqual(output.stdout,Buffer.from(exportSvg({geometry,
       width:native.segmentation.width,height:native.segmentation.height,hiddenRegions})));
   }
 });
@@ -130,7 +137,7 @@ test('CLI validates background batches and selected settings before replacing ou
   }
 });
 
-for (const reference of gestureReferences.filter(row => row.expectedCompleted.length)) test('CLI native gesture plan: '+reference.id,() => {
+for (const reference of gestureReferences.filter(row => row.expectedCompleted.length)) test('CLI gesture plan matches independent application geometry: '+reference.id,() => {
   const image = join(directory,'gesture-'+reference.id+'-'+reference.input.name),edits = join(directory,'gesture-'+reference.id+'.json');
   writeFileSync(image,Buffer.from(reference.input.bytes,'base64'));
   const commands = reference.actions.map(action => {
@@ -141,20 +148,18 @@ for (const reference of gestureReferences.filter(row => row.expectedCompleted.le
   });
   writeFileSync(edits,JSON.stringify(commands));
   const result = invoke(['vectorize',image,'--edits',edits,'--layout','stacked']);success(result);
-  const native = reference.expectedCompleted.at(-1).state;
-  assert.deepEqual(result.stdout,Buffer.from(exportSvg({geometry:native.fittedGeometry,
-    width:native.segmentation.width,height:native.segmentation.height})));
+  const expected=replayApplicationEdits({input:reference.input,actions:reference.actions},{gesture:true});
+  assert.deepEqual(result.stdout,Buffer.from(exportSvg(expected)));
 });
 
-for (const reference of editReferences.filter(record => record.referenceOutcome === 'completed-native-finite'))
-  test('CLI edits produce native-reference SVG: '+reference.id,() => {
+for (const reference of editReferences)
+  test('CLI edits match independent straight-color application SVG: '+reference.id,() => {
     const image = join(directory,reference.id+'-'+reference.input.name),edits = join(directory,reference.id+'-edits.json');
     writeFileSync(image,Buffer.from(reference.input.bytes,'base64'));
     writeFileSync(edits,JSON.stringify(reference.actions.filter(action => action.action !== 5).map(editCommand)));
     const result = invoke(['vectorize',image,'--edits',edits,'--layout','stacked']);success(result);
-    const native = reference.expectedCompleted.at(-1).state;
-    assert.deepEqual(result.stdout,Buffer.from(exportSvg({geometry:native.fittedGeometry,
-      width:native.segmentation.width,height:native.segmentation.height})));
+    const expected=replayApplicationEdits({input:reference.input,actions:reference.actions.filter(action=>action.action!==5)});
+    assert.deepEqual(result.stdout,Buffer.from(exportSvg(expected)));
   });
 
 test('CLI rejects malformed edit plans before writing or replacing output',() => {
@@ -230,7 +235,35 @@ test('vectorize validates usage and format before processing',()=>{
 const bitmapScenes=['bitmap-scenes-reference','bitmap-jpeg-scenes-reference','bitmap-visibility-reference'].flatMap(name=>
   gunzipSync(readFileSync(new URL('./fixtures/'+name+'.ndjson.gz',import.meta.url)))
     .toString().trim().split('\n').map(JSON.parse));
-for (const reference of bitmapScenes) test('bitmap CLI matches native files: '+reference.id,()=>{
+
+// A separate JS tracing/raster implementation supplies the complete expected
+// image where the original application's associated-color export was wrong.
+// Opaque and binary-alpha captures below remain exact historical byte checks.
+function independentBitmap(reference,format,decoded) {
+  const {extension,shadowControl}=resolveImageFilename(reference.sourceFilename);
+  const document=new CoreSession().createDocument({...decoded,shadowControl});
+  document.runAutomatic({...structuredClone(cleanStartupProfile.controls),extension});
+  if (reference.actions?.length) {
+    document.beginBackgroundEditing();
+    for (const [,action,...point] of reference.actions) {
+      if (action===0) document.toggleBackground(point);
+      else document[{1:'undoBackground',2:'redoBackground',3:'revertBackground'}[action]]();
+    }
+    document.finishBackgroundEditing();
+  }
+  const state=document.snapshot(),background=document.backgroundState();
+  const hasAlpha=background.undo.length!==0 ||
+    (format==='png'&&document.sourceAlphaType()!==0&&![1,2].includes(state.settings.backgroundMode));
+  const rendered=renderBitmap({geometry:presentationOfNativeGeometry(state.fitting.geometry).geometry,
+    width:state.original.width,height:state.original.height,scale:reference.scale,hasAlpha,
+    hiddenRegions:background.hiddenRegions});
+  if (hasAlpha&&['png','tif','tiff'].includes(format)) for (let i=0;i<rendered.bgra.length;i+=4)
+    for (let c=0;c<3;c++) rendered.bgra[i+c]=rendered.bgra[i+3] ? Math.floor(rendered.bgra[i+c]*255/rendered.bgra[i+3]) : 0;
+  return {bmp:encodeBmp,jpg:encodeJpeg,png:encodePng,tif:encodeTiff}[format](rendered);
+}
+for (const reference of bitmapScenes) test('bitmap CLI preserves reference drawing with straight colors: '+reference.id,()=>{
+  const source=Buffer.from(reference.sourceBytes,'base64'),decoded=decodeImage(source);
+  const translucent=decoded.bgra.some((byte,index)=>index%4===3&&byte!==0&&byte!==255);
   const args=['vectorize','-','--filename',reference.sourceFilename,'--scale',String(reference.scale)];
   if (reference.actions?.length) {
     const plan=join(directory,reference.id+' bitmap edits.json');
@@ -241,8 +274,9 @@ for (const reference of bitmapScenes) test('bitmap CLI matches native files: '+r
   }
   for (const [filename,expected] of Object.entries(reference.expected)) {
     const format=filename.slice(filename.lastIndexOf('.')+1);
-    const converted=invoke([...args,'--format',format],{input:Buffer.from(reference.sourceBytes,'base64')});success(converted);
-    assert.deepEqual(converted.stdout,Buffer.from(expected.bytes,'base64'),reference.id+' '+filename);
+    const converted=invoke([...args,'--format',format],{input:source});success(converted);
+    const bytes=translucent ? independentBitmap(reference,format,decoded) : Buffer.from(expected.bytes,'base64');
+    assert.deepEqual(converted.stdout,Buffer.from(bytes),reference.id+' '+filename);
   }
 });
 
@@ -314,7 +348,7 @@ for (const codec of ['jpeg','gif','tiff','tiff-jpeg','jpeg-alpha','bmp-expanded'
     const finished=Date.now();
     const native=reference.expectedAutomatic.state;
     const expected=writer({width:native.sourceDimensions[0],height:native.sourceDimensions[1],
-      geometry:native.fittedGeometry,palette:native.segmentation.palette,
+      ...presentationOfNativeGeometry(native.fittedGeometry),
       ...(format==='eps' ? {creationDate:observedEpsCreationDate(converted.stdout,started,finished)} : {})});
     assert.deepEqual(converted.stdout,Buffer.from(expected),reference.id+' '+format+' native geometry export');
   }
