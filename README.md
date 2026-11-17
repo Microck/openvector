@@ -61,15 +61,17 @@ and [verification and known limits](docs/verification.md).
 
 the cli and node library are published as [openvector](https://www.npmjs.com/package/openvector).
 
-the npm package includes native binaries for linux amd64 and arm64, and
-windows x64. use node.js 22.19 or later. windows arm64 machines need x64 node.js;
-native arm64 windows, macos and alpine/musl packages are not included.
-linux packages are built and tested on ubuntu 24.04.
+the npm package includes native binaries for linux amd64 and arm64, windows x64,
+and macos apple silicon and intel. use node.js 22.19 or later. windows arm64
+machines need x64 node.js; native arm64 windows and alpine/musl packages are not
+included. linux packages are built and tested on ubuntu 24.04.
 
 ```sh
 npm install openvector
 npx openvector vectorize logo.png --output logo.svg
 ```
+
+for a global cli installation, run `npm install -g openvector`, then `openvector --help`.
 
 the desktop app is a separate download. npm installation does not need rust
 or download additional native binaries.

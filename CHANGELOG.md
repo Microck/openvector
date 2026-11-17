@@ -6,6 +6,10 @@ Dates are the GitHub release publication dates in UTC.
 
 ## [Unreleased]
 
+### Added
+
+- Include macOS Apple Silicon and Intel CLI and Node.js binaries in the npm package
+
 ## [0.1.3] - 2026-11-08
 
 ### Changed

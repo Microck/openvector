@@ -50,6 +50,6 @@ try {
   copyBundledNotices(licenses);
   console.log(`Packaged native/${platform}-${arch}/${executableName} and openvector-node.node`);
 } catch (error) {
-  console.error(`${error.message}\nBuild from the source checkout or extracted npm package root with a current stable Rust toolchain and its rust-docs component, Cargo, Git, and a C compiler/linker for the selected target. Notice collection currently needs Debian-packaged GNU/Linux or MinGW runtimes and dpkg-query; see README.md. GPUI is not compiled by this command.`);
+  console.error(`${error.message}\nBuild from the source checkout or extracted npm package root with a current stable Rust toolchain and its rust-docs component, Cargo, Git, and a C compiler/linker for the selected target. Notice collection supports macOS and Debian-packaged GNU/Linux or MinGW runtimes; GNU targets need dpkg-query. See docs/building.md. GPUI is not compiled by this command.`);
   process.exitCode = 1;
 }

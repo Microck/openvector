@@ -92,7 +92,7 @@ suites, native execution, or manual desktop QA.
 | Workflow | Trigger | Required artifacts and checks |
 | --- | --- | --- |
 | [Desktop candidates](../.github/workflows/desktop-candidates.yml) | A PR whose head branch starts with `release/`, excluding `release/npm-` | `corresponding-source`, all selected `desktop-*` jobs, and Windows installation checks |
-| [npm candidates](../.github/workflows/npm-candidates.yml) | A `release/npm-` PR, or manual dispatch at a selected ref | Three `native-*` builds, `npm-package`, and all six installed-package checks |
+| [npm candidates](../.github/workflows/npm-candidates.yml) | A `release/npm-` PR, or manual dispatch at a selected ref | Five native builds, `npm-package`, and all ten installed-package checks |
 
 For a combined release PR such as `release/X.Y.Z`, set `CANDIDATE_REF` to that frozen
 remote branch. Explicitly dispatch npm candidates there after authorization:
@@ -114,7 +114,7 @@ gh run download "$NPM_RUN" --repo "$REPO" --name npm-package --dir "$WORKDIR/npm
 
 Require successful relevant jobs, not merely downloadable artifacts: desktop
 jobs upload diagnostics even when they fail. The npm matrix checks Linux x64,
-Linux ARM64, and Windows x64 on Node 22.19 and 24.
+Linux ARM64, Windows x64, macOS ARM64, and macOS x64 on Node 22.19 and 24.
 
 ## 3. Verify the packaged desktop applications
 
@@ -296,14 +296,14 @@ release. Use a prerelease or draft only when explicitly authorized.
 
 ## 6. Publish the exact npm candidate
 
-The npm target set is Linux x64/ARM64 and Windows x64. Desktop macOS QA does not
-add macOS Node binaries; the npm workflow must explicitly build and test a target
-before it is included. Download the successful run's single `npm-package` artifact
+The npm target set is Linux x64/ARM64, Windows x64, and macOS ARM64/x64. Desktop
+macOS QA does not replace the npm workflow's CLI and Node addon checks.
+Download the successful run's single `npm-package` artifact
 and set `NPM_TARBALL` to its absolute `.tgz` path. Do not rebuild or run `npm pack`
 in a host-only directory to replace it.
 
-Inspect its package name/version, members, notices, three target directories, and
-SHA-512 integrity. Retain the audited tarball and integrity value. All six CI
+Inspect its package name/version, members, notices, five target directories, and
+SHA-512 integrity. Retain the audited tarball and integrity value. All ten CI
 installed-consumer jobs must have passed for those exact bytes.
 
 Authenticate with a securely supplied token file. Agents use a secure secret-input
