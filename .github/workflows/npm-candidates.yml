@@ -62,10 +62,15 @@ jobs:
         run: npm run build -- --target "$TARGET"
       - name: Check macOS dynamic dependencies
         if: runner.os == 'macOS'
+        shell: bash
         run: |
           for binary in "native/$PLATFORM/openvector" "native/$PLATFORM/openvector-node.node"; do
             otool -L "$binary"
-            otool -L "$binary" | tail -n +2 | awk '{print $1}' | while read -r library; do
+            # LC_ID_DYLIB names the addon itself, not a library it loads.
+            otool -l "$binary" | awk '
+              $1 == "cmd" { dependency = $2 ~ /^LC_.*DYLIB$/ && $2 != "LC_ID_DYLIB" }
+              dependency && $1 == "name" { print $2 }
+            ' | while read -r library; do
               case "$library" in
                 /usr/lib/*|/System/Library/Frameworks/*) ;;
                 *) echo "Unexpected non-system dependency: $library" >&2; exit 1 ;;
