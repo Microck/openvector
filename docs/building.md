@@ -51,7 +51,7 @@ The default target is the Rust toolchain's host. Set `CARGO_BUILD_TARGET` or
 pass `--target` to select another target. The target parser recognizes x64
 and arm64 GNU/Linux, macOS and Windows targets. Packaging MSVC Windows binaries
 stops before compilation because their C runtime notices are not implemented.
-ARM64 macOS CLI/addon builds and installed runtime checks passed previously; they have not been reverified for this cleaned source.
+The npm candidate workflow builds and checks ARM64 and x64 macOS CLI/addon packages.
 This does not establish macOS GUI parity. Other recognized targets still need
 a working toolchain; recognition does not establish that they have been tested.
 The verified Linux ARM64 binaries import GNU libc symbols through
@@ -92,8 +92,9 @@ require an explicit `npm run build` from the extracted package root in a
 supported build environment. No checkout or Vector Magic installation is
 needed for that rebuild. The archive does not contain the full development
 test suite; run those checks from the checkout.
-The public npm distribution targets Linux x64/arm64 and Windows x64. Its candidate
-workflow assembles all three targets before testing the installed archive.
+The public npm distribution targets Linux x64/arm64, Windows x64, and macOS
+arm64/x64. Its candidate workflow assembles all five targets before testing the
+installed archive on Node.js 22.19 and 24, including global CLI installation.
 
 The build writes license notices for the compiled Rust crates and toolchain
 code beside each platform's binaries, in `rust-licenses.txt`,

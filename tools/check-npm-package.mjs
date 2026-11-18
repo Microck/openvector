@@ -21,6 +21,9 @@ try {
   // npm otherwise searches ancestors for a project and can modify operator files.
   writeFileSync(join(directory, 'package.json'), JSON.stringify({ private: true }));
   npm(['install', '--ignore-scripts', '--no-audit', '--no-fund', archive]);
+  const prefix = join(directory, 'global');
+  npm(['install', '--global', '--prefix', prefix, '--ignore-scripts', '--no-audit', '--no-fund', archive]);
+  npm(['exec', '--global', '--prefix', prefix, '--offline', '--', 'openvector', '--help']);
   writeFileSync(join(directory, 'input.bmp'), Buffer.from(bitmap, 'base64'));
   execFileSync(process.execPath, ['--input-type=module', '--eval', `
     import assert from 'node:assert/strict';

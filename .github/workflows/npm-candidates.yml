@@ -27,6 +27,12 @@ jobs:
           - runner: ubuntu-24.04
             target: x86_64-pc-windows-gnu
             platform: win32-x64
+          - runner: macos-15
+            target: aarch64-apple-darwin
+            platform: darwin-arm64
+          - runner: macos-15-intel
+            target: x86_64-apple-darwin
+            platform: darwin-x64
     runs-on: ${{ matrix.runner }}
     timeout-minutes: 45
     env:
@@ -43,6 +49,7 @@ jobs:
         with:
           node-version: '24'
       - name: Install C toolchain
+        if: runner.os == 'Linux'
         run: |
           sudo apt-get update
           sudo apt-get install -y build-essential pkg-config
@@ -53,6 +60,23 @@ jobs:
         run: rustup toolchain install 1.99.1 --profile minimal --component rust-docs --target "$TARGET"
       - name: Build native CLI and Node addon
         run: npm run build -- --target "$TARGET"
+      - name: Check macOS dynamic dependencies
+        if: runner.os == 'macOS'
+        shell: bash
+        run: |
+          for binary in "native/$PLATFORM/openvector" "native/$PLATFORM/openvector-node.node"; do
+            otool -L "$binary"
+            # LC_ID_DYLIB names the addon itself, not a library it loads.
+            otool -l "$binary" | awk '
+              $1 == "cmd" { dependency = $2 ~ /^LC_.*DYLIB$/ && $2 != "LC_ID_DYLIB" }
+              dependency && $1 == "name" { print $2 }
+            ' | while read -r library; do
+              case "$library" in
+                /usr/lib/*|/System/Library/Frameworks/*) ;;
+                *) echo "Unexpected non-system dependency: $library" >&2; exit 1 ;;
+              esac
+            done
+          done
       - name: Archive binaries with executable modes and notices
         run: tar -czf "native-$PLATFORM.tar.gz" native
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
@@ -81,16 +105,29 @@ jobs:
       - name: Assemble one package for all supported targets
         run: |
           for archive in input/*.tar.gz; do tar -xzf "$archive"; done
-          for platform in linux-x64 linux-arm64 win32-x64; do
-            test -f "native/$platform/openvector-node.node"
-            test -f "native/$platform/rust-licenses.txt"
-            test -f "native/$platform/toolchain-licenses.txt"
+          for platform in linux-x64 linux-arm64 win32-x64 darwin-arm64 darwin-x64; do
+            for notice in rust-licenses.txt toolchain-licenses.txt rust-std-COPYRIGHT-library.html; do
+              test -s "native/$platform/$notice"
+            done
+            test -s "native/$platform/openvector-node.node"
           done
           test -x native/linux-x64/openvector
           test -x native/linux-arm64/openvector
+          test -x native/darwin-arm64/openvector
+          test -x native/darwin-x64/openvector
           test -f native/win32-x64/openvector.exe
           mkdir dist
           npm pack --ignore-scripts --pack-destination dist
+          tar -tzf dist/*.tgz > dist/members.txt
+          for platform in linux-x64 linux-arm64 win32-x64 darwin-arm64 darwin-x64; do
+            for file in openvector-node.node rust-licenses.txt toolchain-licenses.txt rust-std-COPYRIGHT-library.html; do
+              grep -Fx "package/native/$platform/$file" dist/members.txt
+            done
+            executable=openvector
+            if [ "$platform" = win32-x64 ]; then executable=openvector.exe; fi
+            grep -Fx "package/native/$platform/$executable" dist/members.txt
+          done
+          grep '^package/native/licenses/' dist/members.txt
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: npm-package
@@ -102,7 +139,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        runner: [ubuntu-24.04, ubuntu-24.04-arm, windows-2025]
+        runner: [ubuntu-24.04, ubuntu-24.04-arm, windows-2025, macos-15, macos-15-intel]
         node: ['22.19.0', '24']
     runs-on: ${{ matrix.runner }}
     timeout-minutes: 10
