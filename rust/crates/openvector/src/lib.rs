@@ -29,6 +29,7 @@ pub mod emf;
 pub mod eps;
 pub mod export_options;
 pub mod extended_arithmetic;
+mod fast_fixed;
 pub mod fitting;
 pub mod gif_input;
 pub mod image_classification;
