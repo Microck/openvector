@@ -96,7 +96,8 @@ fn scan_entries<const WITH_ALPHA: bool>(
     (best, best_cost)
 }
 
-pub(crate) fn assign_indices(bgra: &[u8], colors: &[f32], indices: &mut [i32]) {
+pub(crate) fn assign_indices(bgra: &[u8], colors: &[f32], indices: &mut [i32]) -> bool {
+    let mut changed = false;
     // Artwork contains many identical BGRA samples, often beyond adjacent runs.
     // Cache only this call: refinement changes the palette before the next pass.
     // The full key check makes collisions affect speed, never assignments.
@@ -157,6 +158,7 @@ pub(crate) fn assign_indices(bgra: &[u8], colors: &[f32], indices: &mut [i32]) {
     for (pixel, index) in pixels.iter().zip(indices.iter_mut()) {
         let key = u32::from_le_bytes(*pixel);
         if prev_key == key as u64 {
+            changed |= *index != prev_index;
             *index = prev_index;
             continue;
         }
@@ -164,6 +166,7 @@ pub(crate) fn assign_indices(bgra: &[u8], colors: &[f32], indices: &mut [i32]) {
         let slot = (key.wrapping_mul(0x9e37_79b9) >> (32 - CACHE_BITS)) as usize;
         let cached = &mut cache[slot];
         if cached.1 >= 0 && cached.0 == key {
+            changed |= *index != cached.1;
             *index = cached.1;
             prev_index = cached.1;
             continue;
@@ -194,10 +197,12 @@ pub(crate) fn assign_indices(bgra: &[u8], colors: &[f32], indices: &mut [i32]) {
         } else {
             scan_entries::<true>(entries, blue, green, red, alpha)
         };
+        changed |= *index != best;
         *index = best;
         prev_index = best;
         *cached = (key, best);
     }
+    changed
 }
 
 /// Assign engine-format BGRA pixels to an explicitly supplied palette.
@@ -634,7 +639,7 @@ impl CoreSession {
         let mut indices=vec![0;bgra.len()/4];let mut means=vec![0.0f32;colors.len()];let mut counts=vec![0.0f32;colors.len()/4];let mut weights=vec![0.0;counts.len()];let mut converged=false;let mut passes=0;
         for iteration in 0..10{
             if let Some(callback)=progress.as_deref_mut(){callback(iteration,&colors,if iteration==0{None}else{Some(&indices)})?}
-            assign_indices(bgra,&colors,&mut indices);passes+=1;
+            let moved=assign_indices(bgra,&colors,&mut indices);passes+=1;
             // The weight per pixel is `1.0` when there is no measurement, and the
             // `map_or` was evaluated per pixel. Hoisting it to a `match` outside
             // the loop gives the unweighted path a plain increment: `x + 1.0` is
@@ -646,9 +651,24 @@ impl CoreSession {
                 Some(m)=>for (pixel,&index) in indices.iter().enumerate(){weights[index as usize]+=m[pixel] as f64*(1.0/255.0)},
             }}
             if converged{break}
-            means.fill(0.0);counts.fill(0.0);
-            accumulate_means(bgra, &indices, pixel_weights, &mut means, &mut counts);
-            for (color,&count) in counts.iter().enumerate(){let m=&mut means[color*4..color*4+4];if count>0.0{let reciprocal=(1.0/count as f64) as f32;for value in m{*value*=reciprocal}}else{self.random_color(m)}}
+            // Stable assignments retain the previous counts and normalized means.
+            // Empty colors still draw from the session's random stream on each pass.
+            let recompute = iteration == 0 || moved;
+            if recompute {
+                means.fill(0.0);
+                counts.fill(0.0);
+                accumulate_means(bgra, &indices, pixel_weights, &mut means, &mut counts);
+            }
+            for (mean, &count) in means.chunks_exact_mut(4).zip(&counts) {
+                if count > 0.0 {
+                    if recompute {
+                        let reciprocal = (1.0 / count as f64) as f32;
+                        for value in mean { *value *= reciprocal; }
+                    }
+                } else {
+                    self.random_color(mean);
+                }
+            }
             let mut change=0.0f64;for (a,b) in colors.iter().zip(&means){change=js_max(change,(*a-*b).abs() as f64)}
             colors.copy_from_slice(&means);converged=change<(0.01f32 as f64);
         }
