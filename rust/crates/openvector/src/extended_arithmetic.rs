@@ -82,7 +82,7 @@ pub fn binary_double(value: &BigInt, exponent: i64) -> f64 {
 }
 
 /// Exact 2^n for any n where the product stays representable, matching JS `2 ** n`.
-fn pow2(n: i64) -> f64 {
+pub(crate) fn pow2(n: i64) -> f64 {
     if n > 1023 { return f64::INFINITY; }
     if n >= -1022 { return f64::from_bits(((n + 1023) as u64) << 52); }
     if n >= -1074 { return f64::from_bits(1u64 << (n + 1074)); }
