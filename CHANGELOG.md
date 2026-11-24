@@ -6,9 +6,15 @@ Dates are the GitHub release publication dates in UTC.
 
 ## [Unreleased]
 
+## [0.1.5] - 2026-11-24
+
 ### Added
 
 - Include macOS Apple Silicon and Intel CLI and Node.js binaries in the npm package
+
+### Changed
+
+- Speed up raster-to-vector conversion during smoothing, palette assignment and contour fitting.
 
 ## [0.1.3] - 2026-11-08
 
@@ -87,7 +93,8 @@ This initial desktop release did not include macOS downloads or an npm package.
 Its checks did not establish full reference parity or an entirely green strict
 native suite. See the [historical verification report](https://github.com/Microck/openvector/blob/v0.0.0/docs/verification.md).
 
-[Unreleased]: https://github.com/Microck/openvector/compare/v0.1.3...HEAD
+[Unreleased]: https://github.com/Microck/openvector/compare/v0.1.5...HEAD
+[0.1.5]: https://github.com/Microck/openvector/compare/v0.1.3...v0.1.5
 [0.1.3]: https://github.com/Microck/openvector/compare/v0.1.2...v0.1.3
 [0.1.2]: https://github.com/Microck/openvector/compare/v0.1.1...v0.1.2
 [0.1.1]: https://github.com/Microck/openvector/compare/v0.1.0...v0.1.1
