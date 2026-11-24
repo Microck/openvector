@@ -48,19 +48,31 @@ pub fn quadratic_prior(points: &[Vec<f64>], sample_counts: &[f64]) -> Result<Pri
 
 type Terms = (f64, Option<(P, P)>);
 
+/// Adjacent curvature samples share an edge and can reuse its length and direction.
+#[derive(Clone, Copy)]
+struct Edge { length: f64, inverse: f64, ux: f64, uy: f64 }
+
+fn edge(first: P, middle: P) -> Edge {
+    let x = middle[0] - first[0]; let y = middle[1] - first[1];
+    let length = (x * x + y * y).sqrt();
+    let inverse = 1.0 / length;
+    Edge { length, inverse, ux: x * inverse, uy: y * inverse }
+}
+
 fn curvature_terms(first: P, middle: P, last: P, counts: [f64; 2], length_weight: f64, include_gradient: bool) -> Terms {
-    let incoming_x = middle[0] - first[0]; let incoming_y = middle[1] - first[1];
-    let outgoing_x = last[0] - middle[0]; let outgoing_y = last[1] - middle[1];
-    let incoming_length = (incoming_x * incoming_x + incoming_y * incoming_y).sqrt();
-    let outgoing_length = (outgoing_x * outgoing_x + outgoing_y * outgoing_y).sqrt();
-    let incoming_inverse = 1.0 / incoming_length; let outgoing_inverse = 1.0 / outgoing_length;
-    let iux = incoming_x * incoming_inverse; let iuy = incoming_y * incoming_inverse;
-    let oux = outgoing_x * outgoing_inverse; let ouy = outgoing_y * outgoing_inverse;
+    curvature_terms_cached(middle, last, counts, length_weight, include_gradient, edge(first, middle)).0
+}
+
+/// Returns the outgoing edge for use as the next sample's incoming edge.
+fn curvature_terms_cached(middle: P, last: P, counts: [f64; 2], length_weight: f64, include_gradient: bool, incoming: Edge) -> (Terms, Edge) {
+    let outgoing = edge(middle, last);
+    let (incoming_length, incoming_inverse, iux, iuy) = (incoming.length, incoming.inverse, incoming.ux, incoming.uy);
+    let (outgoing_length, outgoing_inverse, oux, ouy) = (outgoing.length, outgoing.inverse, outgoing.ux, outgoing.uy);
     let dot = oux * iux + ouy * iuy;
     let curvature = ((2.0 - (dot + dot)) + 0.001).sqrt();
     let length_difference = outgoing_length / counts[1] - incoming_length / counts[0];
     let energy = (length_difference * length_weight) * length_difference + curvature;
-    if !include_gradient { return (energy, None); }
+    if !include_gradient { return ((energy, None), outgoing); }
     let ci = 1.0 / curvature;
     let mut fx = (-(iux * dot) + oux) * incoming_inverse * ci;
     let mut fy = (-(iuy * dot) + ouy) * incoming_inverse * ci;
@@ -71,7 +83,7 @@ fn curvature_terms(first: P, middle: P, last: P, counts: [f64; 2], length_weight
     let isi = 1.0 / counts[0]; let osi = 1.0 / counts[1];
     fx = iux * ld * isi + fx; fy = iuy * ld * isi + fy;
     lx = oux * ld * osi + lx; ly = ouy * ld * osi + ly;
-    (energy, Some(([fx, fy], [lx, ly])))
+    ((energy, Some(([fx, fy], [lx, ly]))), outgoing)
 }
 
 fn quadratic_terms(first: P, middle: P, last: P, counts: [f64; 2], include_gradient: bool) -> Terms {
@@ -314,7 +326,19 @@ fn energy_only(state: &mut ObjectiveState) -> Result<f64, String> { Ok(objective
 /// never took removed. Nothing is re-associated and no value is computed that
 /// the pair did not compute before, so every instantiation is bit-identical to
 /// the retained runtime-flag oracle (`objective_terms_reference`).
+///
+/// `settings.prior` is fixed for the whole call and `read_objective_input` has
+/// already validated it to be 0 or 3, so the per-sample `settings.prior == 0`
+/// test is decided once here and handed to the body as a const parameter.
 fn objective_terms_const<const ENERGY: bool, const GRADIENT: bool>(state: &mut ObjectiveState) -> Result<(f64, Option<Vec<f64>>), String> {
+    if state.settings.prior == 0 {
+        objective_terms_prior::<ENERGY, GRADIENT, true>(state)
+    } else {
+        objective_terms_prior::<ENERGY, GRADIENT, false>(state)
+    }
+}
+
+fn objective_terms_prior<const ENERGY: bool, const GRADIENT: bool, const PRIOR_ZERO: bool>(state: &mut ObjectiveState) -> Result<(f64, Option<Vec<f64>>), String> {
     let include_energy = ENERGY;
     let include_gradient = GRADIENT;
     let ObjectiveState { geometry, points, references, penalty_counts, quadratic_flags, border_counts, settings, image_kernel, image_positions } = state;
@@ -334,6 +358,10 @@ fn objective_terms_const<const ENERGY: bool, const GRADIENT: bool>(state: &mut O
         // byte-exact on the sample, every format variant, and the 3000-case oracle.
         // (`boundary.len() == contour.len()` is enforced by `read_objective_input`.)
         let mut first = contour[len - 1];
+        // The first sample's incoming edge is the peeled sample's outgoing edge,
+        // which is not computed yet; `carried` holds the previous iteration's
+        // outgoing edge when that iteration computed one.
+        let mut carried: Option<Edge> = None;
         // `boundary.len() == contour.len()` (`read_objective_input` enforces it), so the
         // boundary's own two-record window runs in lockstep with the contour's: zipping
         // them takes `bs`/`bn` from one window pair instead of two independently
@@ -351,11 +379,15 @@ fn objective_terms_const<const ENERGY: bool, const GRADIENT: bool>(state: &mut O
                 if include_gradient { add_endpoint_gradient(&mut gradient, first, middle, last, q.1.unwrap(), barrier_scale); }
                 quadratic = Some(q);
             }
-            let terms = if region.pixel_count < 8 || (bs[0] & 1 == 0 && settings.prior == 0) {
+            let terms = if region.pixel_count < 8 || (bs[0] & 1 == 0 && PRIOR_ZERO) {
+                carried = None;
                 Some(quadratic.unwrap_or_else(|| quadratic_terms(points[first], points[middle], points[last], counts, include_gradient)))
             } else if bs[0] & 1 == 0 {
-                Some(curvature_terms(points[first], points[middle], points[last], counts, settings.length_weight, include_gradient))
-            } else { None };
+                let incoming = carried.take().unwrap_or_else(|| edge(points[first], points[middle]));
+                let (t, outgoing) = curvature_terms_cached(points[middle], points[last], counts, settings.length_weight, include_gradient, incoming);
+                carried = Some(outgoing);
+                Some(t)
+            } else { carried = None; None };
             if let Some(t) = terms {
                 if include_energy { energy = t.0 + energy; }
                 if include_gradient { add_endpoint_gradient(&mut gradient, first, middle, last, t.1.unwrap(), 1.0); }
@@ -374,10 +406,11 @@ fn objective_terms_const<const ENERGY: bool, const GRADIENT: bool>(state: &mut O
                 if include_gradient { add_endpoint_gradient(&mut gradient, first, middle, last, q.1.unwrap(), barrier_scale); }
                 quadratic = Some(q);
             }
-            let terms = if region.pixel_count < 8 || (bs[0] & 1 == 0 && settings.prior == 0) {
+            let terms = if region.pixel_count < 8 || (bs[0] & 1 == 0 && PRIOR_ZERO) {
                 Some(quadratic.unwrap_or_else(|| quadratic_terms(points[first], points[middle], points[last], counts, include_gradient)))
             } else if bs[0] & 1 == 0 {
-                Some(curvature_terms(points[first], points[middle], points[last], counts, settings.length_weight, include_gradient))
+                let incoming = carried.take().unwrap_or_else(|| edge(points[first], points[middle]));
+                Some(curvature_terms_cached(points[middle], points[last], counts, settings.length_weight, include_gradient, incoming).0)
             } else { None };
             if let Some(t) = terms {
                 if include_energy { energy = t.0 + energy; }
