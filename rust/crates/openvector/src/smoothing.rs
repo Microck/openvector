@@ -241,6 +241,9 @@ fn read_image_kernel<'a>(input: &mut SmoothingInput<'a>) -> Result<&'a mut Image
     }
 }
 
+// Keep one accumulation routine for fused and gradient-only evaluations.
+// Inlining on ARM64 can select different NaN signs for coincident endpoints.
+#[inline(never)]
 fn add_endpoint_gradient(gradient: &mut [f64], first: usize, middle: usize, last: usize, g: (P, P), scale: f64) {
     let fx = g.0[0] * scale; let fy = g.0[1] * scale; let lx = g.1[0] * scale; let ly = g.1[1] * scale;
     // The gradient is two `f64` channels per node, so view it as node pairs: the

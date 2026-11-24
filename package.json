@@ -1,6 +1,6 @@
 {
   "name": "openvector",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Independent raster-to-vector Rust engine with Node-API bindings and a native CLI.",
   "type": "module",
   "license": "MIT",
