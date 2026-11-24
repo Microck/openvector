@@ -1,7 +1,7 @@
 //! Directed subpixel blend-energy optimization and shadow refinement.
 use std::collections::{BTreeSet,HashSet};
 use serde_json::Value;
-use crate::blend_solver::{EIGHT_DIRECTIONS,TWENTY_FOUR_DIRECTIONS,collect_blend_indices,write_blend_sample,fit_prepared_blend,dot_float};
+use crate::blend_solver::{EIGHT_DIRECTIONS,TWENTY_FOUR_DIRECTIONS,MAX_FIT_COLORS, collect_blend_indices_into,write_blend_sample,fit_prepared_blend_into,dot_float,BlendFit};
 use crate::region_data::{Raster,rebuild_connected_regions,repair_diagonal_map,palette_from_byte_colors};
 use crate::segmentation::{ProgressSink,ProgressUpdate,publish,counter,nonnegative,parameter};
 
@@ -23,12 +23,20 @@ fn interior_error(s:&SubpixelRegion,color:&[f32;4])->f64 {
 }
 fn refresh_region(s:&mut SubpixelRegion,costs:&[f32])->f64 {s.interior_error=interior_error(s,&s.color);let mut boundary=0.0;for &pixel in &s.boundary {boundary+=costs[pixel] as f64;}s.error=s.interior_error+boundary;s.error}
 fn refresh_errors(state:&mut SubpixelState){for s in &mut state.regions {refresh_region(s,&state.costs);}}
-fn pixel_cost(r:Raster<'_>,state:&SubpixelState,directions:&[(i64,i64)],settings:[f32;3],pixel:usize,source:i32,target:i32)->Result<f64,String>{
+fn pixel_cost(r:Raster<'_>,state:&SubpixelState,directions:&[(i64,i64)],settings:[f32;3],pixel:usize,source:i32,target:i32,fitted:&mut BlendFit)->Result<f64,String>{
     let mut sample=[0.0;4];write_blend_sample(r.bgra,pixel*4,&mut sample);
-    let selected=collect_blend_indices(&state.indices,r.width,r.height,pixel,directions,source,target);
-    let mut colors=[0.0f32;100];
+    let mut selected=[0i32; MAX_FIT_COLORS];
+    let len=collect_blend_indices_into(&state.indices,r.width,r.height,pixel,directions,source,target,&mut selected);
+    let selected=&selected[..len];
+    // `selected` holds at most nine colors (`collect_blend_indices` stops at
+    // nine), so the local palette is at most 36 `f32`; the fit only ever reads
+    // `&colors[..selected.len()*4]`. The buffer was sized for the 24-direction
+    // neighbourhood's 25 colors, which the collector can never return, and the
+    // whole 400-byte array was zeroed on every call. 36 is the exact bound, so
+    // the zero-fill is 144 bytes and no read changes.
+    let mut colors=[0.0f32; 4 * MAX_FIT_COLORS];
     for (entry,&neighbor) in selected.iter().enumerate(){colors[entry*4..entry*4+4].copy_from_slice(&state.regions[neighbor as usize].color);}
-    let fitted=fit_prepared_blend(&sample,&colors[..selected.len()*4]).map_err(str::to_owned)?;
+    fit_prepared_blend_into(&sample,&colors[..selected.len()*4],fitted).map_err(str::to_owned)?;
     let differences:[f32;4]=std::array::from_fn(|c|sample[c] as f32-fitted.color[c]);
     let mut penalty=(1.0-fitted.self_weight).max(0.0)*settings[1] as f64;
     penalty+=(settings[0] as f64-fitted.self_weight).max(0.0)*settings[2] as f64;
@@ -41,25 +49,35 @@ fn build(r:Raster<'_>,labels:&[i32],neighborhood:Neighborhood,settings:[f32;3],c
     let (indices,statistics)=rebuild_connected_regions(r.width,r.bgra,labels,None);
     if let Some(step)=substep{emit(sink,step,1,&indices)?;emit(sink,step,2,&indices)?;}
     let mut regions:Vec<SubpixelRegion>=statistics.into_iter().map(|s|SubpixelRegion{count:s.count,sums:s.sums,color_index:s.color_index,squares:[0.0;4],interior_count:0,interior_sums:[0.0;4],interior_squares:[0.0;4],color:[0.0;4],boundary:Vec::new(),interior_error:0.0,error:0.0}).collect();
-    let mut boundary_sets=vec![BTreeSet::new();regions.len()];
+    // Boundary pixels are collected per region and ordered once at the end.
+    // The original accumulated them in a `BTreeSet<usize>` per region, so the
+    // published `boundary` vector is ascending and duplicate-free; a `Vec` that
+    // is sorted and deduplicated after the scan produces exactly that sequence
+    // (same elements, same ascending order) without a tree node per insert.
+    // The order is observable — `refresh_region` sums `costs[pixel]` over it in
+    // `f64`, and `cost`/`bounded_cost`/`iterate` walk it — so the sort is
+    // `sort_unstable` on `usize` (a total order with no ties to preserve) and
+    // the dedup keeps the first of each run, which is the same value.
+    let mut boundary_lists:Vec<Vec<usize>>=(0..regions.len()).map(|_|Vec::new()).collect();
     let mut interior_bytes:Vec<[Vec<u8>;4]>=(0..regions.len()).map(|_|std::array::from_fn(|_|Vec::new())).collect();
     if let Some(step)=substep{emit(sink,step,3,&indices)?;}
     for pixel in 0..indices.len(){
         if pixel&8191==0{if let Some(step)=substep{emit(sink,step+1,counter(pixel,indices.len()),&indices)?;}}
         let region=indices[pixel] as usize;let stat=&mut regions[region];let (x,y)=((pixel%r.width) as i64,(pixel/r.width) as i64);let mut boundary=false;
-        for &(dx,dy) in directions{let (column,row)=(x+dx,y+dy);if column<0||row<0||column>=r.width as i64||row>=r.height as i64{continue;}let neighbor=row as usize*r.width+column as usize;if indices[neighbor]!=region as i32{boundary_sets[region].insert(neighbor);boundary=true;}}
-        if boundary{boundary_sets[region].insert(pixel);}else{stat.interior_count+=1;}
+        for &(dx,dy) in directions{let (column,row)=(x+dx,y+dy);if column<0||row<0||column>=r.width as i64||row>=r.height as i64{continue;}let neighbor=row as usize*r.width+column as usize;if indices[neighbor]!=region as i32{boundary_lists[region].push(neighbor);boundary=true;}}
+        if boundary{boundary_lists[region].push(pixel);}else{stat.interior_count+=1;}
         for c in 0..4{let byte=r.bgra[pixel*4+c];let value=byte as f32*(1.0f32/255.0);let square=value*value;stat.squares[c]+=square;if !boundary{stat.interior_sums[c]+=value;stat.interior_squares[c]+=square;interior_bytes[region][c].push(byte);}}
     }
     if let Some(step)=substep{emit(sink,step+2,0,&indices)?;}
     for (i,stat) in regions.iter_mut().enumerate(){
         if stat.interior_count<3{let reciprocal=1.0f32/stat.count as f32;for c in 0..4{stat.color[c]=stat.sums[c]*reciprocal;}}
         else{for c in 0..4{let bytes=&mut interior_bytes[i][c];bytes.sort_unstable();stat.color[c]=bytes[bytes.len()/2] as f32*(1.0f32/255.0);}}
-        stat.boundary=std::mem::take(&mut boundary_sets[i]).into_iter().collect();
+        let list=&mut boundary_lists[i];list.sort_unstable();list.dedup();stat.boundary=std::mem::take(list);
     }
     if let Some(step)=substep{emit(sink,step+2,1,&indices)?;}
     let costs=cached.unwrap_or_else(||vec![0.0;indices.len()]);let mut state=SubpixelState{indices,costs,regions};
-    for region in 0..state.regions.len(){for i in 0..state.regions[region].boundary.len(){let pixel=state.regions[region].boundary[i];if state.indices[pixel]==region as i32{state.costs[pixel]=pixel_cost(r,&state,directions,settings,pixel,-1,-1)? as f32;}}}
+    let mut fitted=BlendFit::default();
+    for region in 0..state.regions.len(){for i in 0..state.regions[region].boundary.len(){let pixel=state.regions[region].boundary[i];if state.indices[pixel]==region as i32{state.costs[pixel]=pixel_cost(r,&state,directions,settings,pixel,-1,-1,&mut fitted)? as f32;}}}
     refresh_errors(&mut state);if let Some(step)=substep{emit(sink,step+2,2,&state.indices)?;}Ok(state)
 }
 pub fn build_subpixel_statistics(width:i64,height:i64,bgra:&[u8],labels:&[i64],parameters:&Value,neighborhood:Neighborhood)->Result<SubpixelState,String>{let settings=controls(parameters)?;let (r,labels)=crate::region_data::read_region_input(width,height,bgra,labels).map_err(|e|e.0)?;build(r,&labels,neighborhood,settings,None,&mut None,None)}
@@ -88,9 +106,9 @@ impl SubpixelModel{
     fn project_colors(&mut self,palette:&[f32],minimum:u32){for stat in &mut self.state.regions{if stat.color_index>=0||stat.interior_count<minimum||stat.count==0{continue;}let mut best=0;let mut best_cost=f64::INFINITY;for color in 0..palette.len()/4{let mut cost=0.0;for c in 0..4{let difference=(stat.color[c]-palette[color*4+c]) as f64;cost+=difference*difference;}if cost<best_cost{best=color;best_cost=cost;}}stat.color.copy_from_slice(&palette[best*4..best*4+4]);stat.color_index=best as i32;}}
     fn pair(&self,source:usize,target:usize)->Result<(),String>{if source>=self.state.regions.len()||target>=self.state.regions.len()||self.state.regions[source].count==0||self.state.regions[target].count==0{Err("Merge source and target must be active region identifiers in the model.".into())}else{Ok(())}}
     pub fn merge_cost(&mut self,source:usize,target:usize,lambda:f64)->Result<f64,String>{self.pair(source,target)?;let lambda=nonnegative(lambda,"Merge lambda")?;self.cost(source,target,lambda)}
-    fn cost(&mut self,source:usize,target:usize,lambda:f32)->Result<f64,String>{let color=self.state.regions[target].color;let stat=&mut self.state.regions[source];let lower=interior_error(stat,&color)-refresh_region(stat,&self.state.costs);if lower>lambda as f64{return Ok(lower);}let mut boundary=0.0;for &pixel in &self.state.regions[source].boundary{boundary+=pixel_cost(self.raster(),&self.state,self.neighborhood.directions(),self.settings,pixel,source as i32,target as i32)? as f32 as f64;}Ok(lower+boundary)}
+    fn cost(&mut self,source:usize,target:usize,lambda:f32)->Result<f64,String>{let color=self.state.regions[target].color;let stat=&mut self.state.regions[source];let lower=interior_error(stat,&color)-refresh_region(stat,&self.state.costs);if lower>lambda as f64{return Ok(lower);}let mut boundary=0.0;let mut fitted=BlendFit::default();for &pixel in &self.state.regions[source].boundary{boundary+=pixel_cost(self.raster(),&self.state,self.neighborhood.directions(),self.settings,pixel,source as i32,target as i32,&mut fitted)? as f32 as f64;}Ok(lower+boundary)}
     pub fn boundary_cost(&self,source:usize,target:usize,budget:f64)->Result<f64,String>{self.pair(source,target)?;if !budget.is_finite()||budget<0.0{return Err("Boundary budget must be a finite nonnegative number.".into());}self.bounded_cost(source,target,budget)}
-    fn bounded_cost(&self,source:usize,target:usize,budget:f64)->Result<f64,String>{let mut error=0.0;for &pixel in &self.state.regions[source].boundary{error+=pixel_cost(self.raster(),&self.state,self.neighborhood.directions(),self.settings,pixel,source as i32,target as i32)?;if error>budget{break;}}Ok(error)}
+    fn bounded_cost(&self,source:usize,target:usize,budget:f64)->Result<f64,String>{let mut error=0.0;let mut fitted=BlendFit::default();for &pixel in &self.state.regions[source].boundary{error+=pixel_cost(self.raster(),&self.state,self.neighborhood.directions(),self.settings,pixel,source as i32,target as i32,&mut fitted)?;if error>budget{break;}}Ok(error)}
     pub fn select_colors(&mut self,margin:f64)->Result<(),String>{self.select_with_progress(margin,&mut None,None)}
     fn select_with_progress(&mut self,margin:f64,sink:&mut Option<&mut ProgressSink<'_>>,step:Option<i32>)->Result<(),String>{
         let margin=nonnegative(margin,"Color selection margin")?;let mut candidates:Vec<usize>=self.state.regions.iter().enumerate().filter(|(_,s)|s.interior_count>=3).map(|(i,_)|i).collect();
@@ -109,7 +127,7 @@ impl SubpixelModel{
         into.count+=from.count;into.interior_count+=from.interior_count;
         for c in 0..4{into.sums[c]+=from.sums[c];into.squares[c]+=from.squares[c];into.interior_sums[c]+=from.interior_sums[c];into.interior_squares[c]+=from.interior_squares[c];}
         from.count=0;from.sums=[0.0;4];from.interior_count=0;from.interior_sums=[0.0;4];from.interior_squares=[0.0;4];
-        for &pixel in &source_boundary{self.state.costs[pixel]=pixel_cost(self.raster(),&self.state,self.neighborhood.directions(),self.settings,pixel,-1,-1)? as f32;}
+        let mut fitted=BlendFit::default();for &pixel in &source_boundary{self.state.costs[pixel]=pixel_cost(self.raster(),&self.state,self.neighborhood.directions(),self.settings,pixel,-1,-1,&mut fitted)? as f32;}
         let mut boundary:BTreeSet<usize>=self.state.regions[target].boundary.iter().copied().collect();
         for &pixel in &source_boundary{if boundary.insert(pixel){continue;}if self.state.indices[pixel]!=target as i32{continue;}let (x,y)=((pixel%self.width) as i64,(pixel/self.width) as i64);let mut interior=true;
             for &(dx,dy) in self.neighborhood.directions(){let (column,row)=(x+dx,y+dy);if column>=0&&row>=0&&column<self.width as i64&&row<self.height as i64&&self.state.indices[row as usize*self.width+column as usize]!=target as i32{interior=false;break;}}
@@ -182,9 +200,122 @@ fn refine_shadow_state_with_progress(r:Raster<'_>,prepared:&SubpixelState,featur
     emit(sink,35,1,&before.indices)?;emit(sink,35,2,&before.indices)?;
     let (filled,assignments)=crate::shadow_classification::reassign_shadow_pixels(r.width,r.height,r.bgra,&before.indices,flags)?;emit(sink,35,3,&filled)?;emit(sink,35,4,&filled)?;
     let eight=build(r,&filled,Neighborhood::Eight,settings,None,sink,Some(36))?;let after=build(r,&eight.indices,Neighborhood::TwentyFour,settings,Some(eight.costs),sink,Some(39))?;emit(sink,42,0,&after.indices)?;
-    for (ordinal,&region) in shadow.iter().enumerate(){let pixels=&pixels_by_shadow[ordinal];let outside=&outside_by_shadow[ordinal];let old=old_energies[ordinal];let mut new=0.0f32;for &pixel in pixels.iter().chain(outside.iter()){new=(new as f64+pixel_cost(r,&after,Neighborhood::TwentyFour.directions(),settings,pixel,-1,-1)?) as f32;}let count=(pixels.len()+outside.len()) as f32;let reciprocal=1.0f32/count;let values=&mut measured[region];let difference=new as f64-old as f64;values[33]=old as f64;values[34]=new as f64;values[35]=reciprocal as f64*old as f64;values[36]=reciprocal as f64*new as f64;values[37]=difference;values[38]=difference/count as f64;}
+    for (ordinal,&region) in shadow.iter().enumerate(){let pixels=&pixels_by_shadow[ordinal];let outside=&outside_by_shadow[ordinal];let old=old_energies[ordinal];let mut new=0.0f32;let mut fitted=BlendFit::default();for &pixel in pixels.iter().chain(outside.iter()){new=(new as f64+pixel_cost(r,&after,Neighborhood::TwentyFour.directions(),settings,pixel,-1,-1,&mut fitted)?) as f32;}let count=(pixels.len()+outside.len()) as f32;let reciprocal=1.0f32/count;let values=&mut measured[region];let difference=new as f64-old as f64;values[33]=old as f64;values[34]=new as f64;values[35]=reciprocal as f64*old as f64;values[36]=reciprocal as f64*new as f64;values[37]=difference;values[38]=difference/count as f64;}
     let mut indices=filled;emit(sink,42,1,&indices)?;
     for (ordinal,&region) in shadow.iter().enumerate(){if crate::shadow_classification::accept_shadow_features(&measured[region],control){accepted[region]=1;}else{for &pixel in &pixels_by_shadow[ordinal]{indices[pixel]=region as i32;}}}
     emit(sink,42,2,&indices)?;let connected=rebuild_connected_regions(r.width,r.bgra,&indices,None).0;let state=build(r,&connected,Neighborhood::Eight,settings,None,sink,Some(43))?;
     Ok(ShadowRefinement{state,features:measured,accepted,assignments,before:Some(before),after:Some(after)})
+}
+
+#[cfg(test)]
+mod boundary_order_equivalence {
+    //! The retained original boundary accumulator against the sorted-`Vec` form.
+    //!
+    //! `build` used to insert every boundary pixel into a per-region
+    //! `BTreeSet<usize>` and then collect the set. The published `boundary`
+    //! vector is therefore the region's boundary pixels in ascending order,
+    //! each once — an order later read by `refresh_region`'s `f64` sum, by
+    //! `cost`/`bounded_cost`, and by `iterate`. The production path now walks
+    //! the same scan with a `Vec` and sorts/deduplicates once per region.
+    //! These tests replay the original `BTreeSet` scan (kept verbatim below)
+    //! over the same rasters and require the two sequences to be equal
+    //! element-by-element, and they pin that the order is observable at all,
+    //! so the equality cannot be vacuous.
+    use super::*;
+    use crate::region_data::rebuild_connected_regions;
+
+    fn settings() -> [f32; 3] {
+        let parameters = serde_json::json!({
+            "SubPixelSegmentation::self_weight_eps": 0.1,
+            "SubPixelSegmentation::self_weight_penalty_low": 0.5,
+            "SubPixelSegmentation::self_weight_penalty_high": 0.5,
+        });
+        controls(&parameters).expect("the three subpixel controls")
+    }
+
+    /// The original accumulator, kept verbatim: a `BTreeSet` per region.
+    fn boundaries_reference(r: Raster<'_>, indices: &[i32], region_count: usize, directions: &[(i64, i64)]) -> Vec<Vec<usize>> {
+        let mut boundary_sets = vec![BTreeSet::new(); region_count];
+        for pixel in 0..indices.len() {
+            let region = indices[pixel] as usize;
+            let (x, y) = ((pixel % r.width) as i64, (pixel / r.width) as i64);
+            let mut boundary = false;
+            for &(dx, dy) in directions {
+                let (column, row) = (x + dx, y + dy);
+                if column < 0 || row < 0 || column >= r.width as i64 || row >= r.height as i64 { continue; }
+                let neighbor = row as usize * r.width + column as usize;
+                if indices[neighbor] != region as i32 { boundary_sets[region].insert(neighbor); boundary = true; }
+            }
+            if boundary { boundary_sets[region].insert(pixel); }
+        }
+        boundary_sets.into_iter().map(|set| set.into_iter().collect()).collect()
+    }
+
+    /// A raster whose labels are a deterministic mix of diagonal stripes,
+    /// single-pixel islands and solid blocks: with the eight-neighbourhood this
+    /// pushes the same neighbour into a region's set many times (so the dedup
+    /// is exercised) and makes several regions share a boundary pixel.
+    fn raster_and_labels(width: usize, height: usize, seed: u32) -> (Vec<u8>, Vec<i64>) {
+        let mut bgra = Vec::with_capacity(width * height * 4);
+        let mut labels = Vec::with_capacity(width * height);
+        let mut state = seed | 1;
+        for pixel in 0..width * height {
+            state = state.wrapping_mul(1664525).wrapping_add(1013904223);
+            let (x, y) = (pixel % width, pixel / width);
+            let label = match (x / 3 + y / 3) % 5 {
+                0 => 0,
+                1 => 1,
+                2 if state % 3 == 0 => 2,
+                3 => 3,
+                _ => 4,
+            };
+            labels.push(label as i64);
+            let byte = (label * 37 % 256) as u8;
+            bgra.extend_from_slice(&[byte, byte.wrapping_add(11), byte.wrapping_add(23), 255]);
+        }
+        (bgra, labels)
+    }
+
+    fn compare_all(width: usize, height: usize, neighborhood: Neighborhood) {
+        for seed in [1u32, 7, 99, 12345] {
+            let (bgra, labels) = raster_and_labels(width, height, seed);
+            let r = Raster { width, height, bgra: &bgra };
+            let (indices, statistics) = rebuild_connected_regions(width, &bgra, &labels.iter().map(|&v| v as i32).collect::<Vec<_>>(), None);
+            let state = build(r, &labels.iter().map(|&v| v as i32).collect::<Vec<_>>(), neighborhood, settings(), None, &mut None, None)
+                .expect("a build over a valid raster");
+            let reference = boundaries_reference(r, &indices, statistics.len(), neighborhood.directions());
+            assert_eq!(state.regions.len(), reference.len(), "region counts must agree");
+            let mut compared = 0usize;
+            for (region, want) in reference.iter().enumerate() {
+                assert_eq!(&state.regions[region].boundary, want,
+                    "boundary sequence differs for region {region} (seed {seed})");
+                compared += want.len();
+            }
+            assert!(compared > 0, "the corpus must have boundary pixels (seed {seed})");
+        }
+    }
+
+    #[test]
+    fn sorted_vector_boundaries_match_the_retained_set_scan() {
+        compare_all(13, 11, Neighborhood::Eight);
+        compare_all(24, 19, Neighborhood::TwentyFour);
+        compare_all(7, 31, Neighborhood::Eight);
+    }
+
+    #[test]
+    fn the_boundary_order_is_observable_so_the_oracle_is_not_vacuous() {
+        // The false control: the same elements in a different order. A sum over
+        // `costs[pixel]` in `f64` is order-sensitive, and the three consumers
+        // walk the vector in order, so a descending order must be a different
+        // boundary vector on at least one region of the corpus.
+        let (width, height) = (13usize, 11usize);
+        let (bgra, labels) = raster_and_labels(width, height, 7);
+        let r = Raster { width, height, bgra: &bgra };
+        let labels: Vec<i32> = labels.iter().map(|&v| v as i32).collect();
+        let state = build(r, &labels, Neighborhood::TwentyFour, settings(), None, &mut None, None).expect("a build");
+        let reversed: Vec<Vec<usize>> = state.regions.iter()
+            .map(|s| s.boundary.iter().rev().copied().collect()).collect();
+        assert!(state.regions.iter().zip(&reversed).any(|(s, r)| s.boundary != *r),
+            "reversing must change at least one region's boundary sequence");
+    }
 }

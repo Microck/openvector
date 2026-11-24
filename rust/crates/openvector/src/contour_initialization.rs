@@ -1,5 +1,5 @@
 //! Port of `src/contour-initialization.mjs`.
-use crate::blend_solver::{collect_blend_indices, fit_prepared_blend, write_blend_sample, EIGHT_DIRECTIONS};
+use crate::blend_solver::{MAX_FIT_COLORS, collect_blend_indices_into, fit_prepared_blend_into, write_blend_sample, BlendFit, EIGHT_DIRECTIONS};
 use crate::contour_neighborhoods::prepare_contour_neighborhoods;
 use crate::contours::Geometry;
 use crate::pixel_input::read_palette_colors;
@@ -187,7 +187,7 @@ fn read_initialization<'a>(input: &InitializationInput<'a>) -> Result<Initializa
         references, border, anti_alias, amplitude })
 }
 
-fn preadjust_node(s: &mut Initialization, node: usize) -> Result<(), String> {
+fn preadjust_node(s: &mut Initialization, node: usize, fitted: &mut BlendFit) -> Result<(), String> {
     let diagonal = 1.0 / 2f64.sqrt();
     let width = s.width;
     let column = s.references[node * 2].trunc() as usize - 1; let row = s.references[node * 2 + 1].trunc() as usize - 1;
@@ -199,13 +199,16 @@ fn preadjust_node(s: &mut Initialization, node: usize) -> Result<(), String> {
     for dy in 0..2 {
         for dx in 0..2 {
             let pixel = (row + dy) * width + column + dx;
-            let selected = collect_blend_indices(pi, width, s.height, pixel, &EIGHT_DIRECTIONS, -1, -1);
+            let mut selected = [0i32; MAX_FIT_COLORS];
+            let len = collect_blend_indices_into(pi, width, s.height, pixel, &EIGHT_DIRECTIONS, -1, -1, &mut selected);
+            let selected = &selected[..len];
             let mut colors = vec![0f32; selected.len() * 4];
             for (index, &color) in selected.iter().enumerate() {
                 colors[index * 4..index * 4 + 4].copy_from_slice(&s.palette[color as usize * 4..color as usize * 4 + 4]);
             }
             write_blend_sample(s.bgra, pixel * 4, &mut sample);
-            let weights = fit_prepared_blend(&sample, &colors)?.weights;
+            fit_prepared_blend_into(&sample, &colors, fitted)?;
+            let weights = &fitted.weights;
             for color in quad {
                 if let Some(index) = selected.iter().position(|&c| c == color) {
                     if index > 0 { totals[dy * 2 + dx] = weights[index] + totals[dy * 2 + dx]; }
@@ -231,7 +234,7 @@ fn clamp_shift(v: f64) -> f64 {
 /// Original deterministic blend-driven adjustment, without PRNG consumption.
 pub fn preadjust_contours(input: &InitializationInput) -> Result<Vec<f64>, String> {
     let mut s = read_initialization(input)?;
-    if s.anti_alias { for node in s.border..s.positions.len() / 2 { preadjust_node(&mut s, node)?; } }
+    if s.anti_alias { let mut fitted = BlendFit::default(); for node in s.border..s.positions.len() / 2 { preadjust_node(&mut s, node, &mut fitted)?; } }
     Ok(s.positions)
 }
 
@@ -239,8 +242,9 @@ pub fn preadjust_contours(input: &InitializationInput) -> Result<Vec<f64>, Strin
 pub fn initialize_contour_coordinates(input: &InitializationInput, next_uniform: &mut dyn FnMut() -> f64) -> Result<Vec<f64>, String> {
     let mut s = read_initialization(input)?;
     if s.anti_alias {
+        let mut fitted = BlendFit::default();
         for node in s.border..s.positions.len() / 2 {
-            preadjust_node(&mut s, node)?;
+            preadjust_node(&mut s, node, &mut fitted)?;
             let x = next_uniform(); let y = next_uniform(); let range = s.amplitude + s.amplitude;
             s.positions[node * 2] = (x * range - s.amplitude) + s.positions[node * 2];
             s.positions[node * 2 + 1] = (range * y - s.amplitude) + s.positions[node * 2 + 1];

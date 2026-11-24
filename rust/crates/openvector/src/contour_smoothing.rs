@@ -3,7 +3,7 @@ use crate::contour_corners::puncture_contour_corners;
 use crate::contour_initialization::{create_contour_smoothing_state, initialize_contour_coordinates, initialize_smoothing_neighborhoods, InitializationInput};
 use crate::contours::Geometry;
 use crate::image_measurement::ContourImageModel;
-use crate::smoothing::{smoothing_optimize, ObjectiveState, SmoothingInput};
+use crate::smoothing::{optimize, ObjectiveState, SmoothingInput};
 use crate::smoothing_repair::{ContourRepair, RepairView};
 use serde_json::Value;
 use serde::{Deserialize, Serialize};
@@ -113,8 +113,15 @@ pub fn smooth_contour_geometry(input: &SmoothContourInput, next_uniform: &mut dy
     let initial = initialize_contour_coordinates(&InitializationInput { width: input.width, height: input.height, bgra: input.bgra,
         geometry: &prepared.geometry, indices: input.indices, reference_positions: &references, border_counts: &border_counts,
         parameters, palette: input.palette }, next_uniform)?;
-    let mut geometry = prepared.geometry.clone();
-    let mut penalty_counts = prepared.penalty_counts.clone();
+    // The prepared state's geometry and penalties are this phase's own working
+    // copies: `create_contour_smoothing_state` built them from the caller's
+    // geometry, and nothing reads `prepared.geometry`/`prepared.penalty_counts`
+    // after this point (the checkpoints above already ran, and the result below
+    // takes `border_counts` and `reference_positions`). Moving them out is the
+    // same value the clone produced, without the deep copy of every region's
+    // contour, boundary and neighbour vectors.
+    let mut geometry = prepared.geometry;
+    let mut penalty_counts = prepared.penalty_counts;
     write_positions(&mut geometry, &initial);
     cp!(1, 0, &geometry, &penalty_counts);
     let budget = |phase: usize| -> i32 {
@@ -128,14 +135,16 @@ pub fn smooth_contour_geometry(input: &SmoothContourInput, next_uniform: &mut dy
         let q = (completed.wrapping_mul(500) as f64 / total_budget as f64 + 0.5).trunc();
         if q.is_finite() { q as i64 as i32 } else { 0 }
     };
-    let nearby_edges = prepared.nearby_edges.clone().unwrap_or_default();
+    // `prepared.nearby_edges` is read only here and by the final repair below,
+    // both through this local, so the phase can take it instead of cloning the
+    // per-node edge lists.
+    let nearby_edges = prepared.nearby_edges.take().unwrap_or_default();
     let near_border: Vec<i64> = prepared.near_border_nodes.iter().map(|&n| n as i64).collect();
     let mut preceding_budget = 0i32;
     for phase in 0..3 {
         if enabled[phase] {
             let optimized = {
                 let has_observer = on_progress.is_some();
-                let mut observed = if on_progress.is_some() { Some((geometry.clone(), penalty_counts.clone())) } else { None };
                 let mut smoothing = SmoothingInput::new(&geometry, parameters);
                 smoothing.reference_positions = &references;
                 smoothing.penalty_counts = &penalty_counts;
@@ -146,16 +155,12 @@ pub fn smooth_contour_geometry(input: &SmoothContourInput, next_uniform: &mut dy
                 smoothing.height = input.height as f64;
                 smoothing.near_border_nodes = &near_border;
                 if anti_alias { smoothing.nearby_edges = Some(&nearby_edges); smoothing.repair_interval = prepared.repair_interval as f64; }
-                let mut observer = |iteration: i64, state: &ObjectiveState| -> Result<(), String> {
-                    let (og, op) = observed.as_mut().unwrap();
-                    for (node, point) in state.points.iter().enumerate() {
-                        og.nodes[node].x = point[0]; og.nodes[node].y = point[1]; og.nodes[node].flags = state.geometry.nodes[node].flags;
-                    }
-                    op.copy_from_slice(&state.penalty_counts);
+                let mut observer = |iteration: i64, state: &mut ObjectiveState| -> Result<(), String> {
+                    state.synchronize_published_coordinates();
                     let counter = progress_counter(preceding_budget.wrapping_add(iteration as i32));
-                    checkpoint(2, counter, og, op, prepared.border_counts, &prepared.reference_positions, &mut on_progress)
+                    checkpoint(2, counter, &state.geometry, &state.penalty_counts, prepared.border_counts, &prepared.reference_positions, &mut on_progress)
                 };
-                smoothing_optimize(&mut smoothing, if has_observer { Some(&mut observer) } else { None })?
+                optimize(&mut smoothing, if has_observer { Some(&mut observer) } else { None })?
             };
             write_positions(&mut geometry, &optimized.positions);
             if let Some(repair) = &optimized.repair_state {
@@ -176,4 +181,170 @@ pub fn smooth_contour_geometry(input: &SmoothContourInput, next_uniform: &mut dy
     }
     cp!(-2, 0, &geometry, &penalty_counts);
     Ok(SmoothedContours { geometry, penalty_counts, border_counts: prepared.border_counts, reference_positions: prepared.reference_positions })
+}
+
+#[cfg(test)]
+mod observer_state_tests {
+    //! End-to-end: the observer-attached path, which is the only path that
+    //! publishes, against the same run without an observer. The phase no longer
+    //! keeps a duplicate of its own input geometry, so these tests pin that the
+    //! result and the published snapshots are exactly the ones the old
+    //! duplicate-maintaining form produced.
+    use super::*;
+    use crate::contours::{extract_contours, ContourInput};
+    use crate::settings::NUMERIC_DATA;
+
+    fn fingerprint(geometry: &Geometry, penalties: &[u8]) -> Vec<u8> {
+        let mut bytes = Vec::new();
+        for node in &geometry.nodes {
+            bytes.extend(node.x.to_bits().to_le_bytes());
+            bytes.extend(node.y.to_bits().to_le_bytes());
+            bytes.push(node.kind);
+            bytes.push(node.flags);
+        }
+        bytes.extend(penalties);
+        for region in &geometry.regions {
+            bytes.extend(region.pixel_count.to_le_bytes());
+            bytes.extend(region.contour.iter().flat_map(|i| i.to_le_bytes()));
+        }
+        bytes
+    }
+
+    /// A two-color 12 by 12 image with an interior diagonal seam, so the
+    /// geometry has interior nodes, a repair pass that writes flags, and
+    /// quarter-dual corners.
+    fn fixture() -> (i64, i64, Vec<u8>, Vec<i64>, Vec<f64>, Geometry) {
+        let (width, height) = (12i64, 12i64);
+        let mut bgra = vec![0u8; (width * height * 4) as usize];
+        for pixel in 0..(width * height) as usize {
+            let (x, y) = (pixel as i64 % width, pixel as i64 / width);
+            let color = if x + y < 12 { 0usize } else { 1usize };
+            bgra[pixel * 4..pixel * 4 + 4].copy_from_slice(if color == 0 { &[20, 40, 60, 255] } else { &[200, 180, 160, 255] });
+        }
+        let indices: Vec<i64> = (0..width * height).map(|pixel| {
+            let (x, y) = (pixel % width, pixel / width);
+            if x + y < 12 { 0 } else { 1 }
+        }).collect();
+        let palette: Vec<f64> = vec![0.23529411764705882, 0.1568627450980392, 0.0784313725490196, 1.0,
+            0.6274509803921569, 0.7058823529411765, 0.7843137254901961, 1.0];
+        let counts: Vec<i64> = vec![indices.iter().filter(|&&i| i == 0).count() as i64,
+            indices.iter().filter(|&&i| i == 1).count() as i64];
+        let colors: Vec<i64> = vec![0, 1];
+        let geometry = extract_contours(&ContourInput { width: width as f64, height: height as f64,
+            indices: &indices, counts: &counts, color_indices: &colors, palette: &palette, anti_alias: Some(true) })
+            .expect("fixture geometry");
+        (width, height, bgra, indices, palette, geometry)
+    }
+
+    fn parameters() -> Value {
+        let mut parameters = NUMERIC_DATA["profiles"][5].clone();
+        parameters["Shared::is_anti_aliased"] = serde_json::json!(1);
+        parameters["ContourSmoother::is_enabled"] = serde_json::json!([1, 1, 1]);
+        parameters["ContourSmoother::measurement_types"] = serde_json::json!([1, 1, 1]);
+        parameters
+    }
+
+    /// The application's own random stream, from a fixed seed.
+    fn stream(seed: u32) -> impl FnMut() -> f64 {
+        let mut state = seed;
+        move || { state = state.wrapping_mul(2003) % 9973; state as f64 * (1.0 / 9973.0) }
+    }
+
+    struct Event { progress: SmoothingProgress, snapshot: Vec<u8>, counters: (i32, i32) }
+
+    fn run(observer: bool) -> (SmoothedContours, Vec<Event>) {
+        let (width, height, bgra, indices, palette, geometry) = fixture();
+        let parameters = parameters();
+        let input = SmoothContourInput { width, height, bgra: &bgra, geometry: &geometry, indices: &indices,
+            palette: &palette, parameters: &parameters };
+        let mut random = stream(0x9e37_79b9);
+        let mut events = Vec::new();
+        let result = if observer {
+            let mut sink = |progress: &SmoothingProgress, live: &SmoothingSnapshot| -> Result<(), String> {
+                events.push(Event { progress: *progress, snapshot: fingerprint(live.geometry, live.penalty_counts),
+                    counters: (live.border_counts[0] as i32, live.reference_positions.len() as i32) });
+                Ok(())
+            };
+            smooth_contour_geometry(&input, &mut random, Some(&mut sink))
+        } else {
+            smooth_contour_geometry(&input, &mut random, None)
+        };
+        (result.expect("smoothed"), events)
+    }
+
+    /// An attached observer must not change one byte of the result, and the
+    /// snapshot after each phase must be the geometry the phase produced.
+    #[test]
+    fn observing_changes_nothing_and_publishes_the_phase_state() {
+        let (quiet, quiet_events) = run(false);
+        let (observed, events) = run(true);
+        assert!(quiet_events.is_empty(), "no observer, no publication");
+        assert_eq!(fingerprint(&quiet.geometry, &quiet.penalty_counts), fingerprint(&observed.geometry, &observed.penalty_counts),
+            "the observer path changed the result");
+        assert_eq!(quiet.penalty_counts, observed.penalty_counts);
+        assert_eq!(quiet.border_counts, observed.border_counts);
+        assert_eq!(quiet.reference_positions, observed.reference_positions);
+        assert!(!events.is_empty(), "the observer must receive events");
+
+        // The last publication of every substep is that substep's final state;
+        // the terminal `-2` snapshot is the returned geometry, byte for byte.
+        let last = events.last().expect("an event");
+        assert_eq!(last.progress.substep, -2, "the run must end with the final publication");
+        assert_eq!(last.snapshot, fingerprint(&observed.geometry, &observed.penalty_counts),
+            "the final publication must be the returned geometry and penalties");
+        // Progress is monotone inside a substep and never repeats a (substep, counter).
+        let mut seen = std::collections::BTreeSet::new();
+        let mut previous = -1i32;
+        for event in &events {
+            assert!(seen.insert((event.progress.substep, event.progress.counter)),
+                "duplicate checkpoint {:?}", (event.progress.substep, event.progress.counter));
+            if event.progress.substep == 2 {
+                assert!(event.progress.counter >= previous, "counters must not go backwards");
+                previous = event.progress.counter;
+            }
+            assert!(event.progress.fraction.is_finite() && (0.0..=1.0).contains(&event.progress.fraction));
+            assert_eq!(event.counters.0, observed.border_counts[0] as i32);
+            assert_eq!(event.counters.1, observed.reference_positions.len() as i32);
+        }
+        // A repair ran (anti-alias fixture), so the published snapshots must
+        // carry flags the input geometry did not have, and coordinates the input
+        // did not have: the two halves of the joined state are both live.
+        let (_, _, _, _, _, input_geometry) = fixture();
+        let initial = fingerprint(&input_geometry, &vec![0u8; input_geometry.nodes.len()]);
+        assert!(events.iter().any(|e| e.snapshot != initial), "publication must move with the search");
+    }
+
+    /// The same RNG stream produces the same bytes whether or not the phases are
+    /// observed, and two cold runs agree, so the removal introduced no hidden
+    /// state shared between phases.
+    #[test]
+    fn the_result_is_deterministic_across_cold_runs() {
+        let (first, _) = run(false);
+        let (second, _) = run(false);
+        let (observed, _) = run(true);
+        let want = fingerprint(&first.geometry, &first.penalty_counts);
+        assert_eq!(want, fingerprint(&second.geometry, &second.penalty_counts));
+        assert_eq!(want, fingerprint(&observed.geometry, &observed.penalty_counts));
+    }
+
+    /// A cancelled observer stops the search at the event that returned the
+    /// error: the error propagates and no later checkpoint runs.
+    #[test]
+    fn a_cancelling_observer_stops_at_its_own_event() {
+        let (width, height, bgra, indices, palette, geometry) = fixture();
+        let parameters = parameters();
+        let input = SmoothContourInput { width, height, bgra: &bgra, geometry: &geometry, indices: &indices,
+            palette: &palette, parameters: &parameters };
+        let mut random = stream(0x1234_5678);
+        let mut seen = 0usize;
+        let result = {
+            let mut sink = |_: &SmoothingProgress, _: &SmoothingSnapshot| -> Result<(), String> {
+                seen += 1;
+                if seen == 5 { Err("cancelled".into()) } else { Ok(()) }
+            };
+            smooth_contour_geometry(&input, &mut random, Some(&mut sink))
+        };
+        assert_eq!(result.err().as_deref(), Some("cancelled"));
+        assert_eq!(seen, 5, "the run must stop at the cancelling event");
+    }
 }

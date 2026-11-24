@@ -1,5 +1,5 @@
 //! Port of `src/blending.mjs`.
-use crate::blend_solver::{collect_blend_indices, dot_float, fit_prepared_blend, write_blend_sample, BlendFit, EIGHT_DIRECTIONS};
+use crate::blend_solver::{MAX_FIT_COLORS, collect_blend_indices_into, dot_float, fit_prepared_blend, fit_prepared_blend_into, write_blend_sample, BlendFit, EIGHT_DIRECTIONS};
 use crate::pixel_input::{fail, read_palette_colors, read_palette_score_input, validate_bgra, InputError};
 
 /// Fit ordered local colors using the original blend model's precision rules.
@@ -58,15 +58,29 @@ pub fn score_prepared_weighted_palette(width: usize, height: usize, bgra: &[u8],
     let mut sample = [0.0f64; 4];
     let mut differences = [0.0f32; 4];
     let mut sum = 0.0f32;
+    // One answer buffer for the whole scan: the fit writes into it and the
+    // prediction is read out of it before the next fit, so the loop allocates
+    // nothing per boundary pixel. The values are the ones the owned fit
+    // produced, bit for bit.
+    let mut fitted = BlendFit::default();
     for pixel in 0..indices.len() {
         write_blend_sample(bgra, pixel * 4, &mut sample);
-        let fitted;
         let predicted: &[f32] = if mask[pixel] != 0 {
-            let selected = collect_blend_indices(indices, width, height, pixel, &EIGHT_DIRECTIONS, -1, -1);
-            let mut local = Vec::with_capacity(selected.len() * 4);
-            for &c in &selected { local.extend_from_slice(&colors[c as usize * 4..c as usize * 4 + 4]); }
-            fitted = fit_prepared_blend(&sample, &local).expect("blend fit").color;
-            &fitted
+            let mut selected = [0i32; MAX_FIT_COLORS];
+            let len = collect_blend_indices_into(indices, width, height, pixel, &EIGHT_DIRECTIONS, -1, -1, &mut selected);
+            let selected = &selected[..len];
+            // `selected` holds at most nine colors, so the local palette is at
+            // most 36 `f32`. Building it in a fixed array instead of a `Vec`
+            // removes one heap block per boundary pixel; the entries are the
+            // same four channels of the same colors in the same order, and the
+            // slice handed to the fit is the same length, so every fit sees
+            // identical operands.
+            let mut local = [0.0f32; 4 * MAX_FIT_COLORS];
+            for (entry, &c) in selected.iter().enumerate() {
+                local[entry * 4..entry * 4 + 4].copy_from_slice(&colors[c as usize * 4..c as usize * 4 + 4]);
+            }
+            fit_prepared_blend_into(&sample, &local[..selected.len() * 4], &mut fitted).expect("blend fit");
+            &fitted.color
         } else {
             let o = indices[pixel] as usize * 4;
             &colors[o..o + 4]

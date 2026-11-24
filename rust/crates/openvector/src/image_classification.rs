@@ -5,7 +5,7 @@ use std::collections::HashSet;
 use std::sync::LazyLock;
 
 use crate::blending::boundary_mask;
-use crate::palette::{byte_to_unit, calculate_measurement, detect_histogram_peaks, js_max};
+use crate::palette::{byte_to_unit, calculate_measurement, detect_histogram_peaks_touched, js_max, TouchedBins};
 
 /// Decision node: `[feature, threshold, less-than child, other child]`, an
 /// extension literal test, or a label leaf. Equal and unordered comparisons
@@ -189,13 +189,25 @@ static CLASSIFIER_BLUR_KERNEL: LazyLock<([f64; 25], f64)> = LazyLock::new(|| {
     (weights, f32r(1.0 / sum))
 });
 
+/// The byte a truncation-then-store of `value` produces.
+///
+/// Rust's `as u8` cast truncates toward zero and saturates at the ends, which is
+/// exactly `value.trunc()` followed by the same cast for every `f64`: below the
+/// ends both give the same integer, above them both clamp, and `NaN` stores 0
+/// either way. So the libm `trunc` call these two kernels used to make before
+/// their store was doing work the cast repeats, and it is gone.
+#[inline]
+fn truncated_byte(value: f64) -> u8 {
+    value as u8
+}
+
 /// Internal initial color preparation over decoded BGRA bytes. Preserve the
 /// double multiply order and truncate each premultiplied channel.
 pub fn premultiply_classifier_pixels(bgra: &[u8]) -> Vec<u8> {
     let mut prepared = bgra.to_vec();
     for (pixel, source) in prepared.chunks_exact_mut(4).zip(bgra.chunks_exact(4)) {
         let alpha = source[3] as f64 * (1.0 / 255.0);
-        for channel in 0..3 { pixel[channel] = (source[channel] as f64 * alpha).trunc() as u8; }
+        for channel in 0..3 { pixel[channel] = truncated_byte(source[channel] as f64 * alpha); }
     }
     prepared
 }
@@ -224,7 +236,12 @@ pub fn blur_classifier_pixels(width: usize, height: usize, bgra: &[u8]) -> Vec<u
             let target = (y as usize * width + x as usize) * 4;
             for channel in 0..3 {
                 let value = f32r(sums[channel] as f64 * reciprocal);
-                blurred[target + channel] = (value + 0.5).trunc().max(0.0).min(255.0) as u8;
+                // The clamp bounds the value to `[0, 255]` before the store, and
+                // the store's cast truncates toward zero, so the `trunc` that
+                // used to sit between them was redundant: on a non-negative
+                // value the cast is the truncation, and `f64::max`/`min` drop a
+                // `NaN` to the same `0.0` the truncated form produced.
+                blurred[target + channel] = truncated_byte((value + 0.5).max(0.0).min(255.0));
             }
         }
     }
@@ -422,17 +439,26 @@ fn histogram_weight(histogram: &[f64]) -> f64 {
     histogram.iter().fold(0.0, |weight, bin| weight + bin)
 }
 
-fn clear_peak_neighborhood(histogram: &mut [f64], peaks: &[u8], offset: usize) {
+/// The histogram bins one peak's 3x3x3x3 neighborhood clear writes, in the
+/// order the clear visits them.
+///
+/// The clear and the save below must agree on the set exactly, so both walk
+/// this one iterator: the same four clamped ranges, the same nesting, the same
+/// index expression.
+fn peak_neighborhood_indices(peaks: &[u8], offset: usize) -> impl Iterator<Item = usize> {
     let [blue, green, red, alpha] = [0, 1, 2, 3].map(|channel| (peaks[offset + channel] >> 4) as i32);
-    for b in (blue - 1).max(0)..=(blue + 1).min(15) {
-        for g in (green - 1).max(0)..=(green + 1).min(15) {
-            for r in (red - 1).max(0)..=(red + 1).min(15) {
-                for a in (alpha - 1).max(0)..=(alpha + 1).min(15) {
-                    histogram[(b + (g << 4) + (r << 8) + (a << 12)) as usize] = 0.0;
-                }
-            }
-        }
-    }
+    ((blue - 1).max(0)..=(blue + 1).min(15)).flat_map(move |b| {
+        ((green - 1).max(0)..=(green + 1).min(15)).flat_map(move |g| {
+            ((red - 1).max(0)..=(red + 1).min(15)).flat_map(move |r| {
+                ((alpha - 1).max(0)..=(alpha + 1).min(15))
+                    .map(move |a| (b + (g << 4) + (r << 8) + (a << 12)) as usize)
+            })
+        })
+    })
+}
+
+fn clear_peak_neighborhood(histogram: &mut [f64], peaks: &[u8], offset: usize) {
+    for index in peak_neighborhood_indices(peaks, offset) { histogram[index] = 0.0; }
 }
 
 fn clear_peak_lines(histogram: &mut [f64], peaks: &[u8]) {
@@ -475,18 +501,33 @@ pub fn measure_classifier_colors(width: usize, height: usize, bgra: &[u8], edge_
     let weights: Vec<f64> = measurement.iter()
         .map(|&value| js_max(1.0 - value as f64 * edge_scale * (1.0 / 255.0), edge_floor)).collect();
     let mut histogram = vec![0.0f64; 65536];
-    for pixel in 0..pixels { histogram[histogram_index(bgra, pixel * 4)] += weights[pixel]; }
-    let mut peaks = detect_histogram_peaks(&histogram, 16, true).bgra;
+    let mut touched = TouchedBins::new(16);
+    for pixel in 0..pixels { touched.add(&mut histogram, histogram_index(bgra, pixel * 4), weights[pixel]); }
+    let mut peaks = detect_histogram_peaks_touched(&histogram, 16, true, touched.indices).bgra;
     let initial_weight = histogram_weight(&histogram);
     for offset in (0..peaks.len()).step_by(4) {
         let index = histogram_index(&peaks, offset);
         histogram[index] = 0.0;
     }
     let bin_remainder = histogram_weight(&histogram);
-    let after_bins = histogram.clone();
+    // The neighborhood clear below is undone before `clear_peak_lines` runs, and
+    // the only write it makes is `= 0.0`. So instead of cloning the whole
+    // 65,536-bin histogram (512 KiB) and copying it back, save the bins the
+    // clear will touch and restore exactly those. The set is the union of the
+    // peaks' neighborhoods (at most 12 x 81 bins), built from the same iterator
+    // the clear walks, so the save and the clear cannot disagree; a bin shared
+    // by two neighborhoods is saved once, before the first write, and restored
+    // once, after the last. Every other bin is untouched by the clear, so it
+    // needs no restore, and each restored bin gets back the value it held
+    // before the clear — bit-identical to the copy-back.
+    let mut cleared: Vec<usize> = (0..peaks.len()).step_by(4)
+        .flat_map(|offset| peak_neighborhood_indices(&peaks, offset)).collect();
+    cleared.sort_unstable();
+    cleared.dedup();
+    let saved: Vec<f64> = cleared.iter().map(|&index| histogram[index]).collect();
     for offset in (0..peaks.len()).step_by(4) { clear_peak_neighborhood(&mut histogram, &peaks, offset); }
     let neighborhood_remainder = histogram_weight(&histogram);
-    histogram.copy_from_slice(&after_bins);
+    for (&index, &value) in cleared.iter().zip(&saved) { histogram[index] = value; }
     clear_peak_lines(&mut histogram, &peaks);
     let line_remainder = histogram_weight(&histogram);
     if peaks.is_empty() { peaks = vec![0; 4]; }
@@ -541,4 +582,299 @@ pub fn measure_classifier_colors(width: usize, height: usize, bgra: &[u8], edge_
         (bin_remainder * weight_reciprocal) as f32, (neighborhood_remainder * weight_reciprocal) as f32,
         (line_remainder * weight_reciprocal) as f32,
     ] }
+}
+
+#[cfg(test)]
+mod classifier_store_equivalence {
+    //! The two classifier kernels' byte stores against the retained, verbatim
+    //! pre-change expressions (`f64::trunc` followed by the same cast). Every
+    //! byte is compared, so a rounding, saturation or NaN mistake fails here.
+    use super::*;
+
+    /// The pre-change premultiply, kept verbatim as the oracle.
+    fn premultiply_reference(bgra: &[u8]) -> Vec<u8> {
+        let mut prepared = bgra.to_vec();
+        for (pixel, source) in prepared.chunks_exact_mut(4).zip(bgra.chunks_exact(4)) {
+            let alpha = source[3] as f64 * (1.0 / 255.0);
+            for channel in 0..3 { pixel[channel] = (source[channel] as f64 * alpha).trunc() as u8; }
+        }
+        prepared
+    }
+
+    /// The pre-change blur, kept verbatim as the oracle.
+    fn blur_reference(width: usize, height: usize, bgra: &[u8]) -> Vec<u8> {
+        let (kernel_weights, reciprocal) = &*CLASSIFIER_BLUR_KERNEL;
+        let mut blurred = bgra.to_vec();
+        for y in 0..height as i64 {
+            for x in 0..width as i64 {
+                let mut sums = [0.0f32; 3];
+                let mut kernel = 0;
+                for dy in -2..=2i64 {
+                    let row = (height as i64 - 1).min((y + dy).max(0)) as usize;
+                    for dx in -2..=2i64 {
+                        let column = (width as i64 - 1).min((x + dx).max(0)) as usize;
+                        let pixel = (row * width + column) * 4;
+                        let weight = kernel_weights[kernel];
+                        kernel += 1;
+                        for channel in 0..3 {
+                            sums[channel] = (sums[channel] as f64 + bgra[pixel + channel] as f64 * weight) as f32;
+                        }
+                    }
+                }
+                let target = (y as usize * width + x as usize) * 4;
+                for channel in 0..3 {
+                    let value = f32r(sums[channel] as f64 * reciprocal);
+                    blurred[target + channel] = (value + 0.5).trunc().max(0.0).min(255.0) as u8;
+                }
+            }
+        }
+        blurred
+    }
+
+    fn stream(len: usize, seed: u64) -> Vec<u8> {
+        let mut state = seed | 1;
+        (0..len).map(|_| { state ^= state << 13; state ^= state >> 7; state ^= state << 17; (state >> 24) as u8 }).collect()
+    }
+
+    /// The premultiply store's whole reachable domain: every `(channel, alpha)`
+    /// byte pair, so every product `s * (a / 255)` the kernel can form.
+    #[test]
+    fn premultiply_store_matches_the_retained_expression() {
+        let mut bgra = Vec::with_capacity(256 * 256 * 4);
+        for alpha in 0..=255u8 {
+            for channel in 0..=255u8 {
+                bgra.extend_from_slice(&[channel, channel, channel, alpha]);
+            }
+        }
+        assert_eq!(premultiply_classifier_pixels(&bgra), premultiply_reference(&bgra));
+        // And the helper itself over the same products plus the ends.
+        for alpha in 0..=255u8 {
+            let unit = alpha as f64 * (1.0 / 255.0);
+            for channel in 0..=255u8 {
+                let value = channel as f64 * unit;
+                assert_eq!(truncated_byte(value), (value.trunc() as u8), "value {value:?}");
+            }
+        }
+        for value in [0.0, -0.0, 0.5, 1.0, 254.5, 255.0, 255.5, 256.0, -1.0, -0.5,
+                      f64::NAN, f64::INFINITY, f64::NEG_INFINITY, 1e300, -1e300] {
+            assert_eq!(truncated_byte(value), (value.trunc() as u8), "value {value:?}");
+        }
+    }
+
+    /// The blur store over real rasters of every small shape (so the clamped
+    /// edge taps are exercised) and over the store's own boundaries.
+    #[test]
+    fn blur_store_matches_the_retained_expression() {
+        for &(w, h) in &[(1, 1), (1, 2), (2, 1), (2, 2), (3, 5), (5, 3), (7, 7), (9, 4), (16, 11)] {
+            for seed in 0..3u64 {
+                let bgra = stream(w * h * 4, seed * 104_729 + (w * h) as u64);
+                assert_eq!(blur_classifier_pixels(w, h, &bgra), blur_reference(w, h, &bgra),
+                           "blur differs at {w}x{h} seed {seed}");
+            }
+        }
+        // Saturated and transparent rasters, so the sums reach both ends.
+        for &(w, h) in &[(4, 4), (6, 3)] {
+            for fill in [0u8, 255u8] {
+                let bgra = vec![fill; w * h * 4];
+                assert_eq!(blur_classifier_pixels(w, h, &bgra), blur_reference(w, h, &bgra));
+            }
+        }
+        // The store's boundaries: the clamp makes the value non-negative, so the
+        // cast is the truncation; a NaN is dropped to 0 by `max` in both forms.
+        let store = |value: f64| -> u8 { (value + 0.5).max(0.0).min(255.0) as u8 };
+        let oracle = |value: f64| -> u8 { (value + 0.5).trunc().max(0.0).min(255.0) as u8 };
+        let mut values = vec![0.0, -0.0, 0.5, -0.5, 1.0, 254.0, 254.5, 255.0, 255.5, 256.0,
+                              -1.0, -1e300, 1e300, f64::NAN, f64::INFINITY, f64::NEG_INFINITY];
+        for k in 0..=512 {
+            values.push(k as f64 - 0.5);
+            values.push(k as f64);
+            values.push(k as f64 + 0.5);
+        }
+        for value in values {
+            assert_eq!(store(value), oracle(value), "store differs at {value:?}");
+        }
+    }
+}
+
+#[cfg(test)]
+mod histogram_restore_equivalence {
+    //! The saved-bin restore against the retained clone/copy-back form. The
+    //! oracle is the pre-change code verbatim: clone the whole histogram, run
+    //! the neighborhood clears, then copy the clone back. Every bin is compared
+    //! by bit pattern, so a missed, doubled or mis-ordered restore fails here.
+    use super::*;
+
+    /// The pre-change form, kept verbatim as the oracle.
+    fn clear_and_restore_reference(histogram: &mut [f64], peaks: &[u8]) {
+        let after_bins = histogram.to_vec();
+        for offset in (0..peaks.len()).step_by(4) { clear_peak_neighborhood(histogram, peaks, offset); }
+        histogram.copy_from_slice(&after_bins);
+    }
+
+    /// The production form: save the bins the clear will touch, clear, restore.
+    fn clear_and_restore_saved(histogram: &mut [f64], peaks: &[u8]) {
+        let mut cleared: Vec<usize> = (0..peaks.len()).step_by(4)
+            .flat_map(|offset| peak_neighborhood_indices(peaks, offset)).collect();
+        cleared.sort_unstable();
+        cleared.dedup();
+        let saved: Vec<f64> = cleared.iter().map(|&index| histogram[index]).collect();
+        for offset in (0..peaks.len()).step_by(4) { clear_peak_neighborhood(histogram, peaks, offset); }
+        for (&index, &value) in cleared.iter().zip(&saved) { histogram[index] = value; }
+    }
+
+    fn bits(values: &[f64]) -> Vec<u64> { values.iter().map(|v| v.to_bits()).collect() }
+
+    #[test]
+    fn the_saved_bin_restore_matches_the_clone_and_copy_back() {
+        // A deterministic spread of bin values, including the ones a restore
+        // could confuse: zero, negative zero, NaN, infinities and tiny values.
+        let mut seed = 0x2545_f491_4f6c_dd1du64;
+        let mut next = || { seed ^= seed << 13; seed ^= seed >> 7; seed ^= seed << 17; seed };
+        let mut histogram: Vec<f64> = (0..65536).map(|i| match i % 97 {
+            0 => 0.0,
+            1 => -0.0,
+            2 => f64::NAN,
+            3 => f64::INFINITY,
+            4 => f64::NEG_INFINITY,
+            _ => (next() % 1_000_000) as f64 * 1e-6,
+        }).collect();
+        // Peaks at the corners, the middle and the edges, so the clamped ranges
+        // are exercised at both ends and in the interior.
+        let peaks: Vec<u8> = vec![
+            0, 0, 0, 0,
+            255, 255, 255, 255,
+            0, 255, 0, 255,
+            128, 128, 128, 128,
+            16, 32, 48, 64,
+            240, 224, 208, 192,
+        ];
+        let mut reference = histogram.clone();
+        clear_and_restore_reference(&mut reference, &peaks);
+        clear_and_restore_saved(&mut histogram, &peaks);
+        assert_eq!(bits(&histogram), bits(&reference), "the restore changed a bin");
+        // Non-vacuity: the clear really did write, and the restore really did
+        // put values back (the reference and the saved form both differ from a
+        // histogram that was cleared and never restored).
+        let mut cleared_only = reference.clone();
+        for offset in (0..peaks.len()).step_by(4) { clear_peak_neighborhood(&mut cleared_only, &peaks, offset); }
+        assert_ne!(bits(&cleared_only), bits(&reference), "the clear wrote nothing");
+        let touched = (0..peaks.len()).step_by(4)
+            .flat_map(|offset| peak_neighborhood_indices(&peaks, offset)).count();
+        assert!(touched >= 4 * 27, "the neighborhood set is too small: {touched}");
+    }
+
+    #[test]
+    fn the_saved_set_is_exactly_the_set_the_clear_writes() {
+        let mut histogram = vec![1.0; 65536];
+        for blue in 0..16u8 {
+            for green in 0..16u8 {
+                for red in 0..16u8 {
+                    for alpha in 0..16u8 {
+                        let peaks = [blue << 4, green << 4, red << 4, alpha << 4];
+                        let mut saved: Vec<_> = peak_neighborhood_indices(&peaks, 0).collect();
+                        saved.sort_unstable();
+                        saved.dedup();
+                        assert!(!saved.is_empty());
+                        // A stray write is visible either before the next clear
+                        // that covers its bin, or in the final histogram.
+                        assert!(saved.iter().all(|&i| histogram[i] == 1.0), "peak {peaks:?}");
+                        clear_peak_neighborhood(&mut histogram, &peaks, 0);
+                        for i in saved {
+                            assert_eq!(histogram[i], 0.0, "peak {peaks:?}, bin {i}");
+                            histogram[i] = 1.0;
+                        }
+                    }
+                }
+            }
+        }
+        assert!(histogram.iter().all(|&value| value == 1.0));
+    }
+
+    /// Overlapping and repeated neighborhoods: a bin shared by several peaks is
+    /// saved once, before the first write, and restored once, after the last.
+    #[test]
+    fn overlapping_and_repeated_neighborhoods_restore_the_pre_clear_values() {
+        let mut seed = 0x9e37_79b9_7f4a_7c15u64;
+        let mut next = || { seed ^= seed << 13; seed ^= seed >> 7; seed ^= seed << 17; seed };
+        let histogram: Vec<f64> = (0..65536).map(|i| match i % 89 {
+            0 => 0.0,
+            1 => -0.0,
+            2 => f64::NAN,
+            3 => f64::NEG_INFINITY,
+            _ => (next() % 1_000_000) as f64 * 1e-6,
+        }).collect();
+        // The same peak four times, then peaks one nibble apart in each channel,
+        // so every neighborhood overlaps its neighbours and the union is much
+        // smaller than the sum of the parts.
+        let peaks: Vec<u8> = vec![
+            0x80, 0x80, 0x80, 0x80,
+            0x80, 0x80, 0x80, 0x80,
+            0x80, 0x80, 0x80, 0x80,
+            0x80, 0x80, 0x80, 0x80,
+            0x70, 0x80, 0x80, 0x80,
+            0x80, 0x70, 0x80, 0x80,
+            0x80, 0x80, 0x70, 0x80,
+            0x80, 0x80, 0x80, 0x70,
+            0x90, 0x90, 0x90, 0x90,
+        ];
+        let mut reference = histogram.clone();
+        clear_and_restore_reference(&mut reference, &peaks);
+        let mut saved_form = histogram.clone();
+        clear_and_restore_saved(&mut saved_form, &peaks);
+        assert_eq!(bits(&saved_form), bits(&reference), "an overlapping restore changed a bin");
+        let mut saved: Vec<usize> = (0..peaks.len()).step_by(4)
+            .flat_map(|offset| peak_neighborhood_indices(&peaks, offset)).collect();
+        let raw = saved.len();
+        saved.sort_unstable();
+        saved.dedup();
+        assert!(saved.len() < raw, "the fixture does not overlap: {raw} vs {}", saved.len());
+        // Every saved bin really was written by the clear, and every bin the
+        // clear wrote is in the saved set.
+        let mut cleared_only = histogram.clone();
+        for offset in (0..peaks.len()).step_by(4) { clear_peak_neighborhood(&mut cleared_only, &peaks, offset); }
+        let written: Vec<usize> = (0..65536).filter(|&i| cleared_only[i] == 0.0 && histogram[i] != 0.0).collect();
+        for index in &written { assert!(saved.binary_search(index).is_ok(), "bin {index} written but not saved"); }
+    }
+
+    /// Negative controls: the comparison above must fail for a restore that
+    /// skips a bin, and for one that saves after the clear instead of before.
+    #[test]
+    fn a_wrong_restore_is_observable_on_this_corpus() {
+        let histogram: Vec<f64> = (0..65536).map(|i| 1.0 + i as f64).collect();
+        let peaks: Vec<u8> = vec![0x80, 0x80, 0x80, 0x80, 0x00, 0xff, 0x10, 0x20];
+        let mut reference = histogram.clone();
+        clear_and_restore_reference(&mut reference, &peaks);
+        // Skipping the last saved bin leaves it zeroed.
+        let mut skipped = histogram.clone();
+        {
+            let mut cleared: Vec<usize> = (0..peaks.len()).step_by(4)
+                .flat_map(|offset| peak_neighborhood_indices(&peaks, offset)).collect();
+            cleared.sort_unstable();
+            cleared.dedup();
+            let saved: Vec<f64> = cleared.iter().map(|&index| histogram[index]).collect();
+            for offset in (0..peaks.len()).step_by(4) { clear_peak_neighborhood(&mut skipped, &peaks, offset); }
+            for (&index, &value) in cleared.iter().zip(&saved).take(cleared.len() - 1) { skipped[index] = value; }
+        }
+        assert_ne!(bits(&skipped), bits(&reference), "a skipped restore went unnoticed");
+        // Saving after the clear restores zeros.
+        let mut late = histogram.clone();
+        {
+            let mut cleared: Vec<usize> = (0..peaks.len()).step_by(4)
+                .flat_map(|offset| peak_neighborhood_indices(&peaks, offset)).collect();
+            cleared.sort_unstable();
+            cleared.dedup();
+            for offset in (0..peaks.len()).step_by(4) { clear_peak_neighborhood(&mut late, &peaks, offset); }
+            let saved: Vec<f64> = cleared.iter().map(|&index| late[index]).collect();
+            for (&index, &value) in cleared.iter().zip(&saved) { late[index] = value; }
+        }
+        assert_ne!(bits(&late), bits(&reference), "a post-clear save went unnoticed");
+    }
+
+    #[test]
+    fn an_empty_peak_list_restores_nothing_and_changes_nothing() {
+        let histogram: Vec<f64> = (0..65536).map(|i| i as f64).collect();
+        let mut saved_form = histogram.clone();
+        clear_and_restore_saved(&mut saved_form, &[]);
+        assert_eq!(bits(&saved_form), bits(&histogram));
+    }
 }

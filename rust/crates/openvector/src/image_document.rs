@@ -193,7 +193,35 @@ impl ImageDocument{
             sampling_palette.resize(sampling_palette.len().max(map.palette.len()),0.0);
             for (slot,&color) in sampling_palette.iter_mut().zip(&map.palette){*slot=color as f64;}
             let pixels=self.state.working.clone();let parameters=self.state.parameters.clone();self.state.fitting=None;let session=self.session.clone();
-            let result=smooth_contour_geometry(&SmoothContourInput{width:pixels.width as i64,height:pixels.height as i64,bgra:&pixels.bgra,geometry:&geometry,indices:&indices,palette:&sampling_palette,parameters:&parameters},&mut||session.next_random(),Some(&mut|event,live|{self.state.contours=Some(live.geometry.clone());self.state.smoothing=Some(SmoothedContours{geometry:live.geometry.clone(),penalty_counts:live.penalty_counts.to_vec(),border_counts:live.border_counts,reference_positions:live.reference_positions.to_vec()});self.notify(DocumentProgress{stage:"smoothing",phase:event.phase,substep:event.substep,counter:event.counter,fraction:event.fraction,percent:event.percent,color_count:None,iteration:None},&mut observer)}));
+            let mut checkpointed = false;
+            let result=smooth_contour_geometry(&SmoothContourInput{width:pixels.width as i64,height:pixels.height as i64,bgra:&pixels.bgra,geometry:&geometry,indices:&indices,palette:&sampling_palette,parameters:&parameters},&mut||session.next_random(),Some(&mut |event, live| {
+                // Keep the last checkpoint on engine errors as well as cancellation.
+                // Coordinates and penalties change each iteration. Region boundaries
+                // can change during corner puncture between phases.
+                if let Some(previous) = self.state.smoothing.as_mut().filter(|_| checkpointed) {
+                    previous.geometry.nodes.clone_from(&live.geometry.nodes);
+                    if previous.geometry.regions != live.geometry.regions {
+                        previous.geometry.regions.clone_from(&live.geometry.regions);
+                    }
+                    previous.penalty_counts.copy_from_slice(live.penalty_counts);
+                } else {
+                    self.state.smoothing = Some(SmoothedContours {
+                        geometry: live.geometry.clone(),
+                        penalty_counts: live.penalty_counts.to_vec(),
+                        border_counts: live.border_counts,
+                        reference_positions: live.reference_positions.to_vec(),
+                    });
+                    checkpointed = true;
+                }
+                if observer.is_some() { self.state.contours = Some(live.geometry.clone()); }
+                self.notify(DocumentProgress {
+                    stage: "smoothing", phase: event.phase, substep: event.substep, counter: event.counter,
+                    fraction: event.fraction, percent: event.percent, color_count: None, iteration: None,
+                }, &mut observer)
+            }));
+            if result.is_err() && checkpointed && observer.is_none() {
+                self.state.contours = self.state.smoothing.as_ref().map(|snapshot| snapshot.geometry.clone());
+            }
             match result{Ok(smoothed)=>{self.state.contours=Some(smoothed.geometry.clone());self.state.smoothing=Some(smoothed)},Err(e)=>{self.state.stage_keys.smoothing.clear();self.state.stage_keys.fitting.clear();if self.state.contours.is_some(){self.bind_smoothing()?}return self.interrupted(e)}}self.state.fitting=None;self.state.stage_keys.fitting.clear();self.bind_smoothing()?;
         }
         if !self.finish_cancellable_task(settings){self.state.stage_keys.smoothing.clear();self.state.stage_keys.fitting.clear()}
@@ -354,6 +382,7 @@ impl DocumentSnapshot{
 #[cfg(test)]
 mod checkpoint_tests{
     use super::*;
+
     #[test]
     fn cancelled_final_copy_preserves_settings_and_both_histories(){
         let pixels=vec![255;16];
