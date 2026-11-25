@@ -10,7 +10,7 @@ fn current_creation_date() -> Result<String, VectorOutputError> {
     unsafe {
         let time = libc::time(std::ptr::null_mut());
         let mut date: libc::tm = std::mem::zeroed();
-        #[cfg(unix)]
+        #[cfg(any(unix, target_os="wasi"))]
         let failed = libc::localtime_r(&time, &mut date).is_null();
         #[cfg(windows)]
         let failed = libc::localtime_s(&mut date, &time) != 0;

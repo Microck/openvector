@@ -38,7 +38,7 @@ impl DragFile {
         fs::create_dir_all(&root).map_err(|error| format!("Cannot create drag export directory: {error}"))?;
         static NEXT: AtomicU64 = AtomicU64::new(0);
         let directory = loop {
-            let directory = root.join(format!("{}-{}", std::process::id(), NEXT.fetch_add(1, Ordering::Relaxed)));
+            let directory = root.join(format!("{}-{}", openvector::filesystem_process_id(), NEXT.fetch_add(1, Ordering::Relaxed)));
             let created = {
                 #[cfg(unix)] { use std::os::unix::fs::DirBuilderExt; fs::DirBuilder::new().mode(0o700).create(&directory) }
                 #[cfg(not(unix))] { fs::create_dir(&directory) }

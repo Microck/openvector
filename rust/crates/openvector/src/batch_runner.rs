@@ -112,7 +112,7 @@ fn duration(value:std::time::Duration)->String{let ms=value.as_millis();format!(
 fn clock()->String{
     unsafe {
         let now=libc::time(std::ptr::null_mut());let mut output:libc::tm=std::mem::zeroed();
-        #[cfg(unix)] let valid=!libc::localtime_r(&now,&mut output).is_null();
+        #[cfg(any(unix, target_os="wasi"))] let valid=!libc::localtime_r(&now,&mut output).is_null();
         #[cfg(windows)] let valid=libc::localtime_s(&mut output,&now)==0;
         if valid{format!("{:02}:{:02}:{:02}",output.tm_hour,output.tm_min,output.tm_sec)}else{String::new()}
     }

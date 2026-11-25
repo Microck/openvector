@@ -98,7 +98,7 @@ fn read_array_file(path:&Path,key:&str,shape:&str)->Result<Option<Value>,String>
 /// failed write keeps the previous file and leaves no temporary behind.
 fn write_array_file(path:&Path,key:&str,array:Value)->Result<(),String>{
     static COUNTER:AtomicU64=AtomicU64::new(0);let dir=path.parent().unwrap_or(Path::new("."));
-    let (temporary,file)=loop{let temporary=dir.join(format!(".openvector-profiles-{}-{}.tmp",std::process::id(),COUNTER.fetch_add(1,Ordering::Relaxed)));match OpenOptions::new().write(true).create_new(true).open(&temporary){Ok(f)=>break(temporary,f),Err(e) if e.kind()==std::io::ErrorKind::AlreadyExists=>continue,Err(e)=>return Err(e.to_string())}};
+    let (temporary,file)=loop{let temporary=dir.join(format!(".openvector-profiles-{}-{}.tmp",crate::filesystem_process_id(),COUNTER.fetch_add(1,Ordering::Relaxed)));match OpenOptions::new().write(true).create_new(true).open(&temporary){Ok(f)=>break(temporary,f),Err(e) if e.kind()==std::io::ErrorKind::AlreadyExists=>continue,Err(e)=>return Err(e.to_string())}};
     let mut object=Map::new();object.insert(key.into(),array);
     let result=(||{let mut file=BufWriter::new(file);serde_json::to_writer(&mut file,&Value::Object(object)).map_err(|e|e.to_string())?;file.write_all(b"\n").map_err(|e|e.to_string())?;file.flush().map_err(|e|e.to_string())?;drop(file);fs::rename(&temporary,path).map_err(|e|e.to_string())})();
     let cleanup=fs::remove_file(&temporary);if result.is_ok(){if let Err(e)=cleanup{if e.kind()!=std::io::ErrorKind::NotFound{return Err(e.to_string())}}}result

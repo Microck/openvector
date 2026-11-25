@@ -56,3 +56,24 @@ fn grouped_gui_editing_keeps_straight_automatic_colors() {
     let geometry = doc.presentation_geometry().unwrap();
     assert!(geometry.regions.iter().any(|r| r.bgra[2] >= 250 && (120..=135).contains(&r.bgra[3])));
 }
+
+#[test]
+fn previewing_an_uncached_palette_keeps_the_fitted_region_map() {
+    let mut doc = ImageDocument::new(CoreSession::default());
+    let mut pixels = vec![255; 48 * 48 * 4];
+    for y in 8..40 {
+        for x in 8..40 {
+            let i = 4 * (48 * y + x);
+            pixels[i..i+4].copy_from_slice(&[25, 90, 200, 255]);
+        }
+    }
+    doc.set_source(48, 48, &pixels, false, 2.0).unwrap();
+    let auto = doc.run_automatic(&json!({"extension":".png"})).unwrap();
+    let labels = doc.state().segmentation.as_ref().unwrap().indices.clone();
+    let mut settings = Value::Object(auto.settings.to_json());
+    settings["advanced"] = true.into();
+    let palette = doc.preview_palette(&settings, 13).unwrap();
+    assert_eq!(palette.len(), 13 * 4);
+    assert_eq!(doc.state().segmentation.as_ref().unwrap().indices, labels);
+    assert!(doc.presentation_geometry().is_some());
+}

@@ -395,19 +395,16 @@ impl ImageKernel {
         if self.pixel_energies.len() != self.lists.len() {
             self.pixel_energies = (0..self.lists.len()).map(|pixel| self.pixel_energy(pixel)).collect();
         }
-        let mut energy = 0.0;
-        for pixel in 0..self.lists.len() {
-            if self.lists[pixel].head != NONE {
-                let background = self.color_pixel(pixel);
-                // color_pixel can partially change colors before failing. Preserve
-                // those changes in the cache even when this evaluation returns Err.
-                self.pixel_energies[pixel] = self.pixel_energy(pixel);
-                self.backgrounds[pixel] = background?;
-            }
-            // Preserve the original row-major summation and floating-point order.
-            energy = self.pixel_energies[pixel] + energy;
+        // trace_pixels sorts touched pixels into the original row-major order.
+        for i in 0..self.touched_pixels.len() {
+            let pixel = self.touched_pixels[i];
+            if self.lists[pixel].head == NONE { continue; }
+            let background = self.color_pixel(pixel);
+            // color_pixel may change colors before failing.
+            self.pixel_energies[pixel] = self.pixel_energy(pixel);
+            self.backgrounds[pixel] = background?;
         }
-        energy *= 0.5;
+        let energy = self.pixel_energies.iter().fold(0.0, |sum, &pixel| pixel + sum) * 0.5;
         self.energy = energy;
         Ok(energy)
     }

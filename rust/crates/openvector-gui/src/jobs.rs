@@ -1,4 +1,5 @@
-use std::{path::PathBuf, sync::{Arc, atomic::{AtomicBool, Ordering}, mpsc}, thread};
+use std::{path::PathBuf, sync::{Arc, atomic::{AtomicBool, Ordering}, mpsc}};
+use std::{sync::OnceLock, thread};
 use openvector::{batch_queue::{BatchQueue, BatchSnapshot, OverwriteDecision}, document_controls::DocumentSettings, image_document::ImageDocument, palette::CoreSession};
 use gpui::RenderImage;
 use serde_json::Value;
@@ -121,29 +122,45 @@ pub struct Worker {
     commands: mpsc::Sender<Command>,
     pub events: mpsc::Receiver<Event>,
     cancellation: Arc<AtomicBool>,
-    document_cancellation: Arc<AtomicBool>,
+    document_cancellation: Arc<OnceLock<Arc<AtomicBool>>>,
     decisions: mpsc::Sender<OverwriteDecision>,
 }
 impl Worker {
+    fn document(initial: &openvector::settings_profile::SettingsProfile) -> Result<ImageDocument, String> {
+        let mut document = CoreSession::default().create_document();
+        document.commit_settings(&Value::Object(initial.settings.to_json()))?;
+        Ok(document)
+    }
     pub fn start(initial: openvector::settings_profile::SettingsProfile) -> Result<Self, String> {
         let (commands, incoming) = mpsc::channel();
         let (outgoing, events) = mpsc::channel();
         let (decisions, decision_rx) = mpsc::channel();
-        let (ready, document_ready) = mpsc::sync_channel(1);
         let cancellation = Arc::new(AtomicBool::new(false));
         let cancelled = cancellation.clone();
+        let document_cancellation = Arc::new(OnceLock::new());
+        let handle = document_cancellation.clone();
+        #[cfg(not(target_os = "wasi"))]
+        let (ready, document_ready) = mpsc::sync_channel(1);
         thread::Builder::new().name("openvector-document".into()).spawn(move || {
-            let mut document = ImageDocument::new(CoreSession::default());
-            // MainModel commits the startup selection before the first source.
-            // Do this before readiness, so it cannot race a later Open command.
-            let cancellation = match document.commit_settings(&Value::Object(initial.settings.to_json())) {
-                Ok(()) => document.cancellation_handle(),
-                Err(error) => { let _ = ready.send(Err(error)); return; }
+            let document = match Self::document(&initial) {
+                Ok(document) => document,
+                Err(error) => {
+                    #[cfg(not(target_os = "wasi"))]
+                    let _ = ready.send(Err(error));
+                    #[cfg(target_os = "wasi")]
+                    let _ = outgoing.send(Event::Finished(Err(error)));
+                    return;
+                }
             };
-            if ready.send(Ok(cancellation)).is_err() { return; }
+            let _ = handle.set(document.cancellation_handle());
+            #[cfg(not(target_os = "wasi"))]
+            if ready.send(Ok(())).is_err() { return; }
             crate::engine_worker::run(document, initial.color_count, incoming, outgoing, cancelled, decision_rx);
         }).map_err(|error| format!("Cannot start image worker: {error}"))?;
-        let document_cancellation = document_ready.recv().map_err(|_| "The image worker stopped during startup.".to_string())??;
+        // The window cannot block on a thread startup handshake in a browser.
+        // Its command queue is available throughout worker initialization.
+        #[cfg(not(target_os = "wasi"))]
+        document_ready.recv().map_err(|_| "The image worker stopped during startup.".to_string())??;
         Ok(Self { commands, events, cancellation, document_cancellation, decisions })
     }
     pub fn submit(&self, command: Command) -> Result<(), String> {
@@ -154,10 +171,10 @@ impl Worker {
     pub fn cancel(&self) {
         // The completion latch survives the document's per-task cancellation resets.
         self.cancellation.store(true, Ordering::Release);
-        self.document_cancellation.store(true, Ordering::Relaxed);
+        if let Some(handle) = self.document_cancellation.get() { handle.store(true, Ordering::Relaxed); }
     }
     pub fn decide(&self, decision: OverwriteDecision) -> Result<(), String> {
-        self.decisions.send(decision).map_err(|_| "Image worker stopped before the overwrite decision.".into())
+        self.decisions.send(decision).map_err(|_| "Image worker stopped before the overwrite decision.".to_string())
     }
 }
 impl Drop for Worker {

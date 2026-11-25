@@ -1,0 +1,31 @@
+{$OPENVECTOR_SITE} {
+	root * {$OPENVECTOR_DIST}
+	header {
+		X-Content-Type-Options nosniff
+		Referrer-Policy strict-origin-when-cross-origin
+		Strict-Transport-Security "max-age=31536000"
+	}
+	# Only the editor needs cross-origin isolation, for shared Wasm memory. The landing page stays unisolated
+	# so it can embed third-party ads.
+	header /app/* {
+		Cross-Origin-Opener-Policy same-origin
+		Cross-Origin-Embedder-Policy require-corp
+	}
+	# The editor ships pre-gzipped files; the landing page's CSS, JS and SVG are compressed on the fly.
+	@mutable not path /app/engine/*
+	header @mutable Cache-Control "no-cache"
+	header /app/engine/* Cache-Control "public, max-age=31536000, immutable"
+	encode zstd gzip
+	file_server {
+		precompressed gzip
+	}
+	handle_errors 404 {
+		rewrite * /404.html
+		file_server
+	}
+}
+
+# One canonical host: send www to the bare domain.
+www.{$OPENVECTOR_SITE} {
+	redir https://{$OPENVECTOR_SITE}{uri} permanent
+}

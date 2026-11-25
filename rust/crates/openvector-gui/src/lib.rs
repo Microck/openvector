@@ -16,3 +16,6 @@ pub mod numeric_text;
 pub mod drag_result;
 
 pub use app::OpenVectorApp;
+
+#[cfg(target_os = "wasi")]
+mod browser;

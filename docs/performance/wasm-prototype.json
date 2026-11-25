@@ -1,0 +1,187 @@
+{
+  "browser": "156.0.8078.79",
+  "arch": "x86_64",
+  "local_page_to_ready_ms": 322.34383499996966,
+  "cases": [
+    {
+      "image": "triangle.png",
+      "input_sha256": "2b2107b55be423856b684a1a46e17648c29d49978b061e68dba3eb09ad820f87",
+      "cli_sha256": "fdcf2363853d2bbf3eb9bfdc37818b64342b9dbf36088302f336819c27763e16",
+      "native_sha256": "fdcf2363853d2bbf3eb9bfdc37818b64342b9dbf36088302f336819c27763e16",
+      "wasm_sha256": [
+        "fdcf2363853d2bbf3eb9bfdc37818b64342b9dbf36088302f336819c27763e16",
+        "fdcf2363853d2bbf3eb9bfdc37818b64342b9dbf36088302f336819c27763e16",
+        "fdcf2363853d2bbf3eb9bfdc37818b64342b9dbf36088302f336819c27763e16",
+        "fdcf2363853d2bbf3eb9bfdc37818b64342b9dbf36088302f336819c27763e16",
+        "fdcf2363853d2bbf3eb9bfdc37818b64342b9dbf36088302f336819c27763e16",
+        "fdcf2363853d2bbf3eb9bfdc37818b64342b9dbf36088302f336819c27763e16"
+      ],
+      "exact": true,
+      "output_bytes": 710,
+      "paths": 2,
+      "native_ms": [
+        5.79629,
+        4.69663,
+        4.708723,
+        4.611863,
+        4.508858999999999,
+        5.14485
+      ],
+      "wasm_ms": [
+        110.5,
+        9.1,
+        15.0,
+        11.4,
+        8.6,
+        9.0
+      ],
+      "native_median_ms": 4.69663,
+      "wasm_median_ms": 9.1,
+      "wasm_over_native": 1.9375594841407562
+    },
+    {
+      "image": "alpha-logo.png",
+      "input_sha256": "77a7e71fee480b04865f59dc001c68dd7ddd107d6d995f12bebc8f11abd4ac9b",
+      "cli_sha256": "e09ae901313dd02100a80d5cb00665c8193ef79cbf7fa8efe88e477a058d4305",
+      "native_sha256": "e09ae901313dd02100a80d5cb00665c8193ef79cbf7fa8efe88e477a058d4305",
+      "wasm_sha256": [
+        "e09ae901313dd02100a80d5cb00665c8193ef79cbf7fa8efe88e477a058d4305",
+        "e09ae901313dd02100a80d5cb00665c8193ef79cbf7fa8efe88e477a058d4305",
+        "e09ae901313dd02100a80d5cb00665c8193ef79cbf7fa8efe88e477a058d4305",
+        "e09ae901313dd02100a80d5cb00665c8193ef79cbf7fa8efe88e477a058d4305",
+        "e09ae901313dd02100a80d5cb00665c8193ef79cbf7fa8efe88e477a058d4305",
+        "e09ae901313dd02100a80d5cb00665c8193ef79cbf7fa8efe88e477a058d4305"
+      ],
+      "exact": true,
+      "output_bytes": 1427,
+      "paths": 2,
+      "native_ms": [
+        478.456703,
+        682.116088,
+        881.371978,
+        797.8247210000001,
+        556.950294,
+        449.139198
+      ],
+      "wasm_ms": [
+        1315.4,
+        907.7,
+        933.7,
+        1389.7,
+        858.1,
+        923.7
+      ],
+      "native_median_ms": 682.116088,
+      "wasm_median_ms": 923.7,
+      "wasm_over_native": 1.3541683244978677
+    },
+    {
+      "image": "recent30-artwork.png",
+      "input_sha256": "a2704049acfdaa86650fc2d77fb661a68db54b98827682f4838eb284bb2b2dbf",
+      "cli_sha256": "5b440f13151ef022f503c140c7cef3c26f7cee53f8590e7ebb63c1b20b60647f",
+      "native_sha256": "5b440f13151ef022f503c140c7cef3c26f7cee53f8590e7ebb63c1b20b60647f",
+      "wasm_sha256": [
+        "5b440f13151ef022f503c140c7cef3c26f7cee53f8590e7ebb63c1b20b60647f",
+        "5b440f13151ef022f503c140c7cef3c26f7cee53f8590e7ebb63c1b20b60647f",
+        "5b440f13151ef022f503c140c7cef3c26f7cee53f8590e7ebb63c1b20b60647f",
+        "5b440f13151ef022f503c140c7cef3c26f7cee53f8590e7ebb63c1b20b60647f",
+        "5b440f13151ef022f503c140c7cef3c26f7cee53f8590e7ebb63c1b20b60647f",
+        "5b440f13151ef022f503c140c7cef3c26f7cee53f8590e7ebb63c1b20b60647f"
+      ],
+      "exact": true,
+      "output_bytes": 1945,
+      "paths": 4,
+      "native_ms": [
+        29.861426,
+        34.254674,
+        27.517907,
+        34.150944,
+        24.993745,
+        24.682326
+      ],
+      "wasm_ms": [
+        45.6,
+        42.5,
+        46.5,
+        41.8,
+        47.2,
+        41.5
+      ],
+      "native_median_ms": 27.517907,
+      "wasm_median_ms": 42.5,
+      "wasm_over_native": 1.5444488565209555
+    },
+    {
+      "image": "gradient.png",
+      "input_sha256": "1ce854e7605bcffb4428272e94d8c3b0b952da55004f57472bc002a5717dfd1f",
+      "cli_sha256": "1638087c2f7c827f56396cd9c645d6e6820f8dda89de20a467944af83dbbfebc",
+      "native_sha256": "1638087c2f7c827f56396cd9c645d6e6820f8dda89de20a467944af83dbbfebc",
+      "wasm_sha256": [
+        "1638087c2f7c827f56396cd9c645d6e6820f8dda89de20a467944af83dbbfebc",
+        "1638087c2f7c827f56396cd9c645d6e6820f8dda89de20a467944af83dbbfebc",
+        "1638087c2f7c827f56396cd9c645d6e6820f8dda89de20a467944af83dbbfebc",
+        "1638087c2f7c827f56396cd9c645d6e6820f8dda89de20a467944af83dbbfebc",
+        "1638087c2f7c827f56396cd9c645d6e6820f8dda89de20a467944af83dbbfebc",
+        "1638087c2f7c827f56396cd9c645d6e6820f8dda89de20a467944af83dbbfebc"
+      ],
+      "exact": true,
+      "output_bytes": 8413,
+      "paths": 31,
+      "native_ms": [
+        51.513266,
+        45.815817,
+        49.398056000000004,
+        55.952451,
+        47.849214,
+        50.089999000000006
+      ],
+      "wasm_ms": [
+        69.5,
+        65.7,
+        65.8,
+        63.3,
+        63.3,
+        64.6
+      ],
+      "native_median_ms": 49.398056000000004,
+      "wasm_median_ms": 64.6,
+      "wasm_over_native": 1.3077437703216497
+    },
+    {
+      "image": "openvector-logo.png",
+      "input_sha256": "575e8bb1f3ebcbf0b57f4dd4e9e73cde5d13f91c1a8f4e7453e322bc5b240025",
+      "cli_sha256": "2366476dfae6d02be1b793684ef01a4b8cd2116211248752e6c02988255d84d5",
+      "native_sha256": "2366476dfae6d02be1b793684ef01a4b8cd2116211248752e6c02988255d84d5",
+      "wasm_sha256": [
+        "2366476dfae6d02be1b793684ef01a4b8cd2116211248752e6c02988255d84d5",
+        "2366476dfae6d02be1b793684ef01a4b8cd2116211248752e6c02988255d84d5",
+        "2366476dfae6d02be1b793684ef01a4b8cd2116211248752e6c02988255d84d5",
+        "2366476dfae6d02be1b793684ef01a4b8cd2116211248752e6c02988255d84d5",
+        "2366476dfae6d02be1b793684ef01a4b8cd2116211248752e6c02988255d84d5",
+        "2366476dfae6d02be1b793684ef01a4b8cd2116211248752e6c02988255d84d5"
+      ],
+      "exact": true,
+      "output_bytes": 1552,
+      "paths": 2,
+      "native_ms": [
+        5519.4816949999995,
+        5851.068109,
+        6009.484094,
+        6034.568325,
+        5768.401782,
+        5199.700457
+      ],
+      "wasm_ms": [
+        8659.3,
+        8670.5,
+        8463.1,
+        8258.2,
+        8198.9,
+        8317.0
+      ],
+      "native_median_ms": 5851.068109,
+      "wasm_median_ms": 8317.0,
+      "wasm_over_native": 1.4214498695045015
+    }
+  ]
+}

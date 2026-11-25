@@ -1,4 +1,5 @@
-use std::{path::{Path, PathBuf}, sync::{Arc, atomic::{AtomicBool, Ordering}, mpsc}, time::Duration};
+use std::{path::{Path, PathBuf}, sync::{Arc, atomic::{AtomicBool, Ordering}, mpsc}};
+use std::time::Duration;
 use openvector::{batch_queue::OverwriteDecision, batch_runner::{BatchRunner, BatchEvent},
     export_options::{read_export_options, ExportOptions}, image_document::{ImageDocument, DocumentProgress, DocumentSnapshot, DocumentObserver, DocumentExportEnvironment, CANCEL_TASK},
     image_input::{decode_image, resolve_image_filename}, pixel_input::quantize_qcolor_channels,
@@ -10,13 +11,18 @@ use crate::{jobs::{Bitmap, Command, DocumentView, Event, SourceOrigin}, viewer::
 #[path = "../../openvector/tests/common/mod.rs"]
 mod common;
 
-pub fn run(mut document: ImageDocument, mut committed_count: i32, commands: mpsc::Receiver<Command>, events: mpsc::Sender<Event>, cancelled: Arc<AtomicBool>, decisions: mpsc::Receiver<OverwriteDecision>) {
+pub fn run(document: ImageDocument, committed_count: i32, commands: mpsc::Receiver<Command>, events: mpsc::Sender<Event>, cancelled: Arc<AtomicBool>, decisions: mpsc::Receiver<OverwriteDecision>) {
+    let mut process = processor(document, committed_count, events, cancelled, decisions);
+    while let Ok(command) = commands.recv() { if !process(command) { break; } }
+}
+
+fn processor(mut document: ImageDocument, mut committed_count: i32, events: mpsc::Sender<Event>, cancelled: Arc<AtomicBool>, decisions: mpsc::Receiver<OverwriteDecision>) -> impl FnMut(Command) -> bool {
     let mut filename = PathBuf::new();
     let mut origin = SourceOrigin::Path;
     let mut has_alpha = false;
     let mut source = None;
     let mut display = DisplayScene::default();
-    while let Ok(command) = commands.recv() {
+    move |command| {
         let source_may_change = matches!(&command, Command::Open { .. } | Command::PasteImage { .. } | Command::PrepareSource { .. } | Command::Batch { .. } | Command::Reset(_));
         let exported = matches!(&command, Command::Export { .. } | Command::BitmapExport { .. } | Command::PrepareDrag { .. });
         let refresh_vectors = matches!(&command, Command::Automatic(_) | Command::Process { .. } | Command::Profile { .. } | Command::Batch { .. } | Command::Edit { action: "finish", .. });
@@ -111,8 +117,18 @@ pub fn run(mut document: ImageDocument, mut committed_count: i32, commands: mpsc
                 "revert" => { document.revert_background(); Ok(()) }, "finish" => { document.finish_background_editing(); Ok(()) },
                 _ => Err(format!("Unknown background editing action: {action}")),
             },
-            Command::Export { path, options } => export(&mut document, &path, &options, &cancelled, &events),
-            Command::BitmapExport { path, format, scale, flatten } => bitmap_export(&mut document, &path, &format, scale, flatten, &cancelled),
+            Command::Export { path, options } => {
+                let result = export(&mut document, &path, &options, &cancelled, &events);
+                #[cfg(target_os = "wasi")]
+                let result = result.and_then(|()| crate::browser::download(&path));
+                result
+            },
+            Command::BitmapExport { path, format, scale, flatten } => {
+                let result = bitmap_export(&mut document, &path, &format, scale, flatten, &cancelled);
+                #[cfg(target_os = "wasi")]
+                let result = result.and_then(|()| crate::browser::download(&path));
+                result
+            },
             Command::PrepareDrag { request, directory, format, options } => {
                 let prepared = (|| {
                     if cancelled.load(Ordering::Acquire) { return Err(CANCEL_TASK.into()); }
@@ -122,7 +138,7 @@ pub fn run(mut document: ImageDocument, mut committed_count: i32, commands: mpsc
                     Ok(Arc::new(file))
                 })();
                 let completed = prepared.as_ref().map(|_| ()).map_err(Clone::clone);
-                if events.send(Event::DragPrepared { request, result: prepared }).is_err() { return; }
+                if events.send(Event::DragPrepared { request, result: prepared }).is_err() { return false; }
                 completed
             },
             Command::Profile { profile, basic } => {
@@ -153,7 +169,7 @@ pub fn run(mut document: ImageDocument, mut committed_count: i32, commands: mpsc
                 let settings = openvector::settings_profile::batch_profile_controls(&profile);
                 let mut selected_profile = profile.clone();
                 let mut last_was_load = false;
-                let mut runner = BatchRunner::from_document(queue, document);
+                let mut runner = BatchRunner::from_document(queue, std::mem::replace(&mut document, openvector::palette::CoreSession::default().create_document()));
                 let cancel_handle = runner.cancellation_handle();
                 let mut observer = |event: &BatchEvent<'_>| -> Result<(), String> {
                     last_was_load = event.stage == "load";
@@ -202,6 +218,10 @@ pub fn run(mut document: ImageDocument, mut committed_count: i32, commands: mpsc
                     events.send(Event::BatchState(result.queue.clone())).map_err(|_| CANCEL_TASK.to_string())?;
                     events.send(Event::BatchLog(std::mem::take(&mut result.log))).map_err(|_| CANCEL_TASK.to_string())?;
                     let was_cancelled = result.status == "cancelled";
+                    #[cfg(target_os = "wasi")]
+                    for file in &result.files {
+                        if file.status == "written" { crate::browser::download(Path::new(&file.output_filename))?; }
+                    }
                     events.send(Event::BatchResults(result)).map_err(|_| CANCEL_TASK.to_string())?;
                     if was_cancelled { Err("Cancelled".into()) } else { Ok(()) }
                 });
@@ -212,7 +232,7 @@ pub fn run(mut document: ImageDocument, mut committed_count: i32, commands: mpsc
         // After the command's final Selection, so the GUI records the selected
         // settings that produced this fitting rather than stale controls.
         if let (Ok(()), Some((status, did_work))) = (&result, fitting) {
-            if events.send(Event::Fitting { status, did_work }).is_err() { return; }
+            if events.send(Event::Fitting { status, did_work }).is_err() { return false; }
         }
         let result = if !exported && document.state().original.width != 0 && !filename.as_os_str().is_empty() {
             if source.is_none() || source_changed {
@@ -222,19 +242,19 @@ pub fn run(mut document: ImageDocument, mut committed_count: i32, commands: mpsc
             }
             let alpha_type = document.source_alpha_type();
             match presentation(&document, &filename, origin, has_alpha, alpha_type, committed_count, source.as_ref().expect("loaded source"), &mut display, refresh_vectors) {
-                Ok(view) => { if events.send(Event::Document(view)).is_err() { return; } result }
+                Ok(view) => { if events.send(Event::Document(view)).is_err() { return false; } result }
                 Err(error) => result.and(Err(error)),
             }
         } else {
             if source_may_change && (document.state().original.width == 0 || filename.as_os_str().is_empty()) {
                 source = None;
                 display = DisplayScene::default();
-                if events.send(Event::DocumentCleared).is_err() { return; }
+                if events.send(Event::DocumentCleared).is_err() { return false; }
             }
             result
         };
         let result = result.map_err(|error| if error == CANCEL_TASK { "Cancelled".to_string() } else { error });
-        if events.send(Event::Finished(result.map(|()| source_recommendations))).is_err() { return; }
+        events.send(Event::Finished(result.map(|()| source_recommendations))).is_ok()
     }
 }
 
@@ -393,7 +413,15 @@ fn export(document: &mut ImageDocument, path: &Path, options: &Value, cancelled:
     let options = read_export_options(options, ExportOptions::default()).map_err(|error| error.to_string())?;
     let mut environment = DocumentExportEnvironment::default();
     if path.extension().is_some_and(|extension| extension == "emf") {
-        environment.reference_device = Some(openvector::emf::EmfDevice::current_display().map_err(|error| error.to_string())?);
+        #[cfg(target_os = "wasi")]
+        // CSS defines one inch as 96 pixels. Ten inches gives exact integer
+        // pixel and millimeter dimensions without depending on browser zoom.
+        let device = openvector::emf::EmfDevice {
+            pixels: [960; 2], millimeters: [254; 2], micrometers: [254000; 2],
+        };
+        #[cfg(not(target_os = "wasi"))]
+        let device = openvector::emf::EmfDevice::current_display().map_err(|error| error.to_string())?;
+        environment.reference_device = Some(device);
     }
     let result = document.save_vector_file_with_environment(path, &options, &environment, Some(&mut |percent| {
         if cancelled.load(Ordering::Acquire) { return Err(CANCEL_TASK.into()); }
@@ -422,7 +450,7 @@ fn bitmap_export(document: &mut ImageDocument, path: &Path, format: &str, scale:
     let directory = path.parent().unwrap_or(Path::new("."));
     let mut sequence = 0_u64;
     let (temporary, mut file) = loop {
-        let temporary = directory.join(format!(".openvector-bitmap-{}-{sequence}.tmp", std::process::id()));
+        let temporary = directory.join(format!(".openvector-bitmap-{}-{sequence}.tmp", openvector::filesystem_process_id()));
         match OpenOptions::new().write(true).create_new(true).open(&temporary) {
             Ok(file) => break (temporary, file),
             Err(error) if error.kind() == std::io::ErrorKind::AlreadyExists => sequence += 1,
@@ -541,7 +569,7 @@ mod cancellation_tests {
         let cancelled = Arc::new(AtomicBool::new(false));
         let flag = cancelled.clone();
         std::thread::spawn(move || run(ImageDocument::new(CoreSession::default()), 2, incoming, outgoing, flag, decision_rx));
-        let directory = std::env::temp_dir().join(format!("openvector-worker-cancellation-{}", std::process::id()));
+        let directory = std::env::temp_dir().join(format!("openvector-worker-cancellation-{}", openvector::filesystem_process_id()));
         std::fs::create_dir_all(&directory).unwrap();
         let source = directory.join("source.png");
         image::RgbImage::from_fn(16, 16, |x, y| image::Rgb(if (4..12).contains(&x) && (4..12).contains(&y) { [0; 3] } else { [255; 3] })).save(&source).unwrap();
@@ -568,7 +596,7 @@ mod cancellation_tests {
         let cancelled = Arc::new(AtomicBool::new(false));
         let flag = cancelled.clone();
         let worker = std::thread::spawn(move || run(ImageDocument::new(CoreSession::default()), 2, incoming, outgoing, flag, decision_rx));
-        let directory = std::env::temp_dir().join(format!("openvector-sizing-cancel-{}", std::process::id()));
+        let directory = std::env::temp_dir().join(format!("openvector-sizing-cancel-{}", openvector::filesystem_process_id()));
         std::fs::create_dir_all(&directory).unwrap();
         let source = directory.join("source.png");
         image::RgbImage::from_pixel(1603, 1003, image::Rgb([17, 71, 143])).save(&source).unwrap();

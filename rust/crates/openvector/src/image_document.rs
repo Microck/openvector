@@ -287,6 +287,23 @@ impl ImageDocument{
     fn merged_settings(&self,input:&Value)->Result<DocumentSettings,String>{let mut s=self.state.settings.to_json();let values=input.as_object().ok_or("Automatic processing requires controls with an extension.")?;for(k,v)in values{s.insert(k.clone(),v.clone());}read_document_settings(&Value::Object(s)).map_err(|e|e.to_string())}
     fn batch_settings(&self,controls:&BatchControls)->Result<DocumentSettings,String>{let mut s=self.state.settings.to_json();for (k,v) in &controls.overrides{s.insert(k.clone(),v.clone());}for(k,v)in [("advanced",json!(controls.advanced)),("category",json!(controls.category)),("quality",json!(controls.quality)),("paletteMode",json!(controls.palette_mode)),("backgroundMode",json!(controls.background_mode)),("palette",json!(controls.palette)),("background",json!([1,1,1,1]))]{s.insert(k.into(),v);}read_document_settings(&Value::Object(s)).map_err(|e|e.to_string())}
     fn selected_palette(&self,count:usize)->Vec<f32>{self.state.palettes[count].chunks_exact(4).flat_map(|c|c.iter().rev().map(|v|(((*v as f64*65535.0+0.5).floor())/65535.0) as f32)).collect()}
+    /// Palette analysis publishes intermediate region labels. A preview must keep
+    /// those labels out of the active segmentation and its undo history.
+    pub fn preview_palette(&mut self, input: &Value, count: usize) -> Result<Vec<f32>, String> {
+        if !(2..=24).contains(&count) { return Err("Choose 2 to 24 colors.".into()); }
+        let settings = read_document_settings(input).map_err(|e| e.to_string())?;
+        let mode = settings.palette_mode;
+        let palette = if self.state.completed[count] != 0 && document_palette_key(&settings) == self.state.stage_keys.palette {
+            self.selected_palette(count)
+        } else {
+            let mut preview = self.session.create_document();
+            preview.install_source(self.state.original.clone(), self.shadow_control.ok_or("Open an image first.")?);
+            preview.analyze_settings(settings, count, count, None)?;
+            preview.selected_palette(count)
+        };
+        self.remember_generated_palette(mode, &palette);
+        Ok(palette)
+    }
     fn minimum_palette(&self)->Option<usize>{let mut minimum=1e10;let mut selected=None;for count in 0..25{if self.state.completed[count]!=0&&(self.state.scores[count] as f64)<minimum{minimum=self.state.scores[count] as f64;selected=Some(count)}}selected}
     fn promote_automatic_two_color_palette(&self, settings: &mut DocumentSettings) -> Option<usize> {
         if settings.palette_mode != 0 {
@@ -360,6 +377,9 @@ impl ImageDocument{
     pub fn restore_committed_editing(&mut self)->Result<Option<EditorSnapshot>,String>{match self.editor.as_mut(){None=>Ok(None),Some(editor)=>{let empty=EditorCheckpoint{undo:Vec::new(),redo:Vec::new()};Ok(Some(editor.restore_checkpoint(self.committed_editing.as_ref().unwrap_or(&empty))?))}}}
     pub fn gesture(&mut self,event:&Value)->Result<EditorSnapshot,String>{self.editor.as_mut().ok_or("Call beginEditing before editing the document.")?.gesture(event,&mut self.pointer)}
     pub fn grouped_gesture(&mut self,event:&Value)->Result<EditorSnapshot,String>{self.editor.as_mut().ok_or("Call beginEditing before editing the document.")?.grouped_gesture(event,&mut self.pointer)}
+    pub fn grouped_gestures(&mut self, events: &[Value]) -> Result<EditorSnapshot, String> {
+        self.editor.as_mut().ok_or("Call beginEditing before editing the document.")?.grouped_gestures(events, &mut self.pointer)
+    }
     pub fn grouped_undo_edit(&mut self)->Result<EditorSnapshot,String>{self.editing_session()?.grouped_undo()}
     pub fn grouped_redo_edit(&mut self)->Result<EditorSnapshot,String>{self.editing_session()?.grouped_redo()}
     pub fn undo_edit(&mut self)->Result<EditorSnapshot,String>{self.editing_session()?.undo()}

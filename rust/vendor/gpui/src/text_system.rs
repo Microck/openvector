@@ -252,6 +252,10 @@ impl TextSystem {
             font_ids_by_font: RwLock::default(),
             wrapper_pool: Mutex::default(),
             font_runs_pool: Mutex::default(),
+            // The browser font database contains only fonts supplied by the application.
+            #[cfg(target_os = "wasi")]
+            fallback_font_stack: smallvec![font("Geist"), font("Geist Mono")],
+            #[cfg(not(target_os = "wasi"))]
             fallback_font_stack: smallvec![
                 // TODO: Remove this when Linux have implemented setting fallbacks.
                 font(".ZedMono"),

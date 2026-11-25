@@ -14,13 +14,14 @@ use std::sync::{LazyLock, Mutex};
 /// Unix metadata needs no content access, so FIFOs do not block this check and
 /// a writable destination need not also grant read permission.
 pub fn same_file_identity(target: &Path, source: &Path) -> io::Result<bool> {
-    #[cfg(unix)] {
-        use std::os::unix::fs::MetadataExt;
+    #[cfg(any(unix, target_os = "wasi"))] {
+        #[cfg(unix)] use std::os::unix::fs::MetadataExt;
+        #[cfg(target_os = "wasi")] use std::os::wasi::fs::MetadataExt;
         let target = std::fs::metadata(target)?;
         let source = std::fs::metadata(source)?;
         Ok((target.dev(), target.ino()) == (source.dev(), source.ino()))
     }
-    #[cfg(not(unix))] { same_file::is_same_file(target, source) }
+    #[cfg(not(any(unix, target_os = "wasi")))] { same_file::is_same_file(target, source) }
 }
 
 /// Text is Latin-1 before CRT newline expansion. `drain` models native endl,
@@ -85,9 +86,12 @@ impl Format {
     }
 }
 
-#[cfg(unix)]
+#[cfg(any(unix, target_os = "wasi"))]
 mod native {
-    use std::{fs::{File, OpenOptions}, io::{self, Write}, os::{fd::IntoRawFd, unix::fs::FileExt}, path::Path};
+    use std::{fs::{File, OpenOptions}, io::{self, Write}, path::Path};
+    use std::os::fd::IntoRawFd;
+    #[cfg(unix)] use std::os::unix::fs::FileExt;
+    #[cfg(target_os = "wasi")] use std::os::wasi::fs::FileExt;
     pub struct NativeFile(File);
     impl NativeFile {
         pub fn open(path: &Path, _share: u32, overwrite: bool) -> io::Result<Self> { OpenOptions::new().write(true).create(overwrite).truncate(overwrite).create_new(!overwrite).open(path).map(Self) }

@@ -608,9 +608,18 @@ impl OpenVectorApp {
         if !duplicates.is_empty() { self.fail(format!("Already in queue: {}", duplicates.join(", ")), cx); }
         cx.notify();
     }
+    #[cfg(target_os = "wasi")]
+    pub(crate) fn open_browser_files(&mut self, paths: Vec<String>, cx: &mut Context<Self>) {
+        if self.busy || self.dialog.is_some() { return; }
+        if self.batch.is_some() { self.add_batch_files(&paths, cx); }
+        else if let Some(path) = paths.into_iter().next() { self.open(path.into(), cx); }
+    }
     fn choose_files(&mut self, batch: bool, cx: &mut Context<Self>) {
         if self.busy { return; }
         self.automatic.cancel(); self.automatic_task = None;
+        #[cfg(target_os = "wasi")]
+        let prompt = crate::browser::pick_images(batch);
+        #[cfg(not(target_os = "wasi"))]
         let prompt = cx.prompt_for_paths(PathPromptOptions { files: true, directories: false, multiple: batch, prompt: Some("Open image".into()) });
         cx.spawn(async move |this, cx| {
             let result = prompt.await;
@@ -627,8 +636,12 @@ impl OpenVectorApp {
     fn choose_export(&mut self, window: &Window, cx: &mut Context<Self>) {
         if self.busy || !self.document.as_ref().is_some_and(|doc| doc.vectors.is_some()) { return; }
         let source = &self.document.as_ref().expect("loaded document").filename;
+        #[cfg(not(target_os = "wasi"))]
         let parent = source.parent().unwrap_or(std::path::Path::new("."));
         let suggested = format!("{}.{}", source.file_stem().unwrap_or_default().to_string_lossy(), self.preferences.format);
+        #[cfg(target_os = "wasi")]
+        let prompt = crate::browser::save_path(&suggested);
+        #[cfg(not(target_os = "wasi"))]
         let prompt = cx.prompt_for_new_path(parent, Some(&suggested));
         cx.spawn_in(window, async move |this, cx| {
             let result = prompt.await;

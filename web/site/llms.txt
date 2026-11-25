@@ -1,0 +1,27 @@
+# OpenVector
+
+> OpenVector is a free, open-source (MIT) raster-to-vector converter. It traces PNG, JPEG, GIF, BMP and TIFF images into editable SVG, PDF, EPS, AI, DXF and EMF vectors. The online editor at https://openvector.app/app/ runs entirely in the browser as WebAssembly, so images are never uploaded. The same Rust engine ships as a desktop app (Windows, macOS, Linux) and as a CLI and Node.js library on npm.
+
+Key facts:
+
+- Price: free. No account, watermark or export limit.
+- Privacy: images stay in the browser tab's memory and are discarded when the tab closes.
+- Tools: automatic tracing, manual palettes, segmentation editing, background removal, batch conversion (desktop and CLI).
+- Browser requirements: current Chrome, Edge, Firefox or Safari with WebAssembly threads and WebGL2. First visit downloads about 5 MB.
+- Current version: 0.1.5. Author: Microck.
+
+## Product
+
+- [OpenVector home](https://openvector.app/): what it does, supported formats and FAQ
+- [Online editor](https://openvector.app/app/): convert an image in the browser
+- [Desktop downloads](https://github.com/Microck/openvector/releases/latest): Windows, macOS and Linux packages
+
+## Developers
+
+- [Source code and README](https://github.com/Microck/openvector): build instructions, CLI and Node.js usage
+- [npm package](https://www.npmjs.com/package/openvector): `npx openvector vectorize logo.png --output logo.svg`
+- [Changelog](https://github.com/Microck/openvector/blob/main/CHANGELOG.md)
+
+## Optional
+
+- [Licenses and source archive](https://openvector.app/licenses/): third-party notices for the web build
