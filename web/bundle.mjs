@@ -10,8 +10,8 @@ import {copyBundledNotices, root, rustNotices} from '../tools/native-notices.mjs
 const outdir = process.argv[2];
 if (!outdir) throw new Error('Supply a new output directory.');
 await mkdir(outdir);
-const app = join(outdir, 'app');
-await mkdir(app);
+const editor = join(outdir, 'editor');
+await mkdir(editor);
 await cp('site', outdir, {recursive: true, filter: path => !path.split(sep).includes('.taste-skill')});
 const licenses = join(outdir, 'licenses');
 await mkdir(licenses);
@@ -20,11 +20,11 @@ await mkdir(licenses);
 const wasm = await readFile('generated/openvector_bg.wasm');
 // Only content-addressed files receive immutable caching on both hosts.
 const engine = 'engine/' + createHash('sha256').update(wasm).digest('hex') + '.wasm';
-await mkdir(join(app, 'engine'));
+await mkdir(join(editor, 'engine'));
 const imports = WebAssembly.Module.imports(await WebAssembly.compile(wasm));
 const names = imports.filter(entry => entry.module === 'wasi_snapshot_preview1').map(entry => entry.name);
 await build({
-  entryPoints: {openvector: 'launch.js', 'document-worker': 'document-worker.js'}, bundle: true, splitting: true, format: 'esm', minify: true, logOverride: {'duplicate-object-key': 'silent'}, outdir: app,
+  entryPoints: {openvector: 'launch.js', 'document-worker': 'document-worker.js'}, bundle: true, splitting: true, format: 'esm', minify: true, logOverride: {'duplicate-object-key': 'silent'}, outdir: editor,
   define: {OPENVECTOR_ENGINE_PATH: JSON.stringify(engine)},
   plugins: [{
     name: 'wasi-browser-host',
@@ -39,13 +39,13 @@ await build({
     },
   }],
 });
-await writeFile(join(app, engine), wasm);
-await writeFile(join(app, engine + '.gz'), gzipSync(wasm, {level: 9}));
-await copyFile('index.html', join(app, 'index.html'));
+await writeFile(join(editor, engine), wasm);
+await writeFile(join(editor, engine + '.gz'), gzipSync(wasm, {level: 9}));
+await copyFile('index.html', join(editor, 'index.html'));
 await copyFile('_headers', join(outdir, '_headers'));
-for (const name of await readdir(app)) {
+for (const name of await readdir(editor)) {
   if (name.endsWith('.js')) {
-    await writeFile(join(app, name + '.gz'), gzipSync(await readFile(join(app, name)), {level: 9}));
+    await writeFile(join(editor, name + '.gz'), gzipSync(await readFile(join(editor, name)), {level: 9}));
   }
 }
 

@@ -1,6 +1,6 @@
 # OpenVector
 
-> OpenVector is a free, open-source (MIT) raster-to-vector converter. It traces PNG, JPEG, GIF, BMP and TIFF images into editable SVG, PDF, EPS, AI, DXF and EMF vectors. The online editor at https://openvector.app/app/ runs entirely in the browser as WebAssembly, so images are never uploaded. The same Rust engine ships as a desktop app (Windows, macOS, Linux) and as a CLI and Node.js library on npm.
+> OpenVector is a free, open-source (MIT) raster-to-vector converter. It traces PNG, JPEG, GIF, BMP and TIFF images into editable SVG, PDF, EPS, AI, DXF and EMF vectors. The online editor at https://openvector.app/editor/ runs entirely in the browser as WebAssembly, so images are never uploaded. The same Rust engine ships as a desktop app (Windows, macOS, Linux) and as a CLI and Node.js library on npm.
 
 Key facts:
 
@@ -13,7 +13,7 @@ Key facts:
 ## Product
 
 - [OpenVector home](https://openvector.app/): what it does, supported formats and FAQ
-- [Online editor](https://openvector.app/app/): convert an image in the browser
+- [Online editor](https://openvector.app/editor/): convert an image in the browser
 - [Desktop downloads](https://github.com/Microck/openvector/releases/latest): Windows, macOS and Linux packages
 
 ## Developers

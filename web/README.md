@@ -13,15 +13,15 @@ WASI_SDK_PATH=/path/to/wasi-sdk npm run build
 python3 serve.py --port 4174
 ```
 
-Serve the contents of `dist/` over HTTPS or localhost. Send `Cross-Origin-Opener-Policy: same-origin` and `Cross-Origin-Embedder-Policy: require-corp` on `/app/`, and `application/wasm` for the Wasm file. The development server supplies these headers. The editor requires WebGL2 for rendering and shared WebAssembly memory for tracing.
+Serve the contents of `dist/` over HTTPS or localhost. Send `Cross-Origin-Opener-Policy: same-origin` and `Cross-Origin-Embedder-Policy: require-corp` on `/editor/`, and `application/wasm` for the Wasm file. The development server supplies these headers. The editor requires WebGL2 for rendering and shared WebAssembly memory for tracing.
 
 The editor and its document worker share the Rust command and progress channels. A trace runs on the worker while GPUI paints and handles input on the browser thread. Both use the same in-memory filesystem. The build enables JavaScript bindings in three pinned crates for this WASI target and keeps the native workspace lockfile intact.
 
-To check cancellation, UI responsiveness, and native SVG parity through the running editor, run `python3 check-worker.py http://localhost:4174/app/`. The check uses Python Playwright, Chromium, and Pillow. Set `CHROMIUM` to use an installed Chromium executable. Pass `--browser firefox` or `--browser webkit` to run the same check on those engines. Use `--headed` when the engine needs a display for WebGL2.
+To check cancellation, UI responsiveness, and native SVG parity through the running editor, run `python3 check-worker.py http://localhost:4174/editor/`. The check uses Python Playwright, Chromium, and Pillow. Set `CHROMIUM` to use an installed Chromium executable. Pass `--browser firefox` or `--browser webkit` to run the same check on those engines. Use `--headed` when the engine needs a display for WebGL2.
 
 ### Export parity
 
-Run `python3 check-exports.py http://localhost:4174/app/` for the six browser
+Run `python3 check-exports.py http://localhost:4174/editor/` for the six browser
 downloads and the JPEG session regression in Chromium. It uses the same
 Playwright, Pillow, and optional `CHROMIUM` settings as the worker check.
 A fresh editor and a fresh native CLI process start with the same smoothing
@@ -32,7 +32,7 @@ must use equivalent display metrics. EPS includes the local creation time.
 
 ## Deploy
 
-The static landing page in `site/` is served at `/`, the editor at `/app/`,
+The static landing page in `site/` is served at `/`, the editor at `/editor/`,
 and the notices at `/licenses/`. If the domain changes, update the canonical
 URL, social tags and structured data in the landing page along with
 `llms.txt`, `robots.txt` and `sitemap.xml`.
@@ -45,7 +45,7 @@ archive, before uploading. For an existing Pages project, deploy with
 `wrangler pages deploy /path/to/new-release --project-name YOUR_PROJECT`.
 Keep the deployment static on Pages Free. Browser workers run on the user's
 device. No Pages Functions, database, or paid storage are required. The build
-gives the Wasm engine a content-based URL under `/app/engine/` so browsers can
+gives the Wasm engine a content-based URL under `/editor/engine/` so browsers can
 cache it for a year; the launcher revalidates and points at the current engine.
 On a preview deployment verify `window.crossOriginIsolated` and run the
 worker check above before promoting it.
@@ -77,5 +77,5 @@ interaction.
 ## Network ads
 
 Network ads belong on the landing page, which is not cross-origin isolated.
-Only `/app/` sends the isolation headers, so ad scripts and frames load on `/`.
+Only `/editor/` sends the isolation headers, so ad scripts and frames load on `/`.
 Keep provider JavaScript out of the editor.
