@@ -8,6 +8,8 @@ import { basename, join } from 'node:path';
 import { parseArgs } from 'node:util';
 import { cargoBuild, copyBundledNotices, root, rustNotices, toolchainNotices, workspace } from './native-notices.mjs';
 
+const appId = 'dev.micr.openvector';
+
 try {
   const { values, positionals } = parseArgs({
     options: { target: { type: 'string' }, profile: { type: 'string', default: 'release' } },
@@ -48,10 +50,13 @@ try {
   if (values.target.includes('-linux-')) {
     const applications = join(destination, 'share', 'applications');
     const icons = join(destination, 'share', 'icons', 'hicolor', '256x256', 'apps');
+    const metainfo = join(destination, 'share', 'metainfo');
+    mkdirSync(metainfo, { recursive: true });
     mkdirSync(applications, { recursive: true });
     mkdirSync(icons, { recursive: true });
-    copyFileSync(join(assets, 'openvector.desktop'), join(applications, 'openvector.desktop'));
-    copyFileSync(join(assets, 'app-icon-256.png'), join(icons, 'openvector.png'));
+    copyFileSync(join(assets, `${appId}.desktop`), join(applications, `${appId}.desktop`));
+    copyFileSync(join(assets, 'app-icon-256.png'), join(icons, `${appId}.png`));
+    copyFileSync(join(assets, `${appId}.metainfo.xml`), join(metainfo, `${appId}.metainfo.xml`));
   }
   if (darwin) {
     const resources = join(bundle, 'Contents', 'Resources');
@@ -84,7 +89,7 @@ function infoPlist(executable, version) {
 <dict>
   <key>CFBundleName</key><string>OpenVector</string>
   <key>CFBundleDisplayName</key><string>OpenVector</string>
-  <key>CFBundleIdentifier</key><string>dev.micr.openvector</string>
+  <key>CFBundleIdentifier</key><string>${appId}</string>
   <key>CFBundleExecutable</key><string>${executable}</string>
   <key>CFBundleIconFile</key><string>OpenVector</string>
   <key>CFBundleIconName</key><string>OpenVector</string>

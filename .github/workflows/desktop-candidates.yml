@@ -91,6 +91,9 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y clang cmake ninja-build pkg-config libssl-dev libfontconfig1-dev libfreetype6-dev libxkbcommon-dev libxkbcommon-x11-dev libwayland-dev libxcb1-dev libxcb-xkb-dev libx11-xcb-dev libxcb-cursor-dev libasound2-dev libvulkan-dev mesa-vulkan-drivers xvfb dbus-x11 protobuf-compiler zip
+      - name: Install Linux packaging tools
+        if: matrix.platform == 'linux'
+        run: sudo apt-get install -y appstream desktop-file-utils flatpak
       - name: Install Windows cross-build tools
         if: matrix.platform == 'windows'
         run: sudo apt-get install -y gcc-mingw-w64-x86-64 g++-mingw-w64-x86-64 nsis
@@ -110,7 +113,7 @@ jobs:
         run: |
           node tools/package-gui.mjs --target "$TARGET" ../stage
           cargo build --locked --offline --manifest-path rust/Cargo.toml --release --target "$TARGET" -p openvector-cli
-      - name: Package Linux archive and test extracted application
+      - name: Build and smoke-test Linux desktop packages
         if: matrix.platform == 'linux'
         working-directory: source
         shell: bash
@@ -123,10 +126,34 @@ jobs:
           tar -czf "../dist/$name.tar.gz" -C .. "$name"
           mkdir ../extracted
           tar -xzf "../dist/$name.tar.gz" -C ../extracted
-          export XDG_RUNTIME_DIR=$(mktemp -d)
-          trap 'rm -rf "$XDG_RUNTIME_DIR"' EXIT
-          dbus-run-session -- xvfb-run -a node tools/check-desktop-package.mjs "../extracted/$name/openvector-gui" "$CARGO_TARGET_DIR/$TARGET/release/openvector"
+          TMPDIR=$(mktemp -d "$HOME/openvector-package-check.XXXXXX")
+          trap 'rm -r "$TMPDIR"' EXIT
+          export TMPDIR
+          export XDG_RUNTIME_DIR="$TMPDIR/runtime"
+          mkdir -m 700 "$XDG_RUNTIME_DIR"
+          cli="$CARGO_TARGET_DIR/$TARGET/release/openvector"
+          xvfb-run -a dbus-run-session -- \
+            node tools/check-desktop-package.mjs "../extracted/$name/openvector-gui" "$cli"
           objdump -T "../extracted/$name/openvector-gui" | sort > "../dist/$name-symbols.txt"
+
+          flatpak remote-add --user --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+          flatpak install --user --noninteractive flathub org.freedesktop.Platform//25.08
+          bash tools/package-linux.sh "../$name" "../dist/$name"
+
+          APPIMAGE_EXTRACT_AND_RUN=1 xvfb-run -a dbus-run-session -- \
+            node tools/check-desktop-package.mjs "../dist/$name.AppImage" "$cli"
+
+          flatpak install --user --noninteractive "../dist/$name.flatpak"
+          # Grant only the disposable fixture directory to the smoke test. The
+          # installed app otherwise obtains user-selected paths via the portal.
+          cat > "$TMPDIR/flatpak-launcher" <<'EOF'
+          #!/usr/bin/env bash
+          exec flatpak run --user --filesystem="$TMPDIR" \
+            --env=OPENVECTOR_PREFERENCES="$OPENVECTOR_PREFERENCES" dev.micr.openvector "$@"
+          EOF
+          chmod +x "$TMPDIR/flatpak-launcher"
+          xvfb-run -a dbus-run-session -- \
+            node tools/check-desktop-package.mjs "$TMPDIR/flatpak-launcher" "$cli"
       - name: Package Windows installer and portable ZIP
         if: matrix.platform == 'windows'
         working-directory: source

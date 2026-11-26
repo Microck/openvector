@@ -21,6 +21,7 @@ git archive HEAD | tar -xf - -C "$temporary/$name"
   mkdir -p .cargo
   cargo vendor --locked --manifest-path rust/Cargo.toml cargo-vendor > .cargo/config.toml
   cargo metadata --locked --offline --manifest-path rust/Cargo.toml --format-version 1 > /dev/null
+  bash tools/prepare-appimage-source.sh appimage-runtime
   printf '%s\n' "$commit" > SOURCE-COMMIT
   cat > REBUILD.txt <<'INSTRUCTIONS'
 This archive contains the application source, local GPUI patches, and vendored
@@ -34,6 +35,9 @@ To modify the LGPL Qt-derived component, edit:
   rust/crates/openvector/src/bitmap_raster/square_stroke.rs
 Its license and modification notices are under:
   rust/crates/openvector/vendor/qt-bezier/
+
+The AppImage runtime source, dependency archives and rebuild notes are in
+appimage-runtime/. See appimage-runtime/licenses/SOURCE.txt for instructions.
 
 From this archive's root, rebuild the desktop application with:
   cargo build --manifest-path rust/Cargo.toml --locked --offline --release -p openvector-gui
