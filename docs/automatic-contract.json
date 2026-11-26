@@ -8,6 +8,7 @@
       "Scan the prepared original lazily for alpha type 0/1/2; invalidate only on source replacement.",
       "Use opaque white background only for category 1 with binary alpha; transparent white otherwise.",
       "For palette modes 0/1, evaluate candidates 2..12, choose the completed minimum score, and pass colors through native 16-bit channel rounding. Skip palette selection for mode 2.",
+      "If automatic classification recommends two colors, reconsider that limit using the evaluated candidates' color-penalized reconstruction scores. Promote to a fixed palette only if another candidate strictly improves the score. Apply this to automatic single-image and automatic basic batch palette selection.",
       "Run segmentation, smoothing and fitting through the canonical completed-task scheduler. Preserve session PRNG and native cache rules."
     ],
     "result": [
