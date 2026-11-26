@@ -13,10 +13,10 @@ const directory = mkdtempSync(join(tmpdir(), 'openvector-package-'));
 const npm = (args) => execFileSync(process.execPath, [process.env.npm_execpath, ...args], {
   cwd: directory, stdio: 'inherit',
 });
-// Authored 8x8 BMP: a blue 4x4 square inside a red border. Expected SVG was
-// independently checked with the native release packages on Linux and Windows.
+// Authored 8x8 BMP: a blue 4x4 square inside a red border. Expected SVG
+// includes the opaque blue backing path behind the hole in the red shape.
 const bitmap = 'Qk32AAAAAAAAADYAAAAoAAAACAAAAAgAAAABABgAAAAAAMAAAADEDgAAxA4AAAAAAAAAAAAAAAD/AAD/AAD/AAD/AAD/AAD/AAD/AAD/AAD/AAD/AAD/AAD/AAD/AAD/AAD/AAD/AAD/AAD//wAA/wAA/wAA/wAAAAD/AAD/AAD/AAD//wAA/wAA/wAA/wAAAAD/AAD/AAD/AAD//wAA/wAA/wAA/wAAAAD/AAD/AAD/AAD//wAA/wAA/wAA/wAAAAD/AAD/AAD/AAD/AAD/AAD/AAD/AAD/AAD/AAD/AAD/AAD/AAD/AAD/AAD/AAD/AAD/AAD/';
-const expected = 'e762312fc6cb03bca38f557bc5b2c724653a3ea774d722a5ab2f9e3d34d2f952';
+const expected = '6b629448fb2884812f972942c361a9cccadcde211d7bd5199769b9c290f02e11';
 try {
   // npm otherwise searches ancestors for a project and can modify operator files.
   writeFileSync(join(directory, 'package.json'), JSON.stringify({ private: true }));
