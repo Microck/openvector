@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>dev.micr.openvector</id>
+  <name>OpenVector</name>
+  <summary>Convert bitmap images to editable vectors</summary>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>MIT</project_license>
+  <developer id="dev.micr">
+    <name>Microck</name>
+  </developer>
+  <description>
+    <p>OpenVector converts raster images such as logos and illustrations into editable vector graphics. Preview the result and adjust the palette before exporting.</p>
+  </description>
+  <launchable type="desktop-id">dev.micr.openvector.desktop</launchable>
+  <url type="homepage">https://github.com/Microck/openvector</url>
+  <url type="bugtracker">https://github.com/Microck/openvector/issues</url>
+  <content_rating type="oars-1.1"/>
+</component>

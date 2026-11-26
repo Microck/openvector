@@ -91,7 +91,7 @@ suites, native execution, or manual desktop QA.
 
 | Workflow | Trigger | Required artifacts and checks |
 | --- | --- | --- |
-| [Desktop candidates](../.github/workflows/desktop-candidates.yml) | A PR whose head branch starts with `release/`, excluding `release/npm-` | `corresponding-source`, all selected `desktop-*` jobs, and Windows installation checks |
+| [Desktop candidates](../.github/workflows/desktop-candidates.yml) | A PR whose head branch starts with `release/`, excluding `release/npm-` | `corresponding-source`, all selected `desktop-*` jobs, including the Linux AppImage and Flatpak bundles, and Windows installation checks |
 | [npm candidates](../.github/workflows/npm-candidates.yml) | A `release/npm-` PR, or manual dispatch at a selected ref | Five native builds, `npm-package`, and all ten installed-package checks |
 
 For a combined release PR such as `release/X.Y.Z`, set `CANDIDATE_REF` to that frozen
@@ -122,8 +122,8 @@ Linux ARM64, Windows x64, macOS ARM64, and macOS x64 on Node 22.19 and 24.
 | --- | --- |
 | macOS Apple Silicon | Developer ID-signed, notarized, stapled `.dmg` |
 | macOS Intel | Developer ID-signed, notarized, stapled `.dmg` |
-| Linux amd64 | Complete `.tar.gz` |
-| Linux ARM64 | Complete `.tar.gz` |
+| Linux amd64 | `.tar.gz`, `.AppImage`, and `.flatpak` |
+| Linux ARM64 | `.tar.gz`, `.AppImage`, and `.flatpak` |
 | Windows x64 | `Setup.exe` and complete portable `.zip` |
 
 Extract each artifact into a fresh directory. Exercise that packaged executable,
@@ -144,6 +144,32 @@ The CI conversion checker is
 `node tools/check-desktop-package.mjs <packaged-GUI> <matching-CLI>`.
 It compares actual GUI and CLI output in isolated state, but does not perform
 manual palette editing or native-reader reopening.
+
+Linux candidates package the same staged GUI and notices into all three formats.
+The AppImage and Flatpak bundle use the filenames
+`openvector-$VERSION-linux-$ARCH.AppImage` and
+`openvector-$VERSION-linux-$ARCH.flatpak`, where `ARCH` is `amd64` or `arm64`.
+Run the AppImage after making it executable. It uses the Ubuntu 24.04 build
+baseline and the host's desktop and graphics libraries. Smoke-test the
+extraction path in CI and test normal FUSE launch on a release test machine.
+
+Install the Flatpak bundle with `flatpak install --user ./<file>.flatpak` and
+launch with `flatpak run dev.micr.openvector`. The bundle uses the Freedesktop
+25.08 runtime from Flathub. Test opening a bitmap and saving an SVG through the
+desktop file chooser with the installed bundle. Use the file chooser for files
+outside the sandbox. Dragging files in from host folders and dragging results
+to other sandboxed apps can fail because those apps lack access to the paths.
+Install in a disposable account to keep its Flatpak remotes, applications, and
+sandbox settings isolated.
+
+The AppImage embeds the [20251108 AppImage runtime](https://github.com/AppImage/type2-runtime/tree/dd6cebedcbddde9c82f89b011e8e1d40b6e43868).
+The corresponding source archive must include `appimage-runtime/` with the
+runtime source, libfuse source and patch, and instructions for rebuilding the
+runtime and replacing it in the AppImage. The AppImage must include the
+runtime's notices in `licenses/appimage-runtime/`. The source packager prepares
+these inputs. To package from a checkout instead, run
+`bash tools/prepare-appimage-source.sh appimage-runtime` first.
+Record the embedded runtime and package hashes in the release provenance.
 
 Windows installation tests need a disposable host with no existing OpenVector
 uninstall registration. Verify custom-path installation, installed/portable byte
@@ -239,7 +265,7 @@ and npm artifacts must correspond to the same reviewed application source.
 Set `PAYLOAD_DIR` to a new directory containing only the selected public downloads,
 corresponding source, and provenance. Keep diagnostic CLIs, candidate Mac tarballs,
 notarization ZIPs, logs, screenshots, and npm tarballs outside it. For all desktop
-targets, expect six binary downloads, one source archive, provenance, and checksums.
+targets, expect ten binary downloads, one source archive, provenance, and checksums.
 
 ## 5. Merge and publish GitHub downloads
 

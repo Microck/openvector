@@ -6,6 +6,10 @@ Dates are the GitHub release publication dates in UTC.
 
 ## [Unreleased]
 
+### Added
+
+- Add AppImage and Flatpak desktop packages for Linux amd64 and arm64. Use the file chooser to open and save host files from the Flatpak sandbox.
+
 ## [0.1.5] - 2026-11-24
 
 ### Added
