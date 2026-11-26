@@ -11,8 +11,12 @@ Dates are the GitHub release publication dates in UTC.
 ### Added
 
 - Use the OpenVector editor in a browser at [openvector.app](https://openvector.app/).
-
 - Add AppImage and Flatpak desktop packages for Linux amd64 and arm64. Use the file chooser to open and save host files from the Flatpak sandbox.
+
+### Fixed
+
+- Preserve small accent colors during automatic tracing.
+- Reduce visible seams around opaque cutouts in SVG exports.
 
 ## [0.1.5] - 2026-11-24
 
