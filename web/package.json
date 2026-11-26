@@ -1,0 +1,8 @@
+{
+  "name": "openvector-web",
+  "private": true,
+  "type": "module",
+  "scripts": { "build": "python3 build-browser.py" },
+  "dependencies": { "@bjorn3/browser_wasi_shim": "0.4.2" },
+  "devDependencies": { "esbuild": "0.27.0" }
+}

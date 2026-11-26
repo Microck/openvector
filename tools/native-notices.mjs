@@ -93,10 +93,9 @@ function packageTexts(pkg, upstream) {
 // Cargo compiled. Packages compiled for `target` are "linked" into the binaries;
 // build scripts, procedural macros and their dependencies compile for the host and
 // are listed as "build". Workspace crates are OpenVector's own MIT code.
-export function rustNotices(target, artifacts) {
-  const metadata = JSON.parse(run('cargo', ['metadata', '--locked', '--format-version', '1']));
+export function rustNotices(target, artifacts, metadata = JSON.parse(run('cargo', ['metadata', '--locked', '--format-version', '1']))) {
   const packages = new Map(metadata.packages.map((pkg) => [pkg.id, pkg]));
-  const members = new Set(metadata.workspace_members);
+  const members = new Set(metadata.workspace_members.filter(id => packages.get(id).name.startsWith('openvector')));
   const roles = new Map();
   for (const artifact of artifacts) {
     if (members.has(artifact.package_id)) continue;

@@ -3738,11 +3738,15 @@ dependencies = [
  "flate2",
  "gpui",
  "gpui_platform",
+ "gpui_web",
  "image",
+ "js-sys",
  "libc",
  "openvector",
  "serde_json",
  "unicode-segmentation",
+ "wasm-bindgen",
+ "wasm-bindgen-futures",
  "windows-sys",
 ]
 

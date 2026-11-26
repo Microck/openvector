@@ -1,3 +1,4 @@
+#![cfg_attr(target_os = "wasi", feature(wasi_ext))]
 //! OpenVector engine. Each module ports the JavaScript module of the same
 //! name in `src/`, which is the verified differential reference. Native
 //! capture fixtures in `test/fixtures` are the specification.
@@ -66,3 +67,11 @@ pub mod tiff_input;
 pub mod tiff_legacy_codecs;
 pub mod vector_file;
 pub mod vector_output;
+
+/// Browser instances each own a private filesystem and have no OS process ID.
+pub fn filesystem_process_id() -> u32 {
+    #[cfg(target_os = "wasi")]
+    { 0 }
+    #[cfg(not(target_os = "wasi"))]
+    { std::process::id() }
+}

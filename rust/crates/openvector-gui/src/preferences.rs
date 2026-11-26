@@ -178,7 +178,7 @@ impl Preferences {
         // must not delete a directory at the destination or another writer's file.
         static NEXT: AtomicU64 = AtomicU64::new(0);
         let (temporary, mut file) = loop {
-            let path = self.path.with_extension(format!("{}-{}.tmp", std::process::id(), NEXT.fetch_add(1, Ordering::Relaxed)));
+            let path = self.path.with_extension(format!("{}-{}.tmp", openvector::filesystem_process_id(), NEXT.fetch_add(1, Ordering::Relaxed)));
             match fs::OpenOptions::new().write(true).create_new(true).open(&path) {
                 Ok(file) => break (path, file),
                 Err(error) if error.kind() == io::ErrorKind::AlreadyExists => continue,

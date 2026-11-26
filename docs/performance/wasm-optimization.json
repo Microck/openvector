@@ -1,0 +1,2176 @@
+{
+  "stages": {
+    "browser": "156.0.8078.79",
+    "samples": 1,
+    "cases": [
+      {
+        "image": "alpha-logo.png",
+        "input_sha256": "77a7e71fee480b04865f59dc001c68dd7ddd107d6d995f12bebc8f11abd4ac9b",
+        "svg_sha256": "e09ae901313dd02100a80d5cb00665c8193ef79cbf7fa8efe88e477a058d4305",
+        "bytes": 1427,
+        "native_ms": [
+          423.05530899999997,
+          414.37156200000004
+        ],
+        "wasm_ms": {
+          "profile": [
+            773.3,
+            667.3
+          ]
+        },
+        "order": [
+          [
+            "profile"
+          ],
+          [
+            "profile"
+          ]
+        ],
+        "browser_stages_ms": {
+          "profile": [
+            {
+              "decode": 5.8999999999999995,
+              "source": 3.9,
+              "classification": 59.7,
+              "palette": 17.3,
+              "segmentation": 46.800000000000004,
+              "smoothing": 630.3,
+              "fitting": 6.3,
+              "snapshot": 0.3,
+              "export": 1.1
+            },
+            {
+              "decode": 0.6,
+              "source": 0.5,
+              "classification": 25.3,
+              "palette": 15.6,
+              "segmentation": 33.0,
+              "smoothing": 590.0,
+              "fitting": 1.5,
+              "snapshot": 0.1,
+              "export": 0.3
+            }
+          ]
+        },
+        "native_stages_ms": [
+          {
+            "decode": 0.517258,
+            "source": 0.373902,
+            "classification": 17.986696,
+            "palette": 9.164471,
+            "segmentation": 25.692012000000002,
+            "smoothing": 368.000474,
+            "fitting": 1.109859,
+            "snapshot": 0.056054,
+            "export": 0.120892
+          },
+          {
+            "decode": 0.455926,
+            "source": 0.10686999999999999,
+            "classification": 17.33023,
+            "palette": 8.813752,
+            "segmentation": 25.201756,
+            "smoothing": 361.157895,
+            "fitting": 1.101617,
+            "snapshot": 0.059067999999999996,
+            "export": 0.109876
+          }
+        ],
+        "byte_identical_downloads": 2
+      },
+      {
+        "image": "openvector-logo.png",
+        "input_sha256": "575e8bb1f3ebcbf0b57f4dd4e9e73cde5d13f91c1a8f4e7453e322bc5b240025",
+        "svg_sha256": "2366476dfae6d02be1b793684ef01a4b8cd2116211248752e6c02988255d84d5",
+        "bytes": 1552,
+        "native_ms": [
+          4305.918815,
+          4250.915814
+        ],
+        "wasm_ms": {
+          "profile": [
+            6640.1,
+            6482.6
+          ]
+        },
+        "order": [
+          [
+            "profile"
+          ],
+          [
+            "profile"
+          ]
+        ],
+        "browser_stages_ms": {
+          "profile": [
+            {
+              "decode": 28.7,
+              "source": 11.2,
+              "classification": 603.4000000000001,
+              "palette": 112.9,
+              "segmentation": 1733.7,
+              "smoothing": 4136.5,
+              "fitting": 10.5,
+              "snapshot": 1.5,
+              "export": 0.4
+            },
+            {
+              "decode": 18.599999999999998,
+              "source": 10.0,
+              "classification": 616.6,
+              "palette": 109.0,
+              "segmentation": 1589.0,
+              "smoothing": 4126.2,
+              "fitting": 10.8,
+              "snapshot": 1.5,
+              "export": 0.5
+            }
+          ]
+        },
+        "native_stages_ms": [
+          {
+            "decode": 19.155253000000002,
+            "source": 6.934888,
+            "classification": 526.857662,
+            "palette": 84.90229500000001,
+            "segmentation": 1363.64741,
+            "smoothing": 2294.590405,
+            "fitting": 8.660883,
+            "snapshot": 1.003208,
+            "export": 0.115184
+          },
+          {
+            "decode": 17.180023,
+            "source": 4.499967,
+            "classification": 491.41153199999997,
+            "palette": 78.55683400000001,
+            "segmentation": 1320.6546239999998,
+            "smoothing": 2327.823422,
+            "fitting": 8.710456,
+            "snapshot": 1.265774,
+            "export": 0.121482
+          }
+        ],
+        "byte_identical_downloads": 2
+      }
+    ]
+  },
+  "cpu": [
+    [
+      "<openvector::image_measurement_kernel::ImageKernel>::energy",
+      1332
+    ],
+    [
+      "<openvector::segmentation::RegionOptimizer>::iterate",
+      500
+    ],
+    [
+      "__udivti3",
+      416
+    ],
+    [
+      "openvector::arctangent::series_fixed_uint",
+      375
+    ],
+    [
+      "__multi3",
+      353
+    ],
+    [
+      "openvector::region_data::rebuild_connected_regions",
+      324
+    ],
+    [
+      "<openvector::subpixel::SubpixelModel>::apply_merge",
+      285
+    ],
+    [
+      "openvector::arctangent::contour_angle_step",
+      272
+    ],
+    [
+      "openvector::image_classification::blur_classifier_pixels",
+      199
+    ],
+    [
+      "<openvector::fast_fixed::FixedUint>::mul_shift_192",
+      161
+    ],
+    [
+      "<openvector::segmentation_state::SegmentationState>::run::{closure#0}",
+      131
+    ],
+    [
+      "openvector::subpixel::build",
+      128
+    ],
+    [
+      "<openvector::image_measurement_kernel::ImageKernel>::add_gradient",
+      117
+    ],
+    [
+      "openvector::image_measurement_kernel::add_record_gradient",
+      115
+    ],
+    [
+      "<openvector::image_measurement_kernel::ImageKernel>::residuals (.llvm.13622933201903259187)",
+      98
+    ],
+    [
+      "<openvector::fast_fixed::FixedUint>::round_significand",
+      78
+    ],
+    [
+      "<openvector::fast_fixed::FixedUint>::shl",
+      77
+    ],
+    [
+      "<openvector::segmentation_state::SegmentationSnapshot as core::clone::Clone>::clone",
+      66
+    ],
+    [
+      "openvector::palette::assign_indices",
+      65
+    ],
+    [
+      "<openvector::fast_fixed::FixedUint>::sub",
+      65
+    ],
+    [
+      "openvector::image_classification::byte_pixel_distance",
+      50
+    ],
+    [
+      "openvector::image_classification::measure_classifier_gradients",
+      49
+    ],
+    [
+      "openvector::image_resize::triangle_pass",
+      46
+    ],
+    [
+      "<openvector::palette::CoreSession>::refine_prepared",
+      44
+    ],
+    [
+      "openvector::image_classification::sample_classifier_edge",
+      40
+    ],
+    [
+      "<openvector::fast_fixed::FixedUint>::add_assign",
+      38
+    ],
+    [
+      "openvector::segmentation::tile",
+      35
+    ],
+    [
+      "__ashlti3",
+      34
+    ],
+    [
+      "<openvector::image_measurement_kernel::ImageKernel>::append",
+      32
+    ],
+    [
+      "<openvector::image_measurement_kernel::ImageKernel>::connect_perimeter",
+      32
+    ],
+    [
+      "openvector::smoothing::objective_terms_const::<false, true>",
+      30
+    ],
+    [
+      "openvector::palette::calculate_measurement",
+      28
+    ],
+    [
+      "<openvector::image_document::ImageDocument>::classify",
+      27
+    ],
+    [
+      "<openvector::fast_fixed::FixedUint>::sub_assign",
+      27
+    ],
+    [
+      "openvector::smoothing_repair::crossing",
+      26
+    ],
+    [
+      "core::slice::sort::unstable::quicksort::quicksort::<usize, <usize as core::cmp::PartialOrd>::lt>",
+      25
+    ],
+    [
+      "__lshrti3",
+      23
+    ],
+    [
+      "openvector::segmentation::run_base",
+      22
+    ],
+    [
+      "openvector::image_classification::measure_classifier_colors",
+      22
+    ],
+    [
+      "<openvector::fast_fixed::SignedFixed>::to_f64",
+      22
+    ],
+    [
+      "<openvector::fast_fixed::FixedUint>::from_f64_fixed",
+      22
+    ],
+    [
+      "<alloc::collections::btree::map::IntoIter<usize, alloc::collections::btree::set_val::SetValZST>>::dying_next (.llvm.4921829479265977333)",
+      20
+    ],
+    [
+      "openvector::contours::extract_contours",
+      18
+    ],
+    [
+      "<openvector::fast_fixed::FixedUint>::add",
+      18
+    ],
+    [
+      "(idle)",
+      17
+    ],
+    [
+      "__rustc::__rust_alloc_zeroed",
+      17
+    ],
+    [
+      "openvector::blending::score_prepared_weighted_palette",
+      17
+    ],
+    [
+      "<openvector::fast_fixed::SignedFixed>::add",
+      17
+    ],
+    [
+      "openvector::blending::boundary_mask",
+      16
+    ],
+    [
+      "openvector::shadow_classification::measure_shadow_features",
+      16
+    ]
+  ],
+  "screen": {
+    "browser": "156.0.8078.79",
+    "samples": 3,
+    "cases": [
+      {
+        "image": "alpha-logo.png",
+        "input_sha256": "77a7e71fee480b04865f59dc001c68dd7ddd107d6d995f12bebc8f11abd4ac9b",
+        "svg_sha256": "e09ae901313dd02100a80d5cb00665c8193ef79cbf7fa8efe88e477a058d4305",
+        "bytes": 1427,
+        "native_ms": [
+          452.395094,
+          433.239342,
+          463.82635700000003,
+          458.271304
+        ],
+        "wasm_ms": {
+          "baseline": [
+            872.0,
+            713.1,
+            737.5,
+            763.6
+          ],
+          "lto": [
+            813.6,
+            696.1,
+            753.9,
+            737.0
+          ],
+          "simd": [
+            861.5,
+            703.8,
+            748.1,
+            752.3
+          ],
+          "combined": [
+            881.8,
+            709.9,
+            727.5,
+            756.6
+          ]
+        },
+        "order": [
+          [
+            "baseline",
+            "simd",
+            "combined",
+            "lto"
+          ],
+          [
+            "simd",
+            "combined",
+            "lto",
+            "baseline"
+          ],
+          [
+            "combined",
+            "lto",
+            "baseline",
+            "simd"
+          ],
+          [
+            "lto",
+            "baseline",
+            "simd",
+            "combined"
+          ]
+        ],
+        "byte_identical_downloads": 16
+      },
+      {
+        "image": "curves-and-hole.png",
+        "input_sha256": "eb5600319783737586002049751afdf2e6b2c160880cd3e557e3f0d9280d92d7",
+        "svg_sha256": "3473fa3b2c0c282017f7556c28d483128ef32da85b8df31a89d2ad78dc13aa93",
+        "bytes": 877,
+        "native_ms": [
+          254.43769700000001,
+          255.381886,
+          234.610763,
+          235.709877
+        ],
+        "wasm_ms": {
+          "baseline": [
+            399.0,
+            385.0,
+            420.7,
+            377.3
+          ],
+          "lto": [
+            428.5,
+            409.9,
+            410.8,
+            425.9
+          ],
+          "simd": [
+            419.9,
+            379.9,
+            400.5,
+            389.7
+          ],
+          "combined": [
+            391.8,
+            410.0,
+            392.8,
+            402.9
+          ]
+        },
+        "order": [
+          [
+            "combined",
+            "baseline",
+            "lto",
+            "simd"
+          ],
+          [
+            "baseline",
+            "lto",
+            "simd",
+            "combined"
+          ],
+          [
+            "lto",
+            "simd",
+            "combined",
+            "baseline"
+          ],
+          [
+            "simd",
+            "combined",
+            "baseline",
+            "lto"
+          ]
+        ],
+        "byte_identical_downloads": 16
+      },
+      {
+        "image": "gradient.png",
+        "input_sha256": "1ce854e7605bcffb4428272e94d8c3b0b952da55004f57472bc002a5717dfd1f",
+        "svg_sha256": "1638087c2f7c827f56396cd9c645d6e6820f8dda89de20a467944af83dbbfebc",
+        "bytes": 8413,
+        "native_ms": [
+          42.34024,
+          42.030153,
+          40.650938,
+          38.497942
+        ],
+        "wasm_ms": {
+          "baseline": [
+            85.1,
+            50.0,
+            50.0,
+            50.7
+          ],
+          "lto": [
+            58.8,
+            50.2,
+            54.3,
+            50.8
+          ],
+          "simd": [
+            53.5,
+            54.7,
+            50.6,
+            50.0
+          ],
+          "combined": [
+            70.4,
+            52.3,
+            73.1,
+            51.1
+          ]
+        },
+        "order": [
+          [
+            "lto",
+            "combined",
+            "baseline",
+            "simd"
+          ],
+          [
+            "combined",
+            "baseline",
+            "simd",
+            "lto"
+          ],
+          [
+            "baseline",
+            "simd",
+            "lto",
+            "combined"
+          ],
+          [
+            "simd",
+            "lto",
+            "combined",
+            "baseline"
+          ]
+        ],
+        "byte_identical_downloads": 16
+      },
+      {
+        "image": "near-colors.png",
+        "input_sha256": "debe636d14d0a820765fe78672ad7278471eaf4e66eaafb7ef452f142aa33492",
+        "svg_sha256": "b1856984f8ef30726443d847ffc976fb15112a0deff790f3fdd9d4db7f827102",
+        "bytes": 1258,
+        "native_ms": [
+          113.65882500000001,
+          111.726409,
+          111.09145400000001,
+          110.084349
+        ],
+        "wasm_ms": {
+          "baseline": [
+            164.1,
+            169.6,
+            184.6,
+            170.9
+          ],
+          "lto": [
+            189.0,
+            194.0,
+            183.1,
+            186.5
+          ],
+          "simd": [
+            172.2,
+            216.6,
+            190.9,
+            177.3
+          ],
+          "combined": [
+            172.4,
+            173.1,
+            179.6,
+            192.0
+          ]
+        },
+        "order": [
+          [
+            "combined",
+            "lto",
+            "baseline",
+            "simd"
+          ],
+          [
+            "lto",
+            "baseline",
+            "simd",
+            "combined"
+          ],
+          [
+            "baseline",
+            "simd",
+            "combined",
+            "lto"
+          ],
+          [
+            "simd",
+            "combined",
+            "lto",
+            "baseline"
+          ]
+        ],
+        "byte_identical_downloads": 16
+      },
+      {
+        "image": "triangle.png",
+        "input_sha256": "2b2107b55be423856b684a1a46e17648c29d49978b061e68dba3eb09ad820f87",
+        "svg_sha256": "fdcf2363853d2bbf3eb9bfdc37818b64342b9dbf36088302f336819c27763e16",
+        "bytes": 710,
+        "native_ms": [
+          4.644043,
+          4.254898,
+          4.231693,
+          4.758515
+        ],
+        "wasm_ms": {
+          "baseline": [
+            7.0,
+            5.7,
+            6.6,
+            6.4
+          ],
+          "lto": [
+            9.8,
+            7.0,
+            6.2,
+            6.6
+          ],
+          "simd": [
+            7.1,
+            6.3,
+            6.4,
+            5.6
+          ],
+          "combined": [
+            5.8,
+            6.2,
+            6.9,
+            6.1
+          ]
+        },
+        "order": [
+          [
+            "simd",
+            "combined",
+            "lto",
+            "baseline"
+          ],
+          [
+            "combined",
+            "lto",
+            "baseline",
+            "simd"
+          ],
+          [
+            "lto",
+            "baseline",
+            "simd",
+            "combined"
+          ],
+          [
+            "baseline",
+            "simd",
+            "combined",
+            "lto"
+          ]
+        ],
+        "byte_identical_downloads": 16
+      },
+      {
+        "image": "recent30-artwork.png",
+        "input_sha256": "a2704049acfdaa86650fc2d77fb661a68db54b98827682f4838eb284bb2b2dbf",
+        "svg_sha256": "5b440f13151ef022f503c140c7cef3c26f7cee53f8590e7ebb63c1b20b60647f",
+        "bytes": 1945,
+        "native_ms": [
+          26.662651,
+          23.840567,
+          25.794655,
+          22.93075
+        ],
+        "wasm_ms": {
+          "baseline": [
+            40.0,
+            35.5,
+            34.4,
+            33.9
+          ],
+          "lto": [
+            37.6,
+            32.7,
+            36.3,
+            34.0
+          ],
+          "simd": [
+            37.3,
+            35.0,
+            38.0,
+            36.8
+          ],
+          "combined": [
+            34.2,
+            36.1,
+            37.8,
+            34.4
+          ]
+        },
+        "order": [
+          [
+            "combined",
+            "baseline",
+            "lto",
+            "simd"
+          ],
+          [
+            "baseline",
+            "lto",
+            "simd",
+            "combined"
+          ],
+          [
+            "lto",
+            "simd",
+            "combined",
+            "baseline"
+          ],
+          [
+            "simd",
+            "combined",
+            "baseline",
+            "lto"
+          ]
+        ],
+        "byte_identical_downloads": 16
+      },
+      {
+        "image": "openvector-logo.png",
+        "input_sha256": "575e8bb1f3ebcbf0b57f4dd4e9e73cde5d13f91c1a8f4e7453e322bc5b240025",
+        "svg_sha256": "2366476dfae6d02be1b793684ef01a4b8cd2116211248752e6c02988255d84d5",
+        "bytes": 1552,
+        "native_ms": [
+          4776.559587999999,
+          4514.943449,
+          4596.172307,
+          4432.975247
+        ],
+        "wasm_ms": {
+          "baseline": [
+            6626.8,
+            7289.0,
+            6917.4,
+            6967.5
+          ],
+          "lto": [
+            7108.3,
+            7159.0,
+            7309.0,
+            7085.3
+          ],
+          "simd": [
+            7157.3,
+            7247.3,
+            7350.3,
+            7318.3
+          ],
+          "combined": [
+            6969.8,
+            6758.3,
+            7037.1,
+            7607.3
+          ]
+        },
+        "order": [
+          [
+            "simd",
+            "lto",
+            "combined",
+            "baseline"
+          ],
+          [
+            "lto",
+            "combined",
+            "baseline",
+            "simd"
+          ],
+          [
+            "combined",
+            "baseline",
+            "simd",
+            "lto"
+          ],
+          [
+            "baseline",
+            "simd",
+            "lto",
+            "combined"
+          ]
+        ],
+        "byte_identical_downloads": 16
+      }
+    ]
+  },
+  "arith": {
+    "browser": "156.0.8078.79",
+    "samples": 3,
+    "cases": [
+      {
+        "image": "alpha-logo.png",
+        "input_sha256": "77a7e71fee480b04865f59dc001c68dd7ddd107d6d995f12bebc8f11abd4ac9b",
+        "svg_sha256": "e09ae901313dd02100a80d5cb00665c8193ef79cbf7fa8efe88e477a058d4305",
+        "bytes": 1427,
+        "native_ms": [
+          437.549847,
+          418.402808,
+          430.189434,
+          413.50737799999996
+        ],
+        "wasm_ms": {
+          "baseline": [
+            792.2,
+            660.2,
+            678.5,
+            677.1
+          ],
+          "division": [
+            816.4,
+            678.2,
+            690.1,
+            678.8
+          ]
+        },
+        "order": [
+          [
+            "division",
+            "baseline"
+          ],
+          [
+            "baseline",
+            "division"
+          ],
+          [
+            "division",
+            "baseline"
+          ],
+          [
+            "baseline",
+            "division"
+          ]
+        ],
+        "byte_identical_downloads": 8
+      },
+      {
+        "image": "curves-and-hole.png",
+        "input_sha256": "eb5600319783737586002049751afdf2e6b2c160880cd3e557e3f0d9280d92d7",
+        "svg_sha256": "3473fa3b2c0c282017f7556c28d483128ef32da85b8df31a89d2ad78dc13aa93",
+        "bytes": 877,
+        "native_ms": [
+          237.33443400000002,
+          228.61129699999998,
+          227.25068100000001,
+          226.35861
+        ],
+        "wasm_ms": {
+          "baseline": [
+            379.1,
+            371.3,
+            379.8,
+            360.7
+          ],
+          "division": [
+            371.9,
+            367.2,
+            381.7,
+            366.6
+          ]
+        },
+        "order": [
+          [
+            "baseline",
+            "division"
+          ],
+          [
+            "division",
+            "baseline"
+          ],
+          [
+            "baseline",
+            "division"
+          ],
+          [
+            "division",
+            "baseline"
+          ]
+        ],
+        "byte_identical_downloads": 8
+      },
+      {
+        "image": "gradient.png",
+        "input_sha256": "1ce854e7605bcffb4428272e94d8c3b0b952da55004f57472bc002a5717dfd1f",
+        "svg_sha256": "1638087c2f7c827f56396cd9c645d6e6820f8dda89de20a467944af83dbbfebc",
+        "bytes": 8413,
+        "native_ms": [
+          39.039741,
+          37.715911,
+          37.863972000000004,
+          37.682009
+        ],
+        "wasm_ms": {
+          "baseline": [
+            50.9,
+            49.5,
+            48.3,
+            51.0
+          ],
+          "division": [
+            51.1,
+            49.9,
+            48.6,
+            48.4
+          ]
+        },
+        "order": [
+          [
+            "baseline",
+            "division"
+          ],
+          [
+            "division",
+            "baseline"
+          ],
+          [
+            "baseline",
+            "division"
+          ],
+          [
+            "division",
+            "baseline"
+          ]
+        ],
+        "byte_identical_downloads": 8
+      },
+      {
+        "image": "near-colors.png",
+        "input_sha256": "debe636d14d0a820765fe78672ad7278471eaf4e66eaafb7ef452f142aa33492",
+        "svg_sha256": "b1856984f8ef30726443d847ffc976fb15112a0deff790f3fdd9d4db7f827102",
+        "bytes": 1258,
+        "native_ms": [
+          106.01123,
+          106.0177,
+          106.171381,
+          104.279145
+        ],
+        "wasm_ms": {
+          "baseline": [
+            163.6,
+            164.4,
+            162.4,
+            163.0
+          ],
+          "division": [
+            164.6,
+            163.6,
+            167.3,
+            164.4
+          ]
+        },
+        "order": [
+          [
+            "baseline",
+            "division"
+          ],
+          [
+            "division",
+            "baseline"
+          ],
+          [
+            "baseline",
+            "division"
+          ],
+          [
+            "division",
+            "baseline"
+          ]
+        ],
+        "byte_identical_downloads": 8
+      },
+      {
+        "image": "triangle.png",
+        "input_sha256": "2b2107b55be423856b684a1a46e17648c29d49978b061e68dba3eb09ad820f87",
+        "svg_sha256": "fdcf2363853d2bbf3eb9bfdc37818b64342b9dbf36088302f336819c27763e16",
+        "bytes": 710,
+        "native_ms": [
+          4.3907620000000005,
+          3.815297,
+          4.041777,
+          4.016579999999999
+        ],
+        "wasm_ms": {
+          "baseline": [
+            6.5,
+            5.5,
+            6.1,
+            6.3
+          ],
+          "division": [
+            6.5,
+            6.6,
+            5.7,
+            5.7
+          ]
+        },
+        "order": [
+          [
+            "division",
+            "baseline"
+          ],
+          [
+            "baseline",
+            "division"
+          ],
+          [
+            "division",
+            "baseline"
+          ],
+          [
+            "baseline",
+            "division"
+          ]
+        ],
+        "byte_identical_downloads": 8
+      },
+      {
+        "image": "recent30-artwork.png",
+        "input_sha256": "a2704049acfdaa86650fc2d77fb661a68db54b98827682f4838eb284bb2b2dbf",
+        "svg_sha256": "5b440f13151ef022f503c140c7cef3c26f7cee53f8590e7ebb63c1b20b60647f",
+        "bytes": 1945,
+        "native_ms": [
+          23.454637,
+          21.480308,
+          22.823208,
+          21.014678
+        ],
+        "wasm_ms": {
+          "baseline": [
+            35.2,
+            32.9,
+            32.3,
+            33.3
+          ],
+          "division": [
+            32.8,
+            31.7,
+            31.9,
+            31.9
+          ]
+        },
+        "order": [
+          [
+            "baseline",
+            "division"
+          ],
+          [
+            "division",
+            "baseline"
+          ],
+          [
+            "baseline",
+            "division"
+          ],
+          [
+            "division",
+            "baseline"
+          ]
+        ],
+        "byte_identical_downloads": 8
+      },
+      {
+        "image": "openvector-logo.png",
+        "input_sha256": "575e8bb1f3ebcbf0b57f4dd4e9e73cde5d13f91c1a8f4e7453e322bc5b240025",
+        "svg_sha256": "2366476dfae6d02be1b793684ef01a4b8cd2116211248752e6c02988255d84d5",
+        "bytes": 1552,
+        "native_ms": [
+          4578.159959,
+          4305.502194,
+          4307.4017619999995,
+          4368.676448
+        ],
+        "wasm_ms": {
+          "baseline": [
+            6894.7,
+            6557.1,
+            6504.3,
+            6647.3
+          ],
+          "division": [
+            7115.5,
+            6555.9,
+            7142.6,
+            6797.2
+          ]
+        },
+        "order": [
+          [
+            "division",
+            "baseline"
+          ],
+          [
+            "baseline",
+            "division"
+          ],
+          [
+            "division",
+            "baseline"
+          ],
+          [
+            "baseline",
+            "division"
+          ]
+        ],
+        "byte_identical_downloads": 8
+      }
+    ]
+  },
+  "energy": {
+    "browser": "156.0.8078.79",
+    "samples": 3,
+    "cases": [
+      {
+        "image": "alpha-logo.png",
+        "input_sha256": "77a7e71fee480b04865f59dc001c68dd7ddd107d6d995f12bebc8f11abd4ac9b",
+        "svg_sha256": "e09ae901313dd02100a80d5cb00665c8193ef79cbf7fa8efe88e477a058d4305",
+        "bytes": 1427,
+        "native_ms": [
+          446.296723,
+          413.415225,
+          420.90587600000003,
+          411.095314
+        ],
+        "wasm_ms": {
+          "baseline": [
+            890.8,
+            725.4,
+            690.1,
+            740.5
+          ],
+          "energy": [
+            770.5,
+            681.3,
+            649.5,
+            645.1
+          ]
+        },
+        "order": [
+          [
+            "energy",
+            "baseline"
+          ],
+          [
+            "baseline",
+            "energy"
+          ],
+          [
+            "energy",
+            "baseline"
+          ],
+          [
+            "baseline",
+            "energy"
+          ]
+        ],
+        "byte_identical_downloads": 8
+      },
+      {
+        "image": "curves-and-hole.png",
+        "input_sha256": "eb5600319783737586002049751afdf2e6b2c160880cd3e557e3f0d9280d92d7",
+        "svg_sha256": "3473fa3b2c0c282017f7556c28d483128ef32da85b8df31a89d2ad78dc13aa93",
+        "bytes": 877,
+        "native_ms": [
+          230.075199,
+          244.79922200000001,
+          237.452266,
+          231.85154599999998
+        ],
+        "wasm_ms": {
+          "baseline": [
+            374.6,
+            390.0,
+            398.3,
+            371.0
+          ],
+          "energy": [
+            391.6,
+            381.4,
+            371.3,
+            367.9
+          ]
+        },
+        "order": [
+          [
+            "baseline",
+            "energy"
+          ],
+          [
+            "energy",
+            "baseline"
+          ],
+          [
+            "baseline",
+            "energy"
+          ],
+          [
+            "energy",
+            "baseline"
+          ]
+        ],
+        "byte_identical_downloads": 8
+      },
+      {
+        "image": "gradient.png",
+        "input_sha256": "1ce854e7605bcffb4428272e94d8c3b0b952da55004f57472bc002a5717dfd1f",
+        "svg_sha256": "1638087c2f7c827f56396cd9c645d6e6820f8dda89de20a467944af83dbbfebc",
+        "bytes": 8413,
+        "native_ms": [
+          38.655442,
+          38.685857999999996,
+          37.618011,
+          41.624258999999995
+        ],
+        "wasm_ms": {
+          "baseline": [
+            52.5,
+            50.3,
+            48.6,
+            51.8
+          ],
+          "energy": [
+            50.9,
+            58.2,
+            51.2,
+            49.0
+          ]
+        },
+        "order": [
+          [
+            "baseline",
+            "energy"
+          ],
+          [
+            "energy",
+            "baseline"
+          ],
+          [
+            "baseline",
+            "energy"
+          ],
+          [
+            "energy",
+            "baseline"
+          ]
+        ],
+        "byte_identical_downloads": 8
+      },
+      {
+        "image": "near-colors.png",
+        "input_sha256": "debe636d14d0a820765fe78672ad7278471eaf4e66eaafb7ef452f142aa33492",
+        "svg_sha256": "b1856984f8ef30726443d847ffc976fb15112a0deff790f3fdd9d4db7f827102",
+        "bytes": 1258,
+        "native_ms": [
+          107.192555,
+          104.729819,
+          109.7553,
+          108.87894100000001
+        ],
+        "wasm_ms": {
+          "baseline": [
+            162.1,
+            167.8,
+            164.1,
+            173.0
+          ],
+          "energy": [
+            161.2,
+            156.7,
+            157.2,
+            157.2
+          ]
+        },
+        "order": [
+          [
+            "baseline",
+            "energy"
+          ],
+          [
+            "energy",
+            "baseline"
+          ],
+          [
+            "baseline",
+            "energy"
+          ],
+          [
+            "energy",
+            "baseline"
+          ]
+        ],
+        "byte_identical_downloads": 8
+      },
+      {
+        "image": "triangle.png",
+        "input_sha256": "2b2107b55be423856b684a1a46e17648c29d49978b061e68dba3eb09ad820f87",
+        "svg_sha256": "fdcf2363853d2bbf3eb9bfdc37818b64342b9dbf36088302f336819c27763e16",
+        "bytes": 710,
+        "native_ms": [
+          6.598263,
+          3.9862480000000002,
+          3.878636,
+          4.160620000000001
+        ],
+        "wasm_ms": {
+          "baseline": [
+            6.1,
+            6.3,
+            5.9,
+            5.8
+          ],
+          "energy": [
+            7.2,
+            6.3,
+            6.0,
+            6.6
+          ]
+        },
+        "order": [
+          [
+            "energy",
+            "baseline"
+          ],
+          [
+            "baseline",
+            "energy"
+          ],
+          [
+            "energy",
+            "baseline"
+          ],
+          [
+            "baseline",
+            "energy"
+          ]
+        ],
+        "byte_identical_downloads": 8
+      },
+      {
+        "image": "recent30-artwork.png",
+        "input_sha256": "a2704049acfdaa86650fc2d77fb661a68db54b98827682f4838eb284bb2b2dbf",
+        "svg_sha256": "5b440f13151ef022f503c140c7cef3c26f7cee53f8590e7ebb63c1b20b60647f",
+        "bytes": 1945,
+        "native_ms": [
+          29.86758,
+          22.149288,
+          21.392529,
+          21.263764000000002
+        ],
+        "wasm_ms": {
+          "baseline": [
+            35.6,
+            32.6,
+            33.0,
+            32.6
+          ],
+          "energy": [
+            33.9,
+            35.3,
+            37.7,
+            33.4
+          ]
+        },
+        "order": [
+          [
+            "baseline",
+            "energy"
+          ],
+          [
+            "energy",
+            "baseline"
+          ],
+          [
+            "baseline",
+            "energy"
+          ],
+          [
+            "energy",
+            "baseline"
+          ]
+        ],
+        "byte_identical_downloads": 8
+      },
+      {
+        "image": "openvector-logo.png",
+        "input_sha256": "575e8bb1f3ebcbf0b57f4dd4e9e73cde5d13f91c1a8f4e7453e322bc5b240025",
+        "svg_sha256": "2366476dfae6d02be1b793684ef01a4b8cd2116211248752e6c02988255d84d5",
+        "bytes": 1552,
+        "native_ms": [
+          4280.253981,
+          4242.464981,
+          4283.258188,
+          4169.640393
+        ],
+        "wasm_ms": {
+          "baseline": [
+            6919.4,
+            6664.6,
+            6686.0,
+            6673.3
+          ],
+          "energy": [
+            6122.1,
+            6147.0,
+            6134.9,
+            5884.3
+          ]
+        },
+        "order": [
+          [
+            "energy",
+            "baseline"
+          ],
+          [
+            "baseline",
+            "energy"
+          ],
+          [
+            "energy",
+            "baseline"
+          ],
+          [
+            "baseline",
+            "energy"
+          ]
+        ],
+        "byte_identical_downloads": 8
+      }
+    ]
+  },
+  "confirm": {
+    "browser": "156.0.8078.79",
+    "samples": 5,
+    "cases": [
+      {
+        "image": "alpha-logo.png",
+        "input_sha256": "77a7e71fee480b04865f59dc001c68dd7ddd107d6d995f12bebc8f11abd4ac9b",
+        "svg_sha256": "e09ae901313dd02100a80d5cb00665c8193ef79cbf7fa8efe88e477a058d4305",
+        "bytes": 1427,
+        "native_ms": [
+          444.537221,
+          424.36871199999996,
+          424.589004,
+          426.79683,
+          414.227277,
+          415.81521599999996
+        ],
+        "wasm_ms": {
+          "baseline": [
+            824.9,
+            706.0,
+            706.6,
+            669.1,
+            723.2,
+            723.4
+          ],
+          "energy": [
+            757.4,
+            639.4,
+            653.9,
+            660.4,
+            663.2,
+            666.9
+          ],
+          "blocks": [
+            775.1,
+            652.1,
+            672.8,
+            668.4,
+            689.6,
+            645.4
+          ]
+        },
+        "order": [
+          [
+            "blocks",
+            "energy",
+            "baseline"
+          ],
+          [
+            "energy",
+            "baseline",
+            "blocks"
+          ],
+          [
+            "baseline",
+            "blocks",
+            "energy"
+          ],
+          [
+            "blocks",
+            "energy",
+            "baseline"
+          ],
+          [
+            "energy",
+            "baseline",
+            "blocks"
+          ],
+          [
+            "baseline",
+            "blocks",
+            "energy"
+          ]
+        ],
+        "byte_identical_downloads": 18
+      },
+      {
+        "image": "curves-and-hole.png",
+        "input_sha256": "eb5600319783737586002049751afdf2e6b2c160880cd3e557e3f0d9280d92d7",
+        "svg_sha256": "3473fa3b2c0c282017f7556c28d483128ef32da85b8df31a89d2ad78dc13aa93",
+        "bytes": 877,
+        "native_ms": [
+          229.719334,
+          225.084981,
+          225.352665,
+          225.062747,
+          227.494279,
+          228.219844
+        ],
+        "wasm_ms": {
+          "baseline": [
+            395.8,
+            373.8,
+            378.4,
+            374.3,
+            369.9,
+            381.8
+          ],
+          "energy": [
+            378.1,
+            363.8,
+            356.0,
+            378.4,
+            377.0,
+            390.7
+          ],
+          "blocks": [
+            368.1,
+            371.9,
+            368.1,
+            372.4,
+            367.5,
+            379.0
+          ]
+        },
+        "order": [
+          [
+            "baseline",
+            "blocks",
+            "energy"
+          ],
+          [
+            "blocks",
+            "energy",
+            "baseline"
+          ],
+          [
+            "energy",
+            "baseline",
+            "blocks"
+          ],
+          [
+            "baseline",
+            "blocks",
+            "energy"
+          ],
+          [
+            "blocks",
+            "energy",
+            "baseline"
+          ],
+          [
+            "energy",
+            "baseline",
+            "blocks"
+          ]
+        ],
+        "byte_identical_downloads": 18
+      },
+      {
+        "image": "gradient.png",
+        "input_sha256": "1ce854e7605bcffb4428272e94d8c3b0b952da55004f57472bc002a5717dfd1f",
+        "svg_sha256": "1638087c2f7c827f56396cd9c645d6e6820f8dda89de20a467944af83dbbfebc",
+        "bytes": 8413,
+        "native_ms": [
+          42.993324,
+          36.936352,
+          36.891565,
+          36.836472,
+          36.944715,
+          37.275222
+        ],
+        "wasm_ms": {
+          "baseline": [
+            51.7,
+            47.5,
+            50.2,
+            50.2,
+            48.8,
+            48.3
+          ],
+          "energy": [
+            49.7,
+            51.2,
+            49.4,
+            48.8,
+            48.7,
+            48.0
+          ],
+          "blocks": [
+            51.1,
+            56.7,
+            48.5,
+            52.8,
+            49.3,
+            49.0
+          ]
+        },
+        "order": [
+          [
+            "baseline",
+            "energy",
+            "blocks"
+          ],
+          [
+            "energy",
+            "blocks",
+            "baseline"
+          ],
+          [
+            "blocks",
+            "baseline",
+            "energy"
+          ],
+          [
+            "baseline",
+            "energy",
+            "blocks"
+          ],
+          [
+            "energy",
+            "blocks",
+            "baseline"
+          ],
+          [
+            "blocks",
+            "baseline",
+            "energy"
+          ]
+        ],
+        "byte_identical_downloads": 18
+      },
+      {
+        "image": "near-colors.png",
+        "input_sha256": "debe636d14d0a820765fe78672ad7278471eaf4e66eaafb7ef452f142aa33492",
+        "svg_sha256": "b1856984f8ef30726443d847ffc976fb15112a0deff790f3fdd9d4db7f827102",
+        "bytes": 1258,
+        "native_ms": [
+          121.602977,
+          114.68280899999999,
+          108.64304299999999,
+          103.95667,
+          110.71705,
+          105.341231
+        ],
+        "wasm_ms": {
+          "baseline": [
+            164.4,
+            160.7,
+            170.8,
+            175.7,
+            157.7,
+            167.1
+          ],
+          "energy": [
+            157.2,
+            155.6,
+            154.2,
+            152.4,
+            161.6,
+            160.3
+          ],
+          "blocks": [
+            172.9,
+            173.8,
+            161.4,
+            176.0,
+            189.7,
+            152.9
+          ]
+        },
+        "order": [
+          [
+            "blocks",
+            "baseline",
+            "energy"
+          ],
+          [
+            "baseline",
+            "energy",
+            "blocks"
+          ],
+          [
+            "energy",
+            "blocks",
+            "baseline"
+          ],
+          [
+            "blocks",
+            "baseline",
+            "energy"
+          ],
+          [
+            "baseline",
+            "energy",
+            "blocks"
+          ],
+          [
+            "energy",
+            "blocks",
+            "baseline"
+          ]
+        ],
+        "byte_identical_downloads": 18
+      },
+      {
+        "image": "triangle.png",
+        "input_sha256": "2b2107b55be423856b684a1a46e17648c29d49978b061e68dba3eb09ad820f87",
+        "svg_sha256": "fdcf2363853d2bbf3eb9bfdc37818b64342b9dbf36088302f336819c27763e16",
+        "bytes": 710,
+        "native_ms": [
+          4.853632,
+          4.0639639999999995,
+          3.853797,
+          3.882,
+          4.372788,
+          5.017478
+        ],
+        "wasm_ms": {
+          "baseline": [
+            6.2,
+            5.8,
+            6.0,
+            5.9,
+            5.8,
+            5.5
+          ],
+          "energy": [
+            13.7,
+            5.8,
+            7.1,
+            6.7,
+            5.8,
+            5.8
+          ],
+          "blocks": [
+            6.1,
+            5.8,
+            21.9,
+            5.4,
+            6.0,
+            5.5
+          ]
+        },
+        "order": [
+          [
+            "energy",
+            "baseline",
+            "blocks"
+          ],
+          [
+            "baseline",
+            "blocks",
+            "energy"
+          ],
+          [
+            "blocks",
+            "energy",
+            "baseline"
+          ],
+          [
+            "energy",
+            "baseline",
+            "blocks"
+          ],
+          [
+            "baseline",
+            "blocks",
+            "energy"
+          ],
+          [
+            "blocks",
+            "energy",
+            "baseline"
+          ]
+        ],
+        "byte_identical_downloads": 18
+      },
+      {
+        "image": "recent30-artwork.png",
+        "input_sha256": "a2704049acfdaa86650fc2d77fb661a68db54b98827682f4838eb284bb2b2dbf",
+        "svg_sha256": "5b440f13151ef022f503c140c7cef3c26f7cee53f8590e7ebb63c1b20b60647f",
+        "bytes": 1945,
+        "native_ms": [
+          24.045194,
+          21.930605,
+          21.771976,
+          21.889483000000002,
+          21.98713,
+          23.034565
+        ],
+        "wasm_ms": {
+          "baseline": [
+            34.0,
+            35.9,
+            33.2,
+            33.3,
+            33.9,
+            32.6
+          ],
+          "energy": [
+            34.0,
+            32.4,
+            32.5,
+            32.9,
+            32.2,
+            31.8
+          ],
+          "blocks": [
+            35.0,
+            36.3,
+            31.9,
+            32.7,
+            32.4,
+            33.0
+          ]
+        },
+        "order": [
+          [
+            "baseline",
+            "blocks",
+            "energy"
+          ],
+          [
+            "blocks",
+            "energy",
+            "baseline"
+          ],
+          [
+            "energy",
+            "baseline",
+            "blocks"
+          ],
+          [
+            "baseline",
+            "blocks",
+            "energy"
+          ],
+          [
+            "blocks",
+            "energy",
+            "baseline"
+          ],
+          [
+            "energy",
+            "baseline",
+            "blocks"
+          ]
+        ],
+        "byte_identical_downloads": 18
+      },
+      {
+        "image": "openvector-logo.png",
+        "input_sha256": "575e8bb1f3ebcbf0b57f4dd4e9e73cde5d13f91c1a8f4e7453e322bc5b240025",
+        "svg_sha256": "2366476dfae6d02be1b793684ef01a4b8cd2116211248752e6c02988255d84d5",
+        "bytes": 1552,
+        "native_ms": [
+          4256.507379000001,
+          4283.318149000001,
+          4316.737123,
+          4203.320341000001,
+          4346.006268,
+          4548.534406
+        ],
+        "wasm_ms": {
+          "baseline": [
+            6723.2,
+            6814.3,
+            6880.9,
+            6682.5,
+            6593.6,
+            6786.6
+          ],
+          "energy": [
+            5885.2,
+            5848.3,
+            6066.9,
+            6083.0,
+            5826.1,
+            6148.0
+          ],
+          "blocks": [
+            5954.4,
+            5738.9,
+            5916.3,
+            6021.2,
+            5587.0,
+            6066.8
+          ]
+        },
+        "order": [
+          [
+            "energy",
+            "blocks",
+            "baseline"
+          ],
+          [
+            "blocks",
+            "baseline",
+            "energy"
+          ],
+          [
+            "baseline",
+            "energy",
+            "blocks"
+          ],
+          [
+            "energy",
+            "blocks",
+            "baseline"
+          ],
+          [
+            "blocks",
+            "baseline",
+            "energy"
+          ],
+          [
+            "baseline",
+            "energy",
+            "blocks"
+          ]
+        ],
+        "byte_identical_downloads": 18
+      }
+    ]
+  },
+  "native": {
+    "alpha-logo.png": {
+      "energy": [
+        449.051785,
+        445.834183,
+        548.484896,
+        422.70916800000003,
+        416.213436,
+        406.54475099999996
+      ],
+      "blocks": [
+        505.61874500000005,
+        468.087633,
+        473.56485599999996,
+        479.255619,
+        452.718894,
+        413.047518
+      ],
+      "baseline": [
+        441.670393,
+        515.809227,
+        464.561708,
+        435.59574699999996,
+        430.872199,
+        441.880929
+      ]
+    },
+    "curves-and-hole.png": {
+      "baseline": [
+        316.428627,
+        252.247716,
+        268.215531,
+        230.900463,
+        228.04508,
+        231.33471699999998
+      ],
+      "blocks": [
+        229.846217,
+        270.30305599999997,
+        232.401784,
+        230.512523,
+        234.419838,
+        234.037183
+      ],
+      "energy": [
+        246.524982,
+        232.562545,
+        240.291959,
+        266.22842099999997,
+        248.928366,
+        240.31560499999998
+      ]
+    },
+    "gradient.png": {
+      "energy": [
+        39.77286,
+        38.785355,
+        39.659339,
+        38.896592,
+        37.840224,
+        36.638787
+      ],
+      "blocks": [
+        39.480399999999996,
+        37.226492,
+        37.607704,
+        37.338889,
+        47.358257,
+        46.413036
+      ],
+      "baseline": [
+        40.628316,
+        42.766612,
+        49.94715,
+        38.664833,
+        37.547214000000004,
+        49.487854999999996
+      ]
+    },
+    "near-colors.png": {
+      "baseline": [
+        105.447772,
+        106.51429599999999,
+        105.344376,
+        124.34537,
+        132.684058,
+        105.813431
+      ],
+      "blocks": [
+        117.656841,
+        104.539466,
+        107.820228,
+        114.431562,
+        103.256986,
+        104.576641
+      ],
+      "energy": [
+        107.587741,
+        104.428128,
+        105.4002,
+        105.40718,
+        113.679023,
+        104.669632
+      ]
+    },
+    "triangle.png": {
+      "energy": [
+        4.391464,
+        4.124181999999999,
+        3.618382,
+        10.582999,
+        3.8708110000000002,
+        3.764972
+      ],
+      "blocks": [
+        4.410893,
+        4.42256,
+        3.86352,
+        3.540554,
+        4.092575,
+        3.5533029999999997
+      ],
+      "baseline": [
+        4.229621,
+        3.8801650000000003,
+        3.754065,
+        3.7221569999999997,
+        3.742237,
+        3.775989
+      ]
+    },
+    "recent30-artwork.png": {
+      "baseline": [
+        22.740786999999997,
+        21.296009,
+        21.714454,
+        21.001032,
+        20.974722,
+        20.870084000000002
+      ],
+      "blocks": [
+        56.513244,
+        33.809763,
+        29.216114,
+        21.400141,
+        21.070326,
+        20.939038
+      ],
+      "energy": [
+        22.01108,
+        20.550213000000003,
+        21.448264,
+        21.213801,
+        20.463051999999998,
+        22.805284
+      ]
+    },
+    "openvector-logo.png": {
+      "energy": [
+        4686.162349,
+        4590.571479,
+        4547.19239,
+        4385.310791,
+        4550.404695,
+        4512.294334
+      ],
+      "blocks": [
+        4441.57712,
+        4320.221878,
+        4139.978615,
+        4253.067115000001,
+        4424.78629,
+        4488.92457
+      ],
+      "baseline": [
+        4670.172268,
+        4610.513043,
+        4514.9642109999995,
+        4675.052901,
+        4629.909127,
+        4857.020425
+      ]
+    }
+  },
+  "environment": {
+    "guest": "CloudSSH Raft Linux x86-64",
+    "cpu": "AMD EPYC 9V74",
+    "cpu_quota": 4,
+    "memory_gib": 16,
+    "rust": "1.100.0",
+    "emscripten": "4.0.22",
+    "reference": "npm openvector 0.1.5, native linux-x64 binary",
+    "commit": "eac4dcbde0e0eabf11436745e09c8f970f7a2caf",
+    "primitive_comparisons_per_target": 1000180
+  },
+  "exact_browser_downloads": 354
+}

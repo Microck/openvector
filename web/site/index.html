@@ -1,0 +1,608 @@
+<!doctype html>
+<html lang="en" data-type="software" data-radius="soft" data-ground="sand" data-buttons="arrow" data-motion>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>OpenVector: free image to SVG converter that runs in your browser</title>
+<meta name="description" content="Convert PNG, JPEG, GIF, BMP and TIFF images into editable SVG, PDF, EPS or DXF vectors. Free and open source. Your images stay in your browser and are never uploaded.">
+<link rel="canonical" href="https://openvector.app/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="OpenVector">
+<meta property="og:url" content="https://openvector.app/">
+<meta property="og:title" content="OpenVector: free image to SVG converter that runs in your browser">
+<meta property="og:description" content="Trace PNG and JPEG images into editable vectors. Free, open source, and your images never leave your device.">
+<meta property="og:image" content="https://openvector.app/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="A pixelated PNG beside its smooth traced SVG, with the text: Convert images to SVG without uploading them.">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="license" href="/licenses/LICENSE.txt">
+<link rel="alternate" type="text/plain" title="OpenVector for language models" href="/llms.txt">
+<meta name="theme-color" content="#17181b">
+<meta name="site-kind" content="software">
+<meta name="page-type" content="software">
+<!--
+  Structured data mirrors the visible copy below. Keep the FAQ answers, version
+  and dates in sync with the HTML, or search engines may ignore the markup.
+-->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": "https://openvector.app/#website",
+      "url": "https://openvector.app/",
+      "name": "OpenVector",
+      "inLanguage": "en"
+    },
+    {
+      "@type": "WebApplication",
+      "@id": "https://openvector.app/#app",
+      "name": "OpenVector",
+      "url": "https://openvector.app/app/",
+      "description": "Open-source raster-to-vector converter that traces PNG, JPEG, GIF, BMP and TIFF images into editable SVG, PDF, EPS, AI, DXF and EMF files inside the browser.",
+      "applicationCategory": "DesignApplication",
+      "operatingSystem": "Any modern browser with WebAssembly threads; desktop apps for Windows, macOS and Linux",
+      "softwareVersion": "0.1.5",
+      "isAccessibleForFree": true,
+      "license": "https://opensource.org/license/mit",
+      "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"},
+      "author": {"@type": "Person", "name": "Microck", "url": "https://github.com/Microck"},
+      "codeRepository": "https://github.com/Microck/openvector",
+      "sameAs": ["https://github.com/Microck/openvector", "https://www.npmjs.com/package/openvector"],
+      "image": "https://openvector.app/og.png",
+      "dateModified": "2026-11-26"
+    },
+    {
+      "@type": "FAQPage",
+      "@id": "https://openvector.app/#faq",
+      "mainEntity": [
+        {"@type": "Question", "name": "Is OpenVector free?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. OpenVector is free and open source under the MIT license. There is no account, watermark or export limit."}},
+        {"@type": "Question", "name": "Are my images uploaded?", "acceptedAnswer": {"@type": "Answer", "text": "No. The tracing engine runs in your browser as WebAssembly. Images and results stay in the tab's memory and are gone when you close it."}},
+        {"@type": "Question", "name": "Which image and vector formats work?", "acceptedAnswer": {"@type": "Answer", "text": "It opens PNG, JPEG, GIF, BMP and TIFF. It exports SVG, PDF, EPS, AI, DXF and EMF vectors, and PNG, JPEG, BMP and TIFF renderings."}},
+        {"@type": "Question", "name": "Which images trace well?", "acceptedAnswer": {"@type": "Answer", "text": "Logos, icons, flat illustrations and scanned line art. Photographs trace into thousands of small shapes and rarely make a useful vector."}},
+        {"@type": "Question", "name": "Which browsers can run OpenVector?", "acceptedAnswer": {"@type": "Answer", "text": "A current Chrome, Edge, Firefox or Safari with WebAssembly threads and WebGL2. The first visit downloads about 5 MB; later visits use the cached copy."}}
+      ]
+    }
+  ]
+}
+</script>
+<link rel="preload" href="/fonts/mona-sans.woff2" as="font" type="font/woff2" crossorigin>
+<style>
+  /* Self-hosted instead of the Google Fonts link start.mjs prints: the site promises nothing leaves the browser,
+     and cross-origin isolation (required by the editor's WebAssembly threads) blocks a plain cross-origin stylesheet. */
+  @font-face { font-family: "Mona Sans"; src: url(/fonts/mona-sans.woff2) format("woff2"); font-weight: 400 600; font-stretch: 75% 125%; font-display: swap; }
+  @font-face { font-family: "Geist Mono"; src: url(/fonts/geist-mono.woff2) format("woff2"); font-weight: 400 500; font-display: swap; }
+</style>
+<link rel="stylesheet" href="assets/system.css">
+<link rel="stylesheet" href="assets/ui/cards.css">
+<link rel="stylesheet" href="assets/motion/motion.css">
+<link rel="stylesheet" href="assets/backgrounds/backgrounds.css">
+<link rel="stylesheet" href="assets/layout/layout.css">
+<link rel="stylesheet" href="assets/icons/icon.css">
+<link rel="stylesheet" href="assets/ui/base.css">
+<link rel="stylesheet" href="assets/moments/liquid-type/moment.css">
+<!-- <html lang="en" data-radius="soft">; keep this <style> after the links: layout.css resets --ly-scale -->
+<style>
+:root {
+  --p-bg: #17181b; --p-surface: #1e1f23; --p-ink: #e4e5e7; --p-muted: #a9abb0;
+  --p-accent: #2f6fec; --p-accent-ink: #ffffff; --p-action: #2f6fec; --p-action-ink: #ffffff;
+  --p-inv-bg: #e4e5e7; --p-inv-surface: #d4d5d7; --p-inv-ink: #17181b; --p-inv-muted: #56575a;
+  --p-inv-accent: #2f6fec; --p-inv-accent-ink: #ffffff; --p-inv-action: #2f6fec; --p-inv-action-ink: #ffffff;
+  --font-display: "Mona Sans", system-ui, sans-serif;
+  --font-text: "Mona Sans", system-ui, sans-serif;
+  --font-mono: "Geist Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  --display-weight: 500;
+  --display-tracking: -0.03em;
+  --display-tracking-xl: -0.04em;
+  --display-stretch: 104%;
+  --ly-scale: 0.96;
+}
+</style>
+<script>document.documentElement.classList.add('m-enter');setTimeout(()=>document.documentElement.classList.add('m-enter-done'),700)</script>
+<script src="assets/backgrounds/backgrounds.js"></script>
+<script>document.documentElement.classList.add('mo-js');setTimeout(()=>document.documentElement.classList.add('mo-safe'),2500)</script>
+<link rel="modulepreload" href="assets/moments/moments.js">
+<link rel="modulepreload" href="assets/moments/lib.js">
+<link rel="modulepreload" href="assets/moments/liquid-type/moment.js">
+<!-- page CSS: only what sits inside a visual -->
+<style>
+  /* The OpenVector editor, drawn in HTML from the app's own theme (rust/crates/openvector-gui/src/theme.rs):
+     header with Open/Batch/Export, the view rail, the canvas and the wizard panel. Every image in it is the real
+     sample trace (sample.png in, sample.svg out, sample-paths.svg its 44 curve points). */
+  .ov { --ov-bg: #17181b; --ov-surface: #1e1f23; --ov-viewport: #121316; --ov-text: #e4e5e7; --ov-muted: #8b8d93;
+        --ov-control: #313238; --ov-border: #2a2b30; --ov-cborder: #3d3e45; --ov-selected: #24324f; --ov-accent: #2f6fec;
+        --ov-ease: cubic-bezier(0.23, 1, 0.32, 1);
+        background: var(--ov-bg); color: var(--ov-text); font: 400 13px/1.4 var(--font-text); border: 1px solid var(--ov-cborder);
+        border-radius: 12px; overflow: hidden; box-shadow: 0 24px 64px rgb(0 0 0 / .45); user-select: none; }
+  .ov__bar { display: flex; align-items: center; gap: 6px; height: 38px; padding: 0 10px; background: var(--ov-surface); border-bottom: 1px solid var(--ov-border); }
+  .ov__bar img { width: 18px; height: 18px; margin-right: 6px; }
+  .ov__btn { display: inline-flex; align-items: center; height: 24px; padding: 0 9px; border-radius: 6px; background: var(--ov-control); border: 1px solid var(--ov-cborder); font-size: 12px; }
+  .ov__btn--off { opacity: .45; }
+  .ov__sp { flex: 1; }
+  .ov__body { display: grid; grid-template-columns: 64px minmax(0, 1fr) 232px; }
+  .ov__rail { display: grid; align-content: start; gap: 6px; padding: 10px 8px; background: var(--ov-surface); border-right: 1px solid var(--ov-border); }
+  .ov__mode { height: 24px; border-radius: 6px; border: 1px solid var(--ov-cborder); color: var(--ov-muted); font-size: 11px; display: grid; place-items: center; }
+  .ov__mode.is-on { border-color: var(--ov-accent); background: var(--ov-selected); color: var(--ov-text); }
+  .ov__canvas { position: relative; background: var(--ov-viewport); display: grid; place-items: start center; padding-top: 28px; min-height: 360px; }
+  .ov__art { position: relative; width: min(70%, 232px); aspect-ratio: 1; }
+  .ov__art img { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .ov__art .px { image-rendering: pixelated; }
+  .ov__panel { background: var(--ov-surface); border-left: 1px solid var(--ov-border); padding: 14px; display: grid; align-content: start; gap: 10px; }
+  .ov__panel small { color: var(--ov-muted); font-size: 11px; }
+  .ov__panel b { font-weight: 500; font-size: 15px; }
+  .ov__sw { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+  .ov__sw i { aspect-ratio: 1; border-radius: 5px; box-shadow: inset 0 0 0 1px rgb(255 255 255 / .12); }
+  .ov__row { display: flex; justify-content: space-between; color: var(--ov-muted); font: 400 11px/1.4 var(--font-mono); font-variant-numeric: tabular-nums; }
+  .ov__row span:last-child { color: var(--ov-text); }
+  .ov__go { height: 28px; border-radius: 6px; background: var(--ov-accent); display: grid; place-items: center; font-size: 12px; color: #fff; margin-top: 4px; }
+  .ov__status { height: 26px; display: flex; align-items: center; gap: 8px; padding: 0 10px; border-top: 1px solid var(--ov-border); background: var(--ov-surface); color: var(--ov-muted); font: 400 11px/1 var(--font-mono); }
+  .ov__status [data-step] { color: var(--ov-text); }
+  /* The trace replaces the pixels where they stand: opacity plus a 2px blur bridges the two states, no travel. */
+  .ov__art [data-step] { transform: none; transition: opacity 400ms var(--ov-ease), filter 400ms var(--ov-ease); }
+  .ov__art [data-step].is-off { transform: none; filter: blur(2px); }
+  @media (max-width: 1023px) { .ov__body { grid-template-columns: 48px minmax(0, 1fr); } .ov__panel { display: none; } }
+  @media (max-width: 639px) { .ov__rail, .ov__bar .ov__btn:not(:first-of-type) { display: none; } .ov__body { grid-template-columns: minmax(0, 1fr); } .ov__canvas { min-height: 0; padding: 16px 0; } }
+
+  /* The comparison window: the PNG layer is clipped from the right by the range value; motion is 1:1 with the drag. */
+  #compare .app.ui { display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 8fr); margin-top: var(--s-7); background: #17181b; border: 1px solid #3d3e45; border-radius: 12px; overflow: hidden; }
+  #compare .app__pane { position: relative; min-width: 0; min-height: 0; overflow: hidden; }
+  #compare .app__pane + .app__pane { border-left: 1px solid #2a2b30; }
+  .pal { padding: 20px; display: grid; align-content: start; gap: 4px; background: #1e1f23; height: 100%; }
+  .pal p { margin: 0 0 8px; color: var(--muted); font-size: 13px; }
+  .pal__row { display: grid; grid-template-columns: 28px 1fr auto; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid #2a2b30; font: 400 13px/1.3 var(--font-mono); font-variant-numeric: tabular-nums; }
+  .pal__row i { width: 28px; height: 28px; border-radius: 6px; box-shadow: inset 0 0 0 1px rgb(255 255 255 / .12); }
+  .pal__row span:last-child { color: var(--muted); }
+  .pal { grid-template-rows: auto repeat(5, auto) 1fr auto; }
+  .pal__stats { display: grid; grid-template-columns: 1fr 1fr; gap: 16px 24px; margin: 24px 0 0; align-self: start; }
+  .pal__stats dt { color: var(--muted); font-size: 13px; }
+  .pal__stats dd { margin: 2px 0 0; font: 500 22px/1.2 var(--font-mono); font-variant-numeric: tabular-nums; }
+  .pal__hint { display: flex; align-items: center; gap: 8px; padding-top: 16px; border-top: 1px solid #2a2b30; color: var(--muted); font-size: 13px; }
+  /* --pos is registered so a click on the track can glide to its spot; a drag sets it directly (no transition). */
+  @property --pos { syntax: "<percentage>"; inherits: true; initial-value: 50%; }
+  .cmp { position: relative; height: 100%; min-height: 420px; background: #121316; display: grid; place-items: center; --pos: 50%; }
+  .cmp.is-glide { transition: --pos 220ms cubic-bezier(0.23, 1, 0.32, 1); }
+  .cmp__art { position: relative; height: calc(100% - 48px); max-height: 520px; aspect-ratio: 1; border-radius: 8px; overflow: hidden; background: #f3ead8; }
+  .cmp__art img { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+  .cmp__art .px { image-rendering: pixelated; clip-path: inset(0 calc(100% - var(--pos)) 0 0); }
+  .cmp__line { position: absolute; inset: 0; transform: translateX(var(--pos)); pointer-events: none; }
+  .cmp__line::before { content: ""; position: absolute; top: 0; bottom: 0; left: -1px; width: 2px; background: #17181b; }
+  .cmp__line svg { position: absolute; top: 50%; left: 0; width: 32px; height: 32px; margin: -16px 0 0 -16px; padding: 7px; border-radius: 50%; background: #17181b; color: #e4e5e7; box-shadow: 0 0 0 1px rgb(255 255 255 / .14); }
+  .cmp__tag { position: absolute; bottom: 12px; padding: 3px 8px; border-radius: 6px; background: rgb(23 24 27 / .85); color: #e4e5e7; font: 500 12px/1.3 var(--font-mono); pointer-events: none; }
+  .cmp__tag--l { left: 12px; } .cmp__tag--r { right: 12px; }
+  .cmp input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; cursor: ew-resize; touch-action: pan-y; }
+  .cmp:has(input:focus-visible) .cmp__art { outline: 2px solid var(--action); outline-offset: 3px; }
+  @media (max-width: 1023px) { #compare .app.ui { grid-template-columns: minmax(0, 1fr); } #compare .app__pane + .app__pane { border-left: 0; border-top: 1px solid #2a2b30; } .pal { grid-template-columns: repeat(5, 1fr); grid-template-rows: auto; gap: 8px; } .pal__stats { grid-column: 1 / -1; grid-template-columns: repeat(4, 1fr); margin-top: 16px; } .pal__hint { grid-column: 1 / -1; } .pal p, .pal__row span { display: none; } .pal__row { grid-template-columns: 1fr; border: 0; padding: 0; } .pal__row i { width: 100%; } .cmp { min-height: 380px; } }
+  @media (max-width: 639px) { .pal__stats { display: none; } .pal { padding: 16px; } .pal__hint { padding-top: 12px; } .cmp { min-height: 0; padding: 16px; } .cmp__art { height: auto; width: 100%; } }
+
+  /* Feature panels: each holds one real piece of the product's output. */
+  #features .panel { --p-h: 300px; background: #121316; }
+  .fmt { position: absolute; inset: 24px 24px 0; display: grid; align-content: start; }
+  .fmt span { display: grid; grid-template-columns: 28px 1fr auto; align-items: center; gap: 14px; padding: 9px 4px; border-bottom: 1px solid #2a2b30; }
+  .fmt img { border-radius: 4px; }
+  .fmt b { font: 500 15px/1.3 var(--font-mono); }
+  .fmt small { font: 400 13px/1.3 var(--font-text); color: var(--muted); }
+  .cut { position: absolute; inset: 0; display: grid; place-items: center;
+         background: repeating-conic-gradient(#2a2b30 0 25%, #1e1f23 0 50%) 0 0 / 20px 20px; }
+  .cut img { width: 220px; height: 220px; }
+  .pts { position: absolute; inset: 0; overflow: hidden; }
+  .pts img { position: absolute; width: 300px; height: 300px; left: 50%; top: 50%; margin: -150px 0 0 -150px; }
+  .term { position: absolute; inset: 24px 24px 0; border-bottom: 0; border-radius: 8px 8px 0 0; padding: 16px; border-radius: 8px; background: #0e0f11; border: 1px solid #2a2b30; font: 400 12.5px/1.7 var(--font-mono); color: #8b8d93; font-variant-numeric: tabular-nums; white-space: pre-wrap; }
+  .term b { color: #e4e5e7; font-weight: 400; }
+  .term em { font-style: normal; color: #7aa7ff; }
+  @media (max-width: 639px) { .term__x { display: none; } #features .panel { --p-h: 210px; } .fmt { inset: 12px 16px 0; } .fmt span { padding: 5px 2px; } .fmt img { width: 20px; height: 20px; } .cut img { width: 160px; height: 160px; } }
+
+  /* Statement proof: one file, four sizes, bottoms on one line. */
+  .sizes { display: flex; align-items: flex-end; justify-content: space-between; gap: var(--s-7); margin-top: var(--s-8); }
+  .sizes img { border-radius: 4px; min-width: 0; flex: 0 1 auto; height: auto; }
+  @media (max-width: 639px) { .sizes { gap: 10px; margin-top: var(--s-6); } .sizes img:nth-child(2) { width: 40px; height: 40px; } .sizes img:nth-child(3) { width: 96px; height: 96px; } .sizes img:last-child { width: 150px; height: 150px; } }
+
+  /* Below 360px the bar holds the mark, the button and the menu; the name comes back on wider phones. */
+  @media (max-width: 359px) { .nav__bar > .nav__logo { font-size: 0; gap: 0; } }
+  /* The GitHub and Sponsors marks stay in the bar down to 560px, unlike the other secondary actions. Narrower bars
+     have no room beside the main button and menu, so they move to the menu sheet there. */
+  .nav__icon::before { display: none; }
+  .nav__icon--sponsor:hover, .nav__icon--sponsor:focus-visible { color: #db61a2; }
+  @media (min-width: 560px) and (max-width: 1023px) { .nav:not(.is-open) .nav__actions > .nav__icon { display: inline-flex; } }
+
+  /* The browsers the editor runs in, as their real marks. */
+  .browsers { display: flex; gap: var(--s-5); margin-top: var(--s-7); }
+
+  /* Footer: the app's accent blue as the ground, the name set across the wrap. "Open" is drawn in
+     pixels and "Vector" as type; on a mouse the split follows the pointer, so the name shows the trace itself. */
+  .footer--sun { --sun: #2f6fec; --sun-ink: #ffffff; background: var(--sun); color: var(--sun-ink); border-top: 0;
+                 --ink: var(--sun-ink); --muted: #ffffff; --line: rgb(255 255 255 / .28); --action: var(--sun-ink); --action-ink: var(--sun); }
+  .footer--sun :is(a, h2, h3, p, span) { color: var(--sun-ink); }
+  .footer--sun .btn--primary { background: var(--sun-ink); color: var(--sun); }
+  .footer--sun .btn--primary :is(span, svg) { color: var(--sun); }
+  .footer--sun .footer__col h3 { color: #ffffff; font-weight: 600; }
+  .wm { position: relative; margin-top: var(--s-6); line-height: .82; user-select: none; min-width: 0; overflow-x: clip; }
+  /* The close is one row (heading left, button right) so the name below keeps the whole width on one screen. */
+  @media (min-width: 640px) {
+    .footer--sun .closing__cta { flex-direction: row; align-items: flex-end; justify-content: space-between; gap: var(--s-7); }
+    .footer--sun .closing__cta > .btn { flex-shrink: 0; align-self: flex-end; }
+  }
+  .wm__type, .wm__px { display: block; }
+  .wm__type { font: 500 clamp(32px, 15.6vw, 232px)/.82 var(--font-display); font-stretch: 104%; letter-spacing: -0.03em; white-space: nowrap; color: var(--sun-ink); }
+  /* the n carries a hair more tracking, so its ink no longer touches the V and the resting split has a clean gap */
+  .wm__n { letter-spacing: 0.012em; }
+  .wm__px { position: absolute; inset: 0; width: 100%; height: 100%; image-rendering: pixelated; pointer-events: none; }
+  .wm.is-live .wm__type { clip-path: inset(0 0 0 var(--wm-split, 0%)); }
+  .wm.is-live .wm__px { clip-path: inset(0 calc(100% - var(--wm-split, 0%)) 0 0); }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ov__art [data-step], .ov__art [data-step].is-off { filter: none; }
+    .cmp.is-glide { transition: none; }
+  }
+
+  /* CLI frame */
+  #cli .frame { background: #0e0f11; }
+  /* #cli raises specificity past the kit's ".frame > *" rule, which would make the terminal static. */
+  #cli .frame > .shell { position: absolute; }
+  .shell { position: absolute; inset: 40px 0 0 40px; padding: 20px 24px; border-radius: 12px 0 0 0; background: #17181b; border: 1px solid #2a2b30; border-right: 0; border-bottom: 0;
+           font: 400 13px/1.75 var(--font-mono); color: #8b8d93; white-space: pre; overflow: hidden; font-variant-numeric: tabular-nums; }
+  .shell b { color: #e4e5e7; font-weight: 400; }
+  .shell em { font-style: normal; color: #7aa7ff; }
+  #cli .frame--split { position: relative; overflow: hidden; aspect-ratio: auto; height: 640px; }
+  @media (max-width: 1023px) { #cli .frame--split { height: 520px; } }
+  @media (max-width: 639px) { #cli .frame--split { height: 440px; } .shell { inset: 16px 0 0 16px; font-size: 12px; white-space: pre-wrap; } }
+</style>
+</head>
+<body>
+<!-- type: software
+     deal: hero centred, nav nav-centre, close close-type, footer footer-statement, rhythm space, buttons arrow,
+           mark: the client's own logo (OpenVector's favicon mark), palette: the client's own colours from the app's theme,
+           type mona (Mona Sans + Geist Mono), ground sand, effect grain-gradient in the hero frame
+     moments: liquid-type in #sharp (statement section)
+     plan: hero (the editor tracing the sample), #compare (app-frame: palette list beside the drag comparison),
+           #features (2x2: formats, background, curve points, batch), #sharp (statement, liquid-type),
+           #cli (split-text-left: terminal with real batch output), #faq, footer.closing -->
+<header class="nav nav--centre">
+  <div class="wrap nav__bar">
+    <a class="skip-link" href="#top">Skip to content</a>
+    <a class="nav__logo" href="#top"><img src="/favicon.svg" width="24" height="24" alt="">OpenVector</a>
+    <nav class="nav__links" aria-label="Main">
+      <div class="nav__item"><a class="nav__link" href="#compare">Editor</a></div>
+      <div class="nav__item"><a class="nav__link" href="#features">Features</a></div>
+      <div class="nav__item"><a class="nav__link" href="#cli">CLI</a></div>
+      <div class="nav__item"><a class="nav__link" href="#faq">Questions</a></div>
+    </nav>
+    <div class="nav__actions">
+      <a class="nav__link nav__icon" href="https://github.com/Microck/openvector" aria-label="OpenVector on GitHub"><svg class="ic ic-svg ic-20" viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg></a>
+      <a class="nav__link nav__icon nav__icon--sponsor" href="https://github.com/sponsors/Microck" aria-label="Sponsor OpenVector on GitHub"><svg class="ic ic-svg ic-20" viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M7.655 14.916v-.001h-.002l-.006-.003-.018-.01a22.066 22.066 0 0 1-3.744-2.584C2.045 10.731 0 8.35 0 5.5 0 2.836 2.086 1 4.25 1 5.797 1 7.153 1.802 8 3.02 8.847 1.802 10.203 1 11.75 1 13.914 1 16 2.836 16 5.5c0 2.85-2.044 5.231-3.886 6.818a22.094 22.094 0 0 1-3.433 2.414 7.152 7.152 0 0 1-.31.17l-.018.01-.008.004a.75.75 0 0 1-.69 0Z"/></svg></a>
+      <a class="btn btn--primary" href="/app/">Open the editor<svg class="m-arrow" viewBox="0 0 12 12" aria-hidden="true"><path class="m-arrow__stem" d="M1 6h8"/><path class="m-arrow__head" d="M4.5 2.5 8 6l-3.5 3.5"/></svg></a>
+    </div>
+    <button class="nav__toggle" type="button" aria-expanded="false" aria-label="Menu">
+      <svg width="18" height="18" viewBox="0 0 18 18" aria-hidden="true"><path d="M2 5h14M2 13h14" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+    </button>
+  </div>
+</header>
+
+<main id="top">
+  <section class="hero hero--centred" data-enter aria-labelledby="hero-h">
+    <div class="wrap"><div class="hero-text">
+      <div class="hero__c">
+        <a class="pill" href="https://github.com/Microck/openvector/releases/latest"><span>Version 0.1.5</span><span class="muted">MIT licensed</span></a>
+        <h1 id="hero-h">Free image to SVG converter</h1>
+        <p class="hero__lead">Drop in a PNG or JPEG and OpenVector traces it into editable SVG, PDF or DXF paths. It runs on your device, so nothing is uploaded.</p>
+        <div class="btn-row"><a class="btn btn--primary" href="/app/">Open the editor<svg class="m-arrow" viewBox="0 0 12 12" aria-hidden="true"><path class="m-arrow__stem" d="M1 6h8"/><path class="m-arrow__head" d="M4.5 2.5 8 6l-3.5 3.5"/></svg></a><a class="btn btn--secondary" href="https://github.com/Microck/openvector/releases/latest">Download the desktop app</a></div>
+      </div>
+      <div class="hero__window" data-fx="grain-gradient" data-fx-seed="7" role="img" aria-label="The OpenVector editor tracing a 120 pixel PNG into an SVG with five colors">
+        <div class="ly-piece ui ov" aria-hidden="true">
+          <div class="ov__bar"><img src="/favicon.svg" width="18" height="18" alt=""><span class="ov__btn">Open</span><span class="ov__btn">Batch</span><span class="ov__btn">Export</span><span class="ov__sp"></span><span class="ov__btn">About</span></div>
+          <div class="ov__body">
+            <div class="ov__rail"><span class="ov__mode">Bitmap</span><span class="ov__mode">Regions</span><span class="ov__mode is-on">Vector</span><span class="ov__mode">Paths</span></div>
+            <div class="ov__canvas" data-ly-steps="900">
+              <div class="ov__art">
+                <img class="px" src="/sample.png" alt="" width="300" height="300">
+                <img src="/sample.svg" alt="" width="300" height="300" data-step>
+                <img src="/sample-paths.svg" alt="" width="300" height="300" data-step>
+              </div>
+            </div>
+            <div class="ov__panel">
+              <small>Basic wizard</small>
+              <b>Review colors</b>
+              <div class="ov__sw"><i style="background:#f3ead8"></i><i style="background:#1f4e5a"></i><i style="background:#f2b134"></i><i style="background:#e2603b"></i><i style="background:#2c7a6b"></i></div>
+              <div class="ov__row"><span>Image</span><span>Artwork</span></div>
+              <div class="ov__row"><span>Colors</span><span>5</span></div>
+              <div class="ov__row"><span>Smoothing</span><span>0.243 s</span></div>
+              <div class="ov__row"><span>Output</span><span>2.0 KB SVG</span></div>
+              <span class="ov__go">Export</span>
+            </div>
+          </div>
+          <div class="ov__status"><span>logo.png</span><span>120 × 120</span><span class="ov__sp"></span><span>Done</span></div>
+        </div>
+      </div>
+    </div></div>
+  </section>
+
+  <section class="section" id="compare" aria-labelledby="compare-h">
+    <div class="wrap">
+      <div class="grid">
+        <h2 id="compare-h" class="span-5">Each color becomes one SVG shape</h2>
+        <div class="span-6 start-7 stack-4">
+          <p class="muted">OpenVector groups the pixels by color, then fits curves around each region. This logo has five colors, so it traces into five paths.</p>
+          <a class="link" href="/sample.svg">Download the traced SVG</a>
+        </div>
+      </div>
+      <div class="ui app fill" data-ui-pause-host>
+        <div class="app__pane pal" aria-label="Palette found in the logo">
+          <p>Palette, found automatically</p>
+          <div class="pal__row"><i style="background:#f3ead8"></i><span>#F3EAD8</span><span>ground</span></div>
+          <div class="pal__row"><i style="background:#1f4e5a"></i><span>#1F4E5A</span><span>sky</span></div>
+          <div class="pal__row"><i style="background:#f2b134"></i><span>#F2B134</span><span>sun</span></div>
+          <div class="pal__row"><i style="background:#e2603b"></i><span>#E2603B</span><span>hill</span></div>
+          <div class="pal__row"><i style="background:#2c7a6b"></i><span>#2C7A6B</span><span>leaf</span></div>
+          <dl class="pal__stats">
+            <div><dt>Paths</dt><dd>5</dd></div>
+            <div><dt>Curve points</dt><dd>44</dd></div>
+            <div><dt>PNG</dt><dd>7.5&nbsp;KB</dd></div>
+            <div><dt>SVG</dt><dd>2.0&nbsp;KB</dd></div>
+          </dl>
+          <label class="pal__hint" for="cmp-range"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 7-5 5 5 5M15 7l5 5-5 5"/></svg>Drag the line to compare the PNG and the SVG</label>
+        </div>
+        <div class="app__pane">
+          <div class="cmp" id="cmp">
+            <div class="cmp__art">
+              <img src="/sample.svg" width="520" height="520" alt="The traced SVG with smooth edges" loading="lazy">
+              <img class="px" src="/sample.png" width="520" height="520" alt="The original 120 pixel PNG, enlarged so its pixels show" loading="lazy">
+              <span class="cmp__line" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 7-5 5 5 5M15 7l5 5-5 5"/></svg></span>
+              <span class="cmp__tag cmp__tag--l" aria-hidden="true">PNG</span>
+              <span class="cmp__tag cmp__tag--r" aria-hidden="true">SVG</span>
+            </div>
+            <input id="cmp-range" type="range" min="0" max="100" value="50">
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section g2" id="features" aria-labelledby="features-h">
+    <div class="wrap">
+      <div class="group">
+        <div class="section-head">
+          <h2 id="features-h">Editor features. <span class="muted">Check and fix the trace before you export.</span></h2>
+        </div>
+        <div class="grid">
+          <article class="card card--row card--open span-6">
+            <h3>Exports SVG and five other formats</h3>
+            <p>Save for the web as SVG, for print as PDF or EPS, or for a cutter as DXF.</p>
+            <div class="panel" role="img" aria-label="The logo exported as SVG, PDF, EPS, AI, DXF and EMF files">
+              <div class="fmt" data-ly-steps="700">
+                <span><img src="/sample.svg" width="28" height="28" alt="" loading="lazy"><b>logo.svg</b><small>Web and Figma</small></span>
+                <span data-step><img src="/sample.svg" width="28" height="28" alt="" loading="lazy"><b>logo.pdf</b><small>Print</small></span>
+                <span data-step><img src="/sample.svg" width="28" height="28" alt="" loading="lazy"><b>logo.eps</b><small>Print shops</small></span>
+                <span data-step><img src="/sample.svg" width="28" height="28" alt="" loading="lazy"><b>logo.ai</b><small>Illustrator</small></span>
+                <span data-step><img src="/sample.svg" width="28" height="28" alt="" loading="lazy"><b>logo.dxf</b><small>CAD and cutters</small></span>
+                <span data-step><img src="/sample.svg" width="28" height="28" alt="" loading="lazy"><b>logo.emf</b><small>Office documents</small></span>
+              </div>
+            </div>
+          </article>
+          <article class="card card--row card--open span-6">
+            <h3>Removes the image background</h3>
+            <p>Drop the background color and the logo exports with nothing behind it.</p>
+            <div class="panel"><div class="cut"><img src="/sample-cutout.svg" width="220" height="220" alt="The traced sample with its cream background removed" loading="lazy"></div></div>
+          </article>
+        </div>
+      </div>
+      <div class="grid">
+        <article class="card card--row card--open span-6">
+          <h3>Shows every SVG curve point</h3>
+          <p>The Paths view draws the 44 points this logo traced into, so you can see what an editor will get.</p>
+          <div class="panel"><div class="pts"><img src="/sample-paths.svg" width="300" height="300" alt="The sample's paths in blue with their curve points" loading="lazy"></div></div>
+        </article>
+        <article class="card card--row card--open span-6">
+          <h3>Converts a folder in one go</h3>
+          <p>The desktop app and the CLI trace a whole batch with the same settings.</p>
+          <div class="panel" role="img" aria-label="The batch command converting two files to SVG">
+            <div class="term"><b>$ npx openvector batch logo.png badge.jpg --format svg --output-dir vectors</b>
+Starting batch processing of 2 images...
+<span class="term__x">Converting 'logo.png' to 'logo.svg'...
+Image Category: Artwork with blending
+</span>Number of Colors: <em>5</em>
+<span class="term__x">Done smoothing: <em>0:00.243</em>
+Converting 'badge.jpg' to 'badge.svg'...
+Palette Mode: Flexible Palette
+Done smoothing: <em>0:00.963</em>
+</span>Elapsed time: <em>0:01.331</em>
+Done processing images.</div>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section statement" id="sharp" aria-labelledby="sharp-h">
+    <div class="wrap">
+      <div data-moment="liquid-type" class="section-head" style="max-width:none">
+        <h2 id="sharp-h" class="mo-lt__type">Sharp at any size</h2>
+        <p>The same 2.0&nbsp;KB file, drawn at 16, 48, 128 and 400 pixels.</p>
+      </div>
+      <div class="sizes" role="img" aria-label="The traced logo drawn at 16, 48, 128 and 400 pixels, sharp at every size">
+        <img src="/sample.svg" width="16" height="16" alt="" loading="lazy">
+        <img src="/sample.svg" width="48" height="48" alt="" loading="lazy">
+        <img src="/sample.svg" width="128" height="128" alt="" loading="lazy">
+        <img src="/sample.svg" width="400" height="400" alt="" loading="lazy">
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="cli" aria-labelledby="cli-h">
+    <div class="wrap">
+      <div class="grid">
+        <div class="span-5 stack-6">
+          <h2 id="cli-h">Converts images from a script</h2>
+          <p class="t-lead">The npm package runs the same engine as the editor. Add it to a build step and every logo in a folder comes out as SVG.</p>
+          <ul class="stack-2">
+            <li>Node.js 22.19 or later</li>
+            <li>Linux, macOS and Windows binaries included</li>
+            <li>Also a Node.js library</li>
+          </ul>
+          <a class="link" href="https://www.npmjs.com/package/openvector">See the npm package</a>
+        </div>
+        <div class="frame frame--split span-6 start-7" role="img" aria-label="A terminal tracing two images with the openvector command">
+          <div class="shell"><b>$ npm install openvector</b>
+<b>$ npx openvector vectorize logo.png --output logo.svg</b>
+<b>$ mkdir vectors</b>
+<b>$ npx openvector batch logo.png badge.jpg \
+    --format svg --output-dir vectors</b>
+Image Category: Artwork with blending
+Number of Colors: <em>5</em>
+Done smoothing: <em>0:00.243</em>
+Converting 'badge.jpg' to 'badge.svg'...
+Palette Mode: Flexible Palette
+Done smoothing: <em>0:00.963</em>
+Elapsed time: <em>0:01.331</em>
+Done processing images.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="faq" aria-labelledby="faq-h">
+    <div class="wrap">
+      <div class="grid">
+        <div class="span-5 stack-4">
+          <h2 id="faq-h">Questions</h2>
+          <p class="muted">Something else? Open an issue on GitHub.</p>
+          <a class="link" href="https://github.com/Microck/openvector/issues">Report a problem</a>
+          <div class="browsers">
+            <img class="ic ic-40" src="/icons/chrome.svg" loading="lazy" alt="Chrome" width="40" height="40">
+            <img class="ic ic-40" src="/icons/firefox.svg" loading="lazy" alt="Firefox" width="39" height="40">
+            <img class="ic ic-40" src="/icons/safari.svg" loading="lazy" alt="Safari" width="40" height="40">
+            <img class="ic ic-40" src="/icons/microsoft-edge.svg" loading="lazy" alt="Microsoft Edge" width="40" height="40">
+          </div>
+        </div>
+        <div class="faq span-6 start-7">
+          <div class="faq__item"><h3>Is OpenVector free?</h3><p>Yes. OpenVector is free and open source under the MIT license. There is no account, watermark or export limit.</p></div>
+          <div class="faq__item"><h3>Are my images uploaded?</h3><p>No. The tracing engine runs in your browser as WebAssembly. Images and results stay in the tab's memory and are gone when you close it.</p></div>
+          <div class="faq__item"><h3>Which image and vector formats work?</h3><p>It opens PNG, JPEG, GIF, BMP and TIFF. It exports SVG, PDF, EPS, AI, DXF and EMF vectors, and PNG, JPEG, BMP and TIFF renderings.</p></div>
+          <div class="faq__item"><h3>Which images trace well?</h3><p>Logos, icons, flat illustrations and scanned line art. Photographs trace into thousands of small shapes and rarely make a useful vector.</p></div>
+          <div class="faq__item"><h3>Which browsers can run OpenVector?</h3><p>A current Chrome, Edge, Firefox or Safari with WebAssembly threads and WebGL2. The first visit downloads about 5&nbsp;MB; later visits use the cached copy.</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="footer closing footer--sun" id="contact" aria-labelledby="close-h">
+  <div class="wrap">
+    <div class="closing__cta close--type">
+      <div class="section-head">
+        <h2 id="close-h">Trace your first logo</h2>
+        <p>Free, no account, and the image stays on your device.</p>
+      </div>
+      <a class="btn btn--primary" href="/app/">Open the editor<svg class="m-arrow" viewBox="0 0 12 12" aria-hidden="true"><path class="m-arrow__stem" d="M1 6h8"/><path class="m-arrow__head" d="M4.5 2.5 8 6l-3.5 3.5"/></svg></a>
+    </div>
+    <div class="closing__links">
+      <div class="grid">
+        <div class="span-4 stack-4">
+          <a class="nav__logo" href="#top"><img src="/favicon.svg" width="24" height="24" alt="" loading="lazy">OpenVector</a>
+        </div>
+        <div class="span-2 footer__col"><h3>Product</h3><ul><li><a href="#compare">Editor</a></li><li><a href="#features">Features</a></li><li><a href="#cli">CLI</a></li></ul></div>
+        <div class="span-2 footer__col"><h3>Download</h3><ul><li><a href="https://github.com/Microck/openvector/releases/latest">Desktop app</a></li><li><a href="https://www.npmjs.com/package/openvector">npm package</a></li></ul></div>
+        <div class="span-2 footer__col"><h3>Project</h3><ul><li><a href="https://github.com/Microck/openvector">Source code</a></li><li><a href="https://github.com/Microck/openvector/blob/main/CHANGELOG.md">Changelog</a></li><li><a href="/licenses/">Licenses</a></li><li><a href="/privacy/">Privacy</a></li><li><a href="https://github.com/sponsors/Microck">Sponsor on GitHub</a></li><li><a href="mailto:sponsor@openvector.app?subject=Advertising%20on%20OpenVector">Advertise here</a></li></ul></div>
+        <div class="span-2 footer__col"><h3>Help</h3><ul><li><a href="#faq">Questions</a></li><li><a href="https://github.com/Microck/openvector/issues">Report a problem</a></li></ul></div>
+      </div>
+      <div class="wm" aria-hidden="true"><span class="wm__type">Ope<span class="wm__n">n</span>Vector</span><canvas class="wm__px"></canvas></div>
+      <div class="footer__legal">
+        <span>&copy; 2026 OpenVector by Microck. Updated <time datetime="2026-11-26">26 November 2026</time>.</span>
+        <span>Product names and logos are trademarks of their owners.</span>
+        <div class="socials"></div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script type="module" src="assets/system.js"></script>
+<script type="module" src="assets/motion/motion.js"></script>
+<script type="module" src="assets/layout/layout.js"></script>
+<script>
+  // The comparison follows a drag 1:1 and the arrow keys at once; only a click on the track glides to its spot
+  // (220ms). Without script it rests at 50%.
+  const cmp = document.getElementById('cmp');
+  const range = cmp.querySelector('input');
+  let pressed = false, moved = false;
+  range.addEventListener('pointerdown', () => { pressed = true; moved = false; cmp.classList.add('is-glide'); });
+  range.addEventListener('pointermove', () => { if (pressed && moved) cmp.classList.remove('is-glide'); if (pressed) moved = true; });
+  addEventListener('pointerup', () => { pressed = false; });
+  range.addEventListener('keydown', () => cmp.classList.remove('is-glide'));
+  range.addEventListener('input', e => cmp.style.setProperty('--pos', e.target.value + '%'));
+</script>
+<script type="module">
+  // The footer name: the type is sized to fill the wrap exactly, then redrawn into a small canvas and scaled up with
+  // pixelated rendering. The split rests after "Open"; on a mouse it follows the pointer with frame-rate-independent
+  // smoothing and stops drawing once it settles. Touch, reduced motion and no-script show the crisp name.
+  const wm = document.querySelector('.wm'), type = wm.querySelector('.wm__type'), canvas = wm.querySelector('.wm__px');
+  await document.fonts.ready;
+  let rest = 0, split = 0, target = 0, raf = 0, last = 0;
+  function layout() {
+    type.style.fontSize = '';
+    const fit = parseFloat(getComputedStyle(type).fontSize) * wm.clientWidth / type.scrollWidth;
+    type.style.fontSize = fit + 'px';
+    const style = getComputedStyle(type), box = wm.getBoundingClientRect();
+    const cell = Math.max(4, Math.round(fit / 15));            // one drawn pixel: about 15 per letter height
+    const W = Math.ceil(box.width / cell), H = Math.ceil(box.height / cell);
+    // Draw each glyph where the real type puts it (Range rects), at a high resolution first, so letter-spacing and
+    // the width axis (which canvas cannot set) match; then sample it down to the cell grid and threshold it to two
+    // tones, so the pixels read as a bitmap and not as blurred type.
+    const hi = document.createElement('canvas'), k = 4;
+    hi.width = W * k; hi.height = H * k;
+    const h = hi.getContext('2d');
+    h.font = `${style.fontWeight} ${fit / cell * k}px ${style.fontFamily}`;
+    h.fillStyle = '#000';
+    const range = document.createRange(), glyphs = [];
+    const walk = document.createTreeWalker(type, NodeFilter.SHOW_TEXT);
+    for (let node; (node = walk.nextNode());) for (let j = 0; j < node.length; j++) glyphs.push([node, j]);
+    const asc = h.measureText('O').fontBoundingBoxAscent, desc = h.measureText('O').fontBoundingBoxDescent;
+    const lineH = parseFloat(style.lineHeight) / cell * k;
+    const base = (lineH - (asc + desc)) / 2 + asc + (type.getBoundingClientRect().top - box.top) / cell * k;
+    let openEnd = 0, vStart = 0;
+    for (let i = 0; i < glyphs.length; i++) {
+      const [node, j] = glyphs[i];
+      range.setStart(node, j); range.setEnd(node, j + 1);
+      const r = range.getBoundingClientRect(), ch = node.data[j];
+      const x = (r.left - box.left) / cell * k, wantW = (r.width - parseFloat(getComputedStyle(node.parentElement).letterSpacing)) / cell * k;
+      const sx = wantW / h.measureText(ch).width;
+      h.save(); h.translate(x, base); h.scale(sx, 1); h.fillText(ch, 0, 0); h.restore();
+      const ink = h.measureText(ch);
+      if (i === 3) openEnd = r.left - box.left + ink.actualBoundingBoxRight * sx / k * cell;
+      if (i === 4) vStart = r.left - box.left - ink.actualBoundingBoxLeft * sx / k * cell;
+    }
+    canvas.width = W; canvas.height = H;
+    const ctx = canvas.getContext('2d', { willReadFrequently: true });
+    ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = 'high';
+    ctx.drawImage(hi, 0, 0, W, H);
+    const img = ctx.getImageData(0, 0, W, H), d = img.data;
+    const [, cr, cg, cb] = style.color.match(/(\d+),\s*(\d+),\s*(\d+)/).map(Number);
+    for (let i = 0; i < d.length; i += 4) { const on = d[i + 3] > 112; d[i] = cr; d[i + 1] = cg; d[i + 2] = cb; d[i + 3] = on ? 255 : 0; }
+    ctx.putImageData(img, 0, 0);
+    // rest in the gap between the ink of "n" and "V"; when tight tracking makes them overlap, all of "n" stays pixels
+    rest = (vStart > openEnd ? (openEnd + vStart) / 2 : openEnd + 1) / box.width * 100;
+    if (!raf) { split = target = rest; paint(); }
+  }
+  const paint = () => wm.style.setProperty('--wm-split', split.toFixed(2) + '%');
+  function tick(now) {
+    const dt = Math.min(64, now - (last || now)); last = now;
+    split += (target - split) * (1 - Math.exp(-dt / 90));
+    paint();
+    raf = Math.abs(target - split) > 0.05 ? requestAnimationFrame(tick) : (split = target, paint(), last = 0, 0);
+  }
+  const go = () => { if (!raf) raf = requestAnimationFrame(tick); };
+  layout(); wm.classList.add('is-live');
+  new ResizeObserver(() => layout()).observe(wm);
+  const follow = matchMedia('(hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference)');
+  const footer = wm.closest('footer');
+  footer.addEventListener('pointermove', e => {
+    if (!follow.matches || e.pointerType !== 'mouse') return;
+    const r = wm.getBoundingClientRect();
+    target = Math.min(100, Math.max(0, (e.clientX - r.left) / r.width * 100)); go();
+  });
+  footer.addEventListener('pointerleave', () => { target = rest; go(); });
+</script>
+<script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "2f1d95923c2648a2b980dc6d376db19f"}'></script>
+</body>
+</html>

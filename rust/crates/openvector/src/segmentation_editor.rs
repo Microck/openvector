@@ -88,6 +88,10 @@ impl SegmentationEditor{
     pub fn apply(&mut self,input:&Value)->Result<EditorSnapshot,String>{self.grouped_stroke_active=false;self.grouped_stroke_has_record=false;let (record,commit)=read_command(input)?;self.apply_record(record,commit)?;Ok(self.snapshot())}
     fn apply_record(&mut self,record:ToolRecord,commit:bool)->Result<(),String>{if self.execute(&record)?&&commit{self.undo.push(record);self.redo.clear();}Ok(())}
     pub fn gesture(&mut self,input:&Value,pointer:&mut EditorPointer)->Result<EditorSnapshot,String>{
+        self.apply_gesture(input, pointer)?;
+        Ok(self.snapshot())
+    }
+    fn apply_gesture(&mut self,input:&Value,pointer:&mut EditorPointer)->Result<(),String>{
         match read_editor_gesture(input,&TOOLS)?{
             EditorGesture::Select(tool)=>{let next=if tool==self.tool{"pan".into()}else{tool};self.previous_tool=std::mem::replace(&mut self.tool,next);},
             EditorGesture::Color(color)=>self.color=color,
@@ -98,22 +102,29 @@ impl SegmentationEditor{
                     else if phase==PointerPhase::Press&&(self.tool=="fill"||self.tool=="zap"){self.apply_record(ToolRecord::new(if self.tool=="fill"{5}else{6},x,y,[-1.0;4],argb),true)?;}
                 }
             }
-        }Ok(self.snapshot())
+        }Ok(())
     }
     /// GUI-only grouping preserves the engine's reference-compatible per-event API.
     pub fn grouped_gesture(&mut self,input:&Value,pointer:&mut EditorPointer)->Result<EditorSnapshot,String>{
+        self.grouped_gestures(std::slice::from_ref(input), pointer)
+    }
+    pub fn grouped_gestures(&mut self,events:&[Value],pointer:&mut EditorPointer)->Result<EditorSnapshot,String>{
+        for event in events { self.apply_grouped_gesture(event, pointer)?; }
+        Ok(self.snapshot())
+    }
+    fn apply_grouped_gesture(&mut self,input:&Value,pointer:&mut EditorPointer)->Result<(),String>{
         let phase=input["phase"].as_str().unwrap_or("");
         let left=input["buttons"].as_u64().unwrap_or(0)&1!=0;
         let painting=self.tool=="pencil"&&left&&(phase=="press"||phase=="move");
         if phase=="press" || !painting { self.grouped_stroke_active=false; self.grouped_stroke_has_record=false; }
         if painting && !self.grouped_stroke_active { self.grouped_stroke_active=true; self.grouped_stroke_has_record=false; }
         let before=self.undo.len();
-        self.gesture(input,pointer)?;
+        self.apply_gesture(input,pointer)?;
         if painting && self.undo.len()>before {
             self.undo.last_mut().unwrap().joins_previous=self.grouped_stroke_has_record;
             self.grouped_stroke_has_record=true;
         }
-        Ok(self.snapshot())
+        Ok(())
     }
     pub fn grouped_undo(&mut self)->Result<EditorSnapshot,String>{
         self.grouped_stroke_active=false;self.grouped_stroke_has_record=false;

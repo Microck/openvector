@@ -351,10 +351,13 @@ impl WgpuContext {
             WebBackendPreference::WebGpu => wgpu::Backends::BROWSER_WEBGPU,
             WebBackendPreference::WebGl => wgpu::Backends::GL,
         };
+        // WebGL cannot block the browser thread on a fence during surface resize.
+        let mut backend_options = wgpu::BackendOptions::default();
+        backend_options.gl.fence_behavior = wgpu::GlFenceBehavior::AutoFinish;
         let descriptor = wgpu::InstanceDescriptor {
             backends,
             flags: wgpu::InstanceFlags::default(),
-            backend_options: wgpu::BackendOptions::default(),
+            backend_options,
             memory_budget_thresholds: wgpu::MemoryBudgetThresholds::default(),
             display: Some(Box::new(WebDisplaySource)),
         };

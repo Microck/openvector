@@ -1,0 +1,6 @@
+/generated/
+/node_modules/
+/openvector.js
+/openvector.wasm
+/dist/
+/site/.taste-skill/
