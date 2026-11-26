@@ -203,6 +203,7 @@ pub trait VectorWriter {
     /// row's shape when its phase changes (every fourth row is checked).
     fn progress(&mut self, _percent: i32) -> Result<(), Self::Error> { Ok(()) }
     fn accept_color(&mut self, bgra: &[u8; 4]) -> bool;
+    fn cutout_backing_alpha(&self) -> Option<u8> { None }
     fn begin_group(&mut self, _bgra: &[u8; 4]) -> Result<(), Self::Error> { Ok(()) }
     fn end_group(&mut self, _bgra: &[u8; 4]) -> Result<(), Self::Error> { Ok(()) }
     fn begin_shape(&mut self, bgra: &[u8; 4], has_holes: bool) -> Result<(), Self::Error>;
@@ -232,8 +233,63 @@ pub fn walk_vector_output<W: VectorWriter>(geometry: &FittedGeometry, options: &
             else { writer.cubic(points, start_kind, false) }
         }
     };
+    let emit_hole = |writer: &mut W, path: &[HoleStep]| -> Result<(), W::Error> {
+        for (index, &(child, edge)) in path.iter().rev().enumerate() {
+            let kind = if index == 0 { START_HOLE } else { START_CONTINUE };
+            emit_edge(writer, child, &regions[child].edges[edge], true, kind)?;
+        }
+        Ok(())
+    };
     let shape_mode = options.shape_mode;
     let mut previous_phase = -1;
+    if shape_mode != 0
+        && let Some(opaque_alpha) = writer.cutout_backing_alpha()
+        && holes.iter().any(|paths| !paths.is_empty())
+    {
+        writer.progress(export_progress_percent(0))?;
+        previous_phase = 0;
+        let opaque_and_visible = |region: usize| {
+            regions[region].bgra[3] >= opaque_alpha
+                && is_output_region_visible(options.hidden_size, &options.hidden_words, region)
+        };
+        let mut contains_transparency = vec![false; regions.len()];
+        for region in 0..regions.len() {
+            if opaque_and_visible(region) {
+                continue;
+            }
+            // A hidden or translucent descendant must keep its entire hole clear.
+            let mut ancestor = region as i32;
+            while ancestor >= 0 && !contains_transparency[ancestor as usize] {
+                contains_transparency[ancestor as usize] = true;
+                ancestor = regions[ancestor as usize].parent;
+            }
+        }
+        for (region, paths) in holes.iter().enumerate() {
+            if !opaque_and_visible(region) {
+                continue;
+            }
+            for path in paths {
+                let mut sums = [0_u64; 3];
+                let opaque = path.iter().all(|&(child, _)| {
+                    for (sum, channel) in sums.iter_mut().zip(regions[child].bgra) {
+                        *sum += u64::from(channel);
+                    }
+                    !contains_transparency[child]
+                });
+                if !opaque {
+                    continue;
+                }
+                // The backing fills the inside of the hole. Use its boundary
+                // colors so it doesn't introduce the surrounding color there.
+                let count = path.len() as u64;
+                let [blue, green, red] = sums.map(|sum| ((sum + count / 2) / count) as u8);
+                let color = [blue, green, red, 255];
+                writer.begin_shape(&color, false)?;
+                emit_hole(writer, path)?;
+                writer.end_shape(&color, false)?;
+            }
+        }
+    }
     for row in 0..regions.len() {
         if row & 3 == 0 {
             let phase = (row as f64 * 50.0 / regions.len() as f64 + 0.5).trunc() as i32;
@@ -254,11 +310,7 @@ pub fn walk_vector_output<W: VectorWriter>(geometry: &FittedGeometry, options: &
             }
             if shape_mode != 0 {
                 for path in &holes[region] {
-                    for index in (0..path.len()).rev() {
-                        let (child, edge) = path[index];
-                        let kind = if index == path.len() - 1 { START_HOLE } else { START_CONTINUE };
-                        emit_edge(writer, child, &regions[child].edges[edge], true, kind)?;
-                    }
+                    emit_hole(writer, path)?;
                 }
             }
             writer.end_shape(&shape.bgra, has_holes)?;

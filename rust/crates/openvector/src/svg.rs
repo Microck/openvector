@@ -5,6 +5,8 @@ use crate::vector_file::{collect_text, TextOutput};
 use crate::vector_output::*;
 use std::collections::HashMap;
 
+const OPAQUE_ALPHA: u8 = 251;
+
 pub fn export_svg(input: &VectorOutputInput<'_>) -> Result<String, VectorOutputError> {
     collect_text(|output| serialize_svg(input, output))
 }
@@ -34,6 +36,7 @@ impl VectorWriter for SvgWriter<'_> {
     type Error = VectorOutputError;
     fn progress(&mut self, percent: i32) -> Result<(), Self::Error> { self.output.progress(percent) }
     fn accept_color(&mut self, color: &[u8; 4]) -> bool { color[3] > 10 }
+    fn cutout_backing_alpha(&self) -> Option<u8> { (!self.thin).then_some(OPAQUE_ALPHA) }
     fn begin_group(&mut self, color: &[u8; 4]) -> Result<(), Self::Error> {
         self.output.write("\n", true)?;
         self.output.write(&format!("<g id=\"#{}{:02x}\">", rgb(color), color[3]), false)
@@ -46,7 +49,7 @@ impl VectorWriter for SvgWriter<'_> {
         let rgb = rgb(color);
         self.output.write(&format!("<path fill=\"#{rgb}\""), false)?;
         if self.thin { self.output.write(&format!(" stroke=\"#{rgb}\" stroke-width=\"0.09375\""), false)?; }
-        let opacity = if color[3] >= 251 { "1.00".into() } else { fixed_decimal(color[3] as f64 * (1.0 / 255.0), 2) };
+        let opacity = if color[3] >= OPAQUE_ALPHA { "1.00".into() } else { fixed_decimal(color[3] as f64 * (1.0 / 255.0), 2) };
         self.output.write(&format!(" opacity=\"{opacity}\" d=\""), false)
     }
     fn end_shape(&mut self, _: &[u8; 4], _: bool) -> Result<(), Self::Error> { self.output.write(" Z\" />", false) }
@@ -59,5 +62,50 @@ impl VectorWriter for SvgWriter<'_> {
         self.output.write(" C", false)?;
         for index in [2, 4, 6] { let point = self.point(curve[index], curve[index + 1]); self.output.write(&format!(" {point}"), false)?; }
         Ok(())
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::contour_fitting::{FitRegion, FittedGeometry};
+    use crate::export_options::Layout;
+
+    #[test]
+    fn cutout_backing_preserves_hidden_and_translucent_descendants() {
+        let mut geometry = FittedGeometry {
+            cubic_storage_slots: 0,
+            cubics: vec![],
+            nodes: vec![],
+            regions: vec![],
+        };
+        for (layer, bgra) in [[0, 0, 255, 255], [0, 255, 0, 255], [255, 0, 0, 255]].into_iter().enumerate() {
+            let lo = layer as f64 * 2.0;
+            let hi = 12.0 - lo;
+            let base = geometry.nodes.len();
+            let parent = layer as i32 - 1;
+            geometry.nodes.extend([(lo, lo), (hi, lo), (hi, hi), (lo, hi)].map(|(x, y)| {
+                FitNode { x, y, kind: 0, cubic: -1 }
+            }));
+            geometry.regions.push(FitRegion {
+                bgra, pixel_count: 1, color_index: layer as i32, parent,
+                contour: (base..base + 4).collect(),
+                boundary: vec![],
+                edges: (0..4).map(|index| {
+                    let next = (index + 1) % 4;
+                    [index as i64, 0, parent as i64, (base + index) as i64, (base + next) as i64, index as i64, next as i64]
+                }).collect(),
+            });
+        }
+        fn render(geometry: &FittedGeometry, hidden_regions: &[i64]) -> String {
+            let mut input = VectorOutputInput::new(geometry, 12, 12);
+            input.layout = Layout::Cutouts;
+            input.hidden_regions = hidden_regions;
+            export_svg(&input).unwrap()
+        }
+        assert_eq!(render(&geometry, &[]).matches("<path ").count(), 5);
+        assert_eq!(render(&geometry, &[2]).matches("<path ").count(), 2);
+        geometry.regions[2].bgra[3] = 128;
+        assert_eq!(render(&geometry, &[]).matches("<path ").count(), 3);
     }
 }

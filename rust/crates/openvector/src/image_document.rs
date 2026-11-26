@@ -288,11 +288,33 @@ impl ImageDocument{
     fn batch_settings(&self,controls:&BatchControls)->Result<DocumentSettings,String>{let mut s=self.state.settings.to_json();for (k,v) in &controls.overrides{s.insert(k.clone(),v.clone());}for(k,v)in [("advanced",json!(controls.advanced)),("category",json!(controls.category)),("quality",json!(controls.quality)),("paletteMode",json!(controls.palette_mode)),("backgroundMode",json!(controls.background_mode)),("palette",json!(controls.palette)),("background",json!([1,1,1,1]))]{s.insert(k.into(),v);}read_document_settings(&Value::Object(s)).map_err(|e|e.to_string())}
     fn selected_palette(&self,count:usize)->Vec<f32>{self.state.palettes[count].chunks_exact(4).flat_map(|c|c.iter().rev().map(|v|(((*v as f64*65535.0+0.5).floor())/65535.0) as f32)).collect()}
     fn minimum_palette(&self)->Option<usize>{let mut minimum=1e10;let mut selected=None;for count in 0..25{if self.state.completed[count]!=0&&(self.state.scores[count] as f64)<minimum{minimum=self.state.scores[count] as f64;selected=Some(count)}}selected}
+    fn promote_automatic_two_color_palette(&self, settings: &mut DocumentSettings) -> Option<usize> {
+        if settings.palette_mode != 0 {
+            return None;
+        }
+        // Public scores encode the classifier's decision. The candidates retain
+        // their measured reconstruction error and the penalty for adding colors.
+        let mut best = self.candidates[2].as_ref()?;
+        for candidate in self.candidates[3..=12].iter().flatten() {
+            if candidate.score.total < best.score.total {
+                best = candidate;
+            }
+        }
+        if best.color_count > 2 {
+            settings.palette_mode = 1;
+            Some(best.color_count)
+        } else {
+            None
+        }
+    }
     pub fn run_automatic(&mut self,input:&Value)->Result<AutomaticResult,String>{self.run_automatic_with_observers(input,None,None)}
     pub fn run_automatic_with_observer(&mut self,input:&Value,observer:Option<&mut DocumentObserver>)->Result<AutomaticResult,String>{self.run_automatic_with_observers(input,observer,None)}
     pub fn run_automatic_with_observers(&mut self,input:&Value,mut observer:Option<&mut DocumentObserver>,mut on_stage:Option<&mut DocumentStageObserver>)->Result<AutomaticResult,String>{
         let extension=input["extension"].as_str().ok_or("Automatic processing requires an extension string.")?;let mut settings=self.merged_settings(input)?;settings.advanced=false;let alpha=self.source_alpha_type();let mut classify=Value::Object(settings.to_json());classify["extension"]=json!(extension);let result=self.run_task("classification",&classify,None)?;if result.state.status==2{return Err(CANCEL_TASK.into())}let c=&result.state.classification;let recommended=i32::from(c.category==1&&alpha==1);settings.category=c.category;settings.quality=c.quality;settings.palette_mode=c.palette_mode;settings.background_mode=recommended;settings.background=[1.0,1.0,1.0,recommended as f32];let mut selection=AutomaticSelection{settings,palette_count:None,recommended_background_mode:recommended};if let Some(cb)=on_stage.as_deref_mut(){cb("classification",&result,&selection)?}
-        if matches!(selection.settings.palette_mode,0|1){let mut controls=Value::Object(selection.settings.to_json());controls["lower"]=json!(2);controls["upper"]=json!(12);let result=self.run_task("palette",&controls,observer.as_mut().map(|o|&mut **o as &mut DocumentObserver))?;let count=self.minimum_palette().ok_or("Automatic palette selection found no eligible candidate.")?;selection.palette_count=Some(count);selection.settings.palette=self.selected_palette(count);if let Some(cb)=on_stage.as_deref_mut(){cb("palette",&result,&selection)?}}
+        if matches!(selection.settings.palette_mode,0|1){let mut controls=Value::Object(selection.settings.to_json());controls["lower"]=json!(2);controls["upper"]=json!(12);let result=self.run_task("palette",&controls,observer.as_mut().map(|o|&mut **o as &mut DocumentObserver))?;let count = self.promote_automatic_two_color_palette(&mut selection.settings)
+                .or_else(|| self.minimum_palette())
+                .ok_or("Automatic palette selection found no eligible candidate.")?;
+            selection.palette_count=Some(count);selection.settings.palette=self.selected_palette(count);if let Some(cb)=on_stage.as_deref_mut(){cb("palette",&result,&selection)?}}
         // Keep the selected palette provenance even if segmentation is interrupted.
         // Current fitted geometry retains its own encoding until segmentation replaces it.
         self.remember_generated_palette(selection.settings.palette_mode,&selection.settings.palette);
@@ -305,7 +327,15 @@ impl ImageDocument{
         if classify{let mut controls=Value::Object(settings.to_json());controls["extension"]=json!(extension);let result=self.run_task("classification",&controls,None)?;if result.state.status==2{return Err(CANCEL_TASK.into())}if let Some(cb)=on_stage.as_deref_mut(){cb("classification",&result,&AutomaticSelection{settings:settings.clone(),palette_count:None,recommended_background_mode:0})?}}
         let c=&self.state.classification;if classify&&requested.category==3{settings.category=c.category}if classify&&requested.quality==3{settings.quality=c.quality}if classify&&requested.palette_mode==3{settings.palette_mode=c.palette_mode}let recommended=i32::from(settings.category==1&&alpha==1);if !requested.advanced&&requested.background_mode==3{settings.background_mode=recommended;settings.background=[1.0,1.0,1.0,recommended as f32]}
         let mut selection=AutomaticSelection{settings,palette_count:None,recommended_background_mode:recommended};
-        if if requested.advanced{requested.palette_mode==1}else{requested.palette_mode!=2}{let mut controls=Value::Object(selection.settings.to_json());controls["lower"]=json!(if requested.advanced{requested.color_count}else{2});controls["upper"]=json!(if requested.advanced{requested.color_count}else{12});let result=self.run_task("palette",&controls,observer.as_mut().map(|o|&mut **o as &mut DocumentObserver))?;if let Some(cb)=on_stage.as_deref_mut(){cb("palette",&result,&selection)?}let count=if requested.advanced{Some(requested.color_count as usize)}else if selection.settings.palette_mode==0{Some(2)}else if requested.palette_mode==1&&requested.color_count!=0{Some(requested.color_count as usize)}else{self.minimum_palette()}.ok_or("Batch palette selection found no eligible candidate.")?;selection.palette_count=Some(count);selection.settings.palette=self.selected_palette(count);self.remember_generated_palette(selection.settings.palette_mode,&selection.settings.palette)}
+        if if requested.advanced{requested.palette_mode==1}else{requested.palette_mode!=2}{let mut controls=Value::Object(selection.settings.to_json());controls["lower"]=json!(if requested.advanced{requested.color_count}else{2});controls["upper"]=json!(if requested.advanced{requested.color_count}else{12});let result=self.run_task("palette",&controls,observer.as_mut().map(|o|&mut **o as &mut DocumentObserver))?;if let Some(cb)=on_stage.as_deref_mut(){cb("palette",&result,&selection)?}let count=if requested.advanced{Some(requested.color_count as usize)}else if selection.settings.palette_mode == 0 {
+            if requested.palette_mode == 3 && requested.color_count == 0
+                && let Some(count) = self.promote_automatic_two_color_palette(&mut selection.settings)
+            {
+                Some(count)
+            } else {
+                Some(2)
+            }
+        } else if requested.palette_mode==1&&requested.color_count!=0{Some(requested.color_count as usize)}else{self.minimum_palette()}.ok_or("Batch palette selection found no eligible candidate.")?;selection.palette_count=Some(count);selection.settings.palette=self.selected_palette(count);self.remember_generated_palette(selection.settings.palette_mode,&selection.settings.palette)}
         for stage in ["segmentation","smoothing","fitting"]{let result=self.run_task(stage,&Value::Object(selection.settings.to_json()),observer.as_mut().map(|o|&mut **o as &mut DocumentObserver))?;if result.state.status==2{return Err(CANCEL_TASK.into())}if let Some(cb)=on_stage.as_deref_mut(){cb(stage,&result,&selection)?}}
         Ok(AutomaticResult{settings:selection.settings,palette_count:selection.palette_count,source_alpha_type:alpha,recommended_background_mode:recommended,state:self.snapshot()})
     }

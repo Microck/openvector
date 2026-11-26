@@ -152,9 +152,9 @@
     "dimensions": "Positive signed int32 integers. Output width and height must either both be supplied or both omitted. Header dimensions are pt; source viewBox and coordinates remain unchanged.",
     "geometry": "Completed fitContours graph. Validate finite coordinates, byte BGRA colors, parent and contour references, initialized cubic slots and edge references once at boundary. Preserve read-only caller storage; do not synthesize missing topology.",
     "visibility": "hiddenRegions lists existing nonnegative region IDs. Duplicate IDs are idempotent. An empty list keeps every accepted region visible. Convert once to original hidden-bit layout internally.",
-    "output": "Exact SVG UTF-8 string including native CRLF bytes. No timestamps or random draws.",
+    "output": "SVG UTF-8 including CRLF. Cutout layouts without thin strokes use the colors of the enclosed boundary behind holes whose children and all descendants are visible and opaque, to reduce antialiasing seams. Backing is emitted before the regular artwork, with the same fitted hole boundary. No timestamps or random draws.",
     "cli": "openvector export-svg <document.json|->. Same input as exportSvg, raw SVG to stdout, diagnostics to stderr, exit 0 on success or 1 on error, no partial SVG. Existing numerical commands retain JSON output.",
-    "verification": "All 17436 native byte strings through public API; both CLI input sources, all three layouts and both stroke options, invalid graph/options produce no stdout. Extend prepared public pipeline through export and compare 15 original SVG files."
+    "verification": "Historical native byte fixtures cover both CLI input sources, all layouts and both stroke options. SVGs with opaque cutout backing intentionally add paths to the original byte stream. Regression coverage checks nested opaque, hidden, and translucent regions. Invalid graph/options produce no stdout."
   },
   "eps_recovery": {
     "status": "Implemented and exact-native-compared; original repeats, complete source suite and fresh offline package pass.",
