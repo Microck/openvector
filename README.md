@@ -4,7 +4,7 @@
     <img src=".github/assets/openvector-logo.png" width="160" height="160" alt="openvector logo">
   </picture>
   <h1>openvector</h1>
-  <p>raster-to-vector conversion for the desktop, terminal, and node.js.</p>
+  <p>raster-to-vector conversion in the browser, on the desktop, in the terminal, and in node.js.</p>
   <p>
     <a href="https://github.com/Microck/openvector/releases/latest"><picture><source media="(prefers-color-scheme: dark)" srcset="https://shieldcn.dev/badge/release-0.1.6.svg?variant=secondary&amp;size=xs&amp;logo=false&amp;mode=dark"><img src="https://shieldcn.dev/badge/release-0.1.6.svg?variant=secondary&amp;size=xs&amp;logo=false&amp;mode=light" alt="release 0.1.6"></picture></a>
     <a href="https://www.npmjs.com/package/openvector"><picture><source media="(prefers-color-scheme: dark)" srcset="https://shieldcn.dev/npm/dt/openvector.svg?variant=secondary&amp;size=xs&amp;logo=false&amp;mode=dark"><img src="https://shieldcn.dev/npm/dt/openvector.svg?variant=secondary&amp;size=xs&amp;logo=false&amp;mode=light" alt="npm total downloads"></picture></a>
@@ -16,17 +16,27 @@
 ---
 
 openvector turns png, jpeg, bmp, gif, and tiff images into editable vectors.
-one rust engine powers the native desktop app, cli, and node-api library.
-it runs independently and does not require vector magic or a network service.
+one rust engine powers the web editor, native desktop app, cli, and node-api library.
+tracing always runs on your device: the web editor works in the browser tab and never uploads your images.
 
-[build](docs/building.md) | [cli and node api](docs/usage.md) | [changelog](CHANGELOG.md) | [verification](docs/verification.md) | [release runbook](docs/release-runbook.md)
+[web editor](https://openvector.app/editor/) | [build](docs/building.md) | [cli and node api](docs/usage.md) | [changelog](CHANGELOG.md) | [verification](docs/verification.md) | [release runbook](docs/release-runbook.md)
 
 ## what it does
 
 - automatic tracing, manual palettes, segmentation editing, and background removal.
 - svg, pdf, eps, ai, dxf, and emf export, plus rasterized png, jpeg, bmp, and tiff output.
 - batch conversion, saved advanced profiles, and recent basic settings.
-- a native gpui desktop interface, with the same engine available to scripts.
+- a native gpui desktop interface, also available in the browser, with the same engine available to scripts.
+
+## use it in the browser
+
+open [openvector.app/editor](https://openvector.app/editor/). there is nothing to install and no account.
+
+it is the same gpui editor as the desktop app, compiled to webassembly. images stay in the
+tab's memory and are never uploaded; exports download straight to your device. the editor
+needs webgl2 and a browser with shared webassembly memory.
+
+to build or self-host it, see [web/README.md](web/README.md).
 
 ## download
 
@@ -159,6 +169,7 @@ the broader checks and their private fixture corpus.
 | `rust/crates/openvector-gui` | native desktop app |
 | `rust/crates/openvector-cli` | cli |
 | `rust/crates/openvector-node`, `npm/` | node-api binding and public declarations |
+| `web/` | browser build of the editor, landing page, and hosting config |
 | `src/`, `gui/` | development reference implementation, models, and HTTP test host |
 | `test/`, `docs/` | tests, fixtures, usage guides, and behavioral contracts |
 
