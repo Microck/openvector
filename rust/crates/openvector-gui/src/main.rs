@@ -24,6 +24,8 @@ fn main() {
         if let Err(error) = openvector_gui::assets::register_fonts(cx) {
             eprintln!("Cannot load bundled fonts: {error}"); std::process::exit(1);
         }
+        #[cfg(target_os = "macos")]
+        openvector_gui::app::install_app_menu(cx);
         let bounds = Bounds::centered(None, size(px(1180.0), px(760.0)), cx);
         let window = cx.open_window(WindowOptions {
             window_bounds: Some(WindowBounds::Windowed(bounds)),

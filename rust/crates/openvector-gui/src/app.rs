@@ -9,6 +9,19 @@ use workflows::{Form, WorkflowAction, Workflows};
 #[path = "app-drag-result.rs"]
 mod drag_result;
 
+gpui::actions!(openvector, [Quit]);
+
+/// Binds Cmd+Q to Quit and installs the app menu that macOS shows its Quit
+/// item in. GPUI ships no default Quit, so without this Cmd+Q does nothing
+/// (issue #48). main.rs installs it on macOS only: "cmd" is GPUI's platform
+/// key, Super elsewhere, and Super+Q must not quit there. Closing the last
+/// window quits on every platform.
+pub fn install_app_menu(cx: &mut App) {
+    cx.on_action(|_: &Quit, cx| cx.quit());
+    cx.bind_keys([gpui::KeyBinding::new("cmd-q", Quit, None)]);
+    cx.set_menus([gpui::Menu::new("OpenVector").items([gpui::MenuItem::action("Quit OpenVector", Quit)])]);
+}
+
 #[derive(Clone)]
 enum Action {
     Open, PasteImage, ConfirmPaste(Arc<Vec<u8>>), Batch, BatchAdd, BatchRemove(usize), BatchStart, BatchFolder, BatchAutoColors,
