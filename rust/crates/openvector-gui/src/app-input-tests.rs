@@ -420,3 +420,21 @@ fn comparison_keys_release_when_the_window_deactivates(cx: &mut gpui::TestAppCon
         visual.run_until_parked();
     }
 }
+
+// Issue #48: Cmd+Q from the app window reaches the Quit action, and the macOS
+// app menu lists it. The counter runs before the real handler and passes the
+// action on, so the real Quit handler still runs (the test platform's quit is a no-op).
+#[gpui::test]
+fn cmd_q_dispatches_quit(cx: &mut gpui::TestAppContext) {
+    let directory = Directory::new();
+    cx.update(install_app_menu);
+    let quits = std::rc::Rc::new(std::cell::Cell::new(0));
+    let counted = quits.clone();
+    cx.update(|cx| { cx.on_action(move |_: &Quit, cx| { counted.set(counted.get() + 1); cx.propagate(); }); });
+    let (app, visual) = cx.add_window_view(|_, cx| OpenVectorApp::with_preferences(directory.0.join("gui.json"), cx).unwrap());
+    app.update_in(visual, |app, window, cx| app.focus.focus(window, cx));
+    visual.simulate_keystrokes("cmd-q");
+    assert_eq!(quits.get(), 1);
+    let menus = visual.update(|_, cx| cx.get_menus()).unwrap();
+    assert!(matches!(&menus[0].items[0], gpui::OwnedMenuItem::Action { name, .. } if name == "Quit OpenVector"));
+}
