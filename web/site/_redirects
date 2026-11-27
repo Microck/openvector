@@ -1,0 +1,2 @@
+# The editor briefly lived at /app/ after launch; keep old links working.
+/app/* /editor/:splat 301

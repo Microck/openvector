@@ -249,7 +249,13 @@
   #cli .frame--split { position: relative; overflow: hidden; aspect-ratio: auto; height: 640px; }
   @media (max-width: 1023px) { #cli .frame--split { height: 520px; } }
   @media (max-width: 639px) { #cli .frame--split { height: 440px; } .shell { inset: 16px 0 0 16px; font-size: 12px; white-space: pre-wrap; } }
+  .ad-slot { padding-block: 32px; }
+  .ad-slot__label { margin: 0 0 8px; font-size: 12px; color: #8b8d93; text-align: center; }
+  /* Hide the whole slot when Google has no ad for it (including before approval), so no empty box or label shows. */
+  .ad-slot:has(ins[data-ad-status="unfilled"]) { display: none; }
 </style>
+<!-- Google AdSense loads on the landing page only; the editor is cross-origin isolated (see web/README.md). -->
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1182866151080746" crossorigin="anonymous"></script>
 </head>
 <body>
 <!-- type: software
@@ -461,6 +467,15 @@ Done processing images.</div>
       </div>
     </div>
   </section>
+
+  <!-- AdSense display unit "landing-display". It sits between content sections, away from the editor buttons. -->
+  <aside class="ad-slot" aria-label="Advertisement">
+    <div class="wrap">
+      <p class="ad-slot__label">Advertisement</p>
+      <ins class="adsbygoogle" style="display:block" data-ad-client="ca-pub-1182866151080746" data-ad-slot="1491555265" data-ad-format="auto" data-full-width-responsive="true"></ins>
+      <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+    </div>
+  </aside>
 
   <section class="section" id="faq" aria-labelledby="faq-h">
     <div class="wrap">

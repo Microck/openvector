@@ -33,7 +33,7 @@ must use equivalent display metrics. EPS includes the local creation time.
 ## Deploy
 
 The static landing page in `site/` is served at `/`, the editor at `/editor/`,
-and the notices at `/licenses/`. If the domain changes, update the canonical
+and the notices at `/licenses/`. On Cloudflare Pages, `site/_redirects` sends the launch-era `/app/` paths to `/editor/`. If the domain changes, update the canonical
 URL, social tags and structured data in the landing page along with
 `llms.txt`, `robots.txt` and `sitemap.xml`.
 
@@ -79,3 +79,6 @@ interaction.
 Network ads belong on the landing page, which is not cross-origin isolated.
 Only `/editor/` sends the isolation headers, so ad scripts and frames load on `/`.
 Keep provider JavaScript out of the editor.
+The landing page loads Google AdSense (`ca-pub-1182866151080746`), and `site/ads.txt` authorizes it.
+Its one display unit (`landing-display`, slot `1491555265`) sits between the CLI and Questions sections and hides itself when unfilled.
+Google's consent message (AdSense Privacy & messaging) covers visitors in the EEA, the UK and Switzerland.
