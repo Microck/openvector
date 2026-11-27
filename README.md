@@ -6,7 +6,7 @@
   <h1>openvector</h1>
   <p>raster-to-vector conversion in the browser, on the desktop, in the terminal, and in node.js.</p>
   <p>
-    <a href="https://github.com/Microck/openvector/releases/latest"><picture><source media="(prefers-color-scheme: dark)" srcset="https://shieldcn.dev/badge/release-0.1.6.svg?variant=secondary&amp;size=xs&amp;logo=false&amp;mode=dark"><img src="https://shieldcn.dev/badge/release-0.1.6.svg?variant=secondary&amp;size=xs&amp;logo=false&amp;mode=light" alt="release 0.1.6"></picture></a>
+    <a href="https://github.com/Microck/openvector/releases/latest"><picture><source media="(prefers-color-scheme: dark)" srcset="https://shieldcn.dev/badge/release-0.1.7.svg?variant=secondary&amp;size=xs&amp;logo=false&amp;mode=dark"><img src="https://shieldcn.dev/badge/release-0.1.7.svg?variant=secondary&amp;size=xs&amp;logo=false&amp;mode=light" alt="release 0.1.7"></picture></a>
     <a href="https://www.npmjs.com/package/openvector"><picture><source media="(prefers-color-scheme: dark)" srcset="https://shieldcn.dev/npm/dt/openvector.svg?variant=secondary&amp;size=xs&amp;logo=false&amp;mode=dark"><img src="https://shieldcn.dev/npm/dt/openvector.svg?variant=secondary&amp;size=xs&amp;logo=false&amp;mode=light" alt="npm total downloads"></picture></a>
     <a href="https://github.com/Microck/openvector/actions/workflows/source.yml"><picture><source media="(prefers-color-scheme: dark)" srcset="https://shieldcn.dev/github/ci/Microck/openvector.svg?workflow=source.yml&amp;branch=main&amp;variant=secondary&amp;size=xs&amp;logo=false&amp;mode=dark"><img src="https://shieldcn.dev/github/ci/Microck/openvector.svg?workflow=source.yml&amp;branch=main&amp;variant=secondary&amp;size=xs&amp;logo=false&amp;mode=light" alt="source ci status"></picture></a>
     <a href="LICENSE"><picture><source media="(prefers-color-scheme: dark)" srcset="https://shieldcn.dev/badge/license-MIT.svg?variant=secondary&amp;size=xs&amp;logo=false&amp;mode=dark"><img src="https://shieldcn.dev/badge/license-MIT.svg?variant=secondary&amp;size=xs&amp;logo=false&amp;mode=light" alt="MIT license"></picture></a>
@@ -43,18 +43,18 @@ to build or self-host it, see [web/README.md](web/README.md).
 download the desktop app from [github releases](https://github.com/Microck/openvector/releases/latest).
 each package includes its third-party notices.
 
-### v0.1.6
+### v0.1.7
 
 | platform | package | run |
 | --- | --- | --- |
-| macos, apple silicon | [dmg](https://github.com/Microck/openvector/releases/download/v0.1.6/openvector-0.1.6-macos-arm64.dmg) | open the disk image and drag OpenVector to Applications |
-| macos, intel | [dmg](https://github.com/Microck/openvector/releases/download/v0.1.6/openvector-0.1.6-macos-x64.dmg) | open the disk image and drag OpenVector to Applications |
-| linux, amd64 | [AppImage](https://github.com/Microck/openvector/releases/download/v0.1.6/openvector-0.1.6-linux-amd64.AppImage), [Flatpak](https://github.com/Microck/openvector/releases/download/v0.1.6/openvector-0.1.6-linux-amd64.flatpak), or [tar.gz](https://github.com/Microck/openvector/releases/download/v0.1.6/openvector-0.1.6-linux-amd64.tar.gz) | see the Linux instructions below |
-| linux, arm64 | [AppImage](https://github.com/Microck/openvector/releases/download/v0.1.6/openvector-0.1.6-linux-arm64.AppImage), [Flatpak](https://github.com/Microck/openvector/releases/download/v0.1.6/openvector-0.1.6-linux-arm64.flatpak), or [tar.gz](https://github.com/Microck/openvector/releases/download/v0.1.6/openvector-0.1.6-linux-arm64.tar.gz) | see the Linux instructions below |
-| windows 10 and 11, x64 | [installer](https://github.com/Microck/openvector/releases/download/v0.1.6/openvector-0.1.6-windows-x64-Setup.exe) or [portable zip](https://github.com/Microck/openvector/releases/download/v0.1.6/openvector-0.1.6-windows-x64-portable.zip) | run the installer, or extract the whole zip and open `openvector-gui.exe` |
+| macos, apple silicon | [dmg](https://github.com/Microck/openvector/releases/download/v0.1.7/openvector-0.1.7-macos-arm64.dmg) | open the disk image and drag OpenVector to Applications |
+| macos, intel | [dmg](https://github.com/Microck/openvector/releases/download/v0.1.7/openvector-0.1.7-macos-x64.dmg) | open the disk image and drag OpenVector to Applications |
+| linux, amd64 | [AppImage](https://github.com/Microck/openvector/releases/download/v0.1.7/openvector-0.1.7-linux-amd64.AppImage), [Flatpak](https://github.com/Microck/openvector/releases/download/v0.1.7/openvector-0.1.7-linux-amd64.flatpak), or [tar.gz](https://github.com/Microck/openvector/releases/download/v0.1.7/openvector-0.1.7-linux-amd64.tar.gz) | see the Linux instructions below |
+| linux, arm64 | [AppImage](https://github.com/Microck/openvector/releases/download/v0.1.7/openvector-0.1.7-linux-arm64.AppImage), [Flatpak](https://github.com/Microck/openvector/releases/download/v0.1.7/openvector-0.1.7-linux-arm64.flatpak), or [tar.gz](https://github.com/Microck/openvector/releases/download/v0.1.7/openvector-0.1.7-linux-arm64.tar.gz) | see the Linux instructions below |
+| windows 10 and 11, x64 | [installer](https://github.com/Microck/openvector/releases/download/v0.1.7/openvector-0.1.7-windows-x64-Setup.exe) or [portable zip](https://github.com/Microck/openvector/releases/download/v0.1.7/openvector-0.1.7-windows-x64-portable.zip) | run the installer, or extract the whole zip and open `openvector-gui.exe` |
 
 on linux, make the AppImage executable and run it, or install the Flatpak with
-`flatpak install --user ./openvector-0.1.6-linux-<arch>.flatpak` and launch it
+`flatpak install --user ./openvector-0.1.7-linux-<arch>.flatpak` and launch it
 with `flatpak run dev.micr.openvector`. use the file chooser in the Flatpak to
 open and save host files. for the tarball, extract it and run the
 `openvector-gui` executable inside.
@@ -70,7 +70,7 @@ wayland remains unverified. the release includes matching source and SHA-256 che
 
 these checks do not establish exact parity or coverage of every input.
 v0.1.2 improves text-field accessibility, but full screen-reader support remains unverified.
-see the [release coverage limits](https://github.com/Microck/openvector/releases/tag/v0.1.6)
+see the [release coverage limits](https://github.com/Microck/openvector/releases/tag/v0.1.7)
 and [verification and known limits](docs/verification.md).
 
 ## install the cli and node library
