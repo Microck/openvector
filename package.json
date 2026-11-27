@@ -1,7 +1,8 @@
 {
   "name": "openvector",
   "version": "0.1.7",
-  "description": "Independent raster-to-vector Rust engine with Node-API bindings and a native CLI.",
+  "description": "Free, open-source raster-to-vector converter. Traces PNG, JPEG, GIF, BMP and TIFF images into SVG, PDF, EPS, AI, DXF and EMF from the CLI or Node.js.",
+  "keywords": ["image-to-svg", "png-to-svg", "raster-to-vector", "vectorize", "image-tracing", "bitmap-tracing", "svg", "dxf", "cli"],
   "type": "module",
   "license": "MIT",
   "engines": {
@@ -76,7 +77,7 @@
     "type": "git",
     "url": "git+https://github.com/Microck/openvector.git"
   },
-  "homepage": "https://github.com/Microck/openvector#readme",
+  "homepage": "https://openvector.app",
   "bugs": {
     "url": "https://github.com/Microck/openvector/issues"
   }

@@ -8,7 +8,7 @@ Key facts:
 - Privacy: images stay in the browser tab's memory and are discarded when the tab closes.
 - Tools: automatic tracing, manual palettes, segmentation editing, background removal, batch conversion (desktop and CLI).
 - Browser requirements: current Chrome, Edge, Firefox or Safari with WebAssembly threads and WebGL2. First visit downloads about 5 MB.
-- Current version: 0.1.5. Author: Microck.
+- Current version: 0.1.7. Author: Microck.
 
 ## Product
 

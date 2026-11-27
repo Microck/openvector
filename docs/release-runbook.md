@@ -17,7 +17,8 @@ packager needs a Git checkout at the build commit, which CI supplies.
 
 1. Choose an unused semantic version. Update `package.json`, `package-lock.json`,
    the workspace version in `rust/Cargo.toml`, and workspace package versions in
-   `rust/Cargo.lock` together.
+   `rust/Cargo.lock` together. Update the site's version too: `softwareVersion`
+   and the version label in `web/site/index.html`, and `web/site/llms.txt`.
 2. Add user-visible changes under `[Unreleased]` in the changelog. Use `Added`,
    `Changed`, `Deprecated`, `Removed`, `Fixed`, or `Security`; omit empty categories.
    Do not turn test, CI, or housekeeping commits into product changes.
