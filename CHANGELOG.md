@@ -6,6 +6,12 @@ Dates are the GitHub release publication dates in UTC.
 
 ## [Unreleased]
 
+## [0.1.7] - 2026-11-27
+
+### Fixed
+
+- Quit OpenVector with Cmd+Q on macOS. The app menu now includes Quit OpenVector.
+
 ## [0.1.6] - 2026-11-26
 
 ### Added
@@ -105,7 +111,8 @@ This initial desktop release did not include macOS downloads or an npm package.
 Its checks did not establish full reference parity or an entirely green strict
 native suite. See the [historical verification report](https://github.com/Microck/openvector/blob/v0.0.0/docs/verification.md).
 
-[Unreleased]: https://github.com/Microck/openvector/compare/v0.1.6...HEAD
+[Unreleased]: https://github.com/Microck/openvector/compare/v0.1.7...HEAD
+[0.1.7]: https://github.com/Microck/openvector/compare/v0.1.6...v0.1.7
 [0.1.6]: https://github.com/Microck/openvector/compare/v0.1.5...v0.1.6
 [0.1.5]: https://github.com/Microck/openvector/compare/v0.1.3...v0.1.5
 [0.1.3]: https://github.com/Microck/openvector/compare/v0.1.2...v0.1.3
