@@ -1,4 +1,4 @@
-"""Compare downloads from the browser editor with native 0.1.5 output."""
+"""Compare downloads from the browser editor with native 0.1.7 output."""
 import argparse
 import hashlib
 import io
@@ -19,15 +19,15 @@ PNG = FIXTURES / "browser-session-logo.png"
 # One native automatic trace of JPEG. EMF uses a 960x960, 254x254 mm
 # reference display. The EPS digest excludes only its variable date value.
 FORMATS = {
-    "ai":  (920, 178, "02f4e54e4d31da3f616cea664664655171f0b8643083151a9519bc13cc764a6a"),
-    "dxf": (1020, 178, "20c2607e3c7cdc6999811a199a71ea1f054c1e6f97eb40f8796431cd07531ee7"),
-    "emf": (1110, 178, "0adb94ab2169937ee4de3d7022d8ff73f5d5371c1d335f036946e97c68dcfea7"),
-    "eps": (920, 214, "98dc0123096120a7fe737bfa237abb496d9f4bbf764b951d0503397777c5a925"),
-    "pdf": (1020, 214, "815e4a3cddc0938ae8cf55420863e114499e372a891f2d78abce3047a896b1ea"),
-    "svg": (1110, 214, "6643db9f0544c9146006fbdfb7a0566bfd46df71fa8f2334a7147c797b9ad0fb"),
+    "ai":  (920, 178, "b2f586b23830e84a9c2fae82a5b4c497fbe0c30355d7a080b5a46db5707956d0"),
+    "dxf": (1020, 178, "690626f453033207cf2da085ab1511901eb637a45fb1c5a246251cd687245540"),
+    "emf": (1110, 178, "dbce4970f86eecd2e5754acc754d5a76cb58de72e52f50dc148b18586a367de9"),
+    "eps": (920, 214, "f92ab63178234ff0babe4e23ba23cdfa1b3c2afbcf54f64cc338c2d71f991853"),
+    "pdf": (1020, 214, "82cbc53b2aad104ab881db0a64725de0d4a54e801b67df702d5e93efacb4cf12"),
+    "svg": (1110, 214, "65bed12b8e6fb512d38d336487b6567745c65363b438d2ed2e7757b4d6f5624b"),
 }
 # Native CoreSession with setSource/runAutomatic on PNG, BMP, then JPEG.
-REUSED_SVG = "ff27db19a2a61c2a75c2a26e29d60be9b0a048b3b0130097dbecf8f9e2d377a9"
+REUSED_SVG = "940b1353b320112ec29b4dfc423f95cc2cd42c8fd4188ae7699e106a0c9c770b"
 BLUE = (47, 111, 236)
 SELECTED = (36, 50, 79)
 
